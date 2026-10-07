@@ -7,7 +7,9 @@ risk: standard              # standard | data-sensitive | regulated
 approved_by:                # regulated only: the owner's name and date, added after review
 depends_on: []              # ticket IDs that must be merged into main first
 needs_erpnext: false        # true takes tmp/erpnext.lock; one holder at a time
-files:                      # every file the ticket may change; globs allowed, no {a,b} braces
+# files globs (gates/glob.go): paths from the repo root; * and ? stay within one segment,
+# ** spans zero or more whole segments, a trailing / means everything under it, no {a,b} braces.
+files:                      # every file the ticket may change
   - internal/example/example.go
   - internal/example/example_test.go
 consumes: []                # interfaces or tables this ticket reads
