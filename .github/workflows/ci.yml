@@ -2,6 +2,8 @@ name: ci
 
 on:
   pull_request:
+    # labeled/unlabeled re-run the gates job when the owner adds `approved`.
+    types: [opened, synchronize, reopened, labeled, unlabeled]
   push:
     branches: [main]
 
@@ -15,9 +17,13 @@ concurrency:
 jobs:
   check:
     name: build, vet, lint, test
+    # A label change re-runs only the gates job.
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -41,8 +47,11 @@ jobs:
     name: integration tests
     runs-on: ubuntu-latest
     needs: check
+    if: github.event.action != 'labeled' && github.event.action != 'unlabeled'
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v7
         with:
           go-version-file: go.mod
@@ -50,3 +59,50 @@ jobs:
       # testcontainers-go starts pgvector/pgvector:pg17 on the runner's Docker (CC-401).
       - name: integration tests
         run: go test -race -count=1 -tags=integration ./...
+
+  gates:
+    name: gates (G1 declared files, protected paths)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: origin/${{ github.base_ref }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: ticket ID from branch name
+        id: ticket
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          # cc-602-bank-rec -> CC-602
+          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p')"
+          if [ -z "$id" ]; then
+            echo "::error::branch '$HEAD_REF' is not named cc-<n>-<slug>"
+            exit 1
+          fi
+          echo "id=$id" >>"$GITHUB_OUTPUT"
+      - name: task graph
+        run: go run ./gates/cmd/graph check tasks/graph.yaml
+      # Also checks the spec's id and pinned files/risk/approved_by, and that
+      # every commit subject in base..HEAD starts with "$TASK:" (the task
+      # comes from $GITHUB_HEAD_REF, which Actions sets on pull_request).
+      - name: declared files, spec pin and commit subjects (G1)
+        env:
+          TASK: ${{ steps.ticket.outputs.id }}
+        run: go run ./gates/cmd/declared --spec "specs/$TASK.md" --base "$BASE"
+      - name: protected paths (G1)
+        if: ${{ !cancelled() }}
+        env:
+          TASK: ${{ steps.ticket.outputs.id }}
+        # Labels are read from the event payload at $GITHUB_EVENT_PATH.
+        run: go run ./gates/cmd/protected --base "$BASE" --task "$TASK"
+      - name: custom analyzers (CC-002)
+        if: ${{ !cancelled() }}
+        run: if [ -d gates/cmd/lint ]; then go run ./gates/cmd/lint ./...; fi
