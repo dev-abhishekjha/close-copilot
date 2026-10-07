@@ -1,0 +1,41 @@
+# golangci-lint v2 configuration (CC-101). CI pins the linter version in
+# .github/workflows/ci.yml; install the same version locally.
+version: "2"
+
+run:
+  timeout: 5m
+  build-tags:
+    - integration
+
+linters:
+  # standard = errcheck, govet, ineffassign, staticcheck, unused
+  default: standard
+  enable:
+    - bodyclose
+    - gosec
+    - noctx
+    - revive
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: true # doc comments on every exported name would be noise this early
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - std-error-handling
+    rules:
+      - path: _test\.go
+        linters:
+          - gosec
+          - noctx
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/abhishekjha/close-copilot

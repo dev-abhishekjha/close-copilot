@@ -1,0 +1,857 @@
+# Static task graph (CC-001). Generated from the Orchestrated Implementation Plan's
+# task tables on 2026-10-07; titles from the Implementation Tickets doc.
+# Status is not stored here: a ticket is done when main has a commit "CC-xxx: ...".
+#
+# owner: subagent in .claude/agents/, or human / orchestrator
+# human_review: the owner reviews the diff before merge (G6); always true for regulated
+# needs_erpnext: takes tmp/erpnext.lock; one holder at a time
+# phase_2_pass: the ticket is widened from suite-skeleton to suite-v1 in Phase 2
+# check: the gate-run acceptance a spec must turn into commands
+
+tasks:
+
+  # ---- Phase 0 ----
+  - id: CC-001
+    title: "Build harness: specs, task graph and merge gates"
+    phase: 0
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "specs/_template.md"
+      - "tasks/**"
+      - "gates/*.go"
+      - ".github/**"
+    check: "go test ./gates/...; a PR touching an undeclared file fails G1"
+  - id: CC-002
+    title: "Custom static analyzers"
+    phase: 0
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "gates/analyzers/**"
+    check: "Analyzer tests flag each forbidden pattern in testdata"
+  - id: CC-101
+    title: "Repo skeleton, tooling and CI"
+    phase: 0
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: []
+    needs_erpnext: false
+    files:
+      - "Makefile"
+      - "mk/*.mk"
+      - ".golangci.yml"
+      - "internal/config/**"
+      - ".env.example"
+    check: "make check green in CI"
+  - id: CC-102
+    title: "ERPNext + India Compliance stack in Docker"
+    phase: 0
+    owner: integration-engineer
+    risk: standard
+    human_review: false
+    depends_on: []
+    needs_erpnext: false
+    files:
+      - "deploy/**"
+      - "docs/setup.md"
+    check: "make up; bench list-apps shows both apps"
+  - id: CC-103
+    title: "Customer discovery: two accountant interviews"
+    phase: 0
+    owner: human
+    risk: standard
+    human_review: true
+    depends_on: []
+    needs_erpnext: false
+    files:
+      - "docs/discovery.md"
+      - "config/rules.yaml"
+    check: "Two summaries, three linked backlog changes"
+  - id: CC-201
+    title: "API users, keys and schema discovery"
+    phase: 0
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-102]
+    needs_erpnext: false
+    files:
+      - "cmd/probe/**"
+      - "docs/erpnext-schema/**"
+    check: "Dumps committed; bot key refused on an admin DocType"
+
+  # ---- Phase 1 ----
+  - id: CC-202
+    title: "Frappe REST client"
+    phase: 1
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-201]
+    needs_erpnext: true
+    files:
+      - "internal/frappe/client*.go"
+      - "internal/frappe/errors.go"
+    check: "Integration: insert, submit, cancel round trip"
+  - id: CC-203
+    title: "Typed models and the money package"
+    phase: 1
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-202]
+    needs_erpnext: false
+    files:
+      - "internal/money/**"
+      - "internal/frappe/models.go"
+      - "internal/frappe/convert.go"
+    check: "Format(12345678) is \"₹1,23,456.78\"; CC-002 analyzer clean"
+  - id: CC-204
+    title: "Trial balance and account history"
+    phase: 1
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-203]
+    needs_erpnext: true
+    files:
+      - "internal/books/reports*.go"
+    check: "Debits equal credits; ties to ERPNext's report"
+  - id: CC-301
+    title: "Company profiles, rules config and GSTIN generator"
+    phase: 1
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "config/companies/**"
+      - "config/rules.yaml"
+      - "internal/seed/profile.go"
+      - "internal/seed/gstin.go"
+    check: "Profiles load; GSTIN check-digit tests"
+  - id: CC-302
+    title: "True-world event generator"
+    phase: 1
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-301]
+    needs_erpnext: false
+    phase_2_pass: true
+    files:
+      - "internal/seed/world.go"
+      - "internal/seed/generate_*.go"
+      - "internal/seed/testdata/**"
+    check: "Golden-file determinism test"
+  - id: CC-303
+    title: "ERPNext master data bootstrap"
+    phase: 1
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-202, CC-301]
+    needs_erpnext: true
+    phase_2_pass: true
+    files:
+      - "internal/seed/bootstrap.go"
+    check: "Second run reports zero changes"
+  - id: CC-304
+    title: "Book writer"
+    phase: 1
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-302, CC-303]
+    needs_erpnext: true
+    phase_2_pass: true
+    files:
+      - "internal/seed/books.go"
+      - "internal/seed/erpmap.go"
+    check: "Counts match the world; resume after kill"
+  - id: CC-305
+    title: "Evidence writers: bank CSV and GSTR-2B"
+    phase: 1
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-302]
+    needs_erpnext: false
+    phase_2_pass: true
+    files:
+      - "internal/seed/bankcsv.go"
+      - "internal/seed/gstr2b.go"
+    check: "Balance and coverage invariants"
+  - id: CC-306
+    title: "Error planter and ground truth"
+    phase: 1
+    owner: domain-data-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-304, CC-305]
+    needs_erpnext: true
+    phase_2_pass: true
+    files:
+      - "internal/seed/plant.go"
+      - "internal/seed/truth.go"
+      - "evals/schema/**"
+    check: "Ground truth validates against its schema; every key resolves"
+  - id: CC-307
+    title: "Suite CLI and reset"
+    phase: 1
+    owner: domain-data-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-306]
+    needs_erpnext: true
+    phase_2_pass: true
+    files:
+      - "cmd/seed/**"
+      - "evals/scenarios/**"
+    check: "Two reset-and-seed runs give identical files"
+  - id: CC-401
+    title: "Postgres migrations and store package"
+    phase: 1
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "migrations/0001-0003*.sql"
+      - "internal/store/**"
+    check: "make migrate twice is a no-op"
+  - id: CC-402
+    title: "Bank statement loader"
+    phase: 1
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-401, CC-305]
+    needs_erpnext: false
+    files:
+      - "cmd/load/**"
+      - "internal/evidence/bank.go"
+    check: "Idempotent reload; balance check"
+  - id: CC-501
+    title: "Shared MCP server scaffold"
+    phase: 1
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "internal/mcpkit/**"
+      - "cmd/mcp-books/main.go"
+      - "cmd/mcp-evidence/main.go"
+    check: "Wrong token gets 401; stdio mode works"
+  - id: CC-502
+    title: "Books server: read-only tools"
+    phase: 1
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-501, CC-204]
+    needs_erpnext: true
+    phase_2_pass: true
+    files:
+      - "internal/books/tools*.go"
+    check: "Tool output equals direct client output"
+  - id: CC-503
+    title: "Evidence server"
+    phase: 1
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-501, CC-402]
+    needs_erpnext: false
+    phase_2_pass: true
+    files:
+      - "internal/evidence/tools.go"
+    check: "Rows match the loaded file"
+  - id: CC-505
+    title: "Contract tests and Gate 1"
+    phase: 1
+    owner: integration-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-502, CC-503]
+    needs_erpnext: false
+    files:
+      - "internal/*/contract_test.go"
+      - "internal/*/testdata/schemas/**"
+    check: "Contract tests green in CI"
+  - id: CC-601
+    title: "Finding model, readers and check runner"
+    phase: 1
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-204, CC-401]
+    needs_erpnext: false
+    files:
+      - "internal/checks/finding.go"
+      - "internal/checks/runner.go"
+      - "internal/checks/readers.go"
+    check: "Parallel fakes; dedupe test"
+  - id: CC-602
+    title: "Bank reconciliation matcher"
+    phase: 1
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601]
+    needs_erpnext: false
+    phase_2_pass: true
+    files:
+      - "internal/checks/bankrec*.go"
+    check: "score --require 'unrecorded_bank_charge.recall>=3/3' on the skeleton suite"
+  - id: CC-701
+    title: "LLM provider interface and Anthropic implementation"
+    phase: 1
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "internal/llm/**"
+      - "config/pricing.yaml"
+    check: "Fake round trip; live test records usage"
+  - id: CC-702
+    title: "MCP client tool registry"
+    phase: 1
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-505, CC-701]
+    needs_erpnext: false
+    files:
+      - "internal/agent/registry.go"
+      - "internal/agent/readers.go"
+    check: "Direct and MCP readers give identical findings"
+  - id: CC-703
+    title: "Close workflow orchestrator"
+    phase: 1
+    owner: llm-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-602, CC-709]
+    needs_erpnext: false
+    files:
+      - "internal/agent/workflow.go"
+      - "cmd/agent/**"
+    check: "Skeleton month ends done with a report"
+  - id: CC-704
+    title: "Explainer"
+    phase: 1
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-703]
+    needs_erpnext: false
+    files:
+      - "internal/agent/explain.go"
+      - "internal/agent/prompts/explain.txt"
+    check: "Every finding explained; malformed output retried once"
+  - id: CC-705
+    title: "Verifier"
+    phase: 1
+    owner: llm-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-704]
+    needs_erpnext: false
+    files:
+      - "internal/agent/verify*.go"
+    check: "All crafted bad outputs rejected; retry loop exercised"
+  - id: CC-709
+    title: "Runtime data plane: steps, artifacts, LLM calls and resume"
+    phase: 1
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-401, CC-702]
+    needs_erpnext: false
+    files:
+      - "migrations/0004_steps.sql"
+      - "internal/store/steps.go"
+      - "internal/store/artifacts.go"
+      - "internal/agent/snapshot.go"
+    check: "Kill a run mid-way; resume finishes with no duplicate steps"
+  - id: CC-901
+    title: "Eval runner"
+    phase: 1
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-307, CC-703]
+    needs_erpnext: false
+    files:
+      - "internal/evals/runner.go"
+      - "cmd/eval/**"
+    check: "Unattended run writes results plus manifest"
+  - id: CC-902
+    title: "Scoring and the results report"
+    phase: 1
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-901, CC-306]
+    needs_erpnext: false
+    files:
+      - "internal/evals/score.go"
+    check: "Unit tests on synthetic truth; score.md produced"
+  - id: CC-905
+    title: "Recorded fixtures and the CI eval gate"
+    phase: 1
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-902]
+    needs_erpnext: false
+    files:
+      - "internal/evals/fixtures.go"
+      - ".github/workflows/eval.yml"
+      - "evals/fixtures/**"
+    check: "A PR that breaks bankrec fails CI with a per-item report"
+
+  # ---- Phase 2 ----
+  - id: CC-403
+    title: "GSTR-2B loader and invoice-number normalisation"
+    phase: 2
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-401, CC-305]
+    needs_erpnext: false
+    files:
+      - "internal/evidence/gstr2b.go"
+      - "internal/evidence/invoiceno.go"
+    check: "Normalisation table tests; idempotent reload"
+  - id: CC-504a
+    title: "Audit decorator on every tool"
+    phase: 2
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-502, CC-401]
+    needs_erpnext: false
+    files:
+      - "internal/mcpkit/audit.go"
+    check: "Every Inspector call appears in audit_log"
+  - id: CC-506
+    title: "Run-scoped tool binding"
+    phase: 2
+    owner: integration-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-502, CC-503]
+    needs_erpnext: false
+    files:
+      - "internal/mcpkit/scope.go"
+      - "internal/books/tools*.go"
+      - "internal/evidence/tools.go"
+    check: "Out-of-scope arguments return a tool error; contract test"
+  - id: CC-603
+    title: "Duplicate vendor payment detector"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601, CC-306]
+    needs_erpnext: false
+    files:
+      - "internal/checks/duplicates.go"
+    check: "duplicate_vendor_payment.recall>=6/6; clean month 0"
+  - id: CC-604
+    title: "GSTR-2B matcher"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601, CC-403]
+    needs_erpnext: false
+    files:
+      - "internal/checks/gstr2b.go"
+    check: "All six planted GSTR-2B errors in the right bucket"
+  - id: CC-605
+    title: "Missing accrual detector"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601, CC-204]
+    needs_erpnext: false
+    files:
+      - "internal/checks/accruals.go"
+    check: "missing_accrual.recall>=6/6"
+  - id: CC-606
+    title: "Policy rules: capitalisation, prepaid and cut-off"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601, CC-301]
+    needs_erpnext: false
+    files:
+      - "internal/checks/rules.go"
+    check: "4/4 for each of the three types"
+  - id: CC-607
+    title: "Variance calculator"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-601, CC-204]
+    needs_erpnext: false
+    files:
+      - "internal/checks/variance.go"
+    check: "Every prepaid case also yields a linked variance"
+  - id: CC-706
+    title: "Exceptions investigator agent"
+    phase: 2
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-702, CC-705, CC-506]
+    needs_erpnext: false
+    files:
+      - "internal/agent/investigate.go"
+      - "internal/agent/prompts/investigate.txt"
+    check: "Registry test: allowlist has no retrieval tool; 0 calls outside it"
+  - id: CC-710
+    title: "Pseudonymise identifiers before LLM calls"
+    phase: 2
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-704]
+    needs_erpnext: false
+    files:
+      - "internal/agent/redact.go"
+    check: "Scan of stored prompt artifacts finds no GSTIN or PAN pattern; restored explanations match"
+  - id: CC-903
+    title: "Faithfulness judge"
+    phase: 2
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-902]
+    needs_erpnext: false
+    files:
+      - "internal/evals/judge.go"
+      - "evals/judge/**"
+    check: "Agreement with your 20 labels reported"
+  - id: CC-904
+    title: "OpenTelemetry tracing into Langfuse"
+    phase: 2
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-703]
+    needs_erpnext: false
+    files:
+      - "internal/telemetry/**"
+    check: "One trace spans agent and both MCP servers; no prompt text in attributes"
+  - id: CC-1103
+    title: "Prompt-injection defences"
+    phase: 2
+    owner: llm-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-704, CC-706]
+    needs_erpnext: false
+    files:
+      - "internal/checks/suspicious.go"
+      - "internal/agent/prompts/**"
+    check: "prompt_injection.recall==4/4; unauthorized writes 0"
+
+  # ---- Phase 3 ----
+  - id: CC-707
+    title: "Ask the books"
+    phase: 3
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-708, CC-806]
+    needs_erpnext: false
+    files:
+      - "internal/agent/ask.go"
+    check: "Answers pass the verifier; citation precision at or above threshold"
+  - id: CC-708
+    title: "Question router: rules, classifier and refusal templates"
+    phase: 3
+    owner: llm-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-703, CC-907]
+    needs_erpnext: false
+    files:
+      - "internal/agent/triage.go"
+      - "internal/agent/prompts/triage.txt"
+    check: "Correct refusal at or above threshold; refused requests make no tool or retrieval call"
+  - id: CC-801
+    title: "Document corpus"
+    phase: 3
+    owner: domain-data-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-301]
+    needs_erpnext: false
+    files:
+      - "corpus/**"
+      - "internal/seed/corpus.go"
+    check: "Thresholds in the policy equal rules.yaml (test)"
+  - id: CC-802
+    title: "TEI and docling-serve clients"
+    phase: 3
+    owner: integration-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-102]
+    needs_erpnext: false
+    files:
+      - "internal/retrieval/tei.go"
+      - "internal/retrieval/docling.go"
+    check: "384-dim embeddings; rerank puts the relevant text first"
+  - id: CC-803
+    title: "Ingestion pipeline"
+    phase: 3
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-801, CC-802, CC-401]
+    needs_erpnext: false
+    files:
+      - "cmd/ingest/**"
+      - "internal/retrieval/chunk.go"
+      - "internal/retrieval/ingest.go"
+    check: "Second ingest writes zero rows"
+  - id: CC-804
+    title: "Hybrid search with RRF and reranking"
+    phase: 3
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-803]
+    needs_erpnext: false
+    files:
+      - "internal/retrieval/search.go"
+    check: "A Sharma query never returns a Mehta chunk; recall@5 reported"
+  - id: CC-805
+    title: "search_documents tool"
+    phase: 3
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-804, CC-503]
+    needs_erpnext: false
+    files:
+      - "internal/evidence/tools.go"
+    check: "Contract test; snippets at most 600 characters"
+  - id: CC-806
+    title: "Citations: retrieve before explaining"
+    phase: 3
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-805, CC-705]
+    needs_erpnext: false
+    files:
+      - "internal/agent/explain.go"
+      - "internal/agent/workflow.go"
+    check: "Citation precision at or above baseline"
+  - id: CC-906
+    title: "Benchmarks: the trade-off write-up"
+    phase: 3
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-905, CC-804, CC-907]
+    needs_erpnext: false
+    files:
+      - "docs/benchmarks.md"
+    check: "Four tables with a decision under each"
+  - id: CC-907
+    title: "Golden sets: retrieval, citations and refusals"
+    phase: 3
+    owner: human
+    drafted_by: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-804]
+    needs_erpnext: false
+    files:
+      - "evals/golden/**"
+    check: "You commit them; schema-valid"
+
+  # ---- Phase 4 ----
+  - id: CC-504b
+    title: "Admin tool: post an approved journal entry"
+    phase: 4
+    owner: integration-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-504a, CC-709]
+    needs_erpnext: true
+    files:
+      - "internal/books/admin.go"
+    check: "Unapproved or self-approved proposals refused; second call doesn't double-post"
+  - id: CC-1001
+    title: "Web app skeleton, login and roles"
+    phase: 4
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-703]
+    needs_erpnext: false
+    files:
+      - "internal/web/server.go"
+      - "internal/web/auth.go"
+      - "internal/web/middleware.go"
+      - "config/users.yaml"
+    check: "Viewer gets 403 on maker routes"
+  - id: CC-1002
+    title: "Close runs: start, progress and findings list"
+    phase: 4
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-1001]
+    needs_erpnext: false
+    files:
+      - "internal/web/runs.go"
+      - "internal/web/templates/runs*.templ"
+    check: "Live progress to the findings list"
+  - id: CC-1003
+    title: "Finding detail page"
+    phase: 4
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-1002]
+    needs_erpnext: false
+    files:
+      - "internal/web/finding.go"
+      - "internal/web/templates/finding.templ"
+    check: "Evidence rows and ERPNext links for every finding type"
+  - id: CC-1004
+    title: "Maker-checker approvals"
+    phase: 4
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-1003, CC-504b]
+    needs_erpnext: true
+    files:
+      - "internal/approvals/**"
+      - "internal/web/approvals.go"
+      - "internal/web/templates/approvals.templ"
+    check: "Asha proposes, Ravi approves, entry posted; self-approval refused"
+  - id: CC-1005
+    title: "Audit log and run metrics pages"
+    phase: 4
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-1004]
+    needs_erpnext: false
+    files:
+      - "internal/web/audit.go"
+      - "internal/web/templates/audit.templ"
+    check: "Every demo action shown with its actor"
+
+  # ---- Phase 5 ----
+  - id: CC-1101
+    title: "Resilience and fault injection"
+    phase: 5
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-905]
+    needs_erpnext: false
+    files:
+      - "internal/frappe/breaker.go"
+      - "internal/faults/**"
+    check: "Precision holds with 10% injected errors"
+  - id: CC-1102
+    title: "API rate limits and security pass"
+    phase: 5
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-1001]
+    needs_erpnext: false
+    files:
+      - "internal/web/ratelimit.go"
+      - "internal/mcpkit/ratelimit.go"
+    check: "429s past the limit, no 5xx; govulncheck and gosec clean"
+  - id: CC-1104
+    title: "Cost and latency optimisation"
+    phase: 5
+    owner: llm-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-904, CC-906]
+    needs_erpnext: false
+    files:
+      - "internal/llm/**"
+      - "internal/agent/**"
+    check: "Cost per run and p95 both drop; Gate 4 still passes"
+  - id: CC-1201
+    title: "Deployment on a VM"
+    phase: 5
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-1104, CC-1004]
+    needs_erpnext: false
+    files:
+      - "deploy/prod/**"
+      - "docs/deploy.md"
+    check: "HTTPS demo; fresh clone reproduces locally"
+  - id: CC-1202
+    title: "README, architecture and decision records"
+    phase: 5
+    owner: orchestrator
+    risk: standard
+    human_review: true
+    depends_on: [CC-1201]
+    needs_erpnext: false
+    files:
+      - "README.md"
+      - "docs/**"
+      - "adr/**"
+    check: "A reader can explain the system from the README"
+  - id: CC-1203
+    title: "Demo video and write-up"
+    phase: 5
+    owner: human
+    risk: standard
+    human_review: true
+    depends_on: [CC-1202]
+    needs_erpnext: false
+    files:
+      - "README.md"
+    check: "Linked from the README"
+  - id: CC-1204
+    title: "Resume bullets and interview preparation"
+    phase: 5
+    owner: human
+    risk: standard
+    human_review: true
+    depends_on: [CC-1203]
+    needs_erpnext: false
+    files: []
+    check: "Every number in the results table explainable without notes"
