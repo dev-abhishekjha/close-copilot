@@ -37,10 +37,22 @@ func TestRunReady(t *testing.T) {
 				r.write("deploy/x.yml", "x\n")
 				r.commit("CC-102: stack")
 				r.git("checkout", "-q", "main")
-				r.git("merge", "-q", "--no-ff", "-m", "Merge cc-102-stack", "cc-102-stack")
+				r.git("merge", "-q", "--no-ff", "-m", "CC-102: merge cc-102-stack", "cc-102-stack")
 			},
 			mutate:   replace("depends_on: [CC-101]", "depends_on: [CC-101, CC-102]"),
 			wantCode: ExitPass,
+		},
+		{
+			name: "dependency committed inside another ticket's merged branch is not done",
+			setup: func(r *testRepo) {
+				r.git("checkout", "-q", "-b", "cc-103-other")
+				r.write("deploy/x.yml", "x\n")
+				r.commit("CC-102: stack")
+				r.git("checkout", "-q", "main")
+				r.git("merge", "-q", "--no-ff", "-m", "CC-103: merge cc-103-other", "cc-103-other")
+			},
+			mutate:   replace("depends_on: [CC-101]", "depends_on: [CC-101, CC-102]"),
+			wantCode: ExitFail, want: []string{"depends_on"},
 		},
 		{
 			name:     "overlap with an in-flight branch",
@@ -208,7 +220,15 @@ func TestInFlightAndDone(t *testing.T) {
 	r.commit("not a ticket branch")
 	r.git("checkout", "-q", "main")
 	r.branchWithSpec("cc-779-done", "CC-779", "internal/baz/**")
-	r.git("merge", "-q", "--no-ff", "-m", "Merge cc-779-done", "cc-779-done")
+	// A commit for another ticket inside the merged branch is not merged
+	// work: only first-parent subjects on main count.
+	r.git("checkout", "-q", "cc-779-done")
+	r.write("internal/baz/wip.go", "package baz\n")
+	r.commit("CC-950: wip")
+	r.git("checkout", "-q", "main")
+	r.git("merge", "-q", "--no-ff", "-m", "CC-779: merge cc-779-done", "cc-779-done")
+	// A tag named like an open branch must not hide the branch.
+	r.git("tag", "cc-777-open", "main")
 	r.write("specs/CC-500.md", validSpec(t))
 	r.write("tmp/current-task", "CC-500\n")
 
@@ -218,7 +238,7 @@ func TestInFlightAndDone(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !done["CC-101"] || !done["CC-779"] || done["CC-777"] || done["CC-780"] || len(done) != 2 {
+	if !done["CC-101"] || !done["CC-779"] || done["CC-777"] || done["CC-780"] || done["CC-950"] || len(done) != 2 {
 		t.Errorf("Done = %v, want CC-101 and CC-779", done)
 	}
 

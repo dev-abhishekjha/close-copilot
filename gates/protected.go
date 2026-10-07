@@ -13,7 +13,10 @@ import (
 const ApprovedLabel = "approved"
 
 // ProtectedPaths need the owner's approval to change (CLAUDE.md, "Protected
-// paths"). .github/CODEOWNERS names the owner on each of them.
+// paths"). .github/CODEOWNERS names the owner on each of them. They are
+// matched case-insensitively: on a case-insensitive checkout (macOS) a
+// committed .CLAUDE/x or claude.md is the same file as .claude/x or
+// CLAUDE.md.
 var ProtectedPaths = []string{
 	"evals/golden/**",
 	"evals/scenarios/**",
@@ -30,12 +33,12 @@ var ProtectedPaths = []string{
 }
 
 // ProtectedChanges returns, for each changed protected file, the first
-// protected pattern it matches.
+// protected pattern it matches, ignoring case.
 func ProtectedChanges(changed []string) (map[string]string, error) {
 	hits := make(map[string]string)
 	for _, f := range changed {
 		for _, p := range ProtectedPaths {
-			ok, err := Match(p, f)
+			ok, err := Match(strings.ToLower(p), strings.ToLower(f))
 			if err != nil {
 				return nil, err
 			}

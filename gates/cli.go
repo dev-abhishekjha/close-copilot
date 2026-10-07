@@ -205,7 +205,13 @@ func RunReady(ctx context.Context, env Env, args []string) int {
 }
 
 // RunDeclared is G1's declared-files check:
-// `declared --spec <spec> [--base main] [--report path]`.
+// `declared --spec <spec> [--base main] [--report path]`. Besides the files
+// themselves it checks that the spec's id matches its file name, that the
+// branch is named for the spec's ticket, that every commit subject on the
+// branch starts with "<ID>:", and that the branch has not changed the
+// spec's files, risk or approved_by against its pinned version (see
+// Repo.PinnedSpec). The branch name comes from $GITHUB_HEAD_REF in CI and
+// from HEAD locally.
 func RunDeclared(ctx context.Context, env Env, args []string) int {
 	c := newCommand(env, "declared", args)
 	specPath := c.fs.String("spec", "", "the ticket's spec, specs/CC-xxx.md (required)")
@@ -230,11 +236,56 @@ func RunDeclared(ctx context.Context, env Env, args []string) int {
 	if err != nil {
 		return c.fail("changed files", err)
 	}
+	// Every later check trusts the id, so a mismatch stops here.
+	if want := SpecID(*specPath); s.ID != want {
+		return c.finish(r, []Problem{{
+			Check:    "id",
+			Message:  fmt.Sprintf("id %q does not match the file name, which implies %q", s.ID, want),
+			Evidence: *specPath + "#id",
+		}}, "")
+	}
 	problems, err := DeclaredProblems(s, changed)
 	if err != nil {
 		return c.fail("declared files", err)
 	}
-	return c.finish(r, problems, fmt.Sprintf("%d changed files, all declared", len(changed)))
+
+	commits, err := repo.BranchCommits(ctx, *c.base)
+	if err != nil {
+		return c.fail("branch commits", err)
+	}
+	branch := env.Getenv("GITHUB_HEAD_REF")
+	if branch == "" {
+		branch = repo.CurrentBranch(ctx)
+	}
+	switch task := TicketFromBranch(branch); task {
+	case s.ID:
+		problems = append(problems, CommitSubjectProblems(task, commits)...)
+	default:
+		problems = append(problems, Problem{
+			Check:    "branch",
+			Message:  fmt.Sprintf("branch %q is not named for %s (want cc-%s-<slug>)", branch, s.ID, strings.ToLower(strings.TrimPrefix(s.ID, "CC-"))),
+			Evidence: "branch " + branch,
+		})
+	}
+
+	data, from, found, err := repo.PinnedSpec(ctx, *c.base, s.ID, commits)
+	if err != nil {
+		return c.fail("pinned spec", err)
+	}
+	switch pinned, perr := ParseSpec(data); {
+	case !found:
+		problems = append(problems, Problem{
+			Check: "spec_pin",
+			Message: fmt.Sprintf("specs/%s.md is not on %s and no commit on the branch has the subject %q, so its files, risk and approved_by are not pinned; commit the spec first as %q",
+				s.ID, *c.base, s.ID+": spec", s.ID+": spec"),
+			Evidence: fmt.Sprintf("git log %s..HEAD --format=%%s", *c.base),
+		})
+	case perr != nil:
+		problems = append(problems, Problem{Check: "spec_pin", Message: fmt.Sprintf("pinned spec %s does not parse: %v", from, perr), Evidence: from})
+	default:
+		problems = append(problems, SpecPinProblems(s, pinned, from)...)
+	}
+	return c.finish(r, problems, fmt.Sprintf("%d changed files, all declared; %d commits; spec pinned at %s", len(changed), len(commits), from))
 }
 
 // RunProtected is G1's protected-path check:
@@ -250,6 +301,11 @@ func RunProtected(ctx context.Context, env Env, args []string) int {
 	}
 	if len(pos) != 0 {
 		return c.usage(errors.New("usage: protected [--base main] [--labels approved]"))
+	}
+	// In CI the owner's approval is a pull request label; a flag on the
+	// command line would let the workflow approve itself.
+	if env.Getenv("GITHUB_ACTIONS") == "true" && *labelsFlag != "" {
+		return c.usage(errors.New("--labels is not accepted in GitHub Actions; labels come from $GITHUB_EVENT_PATH"))
 	}
 	labels := SplitLabels(*labelsFlag)
 	if p := env.Getenv("GITHUB_EVENT_PATH"); p != "" {

@@ -72,12 +72,14 @@ func checkRef(ref string) error {
 }
 
 // Done returns the tickets that have a commit on base whose subject starts
-// with "CC-xxx:".
+// with "CC-xxx:". Only base's first-parent history counts: the commits a
+// --no-ff merge brings in are not themselves merged tickets, so the owner's
+// merge commit on main must carry the subject "CC-xxx: ...".
 func (r Repo) Done(ctx context.Context, base string) (map[string]bool, error) {
 	if err := checkRef(base); err != nil {
 		return nil, err
 	}
-	out, err := r.git(ctx, "log", "--format=%s", base, "--")
+	out, err := r.git(ctx, "log", "--first-parent", "--format=%s", base, "--")
 	if err != nil {
 		return nil, fmt.Errorf("list done tickets: %w", err)
 	}
@@ -130,16 +132,23 @@ func (r Repo) InFlight(ctx context.Context, base string) ([]InFlightTicket, erro
 		}
 	}
 
-	out, err := r.git(ctx, "for-each-ref", "--format=%(refname:short)", "--no-merged="+base, "refs/heads/")
+	// %(refname:short) would print "heads/cc-..." when a tag has the same
+	// name, so take the full ref and strip the prefix; git show gets the full
+	// ref too, so a same-named tag cannot shadow the branch.
+	out, err := r.git(ctx, "for-each-ref", "--format=%(refname)", "--no-merged="+base, "refs/heads/")
 	if err != nil {
 		return nil, fmt.Errorf("list unmerged branches: %w", err)
 	}
-	for branch := range strings.SplitSeq(strings.TrimSpace(string(out)), "\n") {
+	for ref := range strings.SplitSeq(strings.TrimSpace(string(out)), "\n") {
+		branch, ok := strings.CutPrefix(ref, "refs/heads/")
+		if !ok {
+			continue
+		}
 		id := TicketFromBranch(branch)
 		if id == "" {
 			continue
 		}
-		data, err := r.git(ctx, "show", branch+":specs/"+id+".md")
+		data, err := r.git(ctx, "show", ref+":specs/"+id+".md")
 		if err != nil {
 			r.logger().Debug("branch has no spec, skipped", "branch", branch, "ticket", id)
 			continue
@@ -160,8 +169,10 @@ func (r Repo) InFlight(ctx context.Context, base string) ([]InFlightTicket, erro
 }
 
 // ChangedFiles returns the files changed on HEAD against base (three-dot
-// diff), plus uncommitted and untracked files, sorted and without tmp/.
-// Renames count as a deletion and an addition, so both paths are checked.
+// diff), plus uncommitted and untracked files, sorted. Only untracked
+// files under tmp/ (per-build state) are skipped; a committed or staged
+// tmp/ file is a change like any other. Renames count as a deletion and an addition, so both paths
+// are checked.
 func (r Repo) ChangedFiles(ctx context.Context, base string) ([]string, error) {
 	if err := checkRef(base); err != nil {
 		return nil, err
@@ -176,19 +187,23 @@ func (r Repo) ChangedFiles(ctx context.Context, base string) ([]string, error) {
 	}
 	set := make(map[string]bool)
 	for f := range strings.SplitSeq(string(diff), "\x00") {
-		set[f] = true
+		if f != "" {
+			set[f] = true
+		}
 	}
 	// Each status entry is "XY path".
 	for entry := range strings.SplitSeq(string(status), "\x00") {
-		if len(entry) > 3 {
-			set[entry[3:]] = true
+		if len(entry) <= 3 {
+			continue
 		}
+		f := entry[3:]
+		if strings.HasPrefix(entry, "??") && (f == "tmp" || strings.HasPrefix(f, "tmp/")) {
+			continue
+		}
+		set[f] = true
 	}
 	files := make([]string, 0, len(set))
 	for f := range set {
-		if f == "" || f == "tmp" || strings.HasPrefix(f, "tmp/") {
-			continue
-		}
 		files = append(files, f)
 	}
 	slices.Sort(files)
@@ -202,4 +217,86 @@ func (r Repo) ShortCommit(ctx context.Context) string {
 		return ""
 	}
 	return strings.TrimSpace(string(out))
+}
+
+// Commit is one commit on a ticket branch.
+type Commit struct {
+	Hash    string
+	Subject string
+}
+
+// BranchCommits returns the non-merge commits in base..HEAD, oldest first.
+// Merge commits are skipped: in CI, HEAD is GitHub's synthetic merge of the
+// pull request into base.
+func (r Repo) BranchCommits(ctx context.Context, base string) ([]Commit, error) {
+	if err := checkRef(base); err != nil {
+		return nil, err
+	}
+	out, err := r.git(ctx, "log", "--no-merges", "--reverse", "--format=%H%x00%s", base+"..HEAD", "--")
+	if err != nil {
+		return nil, fmt.Errorf("list commits on %s..HEAD: %w", base, err)
+	}
+	var commits []Commit
+	for line := range strings.SplitSeq(strings.TrimSpace(string(out)), "\n") {
+		hash, subject, ok := strings.Cut(line, "\x00")
+		if !ok {
+			continue
+		}
+		commits = append(commits, Commit{Hash: hash, Subject: subject})
+	}
+	return commits, nil
+}
+
+// CurrentBranch returns the branch HEAD points at, or "" when HEAD is
+// detached.
+func (r Repo) CurrentBranch(ctx context.Context) string {
+	out, err := r.git(ctx, "symbolic-ref", "--quiet", "--short", "HEAD")
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(out))
+}
+
+// FileAt returns the content of path at rev, and false when rev has no such
+// file.
+func (r Repo) FileAt(ctx context.Context, rev, path string) ([]byte, bool, error) {
+	if err := checkRef(rev); err != nil {
+		return nil, false, err
+	}
+	if _, err := r.git(ctx, "cat-file", "-e", rev+":"+path); err != nil {
+		// A missing file (or rev) is an answer, not an error.
+		return nil, false, nil
+	}
+	data, err := r.git(ctx, "show", rev+":"+path)
+	if err != nil {
+		return nil, false, fmt.Errorf("read %s at %s: %w", path, rev, err)
+	}
+	return data, true, nil
+}
+
+// PinnedSpec returns the version of specs/<id>.md that a ticket branch may
+// not loosen: the one on base when it exists there, otherwise the one in the
+// branch's first commit whose subject is "<id>: spec". from names the
+// version for messages; found is false when there is neither.
+func (r Repo) PinnedSpec(ctx context.Context, base, id string, commits []Commit) (data []byte, from string, found bool, err error) {
+	path := "specs/" + id + ".md"
+	data, found, err = r.FileAt(ctx, base, path)
+	if err != nil || found {
+		return data, base + ":" + path, found, err
+	}
+	for _, c := range commits {
+		if strings.TrimSpace(c.Subject) != id+": spec" {
+			continue
+		}
+		data, found, err = r.FileAt(ctx, c.Hash, path)
+		return data, shortHash(c.Hash) + ":" + path, found, err
+	}
+	return nil, "", false, nil
+}
+
+func shortHash(h string) string {
+	if len(h) > 12 {
+		return h[:12]
+	}
+	return h
 }
