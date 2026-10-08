@@ -1,0 +1,22 @@
+# Close Copilot's override on top of frappe_docker's compose.yaml (CC-102).
+# generate-compose.sh merges it last; edit this file, not docker-compose.yaml.
+#
+# frappe_docker pins `platform: linux/amd64` on every Frappe service. Our image
+# is built natively (arm64 on Apple Silicon) and never pulled, so the pin would
+# make Docker refuse or emulate it. `!reset` drops the key and lets Docker use
+# the engine's own platform on any machine.
+services:
+  configurator:
+    platform: !reset null
+  backend:
+    platform: !reset null
+  frontend:
+    platform: !reset null
+  websocket:
+    platform: !reset null
+  queue-short:
+    platform: !reset null
+  queue-long:
+    platform: !reset null
+  scheduler:
+    platform: !reset null

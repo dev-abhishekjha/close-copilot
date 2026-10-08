@@ -1,0 +1,3 @@
+[submodule "deploy/frappe_docker"]
+	path = deploy/frappe_docker
+	url = https://github.com/frappe/frappe_docker
