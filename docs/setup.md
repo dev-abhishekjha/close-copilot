@@ -118,7 +118,9 @@ This finishes ERPNext's setup wizard **without demo data**. It runs `bench execu
 | Demo data | none |
 | India Compliance | default GST rate 18%, no company GSTIN, audit trail off |
 
-The script then checks the company's abbreviation, country, currency and fiscal year. It is idempotent: if the wizard is complete and the company exists, it changes nothing.
+The script then checks the company's abbreviation, country, currency and fiscal year. It is idempotent: if the wizard is complete, the company exists and the setting below is already on, it changes nothing.
+
+On every run, also when the wizard was already complete, the script turns on Accounts Settings `delete_linked_ledger_entries` (*Delete Accounting and Stock Ledger Entries on deletion of Transaction*) and reads it back. ERPNext's default is off, and then it refuses to delete a cancelled voucher whose GL entries still exist. Integration tests (CC-202) delete the vouchers they create, and the reset (CC-307) needs the same. This is a local development and demo site; the product itself never deletes ledger entries.
 
 It creates no first user. Log in as `Administrator` with `ERP_ADMIN_PASSWORD`. The audit trail is left off because India Compliance can't turn it off once it's on, and seeding and resets (CC-303, CC-307) may need to delete documents. Master data (GSTIN, addresses, suppliers, more fiscal years) is CC-303's job.
 
