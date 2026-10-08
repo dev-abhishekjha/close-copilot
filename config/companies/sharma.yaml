@@ -1,0 +1,43 @@
+# Sharma Traders Pvt Ltd: a synthetic trading company in Karnataka (29).
+# Shared spec "Company profile" (CC-301). Amounts in _inr fields are whole
+# rupees. Every name and number here is invented; pan is seed.PAN(seed,
+# id, 'C') and supplier PANs and GSTINs derive from seed + supplier id.
+id: sharma
+erp_company: Sharma Traders Pvt Ltd
+abbr: STPL
+state_code: "29"
+pan: ZIACS2610I
+opening_bank_balance_inr: 2500000
+seed: 42
+customers: 40
+sales:
+  invoices_per_month: [150, 250]
+  amount_inr: [2000, 80000]
+  gst_rates: [5, 18]
+  gateway_share: 0.4          # share of sales collected through the payment gateway
+  gateway_fee_pct: 2.0        # plus 18% GST on the fee
+suppliers:
+  # rent
+  - {id: omkar-estates, name: Omkar Estates, kind: rent, monthly_inr: 150000, day: 1, gst_rate: 18, state_code: "29"}
+  - {id: lakeview-warehousing, name: Lakeview Warehousing LLP, kind: rent, monthly_inr: 85000, day: 5, gst_rate: 18, state_code: "29"}
+  # utilities
+  - {id: city-power, name: City Power Co, kind: utility, monthly_inr: [18000, 26000], day: 10, registered: false}
+  - {id: bluenet-broadband, name: BlueNet Broadband, kind: utility, monthly_inr: [3500, 4500], day: 5, gst_rate: 18, state_code: "29"}
+  - {id: vaani-telecom, name: Vaani Telecom Services, kind: utility, monthly_inr: [2500, 4000], day: 12, gst_rate: 18, state_code: "27"}
+  # subscriptions
+  - {id: cloudly, name: Cloudly SaaS, kind: subscription, billing: annual, amount_inr: 120000, renew_month: 9, gst_rate: 18, state_code: "27"}
+  - {id: stockbook-cloud, name: Stockbook Cloud, kind: subscription, billing: monthly, monthly_inr: 4500, day: 3, gst_rate: 18, state_code: "29"}
+  # goods for resale
+  - {id: techkart, name: TechKart Supplies, kind: goods, monthly_inr: [40000, 200000], gst_rate: 18, state_code: "27"}
+  - {id: deccan-textiles, name: Deccan Textile Mills, kind: goods, monthly_inr: [60000, 250000], gst_rate: 5, state_code: "29"}
+  - {id: kaveri-packaging, name: Kaveri Packaging Works, kind: goods, monthly_inr: [15000, 45000], gst_rate: 12, state_code: "29"}
+  - {id: sundaram-steelware, name: Sundaram Steelware, kind: goods, monthly_inr: [30000, 120000], gst_rate: 18, state_code: "33"}
+  - {id: bharat-polymers, name: Bharat Polymers Udyog, kind: goods, monthly_inr: [25000, 90000], gst_rate: 18, state_code: "24"}
+  # services
+  - {id: swift-couriers, name: Swift Couriers, kind: services, monthly_inr: [8000, 20000], gst_rate: 18, state_code: "29"}
+  - {id: ledgerwise-associates, name: Ledgerwise Associates, kind: services, monthly_inr: 25000, day: 25, gst_rate: 18, state_code: "29"}
+  - {id: securewell-guards, name: Securewell Guarding Services, kind: services, monthly_inr: [30000, 36000], day: 28, gst_rate: 18, state_code: "29"}
+  - {id: roadking-logistics, name: RoadKing Logistics, kind: services, monthly_inr: [10000, 40000], gst_rate: 12, state_code: "36"}
+  - {id: quickfix-repairs, name: QuickFix Repairs, kind: services, monthly_inr: [2000, 9000], registered: false}
+payroll: {monthly_inr: 600000, day: last}
+bank: {name: HDFC Bank, account: HDFC Current 0001, monthly_charges_inr: 1000}

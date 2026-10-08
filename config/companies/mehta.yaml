@@ -1,0 +1,44 @@
+# Mehta Tech Services Pvt Ltd: a synthetic IT services company in
+# Maharashtra (27). Shared spec "Company profile" (CC-301). Amounts in _inr
+# fields are whole rupees. Every name and number here is invented; pan is
+# seed.PAN(seed, id, 'C') and supplier PANs and GSTINs derive from seed +
+# supplier id.
+id: mehta
+erp_company: Mehta Tech Services Pvt Ltd
+abbr: MTSPL
+state_code: "27"
+pan: KTQCM9505P
+opening_bank_balance_inr: 4000000
+seed: 1729
+customers: 25
+sales:
+  invoices_per_month: [20, 40]
+  amount_inr: [50000, 500000]
+  gst_rates: [18]
+  gateway_share: 0.1          # share of sales collected through the payment gateway
+  gateway_fee_pct: 2.0        # plus 18% GST on the fee
+suppliers:
+  # rent
+  - {id: lotus-business-parks, name: Lotus Business Parks, kind: rent, monthly_inr: 220000, day: 1, gst_rate: 18, state_code: "27"}
+  # utilities
+  - {id: sahyadri-power, name: Sahyadri Power Distribution, kind: utility, monthly_inr: [30000, 45000], day: 8, registered: false}
+  - {id: fibrelink-networks, name: FibreLink Networks, kind: utility, monthly_inr: [12000, 15000], day: 5, gst_rate: 18, state_code: "27"}
+  - {id: konkan-mobile, name: Konkan Mobile Services, kind: utility, monthly_inr: [6000, 9000], day: 14, gst_rate: 18, state_code: "29"}
+  # subscriptions
+  - {id: hostmesa-cloud, name: Hostmesa Cloud, kind: subscription, monthly_inr: [80000, 140000], day: 2, gst_rate: 18, state_code: "29"}
+  - {id: codeforge-licences, name: Codeforge Licences, kind: subscription, billing: annual, amount_inr: 360000, renew_month: 4, gst_rate: 18, state_code: "07"}
+  - {id: designdeck-software, name: DesignDeck Software, kind: subscription, billing: annual, amount_inr: 96000, renew_month: 11, gst_rate: 18, state_code: "33"}
+  - {id: securemail-suite, name: SecureMail Suite, kind: subscription, monthly_inr: 18000, day: 3, gst_rate: 18, state_code: "27"}
+  # goods
+  - {id: nexa-computers, name: Nexa Computers, kind: goods, monthly_inr: [50000, 300000], gst_rate: 18, state_code: "27"}
+  - {id: orbit-peripherals, name: Orbit Peripherals, kind: goods, monthly_inr: [8000, 40000], gst_rate: 18, state_code: "24"}
+  - {id: paperline-stationers, name: Paperline Stationers, kind: goods, monthly_inr: [3000, 9000], gst_rate: 12, state_code: "27"}
+  # services
+  - {id: talentbridge-staffing, name: TalentBridge Staffing, kind: services, monthly_inr: [150000, 250000], gst_rate: 18, state_code: "27"}
+  - {id: ledgerline-advisors, name: Ledgerline Advisors, kind: services, monthly_inr: 40000, day: 25, gst_rate: 18, state_code: "27"}
+  - {id: bluepeak-consulting, name: Bluepeak Consulting, kind: services, monthly_inr: [60000, 180000], gst_rate: 18, state_code: "29"}
+  - {id: cleanspace-facility, name: Cleanspace Facility Services, kind: services, monthly_inr: [25000, 28000], day: 28, gst_rate: 18, state_code: "27"}
+  - {id: swiftmove-cabs, name: Swiftmove Cabs, kind: services, monthly_inr: [10000, 30000], gst_rate: 5, state_code: "27"}
+  - {id: tiffin-corner, name: Tiffin Corner Caterers, kind: services, monthly_inr: [5000, 15000], registered: false}
+payroll: {monthly_inr: 2400000, day: last}
+bank: {name: ICICI Bank, account: ICICI Current 0002, monthly_charges_inr: 1500}

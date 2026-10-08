@@ -1,0 +1,21 @@
+# Policy thresholds for the deterministic checks (shared spec "Rules",
+# CC-301). Amounts in _inr fields are whole rupees; the GSTR-2B tolerance is
+# in paise. Loaded and validated by seed.LoadRules.
+capitalisation:
+  threshold_inr: 50000
+  asset_keywords: [laptop, printer, server, furniture, air conditioner]
+  watched_expense_accounts: ["Repairs and Maintenance"]
+prepaid:
+  min_amount_inr: 50000
+  keywords: [annual, yearly, "12 months", renewal]
+variance:
+  pct_threshold: 25
+  abs_threshold_inr: 50000
+bank_match:
+  date_window_days: 3
+gstr2b:
+  amount_tolerance_paise: 100
+accruals:
+  lookback_months: 4
+  min_occurrences: 3
+  amount_band_pct: 20
