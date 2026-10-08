@@ -20,6 +20,7 @@ func TestNoERPImport(t *testing.T) {
 	}{
 		{"frappe import in internal/agent, test file included", []string{"internal/agent"}},
 		{"agent subpackage through MCP is clean", []string{"internal/agent/mcp"}},
+		{"internal/agent_test dir stays in scope", []string{"internal/agent_test"}},
 		{"internal/agentx is out of scope", []string{"internal/agentx"}},
 	}
 	for _, tt := range tests {

@@ -182,6 +182,49 @@ func TestTimeout(t *testing.T) {
 	}
 }
 
+// TestIgnoresProxyEnv checks that a proxy from the environment, which is
+// not on the allowlist, never receives traffic. The target is a
+// non-loopback allowlisted host, which ProxyFromEnvironment would send
+// through the proxy. Nothing is dialled: the test inspects the transport.
+func TestIgnoresProxyEnv(t *testing.T) {
+	tests := []struct {
+		name, env, proxy, target string
+	}{
+		{"http proxy, http target", "HTTP_PROXY", "http://attacker.example:8080", "http://erpnext:8000/api/method/ping"},
+		{"https proxy, https target", "HTTPS_PROXY", "http://attacker.example:8080", "https://api.anthropic.com/v1/messages"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv(tt.env, tt.proxy)
+			t.Setenv("NO_PROXY", "")
+			c, err := New(config.Config{ERPBaseURL: "http://erpnext:8000"})
+			if err != nil {
+				t.Fatal(err)
+			}
+			g, ok := c.Transport.(*guard)
+			if !ok {
+				t.Fatalf("Transport is %T, want *guard", c.Transport)
+			}
+			tr, ok := g.base.(*http.Transport)
+			if !ok {
+				t.Fatalf("guard base is %T, want *http.Transport", g.base)
+			}
+			if tr.Proxy == nil {
+				return
+			}
+			// Any proxy function is a failure. ProxyFromEnvironment caches
+			// the environment once per process, so also show where it
+			// would send the request when that is already visible.
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, tt.target, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+			u, err := tr.Proxy(req)
+			t.Errorf("transport has a proxy function (for %s it returns %v, %v); want none", tt.target, u, err)
+		})
+	}
+}
+
 func TestTimeoutApplies(t *testing.T) {
 	block := make(chan struct{})
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

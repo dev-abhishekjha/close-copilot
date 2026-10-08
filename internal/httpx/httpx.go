@@ -47,7 +47,8 @@ func WithTimeout(d time.Duration) Option {
 // plus api.anthropic.com. Unset URLs are skipped. A host is compared with
 // its port (the scheme's default when absent), so two services on
 // localhost stay distinct. Redirects pass through the same transport, so a
-// redirect to a refused host fails.
+// redirect to a refused host fails. HTTP_PROXY, HTTPS_PROXY and NO_PROXY
+// are ignored: the transport always dials the allowed host directly.
 //
 // New fails if a configured URL can't be parsed or has no host.
 func New(cfg config.Config, opts ...Option) (*http.Client, error) {
@@ -65,9 +66,14 @@ func New(cfg config.Config, opts ...Option) (*http.Client, error) {
 	if !ok {
 		return nil, errors.New("httpx: http.DefaultTransport is not an *http.Transport")
 	}
+	tr := base.Clone()
+	// The clone inherits http.ProxyFromEnvironment. A proxy would receive
+	// every request (and, over plain http, its credentials) although its
+	// host is not on the allowlist, so never use one.
+	tr.Proxy = nil
 	return &http.Client{
 		Timeout:   o.timeout,
-		Transport: &guard{base: base.Clone(), allowed: allowed},
+		Transport: &guard{base: tr, allowed: allowed},
 	}, nil
 }
 

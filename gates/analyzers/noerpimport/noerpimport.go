@@ -26,7 +26,8 @@ would test a path production never takes.`,
 }
 
 func run(pass *analysis.Pass) (any, error) {
-	if !scope.In(pass.Pkg.Path(), "internal/agent") {
+	// InTested: an external test package (internal/agent_test) is in scope too.
+	if !scope.InTested(pass.Pkg.Path(), "internal/agent") {
 		return nil, nil
 	}
 	for _, f := range pass.Files {
