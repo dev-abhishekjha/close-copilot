@@ -36,8 +36,9 @@ vet: ## go vet
 	$(GO) vet $(PKGS)
 
 .PHONY: lint
-lint: ## golangci-lint (install: https://golangci-lint.run/welcome/install/)
+lint: ## golangci-lint (install: https://golangci-lint.run/welcome/install/), then the CC-002 analyzers
 	golangci-lint run
+	$(GO) run ./gates/cmd/lint $(PKGS)
 
 .PHONY: test
 test: ## Unit tests with the race detector

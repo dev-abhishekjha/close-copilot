@@ -27,5 +27,4 @@ import (
 	_ "go.yaml.in/yaml/v3"                                              // CC-301: profiles, rules, suites
 	_ "golang.org/x/crypto/bcrypt"                                      // CC-1001: password hashes in config/users.yaml
 	_ "golang.org/x/time/rate"                                          // CC-1102: per-user rate limits
-	_ "golang.org/x/tools/go/analysis"                                  // CC-002: custom static analyzers
 )
