@@ -1,0 +1,68 @@
+{
+  "name": "Purchase Invoice",
+  "module": "Accounts",
+  "istable": 0,
+  "is_submittable": 1,
+  "fields": [
+    {
+      "fieldname": "bill_no",
+      "fieldtype": "Data",
+      "label": "Supplier Invoice No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_6",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "place_of_supply",
+      "fieldtype": "Autocomplete",
+      "label": "Place of Supply",
+      "options": "01-Jammu and Kashmir\n02-Himachal Pradesh",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "supplier",
+      "fieldtype": "Link",
+      "label": "Supplier",
+      "options": "Supplier",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_gstin",
+      "fieldtype": "Data",
+      "label": "Supplier GSTIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "taxes",
+      "fieldtype": "Table",
+      "label": "Purchase Taxes and Charges",
+      "options": "Purchase Taxes and Charges",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

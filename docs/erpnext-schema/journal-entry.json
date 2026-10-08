@@ -1,0 +1,608 @@
+{
+  "name": "Journal Entry",
+  "module": "Accounts",
+  "istable": 0,
+  "is_submittable": 1,
+  "fields": [
+    {
+      "fieldname": "2_add_edit_gl_entries",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "fa fa-table",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "accounts",
+      "fieldtype": "Table",
+      "label": "Accounting Entries",
+      "options": "Journal Entry Account",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "addtional_info",
+      "fieldtype": "Section Break",
+      "label": "More Information",
+      "options": "fa fa-file-text",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "amended_from",
+      "fieldtype": "Link",
+      "label": "Amended From",
+      "options": "Journal Entry",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "apply_tds",
+      "fieldtype": "Check",
+      "label": "Apply Tax Withholding Amount ",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_repeat",
+      "fieldtype": "Link",
+      "label": "Auto Repeat",
+      "options": "Auto Repeat",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bill_date",
+      "fieldtype": "Date",
+      "label": "Bill Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bill_no",
+      "fieldtype": "Data",
+      "label": "Bill No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cheque_date",
+      "fieldtype": "Date",
+      "label": "Reference Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cheque_no",
+      "fieldtype": "Data",
+      "label": "Reference Number",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "clearance_date",
+      "fieldtype": "Date",
+      "label": "Clearance Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break1",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break3",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break98",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break99",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_30",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_35",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "label": "Company",
+      "options": "Company",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_gstin",
+      "fieldtype": "Autocomplete",
+      "label": "Company GSTIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "difference",
+      "fieldtype": "Currency",
+      "label": "Difference (Dr - Cr)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "due_date",
+      "fieldtype": "Date",
+      "label": "Due Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "entry_type_and_date",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "fa fa-flag",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "finance_book",
+      "fieldtype": "Link",
+      "label": "Finance Book",
+      "options": "Finance Book",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "from_template",
+      "fieldtype": "Link",
+      "label": "From Template",
+      "options": "Journal Entry Template",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "get_balance",
+      "fieldtype": "Button",
+      "label": "Make Difference Entry",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "get_outstanding_invoices",
+      "fieldtype": "Button",
+      "label": "Get Outstanding Invoices",
+      "options": "get_outstanding_invoices",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "ineligibility_reason",
+      "fieldtype": "Select",
+      "label": "Reversal Type",
+      "options": "As per rules 42 & 43 of CGST Rules\nOthers",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "inter_company_journal_entry_reference",
+      "fieldtype": "Link",
+      "label": "Inter Company Journal Entry Reference",
+      "options": "Journal Entry",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_opening",
+      "fieldtype": "Select",
+      "label": "Is Opening",
+      "options": "No\nYes",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_system_generated",
+      "fieldtype": "Check",
+      "label": "Is System Generated",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "letter_head",
+      "fieldtype": "Link",
+      "label": "Letter Head",
+      "options": "Letter Head",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "mode_of_payment",
+      "fieldtype": "Link",
+      "label": "Mode of Payment",
+      "options": "Mode of Payment",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "multi_currency",
+      "fieldtype": "Check",
+      "label": "Multi Currency",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "ACC-JV-.YYYY.-",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "paid_loan",
+      "fieldtype": "Data",
+      "label": "Paid Loan",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "party_not_required",
+      "fieldtype": "Check",
+      "label": "Party Not Required",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "pay_to_recd_from",
+      "fieldtype": "Data",
+      "label": "Pay To / Recd From",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_order",
+      "fieldtype": "Link",
+      "label": "Payment Order",
+      "options": "Payment Order",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "posting_date",
+      "fieldtype": "Date",
+      "label": "Posting Date",
+      "options": "",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "printing_settings",
+      "fieldtype": "Section Break",
+      "label": "Printing Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "process_deferred_accounting",
+      "fieldtype": "Link",
+      "label": "Process Deferred Accounting",
+      "options": "Process Deferred Accounting",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference",
+      "fieldtype": "Section Break",
+      "label": "Reference",
+      "options": "fa fa-pushpin",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "remark",
+      "fieldtype": "Small Text",
+      "label": "Remark",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reversal_of",
+      "fieldtype": "Link",
+      "label": "Reversal Of",
+      "options": "Journal Entry",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break99",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "select_print_heading",
+      "fieldtype": "Link",
+      "label": "Print Heading",
+      "options": "Print Heading",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "stock_entry",
+      "fieldtype": "Link",
+      "label": "Stock Entry",
+      "options": "Stock Entry",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "subscription_section",
+      "fieldtype": "Section Break",
+      "label": "Subscription Section",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_withholding_category",
+      "fieldtype": "Link",
+      "label": "Tax Withholding Category",
+      "options": "Tax Withholding Category",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Title",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "total_amount",
+      "fieldtype": "Currency",
+      "label": "Total Amount",
+      "options": "total_amount_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "total_amount_currency",
+      "fieldtype": "Link",
+      "label": "Total Amount Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "total_amount_in_words",
+      "fieldtype": "Data",
+      "label": "Total Amount in Words",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "total_credit",
+      "fieldtype": "Currency",
+      "label": "Total Credit",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_debit",
+      "fieldtype": "Currency",
+      "label": "Total Debit",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "user_remark",
+      "fieldtype": "Small Text",
+      "label": "User Remark",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "voucher_type",
+      "fieldtype": "Select",
+      "label": "Entry Type",
+      "options": "Journal Entry\nInter Company Journal Entry\nBank Entry\nCash Entry\nCredit Card Entry\nDebit Note\nCredit Note\nContra Entry\nExcise Entry\nWrite Off Entry\nOpening Entry\nDepreciation Entry\nExchange Rate Revaluation\nExchange Gain Or Loss\nDeferred Revenue\nDeferred Expense",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off",
+      "fieldtype": "Section Break",
+      "label": "Write Off",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_amount",
+      "fieldtype": "Currency",
+      "label": "Write Off Amount",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_based_on",
+      "fieldtype": "Select",
+      "label": "Write Off Based On",
+      "options": "Accounts Receivable\nAccounts Payable",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}
