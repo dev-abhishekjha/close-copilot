@@ -24,7 +24,6 @@ import (
 	_ "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp" // CC-904: export to Langfuse
 	_ "go.opentelemetry.io/otel/sdk/trace"                              // CC-904: tracer provider
 	_ "go.opentelemetry.io/otel/trace"                                  // CC-904: span types
-	_ "go.yaml.in/yaml/v3"                                              // CC-301: profiles, rules, suites
 	_ "golang.org/x/crypto/bcrypt"                                      // CC-1001: password hashes in config/users.yaml
 	_ "golang.org/x/time/rate"                                          // CC-1102: per-user rate limits
 )
