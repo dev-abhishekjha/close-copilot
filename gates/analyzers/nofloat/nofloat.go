@@ -45,7 +45,9 @@ the ledger.`,
 }
 
 func run(pass *analysis.Pass) (any, error) {
-	if !scope.In(pass.Pkg.Path(), Packages...) {
+	// InTested widens the scope (a dir such as internal/checks_test is
+	// checked too); it never narrows it.
+	if !scope.InTested(pass.Pkg.Path(), Packages...) {
 		return nil, nil
 	}
 	for _, f := range pass.Files {

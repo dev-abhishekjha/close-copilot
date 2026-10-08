@@ -18,14 +18,16 @@ import (
 // Module is this repository's module path (go.mod). A test keeps it in sync.
 const Module = "github.com/abhishekjha/close-copilot"
 
-// Rel returns path relative to the module root. External test packages
-// (foo_test) and go list test-variant suffixes ("foo [foo.test]") are
-// normalised to the package they test.
+// Rel returns path relative to the module root. A go list test-variant
+// suffix ("foo [foo.test]") is dropped, because that variant compiles the
+// same directory. A trailing _test is kept: a package path ending in _test
+// names another directory (or an external test package, whose files are
+// all *_test.go), so it never inherits the allowances of the package it
+// resembles.
 func Rel(path string) string {
 	if i := strings.Index(path, " ["); i >= 0 {
 		path = path[:i]
 	}
-	path = strings.TrimSuffix(path, "_test")
 	if path == Module {
 		return ""
 	}
@@ -33,14 +35,28 @@ func Rel(path string) string {
 }
 
 // Is reports whether path is exactly the package dir (for example
-// "internal/httpx"), not one of its subpackages.
+// "internal/httpx"), not one of its subpackages. Use it for allowances and
+// exemptions.
 func Is(path, dir string) bool {
 	return Rel(path) == dir
 }
 
 // In reports whether path is one of dirs or a subpackage of one of them.
+// Use it for allowances and exemptions.
 func In(path string, dirs ...string) bool {
-	rel := Rel(path)
+	return within(Rel(path), dirs)
+}
+
+// InTested is In, except that an external test package (foo_test) also
+// counts as the package it tests (foo). Use it only where matching widens
+// a rule's reach (the packages a rule applies to), never for an allowance:
+// there the trailing _test would let an unrelated directory such as
+// internal/approvals_test inherit internal/approvals' exemption.
+func InTested(path string, dirs ...string) bool {
+	return within(strings.TrimSuffix(Rel(path), "_test"), dirs)
+}
+
+func within(rel string, dirs []string) bool {
 	for _, d := range dirs {
 		if rel == d || strings.HasPrefix(rel, d+"/") {
 			return true

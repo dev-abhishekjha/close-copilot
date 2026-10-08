@@ -35,10 +35,13 @@ build: ## Compile every package and the binaries into bin/
 vet: ## go vet
 	$(GO) vet $(PKGS)
 
+# The CC-002 multichecker also checks integration-tagged files, as golangci-lint
+# does (.golangci.yml). Its own -tags flag is deprecated and ignored;
+# go/packages reads build tags from GOFLAGS.
 .PHONY: lint
 lint: ## golangci-lint (install: https://golangci-lint.run/welcome/install/), then the CC-002 analyzers
 	golangci-lint run
-	$(GO) run ./gates/cmd/lint $(PKGS)
+	GOFLAGS="$(GOFLAGS) -tags=integration" $(GO) run ./gates/cmd/lint $(PKGS)
 
 .PHONY: test
 test: ## Unit tests with the race detector

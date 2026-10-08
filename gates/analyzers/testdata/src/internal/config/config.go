@@ -4,6 +4,7 @@ package config
 import "os"
 
 const (
+	EnvERPBaseURL    = "ERP_BASE_URL"
 	EnvMCPTokenAgent = "MCP_TOKEN_AGENT"
 	EnvMCPTokenAdmin = "MCP_TOKEN_ADMIN"
 )
