@@ -1,0 +1,1268 @@
+{
+  "name": "Company",
+  "module": "Setup",
+  "istable": 0,
+  "is_submittable": 0,
+  "fields": [
+    {
+      "fieldname": "abbr",
+      "fieldtype": "Data",
+      "label": "Abbr",
+      "options": "",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "accounts_tab",
+      "fieldtype": "Tab Break",
+      "label": "Accounts",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "accumulated_depreciation_account",
+      "fieldtype": "Link",
+      "label": "Accumulated Depreciation Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "address_html",
+      "fieldtype": "HTML",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_payments_section",
+      "fieldtype": "Section Break",
+      "label": "Advance Payments",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "allow_account_creation_against_child_company",
+      "fieldtype": "Check",
+      "label": "Allow Account Creation Against Child Company",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "asset_received_but_not_billed",
+      "fieldtype": "Link",
+      "label": "Asset Received But Not Billed",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_accounting_for_stock_settings",
+      "fieldtype": "Section Break",
+      "label": "Stock Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_err_frequency",
+      "fieldtype": "Select",
+      "label": "Frequency",
+      "options": "Daily\nWeekly\nMonthly",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_exchange_rate_revaluation",
+      "fieldtype": "Check",
+      "label": "Auto Create Exchange Rate Revaluation",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bank_details_for_printing",
+      "fieldtype": "Table",
+      "label": "Bank Details",
+      "options": "Company Print Options",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "book_advance_payments_in_separate_party_account",
+      "fieldtype": "Check",
+      "label": "Book Advance Payments in Separate Party Account",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "budget_detail",
+      "fieldtype": "Section Break",
+      "label": "Budget Detail",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "buying_and_selling_tab",
+      "fieldtype": "Tab Break",
+      "label": "Buying and Selling",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "capital_work_in_progress_account",
+      "fieldtype": "Link",
+      "label": "Capital Work In Progress Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cb0",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "chart_of_accounts",
+      "fieldtype": "Select",
+      "label": "Chart Of Accounts Template",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break0",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break1",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_26",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_32",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_40",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_dcdl",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_fwcf",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_goals",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_jqfo",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_sttp",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_description",
+      "fieldtype": "Text Editor",
+      "label": "Company Description",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_info",
+      "fieldtype": "Section Break",
+      "label": "Address & Contact",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_logo",
+      "fieldtype": "Attach Image",
+      "label": "Company Logo",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "company_name",
+      "fieldtype": "Data",
+      "label": "Company",
+      "options": "",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cost_center",
+      "fieldtype": "Link",
+      "label": "Default Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "country",
+      "fieldtype": "Link",
+      "label": "Country",
+      "options": "Country",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "create_chart_of_accounts_based_on",
+      "fieldtype": "Select",
+      "label": "Create Chart Of Accounts Based On",
+      "options": "\nStandard Template\nExisting Company",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit_limit",
+      "fieldtype": "Currency",
+      "label": "Credit Limit",
+      "options": "default_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dashboard_tab",
+      "fieldtype": "Tab Break",
+      "label": "Dashboard",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "date_of_commencement",
+      "fieldtype": "Date",
+      "label": "Date of Commencement",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "date_of_establishment",
+      "fieldtype": "Date",
+      "label": "Date of Establishment",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "date_of_incorporation",
+      "fieldtype": "Date",
+      "label": "Date of Incorporation",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_advance_paid_account",
+      "fieldtype": "Link",
+      "label": "Default Advance Paid Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_advance_received_account",
+      "fieldtype": "Link",
+      "label": "Default Advance Received Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_bank_account",
+      "fieldtype": "Link",
+      "label": "Default Bank Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_buying_terms",
+      "fieldtype": "Link",
+      "label": "Default Buying Terms",
+      "options": "Terms and Conditions",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_cash_account",
+      "fieldtype": "Link",
+      "label": "Default Cash Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_currency",
+      "fieldtype": "Link",
+      "label": "Default Currency",
+      "options": "Currency",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_customs_expense_account",
+      "fieldtype": "Link",
+      "label": "Default Customs Duty Expense Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "default_customs_payable_account",
+      "fieldtype": "Link",
+      "label": "Default Customs Duty Payable Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "default_deferred_expense_account",
+      "fieldtype": "Link",
+      "label": "Default Deferred Expense Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_deferred_revenue_account",
+      "fieldtype": "Link",
+      "label": "Default Deferred Revenue Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_discount_account",
+      "fieldtype": "Link",
+      "label": "Default Payment Discount Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_expense_account",
+      "fieldtype": "Link",
+      "label": "Default Cost of Goods Sold Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_finance_book",
+      "fieldtype": "Link",
+      "label": "Default Finance Book",
+      "options": "Finance Book",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_gst_expense_account",
+      "fieldtype": "Link",
+      "label": "Default GST Expense Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "default_gst_rate",
+      "fieldtype": "Select",
+      "label": "Default GST Rate",
+      "options": "0.0\n0.25\n0.1\n1.0\n1.5\n3.0\n5.0\n6.0\n7.5\n40.0\n12.0\n18.0\n28.0",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "default_holiday_list",
+      "fieldtype": "Link",
+      "label": "Default Holiday List",
+      "options": "Holiday List",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_in_transit_warehouse",
+      "fieldtype": "Link",
+      "label": "Default In-Transit Warehouse",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_income_account",
+      "fieldtype": "Link",
+      "label": "Default Income Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_inventory_account",
+      "fieldtype": "Link",
+      "label": "Default Inventory Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_isd_provisional_account",
+      "fieldtype": "Link",
+      "label": "Default ISD Provisional Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "default_letter_head",
+      "fieldtype": "Link",
+      "label": "Default Letter Head",
+      "options": "Letter Head",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_operating_cost_account",
+      "fieldtype": "Link",
+      "label": "Default Operating Cost Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_payable_account",
+      "fieldtype": "Link",
+      "label": "Default Payable Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_provisional_account",
+      "fieldtype": "Link",
+      "label": "Default Provisional Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_receivable_account",
+      "fieldtype": "Link",
+      "label": "Default Receivable Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_sales_contact",
+      "fieldtype": "Link",
+      "label": "Default Sales Contact",
+      "options": "Contact",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_selling_terms",
+      "fieldtype": "Link",
+      "label": "Default Selling Terms",
+      "options": "Terms and Conditions",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_settings",
+      "fieldtype": "Section Break",
+      "label": "Default Accounts",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_warehouse_for_sales_return",
+      "fieldtype": "Link",
+      "label": "Default Warehouse for Sales Return",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "deferred_accounting_section",
+      "fieldtype": "Section Break",
+      "label": "Deferred Accounting",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "depreciation_cost_center",
+      "fieldtype": "Link",
+      "label": "Asset Depreciation Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "depreciation_expense_account",
+      "fieldtype": "Link",
+      "label": "Depreciation Expense Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "details",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "disposal_account",
+      "fieldtype": "Link",
+      "label": "Gain/Loss Account on Asset Disposal",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "domain",
+      "fieldtype": "Data",
+      "label": "Domain",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "email",
+      "fieldtype": "Data",
+      "label": "Email",
+      "options": "Email",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "enable_perpetual_inventory",
+      "fieldtype": "Check",
+      "label": "Enable Perpetual Inventory",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "enable_provisional_accounting_for_non_stock_items",
+      "fieldtype": "Check",
+      "label": "Enable Provisional Accounting For Non Stock Items",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exception_budget_approver_role",
+      "fieldtype": "Link",
+      "label": "Exception Budget Approver Role",
+      "options": "Role",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_gain__loss_section",
+      "fieldtype": "Section Break",
+      "label": "Exchange Gain / Loss",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_gain_loss_account",
+      "fieldtype": "Link",
+      "label": "Exchange Gain / Loss Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_rate_revaluation_settings_section",
+      "fieldtype": "Section Break",
+      "label": "Exchange Rate Revaluation Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "existing_company",
+      "fieldtype": "Link",
+      "label": "Existing Company ",
+      "options": "Company",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "expenses_included_in_asset_valuation",
+      "fieldtype": "Link",
+      "label": "Expenses Included In Asset Valuation",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "expenses_included_in_valuation",
+      "fieldtype": "Link",
+      "label": "Expenses Included In Valuation",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "fax",
+      "fieldtype": "Data",
+      "label": "Fax",
+      "options": "Phone",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "fixed_asset_defaults",
+      "fieldtype": "Section Break",
+      "label": "Fixed Asset Defaults",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "gst_category",
+      "fieldtype": "Select",
+      "label": "GST Category",
+      "options": "Registered Regular\nRegistered Composition\nUnregistered\nSEZ\nOverseas\nDeemed Export\nUIN Holders\nTax Deductor\nTax Collector\nInput Service Distributor",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "gstin",
+      "fieldtype": "Autocomplete",
+      "label": "GSTIN / UIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_group",
+      "fieldtype": "Check",
+      "label": "Is Group",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "lft",
+      "fieldtype": "Int",
+      "label": "Lft",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "manufacturing_section",
+      "fieldtype": "Section Break",
+      "label": "Manufacturing",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "monthly_sales_target",
+      "fieldtype": "Currency",
+      "label": "Monthly Sales Target",
+      "options": "default_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "old_parent",
+      "fieldtype": "Data",
+      "label": "old_parent",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "pan",
+      "fieldtype": "Data",
+      "label": "PAN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "parent_company",
+      "fieldtype": "Link",
+      "label": "Parent Company",
+      "options": "Company",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_terms",
+      "fieldtype": "Link",
+      "label": "Default Payment Terms Template",
+      "options": "Payment Terms Template",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "phone_no",
+      "fieldtype": "Data",
+      "label": "Phone No",
+      "options": "Phone",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "print_options",
+      "fieldtype": "Tab Break",
+      "label": "Print Options",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "reconcile_on_advance_payment_date",
+      "fieldtype": "Check",
+      "label": "Reconcile on Advance Payment Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "reconciliation_takes_effect_on",
+      "fieldtype": "Select",
+      "label": "Reconciliation Takes Effect On",
+      "options": "Advance Payment Date\nOldest Of Invoice Or Advance\nReconciliation Date",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "registration_details",
+      "fieldtype": "Code",
+      "label": "Registration Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "registration_details_for_printing",
+      "fieldtype": "Table",
+      "label": "Registration Details",
+      "options": "Company Print Options",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "registration_info",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "rgt",
+      "fieldtype": "Int",
+      "label": "Rgt",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "round_off_account",
+      "fieldtype": "Link",
+      "label": "Round Off Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "round_off_cost_center",
+      "fieldtype": "Link",
+      "label": "Round Off Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "round_off_for_opening",
+      "fieldtype": "Link",
+      "label": "Round Off for Opening",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "round_off_section",
+      "fieldtype": "Section Break",
+      "label": "Round Off",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sales_monthly_history",
+      "fieldtype": "Small Text",
+      "label": "Sales Monthly History",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "sales_settings",
+      "fieldtype": "Section Break",
+      "label": "Buying & Selling Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_28",
+      "fieldtype": "Section Break",
+      "label": "Chart of Accounts",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "series_for_depreciation_entry",
+      "fieldtype": "Data",
+      "label": "Series for Asset Depreciation Entry (Journal Entry)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "show_physical_signature",
+      "fieldtype": "Check",
+      "label": "Enable Physical Signature",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "stock_adjustment_account",
+      "fieldtype": "Link",
+      "label": "Stock Adjustment Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "stock_received_but_not_billed",
+      "fieldtype": "Link",
+      "label": "Stock Received But Not Billed",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "stock_tab",
+      "fieldtype": "Tab Break",
+      "label": "Stock and Manufacturing",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "submit_err_jv",
+      "fieldtype": "Check",
+      "label": "Submit ERR Journals?",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_details_column_break",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "tax_details_section",
+      "fieldtype": "Section Break",
+      "label": "Tax Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "tax_id",
+      "fieldtype": "Data",
+      "label": "Tax ID",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_monthly_sales",
+      "fieldtype": "Currency",
+      "label": "Total Monthly Sales",
+      "options": "default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "transactions_annual_history",
+      "fieldtype": "Code",
+      "label": "Transactions Annual History",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "unrealized_exchange_gain_loss_account",
+      "fieldtype": "Link",
+      "label": "Unrealized Exchange Gain/Loss Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "unrealized_profit_loss_account",
+      "fieldtype": "Link",
+      "label": "Unrealized Profit / Loss Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "website",
+      "fieldtype": "Data",
+      "label": "Website",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_account",
+      "fieldtype": "Link",
+      "label": "Write Off Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

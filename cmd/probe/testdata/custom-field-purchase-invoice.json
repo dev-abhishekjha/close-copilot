@@ -1,0 +1,1 @@
+{"data":[{"fieldname":"place_of_supply","fieldtype":"Autocomplete","label":"Place of Supply","options":"01-Jammu and Kashmir\n02-Himachal Pradesh","reqd":0,"read_only":0,"hidden":0},{"fieldname":"supplier_gstin","fieldtype":"Data","label":"Supplier GSTIN","options":null,"reqd":0,"read_only":1,"hidden":0}]}

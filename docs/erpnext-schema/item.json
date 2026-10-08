@@ -1,0 +1,1098 @@
+{
+  "name": "Item",
+  "module": "Stock",
+  "istable": 0,
+  "is_submittable": 0,
+  "fields": [
+    {
+      "fieldname": "accounting",
+      "fieldtype": "Tab Break",
+      "label": "Accounting",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "allow_alternative_item",
+      "fieldtype": "Check",
+      "label": "Allow Alternative Item",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "allow_negative_stock",
+      "fieldtype": "Check",
+      "label": "Allow Negative Stock",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "asset_category",
+      "fieldtype": "Link",
+      "label": "Asset Category",
+      "options": "Asset Category",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "asset_naming_series",
+      "fieldtype": "Select",
+      "label": "Asset Naming Series",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "attributes",
+      "fieldtype": "Table",
+      "label": "Variant Attributes",
+      "options": "Item Variant Attribute",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_create_assets",
+      "fieldtype": "Check",
+      "label": "Auto Create Assets on Purchase",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "barcodes",
+      "fieldtype": "Table",
+      "label": "Barcodes",
+      "options": "Item Barcode",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "batch_number_series",
+      "fieldtype": "Data",
+      "label": "Batch Number Series",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "brand",
+      "fieldtype": "Link",
+      "label": "Brand",
+      "options": "Brand",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break0",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break1",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break2",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break3",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_37",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_59",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_74",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_9s9o",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "country_of_origin",
+      "fieldtype": "Link",
+      "label": "Country of Origin",
+      "options": "Country",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "create_new_batch",
+      "fieldtype": "Check",
+      "label": "Automatically Create New Batch",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "customer",
+      "fieldtype": "Link",
+      "label": "Customer",
+      "options": "Customer",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "customer_code",
+      "fieldtype": "Small Text",
+      "label": "Customer Code",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "customer_details",
+      "fieldtype": "Section Break",
+      "label": "Customer Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "customer_items",
+      "fieldtype": "Table",
+      "label": "Customer Items",
+      "options": "Item Customer Detail",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "customs_tariff_number",
+      "fieldtype": "Link",
+      "label": "Customs Tariff Number",
+      "options": "Customs Tariff Number",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dashboard_tab",
+      "fieldtype": "Tab Break",
+      "label": "Dashboard",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_bom",
+      "fieldtype": "Link",
+      "label": "Default BOM",
+      "options": "BOM",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_item_manufacturer",
+      "fieldtype": "Link",
+      "label": "Default Item Manufacturer",
+      "options": "Manufacturer",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_manufacturer_part_no",
+      "fieldtype": "Data",
+      "label": "Default Manufacturer Part No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "default_material_request_type",
+      "fieldtype": "Select",
+      "label": "Default Material Request Type",
+      "options": "Purchase\nMaterial Transfer\nMaterial Issue\nManufacture\nCustomer Provided",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "deferred_accounting_section",
+      "fieldtype": "Section Break",
+      "label": "Deferred Accounting",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "delivered_by_supplier",
+      "fieldtype": "Check",
+      "label": "Delivered by Supplier (Drop Ship)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "description",
+      "fieldtype": "Text Editor",
+      "label": "Description",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "details",
+      "fieldtype": "Tab Break",
+      "label": "Details",
+      "options": "fa fa-flag",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "disabled",
+      "fieldtype": "Check",
+      "label": "Disabled",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "enable_deferred_expense",
+      "fieldtype": "Check",
+      "label": "Enable Deferred Expense",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "enable_deferred_revenue",
+      "fieldtype": "Check",
+      "label": "Enable Deferred Revenue",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "end_of_life",
+      "fieldtype": "Date",
+      "label": "End of Life",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "foreign_trade_details",
+      "fieldtype": "Section Break",
+      "label": "Foreign Trade Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "grant_commission",
+      "fieldtype": "Check",
+      "label": "Grant Commission",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "gst_hsn_code",
+      "fieldtype": "Link",
+      "label": "HSN/SAC",
+      "options": "GST HSN Code",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "has_batch_no",
+      "fieldtype": "Check",
+      "label": "Has Batch No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "has_expiry_date",
+      "fieldtype": "Check",
+      "label": "Has Expiry Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "has_serial_no",
+      "fieldtype": "Check",
+      "label": "Has Serial No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "has_variants",
+      "fieldtype": "Check",
+      "label": "Has Variants",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "image",
+      "fieldtype": "Attach Image",
+      "label": "Image",
+      "options": "image",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "include_item_in_manufacturing",
+      "fieldtype": "Check",
+      "label": "Include Item In Manufacturing",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "inspection_required_before_delivery",
+      "fieldtype": "Check",
+      "label": "Inspection Required before Delivery",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "inspection_required_before_purchase",
+      "fieldtype": "Check",
+      "label": "Inspection Required before Purchase",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "inventory_section",
+      "fieldtype": "Tab Break",
+      "label": "Inventory",
+      "options": "fa fa-truck",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "inventory_settings_section",
+      "fieldtype": "Section Break",
+      "label": "Inventory Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_customer_provided_item",
+      "fieldtype": "Check",
+      "label": "Is Customer Provided Item",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_fixed_asset",
+      "fieldtype": "Check",
+      "label": "Is Fixed Asset",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_grouped_asset",
+      "fieldtype": "Check",
+      "label": "Create Grouped Asset",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_ineligible_for_itc",
+      "fieldtype": "Check",
+      "label": "Is Ineligible for Input Tax Credit",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_purchase_item",
+      "fieldtype": "Check",
+      "label": "Allow Purchase",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_sales_item",
+      "fieldtype": "Check",
+      "label": "Allow Sales",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_stock_item",
+      "fieldtype": "Check",
+      "label": "Maintain Stock",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_sub_contracted_item",
+      "fieldtype": "Check",
+      "label": "Supply Raw Materials for Purchase",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "item_code",
+      "fieldtype": "Data",
+      "label": "Item Code",
+      "options": "",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "item_defaults",
+      "fieldtype": "Table",
+      "label": "Item Defaults",
+      "options": "Item Default",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "item_group",
+      "fieldtype": "Link",
+      "label": "Item Group",
+      "options": "Item Group",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "item_name",
+      "fieldtype": "Data",
+      "label": "Item Name",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "item_tax_section_break",
+      "fieldtype": "Tab Break",
+      "label": "Tax",
+      "options": "fa fa-money",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "last_purchase_rate",
+      "fieldtype": "Float",
+      "label": "Last Purchase Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "lead_time_days",
+      "fieldtype": "Int",
+      "label": "Lead Time in days",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "manufacturing",
+      "fieldtype": "Tab Break",
+      "label": "Manufacturing",
+      "options": "fa fa-cogs",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "max_discount",
+      "fieldtype": "Float",
+      "label": "Max Discount (%)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "min_order_qty",
+      "fieldtype": "Float",
+      "label": "Minimum Order Qty",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "STO-ITEM-.YYYY.-",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "no_of_months",
+      "fieldtype": "Int",
+      "label": "No of Months (Revenue)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "no_of_months_exp",
+      "fieldtype": "Int",
+      "label": "No of Months (Expense)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "opening_stock",
+      "fieldtype": "Float",
+      "label": "Opening Stock",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "over_billing_allowance",
+      "fieldtype": "Float",
+      "label": "Over Billing Allowance (%)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "over_delivery_receipt_allowance",
+      "fieldtype": "Float",
+      "label": "Over Delivery/Receipt Allowance (%)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "purchase_details_cb",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "purchase_uom",
+      "fieldtype": "Link",
+      "label": "Default Purchase Unit of Measure",
+      "options": "UOM",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "purchasing_tab",
+      "fieldtype": "Tab Break",
+      "label": "Purchasing",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "quality_inspection_template",
+      "fieldtype": "Link",
+      "label": "Quality Inspection Template",
+      "options": "Quality Inspection Template",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "quality_tab",
+      "fieldtype": "Tab Break",
+      "label": "Quality",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reorder_levels",
+      "fieldtype": "Table",
+      "label": "Reorder level based on Warehouse",
+      "options": "Item Reorder",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reorder_section",
+      "fieldtype": "Section Break",
+      "label": "Auto re-order",
+      "options": "fa fa-rss",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "retain_sample",
+      "fieldtype": "Check",
+      "label": "Retain Sample",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "safety_stock",
+      "fieldtype": "Float",
+      "label": "Safety Stock",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sales_details",
+      "fieldtype": "Tab Break",
+      "label": "Sales",
+      "options": "fa fa-tag",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sales_uom",
+      "fieldtype": "Link",
+      "label": "Default Sales Unit of Measure",
+      "options": "UOM",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sample_quantity",
+      "fieldtype": "Int",
+      "label": "Max Sample Quantity",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sb_barcodes",
+      "fieldtype": "Section Break",
+      "label": "Barcodes",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_11",
+      "fieldtype": "Section Break",
+      "label": "Description",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_avcp",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "serial_no_series",
+      "fieldtype": "Data",
+      "label": "Serial Number Series",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "serial_nos_and_batches",
+      "fieldtype": "Section Break",
+      "label": "Serial Nos and Batches",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "shelf_life_in_days",
+      "fieldtype": "Int",
+      "label": "Shelf Life In Days",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "standard_rate",
+      "fieldtype": "Currency",
+      "label": "Standard Selling Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "stock_uom",
+      "fieldtype": "Link",
+      "label": "Default Unit of Measure",
+      "options": "UOM",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_details",
+      "fieldtype": "Section Break",
+      "label": "Supplier Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_items",
+      "fieldtype": "Table",
+      "label": "Supplier Items",
+      "options": "Item Supplier",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes",
+      "fieldtype": "Table",
+      "label": "Taxes",
+      "options": "Item Tax",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_projected_qty",
+      "fieldtype": "Float",
+      "label": "Total Projected Qty",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "unit_of_measure_conversion",
+      "fieldtype": "Section Break",
+      "label": "Units of Measure",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "uoms",
+      "fieldtype": "Table",
+      "label": "UOMs",
+      "options": "UOM Conversion Detail",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "valuation_method",
+      "fieldtype": "Select",
+      "label": "Valuation Method",
+      "options": "\nFIFO\nMoving Average\nLIFO",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "valuation_rate",
+      "fieldtype": "Currency",
+      "label": "Valuation Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "variant_based_on",
+      "fieldtype": "Select",
+      "label": "Variant Based On",
+      "options": "Item Attribute\nManufacturer",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "variant_of",
+      "fieldtype": "Link",
+      "label": "Variant Of",
+      "options": "Item",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "variants_section",
+      "fieldtype": "Tab Break",
+      "label": "Variants",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "warranty_period",
+      "fieldtype": "Data",
+      "label": "Warranty Period (in days)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "weight_per_unit",
+      "fieldtype": "Float",
+      "label": "Weight Per Unit",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "weight_uom",
+      "fieldtype": "Link",
+      "label": "Weight UOM",
+      "options": "UOM",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

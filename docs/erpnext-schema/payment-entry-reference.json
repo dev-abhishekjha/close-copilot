@@ -1,0 +1,208 @@
+{
+  "name": "Payment Entry Reference",
+  "module": "Accounts",
+  "istable": 1,
+  "is_submittable": 0,
+  "fields": [
+    {
+      "fieldname": "account",
+      "fieldtype": "Link",
+      "label": "Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "account_type",
+      "fieldtype": "Data",
+      "label": "Account Type",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_voucher_no",
+      "fieldtype": "Dynamic Link",
+      "label": "Advance Voucher No",
+      "options": "advance_voucher_type",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_voucher_type",
+      "fieldtype": "Link",
+      "label": "Advance Voucher Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "allocated_amount",
+      "fieldtype": "Currency",
+      "label": "Allocated",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bill_no",
+      "fieldtype": "Data",
+      "label": "Supplier Invoice No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_4",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "due_date",
+      "fieldtype": "Date",
+      "label": "Due Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_gain_loss",
+      "fieldtype": "Currency",
+      "label": "Exchange Gain/Loss",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_rate",
+      "fieldtype": "Float",
+      "label": "Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "outstanding_amount",
+      "fieldtype": "Currency",
+      "label": "Outstanding",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_request",
+      "fieldtype": "Link",
+      "label": "Payment Request",
+      "options": "Payment Request",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_request_outstanding",
+      "fieldtype": "Float",
+      "label": "Payment Request Outstanding",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_term",
+      "fieldtype": "Link",
+      "label": "Payment Term",
+      "options": "Payment Term",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_term_outstanding",
+      "fieldtype": "Float",
+      "label": "Payment Term Outstanding",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_type",
+      "fieldtype": "Data",
+      "label": "Payment Type",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reconcile_effect_on",
+      "fieldtype": "Date",
+      "label": "Reconcile Effect On",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_doctype",
+      "fieldtype": "Link",
+      "label": "Type",
+      "options": "DocType",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_name",
+      "fieldtype": "Dynamic Link",
+      "label": "Name",
+      "options": "reference_doctype",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_amount",
+      "fieldtype": "Currency",
+      "label": "Grand Total",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

@@ -1,0 +1,458 @@
+{
+  "name": "GL Entry",
+  "module": "Accounts",
+  "istable": 0,
+  "is_submittable": 0,
+  "fields": [
+    {
+      "fieldname": "account",
+      "fieldtype": "Link",
+      "label": "Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "account_currency",
+      "fieldtype": "Link",
+      "label": "Account Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "account_details_section",
+      "fieldtype": "Section Break",
+      "label": "Account Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "against",
+      "fieldtype": "Text",
+      "label": "Against",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "against_voucher",
+      "fieldtype": "Dynamic Link",
+      "label": "Against Voucher",
+      "options": "against_voucher_type",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "against_voucher_type",
+      "fieldtype": "Link",
+      "label": "Against Voucher Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "amounts_section",
+      "fieldtype": "Section Break",
+      "label": "Amounts",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_8abq",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_avko",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_bm1w",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_dpsx",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_ifvf",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_lmnm",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "label": "Company",
+      "options": "Company",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_gstin",
+      "fieldtype": "Autocomplete",
+      "label": "Company GSTIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "cost_center",
+      "fieldtype": "Link",
+      "label": "Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit",
+      "fieldtype": "Currency",
+      "label": "Credit Amount",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit_in_account_currency",
+      "fieldtype": "Currency",
+      "label": "Credit Amount in Account Currency",
+      "options": "account_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit_in_transaction_currency",
+      "fieldtype": "Currency",
+      "label": "Credit Amount in Transaction Currency",
+      "options": "transaction_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dates_section",
+      "fieldtype": "Section Break",
+      "label": "Dates",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "debit",
+      "fieldtype": "Currency",
+      "label": "Debit Amount",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "debit_in_account_currency",
+      "fieldtype": "Currency",
+      "label": "Debit Amount in Account Currency",
+      "options": "account_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "debit_in_transaction_currency",
+      "fieldtype": "Currency",
+      "label": "Debit Amount in Transaction Currency",
+      "options": "transaction_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dimensions_section",
+      "fieldtype": "Section Break",
+      "label": "Dimensions",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "due_date",
+      "fieldtype": "Date",
+      "label": "Due Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "finance_book",
+      "fieldtype": "Link",
+      "label": "Finance Book",
+      "options": "Finance Book",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "fiscal_year",
+      "fieldtype": "Link",
+      "label": "Fiscal Year",
+      "options": "Fiscal Year",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_advance",
+      "fieldtype": "Select",
+      "label": "Is Advance",
+      "options": "No\nYes",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_cancelled",
+      "fieldtype": "Check",
+      "label": "Is Cancelled",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_opening",
+      "fieldtype": "Select",
+      "label": "Is Opening",
+      "options": "No\nYes",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "more_info_section",
+      "fieldtype": "Section Break",
+      "label": "More Info",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "party",
+      "fieldtype": "Dynamic Link",
+      "label": "Party",
+      "options": "party_type",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "party_type",
+      "fieldtype": "Link",
+      "label": "Party Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "posting_date",
+      "fieldtype": "Date",
+      "label": "Posting Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "project",
+      "fieldtype": "Link",
+      "label": "Project",
+      "options": "Project",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "remarks",
+      "fieldtype": "Text",
+      "label": "Remarks",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "to_rename",
+      "fieldtype": "Check",
+      "label": "To Rename",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "transaction_currency",
+      "fieldtype": "Link",
+      "label": "Transaction Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "transaction_date",
+      "fieldtype": "Date",
+      "label": "Transaction Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "transaction_details_section",
+      "fieldtype": "Section Break",
+      "label": "Transaction Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "transaction_exchange_rate",
+      "fieldtype": "Float",
+      "label": "Transaction Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "voucher_detail_no",
+      "fieldtype": "Data",
+      "label": "Voucher Detail No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "voucher_no",
+      "fieldtype": "Dynamic Link",
+      "label": "Voucher No",
+      "options": "voucher_type",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "voucher_subtype",
+      "fieldtype": "Small Text",
+      "label": "Voucher Subtype",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "voucher_type",
+      "fieldtype": "Link",
+      "label": "Voucher Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

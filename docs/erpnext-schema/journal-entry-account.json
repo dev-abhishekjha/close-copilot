@@ -1,0 +1,338 @@
+{
+  "name": "Journal Entry Account",
+  "module": "Accounts",
+  "istable": 1,
+  "is_submittable": 0,
+  "fields": [
+    {
+      "fieldname": "account",
+      "fieldtype": "Link",
+      "label": "Account",
+      "options": "Account",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "account_currency",
+      "fieldtype": "Link",
+      "label": "Account Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "account_type",
+      "fieldtype": "Data",
+      "label": "Account Type",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "accounting_dimensions_section",
+      "fieldtype": "Section Break",
+      "label": "Accounting Dimensions",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_voucher_no",
+      "fieldtype": "Dynamic Link",
+      "label": "Advance Voucher No",
+      "options": "advance_voucher_type",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_voucher_type",
+      "fieldtype": "Link",
+      "label": "Advance Voucher Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "against_account",
+      "fieldtype": "Text",
+      "label": "Against Account",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "bank_account",
+      "fieldtype": "Link",
+      "label": "Bank Account",
+      "options": "Bank Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_break1",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_break2",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_break3",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_10",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cost_center",
+      "fieldtype": "Link",
+      "label": "Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit",
+      "fieldtype": "Currency",
+      "label": "Credit in Company Currency",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit_in_account_currency",
+      "fieldtype": "Currency",
+      "label": "Credit",
+      "options": "account_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "currency_section",
+      "fieldtype": "Section Break",
+      "label": "Currency",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "debit",
+      "fieldtype": "Currency",
+      "label": "Debit in Company Currency",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "debit_in_account_currency",
+      "fieldtype": "Currency",
+      "label": "Debit",
+      "options": "account_currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dimension_col_break",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "exchange_rate",
+      "fieldtype": "Float",
+      "label": "Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "gst_tax_type",
+      "fieldtype": "Data",
+      "label": "GST Tax Type",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_advance",
+      "fieldtype": "Select",
+      "label": "Is Advance",
+      "options": "No\nYes",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_tax_withholding_account",
+      "fieldtype": "Check",
+      "label": "Is Tax Withholding Account",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "party",
+      "fieldtype": "Dynamic Link",
+      "label": "Party",
+      "options": "party_type",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "party_type",
+      "fieldtype": "Link",
+      "label": "Party Type",
+      "options": "DocType",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "project",
+      "fieldtype": "Link",
+      "label": "Project",
+      "options": "Project",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference",
+      "fieldtype": "Section Break",
+      "label": "Reference",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_detail_no",
+      "fieldtype": "Data",
+      "label": "Reference Detail No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_due_date",
+      "fieldtype": "Date",
+      "label": "Reference Due Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_name",
+      "fieldtype": "Dynamic Link",
+      "label": "Reference Name",
+      "options": "reference_type",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reference_type",
+      "fieldtype": "Select",
+      "label": "Reference Type",
+      "options": "\nSales Invoice\nPurchase Invoice\nJournal Entry\nSales Order\nPurchase Order\nExpense Claim\nAsset\nLoan\nPayroll Entry\nEmployee Advance\nExchange Rate Revaluation\nInvoice Discounting\nFees\nFull and Final Statement\nPayment Entry\nBank Transaction",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sec_break1",
+      "fieldtype": "Section Break",
+      "label": "Amount",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "user_remark",
+      "fieldtype": "Small Text",
+      "label": "User Remark",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}

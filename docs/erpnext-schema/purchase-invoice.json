@@ -1,0 +1,2228 @@
+{
+  "name": "Purchase Invoice",
+  "module": "Accounts",
+  "istable": 0,
+  "is_submittable": 1,
+  "fields": [
+    {
+      "fieldname": "accounting_details_section",
+      "fieldtype": "Section Break",
+      "label": "Accounting Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "accounting_dimensions_section",
+      "fieldtype": "Section Break",
+      "label": "Accounting Dimensions ",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "additional_discount_percentage",
+      "fieldtype": "Float",
+      "label": "Additional Discount Percentage",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "additional_info_section",
+      "fieldtype": "Section Break",
+      "label": "Additional Info",
+      "options": "fa fa-file-text",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "address_and_contact_tab",
+      "fieldtype": "Tab Break",
+      "label": "Address & Contact",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "address_display",
+      "fieldtype": "Small Text",
+      "label": "Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advance_tax",
+      "fieldtype": "Table",
+      "label": "Advance Tax",
+      "options": "Advance Tax",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "advances",
+      "fieldtype": "Table",
+      "label": "Advances",
+      "options": "Purchase Invoice Advance",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "advances_section",
+      "fieldtype": "Section Break",
+      "label": "Advance Payments",
+      "options": "fa fa-money",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "against_expense_account",
+      "fieldtype": "Small Text",
+      "label": "Against Expense Account",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "allocate_advances_automatically",
+      "fieldtype": "Check",
+      "label": "Set Advances and Allocate (FIFO)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "amended_from",
+      "fieldtype": "Link",
+      "label": "Amended From",
+      "options": "Purchase Invoice",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "apply_discount_on",
+      "fieldtype": "Select",
+      "label": "Apply Additional Discount On",
+      "options": "\nGrand Total\nNet Total",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "apply_tds",
+      "fieldtype": "Check",
+      "label": "Apply Tax Withholding Amount",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "auto_repeat",
+      "fieldtype": "Link",
+      "label": "Auto Repeat",
+      "options": "Auto Repeat",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_discount_amount",
+      "fieldtype": "Currency",
+      "label": "Additional Discount Amount (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_grand_total",
+      "fieldtype": "Currency",
+      "label": "Grand Total (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_in_words",
+      "fieldtype": "Data",
+      "label": "In Words (Company Currency)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_net_total",
+      "fieldtype": "Currency",
+      "label": "Net Total (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_paid_amount",
+      "fieldtype": "Currency",
+      "label": "Paid Amount (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_rounded_total",
+      "fieldtype": "Currency",
+      "label": "Rounded Total (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_rounding_adjustment",
+      "fieldtype": "Currency",
+      "label": "Rounding Adjustment (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_tax_withholding_net_total",
+      "fieldtype": "Currency",
+      "label": "Base Tax Withholding Net Total",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "base_taxes_and_charges_added",
+      "fieldtype": "Currency",
+      "label": "Taxes and Charges Added (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_taxes_and_charges_deducted",
+      "fieldtype": "Currency",
+      "label": "Taxes and Charges Deducted (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_total",
+      "fieldtype": "Currency",
+      "label": "Total (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_total_taxes_and_charges",
+      "fieldtype": "Currency",
+      "label": "Total Taxes and Charges (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "base_write_off_amount",
+      "fieldtype": "Currency",
+      "label": "Write Off Amount (Company Currency)",
+      "options": "Company:company:default_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bill_date",
+      "fieldtype": "Date",
+      "label": "Supplier Invoice Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "bill_no",
+      "fieldtype": "Data",
+      "label": "Supplier Invoice No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "billing_address",
+      "fieldtype": "Link",
+      "label": "Select Billing Address",
+      "options": "Address",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "billing_address_display",
+      "fieldtype": "Small Text",
+      "label": "Billing Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "buying_price_list",
+      "fieldtype": "Link",
+      "label": "Price List",
+      "options": "Price List",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cash_bank_account",
+      "fieldtype": "Link",
+      "label": "Cash/Bank Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cb_17",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "clearance_date",
+      "fieldtype": "Date",
+      "label": "Clearance Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_br_payments",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_break_address",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "col_break_warehouse",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break1",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break2",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break8",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_112",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_114",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_126",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_130",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_147",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_15",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_177",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_28",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_40",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_46",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_49",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_50",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_58",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_6",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_61",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "column_break_63",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company",
+      "fieldtype": "Link",
+      "label": "Company",
+      "options": "Company",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_billing_address_section",
+      "fieldtype": "Section Break",
+      "label": "Company Billing Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "company_gstin",
+      "fieldtype": "Data",
+      "label": "Company GSTIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "company_shipping_address_section",
+      "fieldtype": "Section Break",
+      "label": "Shipping Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "connections_tab",
+      "fieldtype": "Tab Break",
+      "label": "Connections",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "contact_display",
+      "fieldtype": "Small Text",
+      "label": "Contact",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "contact_email",
+      "fieldtype": "Small Text",
+      "label": "Contact Email",
+      "options": "Email",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "contact_mobile",
+      "fieldtype": "Small Text",
+      "label": "Mobile No",
+      "options": "Phone",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "contact_person",
+      "fieldtype": "Link",
+      "label": "Contact Person",
+      "options": "Contact",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "conversion_rate",
+      "fieldtype": "Float",
+      "label": "Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "cost_center",
+      "fieldtype": "Link",
+      "label": "Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "credit_to",
+      "fieldtype": "Link",
+      "label": "Credit To",
+      "options": "Account",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "currency",
+      "fieldtype": "Link",
+      "label": "Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "currency_and_price_list",
+      "fieldtype": "Section Break",
+      "label": "Currency and Price List",
+      "options": "fa fa-tag",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dimension_col_break",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "disable_rounded_total",
+      "fieldtype": "Check",
+      "label": "Disable Rounded Total",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "discount_amount",
+      "fieldtype": "Currency",
+      "label": "Additional Discount Amount",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dispatch_address",
+      "fieldtype": "Link",
+      "label": "Select Dispatch Address ",
+      "options": "Address",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "dispatch_address_display",
+      "fieldtype": "Text Editor",
+      "label": "Dispatch Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "distance",
+      "fieldtype": "Int",
+      "label": "Distance (in km)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "driver",
+      "fieldtype": "Link",
+      "label": "Driver",
+      "options": "Driver",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "driver_name",
+      "fieldtype": "Small Text",
+      "label": "Driver Name",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "due_date",
+      "fieldtype": "Date",
+      "label": "Due Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "ewaybill",
+      "fieldtype": "Data",
+      "label": "e-Waybill No.",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "from_date",
+      "fieldtype": "Date",
+      "label": "From Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "get_advances",
+      "fieldtype": "Button",
+      "label": "Get Advances Paid",
+      "options": "set_advances",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "grand_total",
+      "fieldtype": "Currency",
+      "label": "Grand Total",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "group_same_items",
+      "fieldtype": "Check",
+      "label": "Group same items",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "gst_breakup_table",
+      "fieldtype": "Text Editor",
+      "label": "GST Breakup Table",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "gst_category",
+      "fieldtype": "Data",
+      "label": "GST Category",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "gst_section",
+      "fieldtype": "Section Break",
+      "label": "GST Details",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "gst_transporter_id",
+      "fieldtype": "Data",
+      "label": "GST Transporter ID",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "gst_vehicle_type",
+      "fieldtype": "Select",
+      "label": "GST Vehicle Type",
+      "options": "Regular\nOver Dimensional Cargo (ODC)",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "hold_comment",
+      "fieldtype": "Small Text",
+      "label": "Reason For Putting On Hold",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "ignore_default_payment_terms_template",
+      "fieldtype": "Check",
+      "label": "Ignore Default Payment Terms Template",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "ignore_pricing_rule",
+      "fieldtype": "Check",
+      "label": "Ignore Pricing Rule",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "in_words",
+      "fieldtype": "Data",
+      "label": "In Words",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "incoterm",
+      "fieldtype": "Link",
+      "label": "Incoterm",
+      "options": "Incoterm",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "ineligibility_reason",
+      "fieldtype": "Select",
+      "label": "Reason for Ineligibility",
+      "options": "\nIneligible As Per Section 17(5)\nITC restricted due to PoS rules",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "inter_company_invoice_reference",
+      "fieldtype": "Link",
+      "label": "Inter Company Invoice Reference",
+      "options": "Sales Invoice",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_boe_applicable",
+      "fieldtype": "Check",
+      "label": "Is BOE Applicable",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_internal_supplier",
+      "fieldtype": "Check",
+      "label": "Is Internal Supplier",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_isd_applicable",
+      "fieldtype": "Check",
+      "label": "Is ISD Applicable",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_old_subcontracting_flow",
+      "fieldtype": "Check",
+      "label": "Is Old Subcontracting Flow",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "is_opening",
+      "fieldtype": "Select",
+      "label": "Is Opening Entry",
+      "options": "No\nYes",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_paid",
+      "fieldtype": "Check",
+      "label": "Is Paid",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_return",
+      "fieldtype": "Check",
+      "label": "Is Return (Debit Note)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "is_reverse_charge",
+      "fieldtype": "Check",
+      "label": "Is Reverse Charge",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "is_subcontracted",
+      "fieldtype": "Check",
+      "label": "Is Subcontracted",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "isd_credit_distributed_percent",
+      "fieldtype": "Float",
+      "label": "ISD Credit Distributed (%)",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "itc_claim_period",
+      "fieldtype": "Autocomplete",
+      "label": "ITC Claim Period",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "itc_classification",
+      "fieldtype": "Select",
+      "label": "ITC Classification",
+      "options": "Input Service Distributor\nImport Of Service\nImport Of Goods\nITC on Reverse Charge\nAll Other ITC",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "items",
+      "fieldtype": "Table",
+      "label": "Items",
+      "options": "Purchase Invoice Item",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "items_section",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "fa fa-shopping-cart",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "language",
+      "fieldtype": "Data",
+      "label": "Print Language",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "last_scanned_warehouse",
+      "fieldtype": "Data",
+      "label": "Last Scanned Warehouse",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "letter_head",
+      "fieldtype": "Link",
+      "label": "Letter Head",
+      "options": "Letter Head",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "lr_date",
+      "fieldtype": "Date",
+      "label": "Transport Receipt Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "lr_no",
+      "fieldtype": "Data",
+      "label": "Transport Receipt No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "mode_of_payment",
+      "fieldtype": "Link",
+      "label": "Mode of Payment",
+      "options": "Mode of Payment",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "mode_of_transport",
+      "fieldtype": "Select",
+      "label": "Mode of Transport",
+      "options": "\nRoad\nAir\nRail\nShip",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "more_info_tab",
+      "fieldtype": "Tab Break",
+      "label": "More Info",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "named_place",
+      "fieldtype": "Data",
+      "label": "Named Place",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "naming_series",
+      "fieldtype": "Select",
+      "label": "Series",
+      "options": "ACC-PINV-.YYYY.-\nACC-PINV-RET-.YYYY.-",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "net_total",
+      "fieldtype": "Currency",
+      "label": "Net Total",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "on_hold",
+      "fieldtype": "Check",
+      "label": "Hold Invoice",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "only_include_allocated_payments",
+      "fieldtype": "Check",
+      "label": "Only Include Allocated Payments",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "other_charges_calculation",
+      "fieldtype": "Text Editor",
+      "label": "Taxes and Charges Calculation",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "outstanding_amount",
+      "fieldtype": "Currency",
+      "label": "Outstanding Amount",
+      "options": "party_account_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "paid_amount",
+      "fieldtype": "Currency",
+      "label": "Paid Amount",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "party_account_currency",
+      "fieldtype": "Link",
+      "label": "Party Account Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_schedule",
+      "fieldtype": "Table",
+      "label": "Payment Schedule",
+      "options": "Payment Schedule",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_schedule_section",
+      "fieldtype": "Section Break",
+      "label": "Payment Terms",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payment_terms_template",
+      "fieldtype": "Link",
+      "label": "Payment Terms Template",
+      "options": "Payment Terms Template",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payments_section",
+      "fieldtype": "Section Break",
+      "label": "Payments",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "payments_tab",
+      "fieldtype": "Tab Break",
+      "label": "Payments",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "per_received",
+      "fieldtype": "Percent",
+      "label": "Per Received",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "place_of_supply",
+      "fieldtype": "Autocomplete",
+      "label": "Place of Supply",
+      "options": "01-Jammu and Kashmir\n02-Himachal Pradesh\n03-Punjab\n04-Chandigarh\n05-Uttarakhand\n06-Haryana\n07-Delhi\n08-Rajasthan\n09-Uttar Pradesh\n10-Bihar\n11-Sikkim\n12-Arunachal Pradesh\n13-Nagaland\n14-Manipur\n15-Mizoram\n16-Tripura\n17-Meghalaya\n18-Assam\n19-West Bengal\n20-Jharkhand\n21-Odisha\n22-Chhattisgarh\n23-Madhya Pradesh\n24-Gujarat\n26-Dadra and Nagar Haveli and Daman and Diu\n27-Maharashtra\n29-Karnataka\n30-Goa\n31-Lakshadweep Islands\n32-Kerala\n33-Tamil Nadu\n34-Puducherry\n35-Andaman and Nicobar Islands\n36-Telangana\n37-Andhra Pradesh\n38-Ladakh\n96-Other Countries\n97-Other Territory",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "plc_conversion_rate",
+      "fieldtype": "Float",
+      "label": "Price List Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "posting_date",
+      "fieldtype": "Date",
+      "label": "Posting Date",
+      "options": "",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "posting_time",
+      "fieldtype": "Time",
+      "label": "Posting Time",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "price_list_currency",
+      "fieldtype": "Link",
+      "label": "Price List Currency",
+      "options": "Currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "pricing_rule_details",
+      "fieldtype": "Section Break",
+      "label": "Pricing Rules",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "pricing_rules",
+      "fieldtype": "Table",
+      "label": "Pricing Rule Detail",
+      "options": "Pricing Rule Detail",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "printing_settings",
+      "fieldtype": "Section Break",
+      "label": "Print Settings",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "project",
+      "fieldtype": "Link",
+      "label": "Project",
+      "options": "Project",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "raw_materials_supplied",
+      "fieldtype": "Section Break",
+      "label": "Raw Materials Supplied",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "reconciliation_status",
+      "fieldtype": "Select",
+      "label": "Reconciliation Status",
+      "options": "\nNot Applicable\nReconciled\nUnreconciled\nIgnored\nMatch Found",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "rejected_warehouse",
+      "fieldtype": "Link",
+      "label": "Rejected Warehouse",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "release_date",
+      "fieldtype": "Date",
+      "label": "Release Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "remarks",
+      "fieldtype": "Small Text",
+      "label": "Remarks",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "represents_company",
+      "fieldtype": "Link",
+      "label": "Represents Company",
+      "options": "Company",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "return_against",
+      "fieldtype": "Link",
+      "label": "Return Against Purchase Invoice",
+      "options": "Purchase Invoice",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "rounded_total",
+      "fieldtype": "Currency",
+      "label": "Rounded Total",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "rounding_adjustment",
+      "fieldtype": "Currency",
+      "label": "Rounding Adjustment",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sb_14",
+      "fieldtype": "Section Break",
+      "label": "Hold Invoice",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "scan_barcode",
+      "fieldtype": "Data",
+      "label": "Scan Barcode",
+      "options": "Barcode",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sec_tax_breakup",
+      "fieldtype": "Section Break",
+      "label": "Tax Breakup",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "sec_warehouse",
+      "fieldtype": "Section Break",
+      "label": "Items",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_addresses",
+      "fieldtype": "Section Break",
+      "label": "Supplier Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_26",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_44",
+      "fieldtype": "Section Break",
+      "label": "Additional Discount",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_49",
+      "fieldtype": "Section Break",
+      "label": "Totals",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_break_51",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "section_gst_breakup",
+      "fieldtype": "Section Break",
+      "label": "GST Breakup",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "select_print_heading",
+      "fieldtype": "Link",
+      "label": "Print Heading",
+      "options": "Print Heading",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "set_from_warehouse",
+      "fieldtype": "Link",
+      "label": "Set From Warehouse",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "set_posting_time",
+      "fieldtype": "Check",
+      "label": "Edit Posting Date and Time",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "set_warehouse",
+      "fieldtype": "Link",
+      "label": "Set Accepted Warehouse",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "shipping_address",
+      "fieldtype": "Link",
+      "label": "Select Shipping Address",
+      "options": "Address",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "shipping_address_display",
+      "fieldtype": "Small Text",
+      "label": "Shipping Address",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "shipping_rule",
+      "fieldtype": "Link",
+      "label": "Shipping Rule",
+      "options": "Shipping Rule",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "status",
+      "fieldtype": "Select",
+      "label": "Status",
+      "options": "\nDraft\nReturn\nDebit Note Issued\nSubmitted\nPaid\nPartly Paid\nUnpaid\nOverdue\nCancelled\nInternal Transfer",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "status_section",
+      "fieldtype": "Section Break",
+      "label": "Status",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "subscription",
+      "fieldtype": "Link",
+      "label": "Subscription",
+      "options": "Subscription",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "subscription_section",
+      "fieldtype": "Section Break",
+      "label": "Subscription",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplied_items",
+      "fieldtype": "Table",
+      "label": "Supplied Items",
+      "options": "Purchase Receipt Item Supplied",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier",
+      "fieldtype": "Link",
+      "label": "Supplier",
+      "options": "Supplier",
+      "reqd": 1,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_address",
+      "fieldtype": "Link",
+      "label": "Select Supplier Address",
+      "options": "Address",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_group",
+      "fieldtype": "Link",
+      "label": "Supplier Group",
+      "options": "Supplier Group",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_gstin",
+      "fieldtype": "Data",
+      "label": "Supplier GSTIN",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "supplier_invoice_details",
+      "fieldtype": "Section Break",
+      "label": "Supplier Invoice",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_name",
+      "fieldtype": "Data",
+      "label": "Supplier Name",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "supplier_warehouse",
+      "fieldtype": "Link",
+      "label": "Supplier Warehouse",
+      "options": "Warehouse",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_category",
+      "fieldtype": "Link",
+      "label": "Tax Category",
+      "options": "Tax Category",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_id",
+      "fieldtype": "Read Only",
+      "label": "Tax Id",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_withheld_vouchers",
+      "fieldtype": "Table",
+      "label": "Tax Withheld Vouchers",
+      "options": "Tax Withheld Vouchers",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_withheld_vouchers_section",
+      "fieldtype": "Section Break",
+      "label": "Tax Withheld Vouchers",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_withholding_category",
+      "fieldtype": "Link",
+      "label": "Tax Withholding Category",
+      "options": "Tax Withholding Category",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "tax_withholding_net_total",
+      "fieldtype": "Currency",
+      "label": "Tax Withholding Net Total",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes",
+      "fieldtype": "Table",
+      "label": "Purchase Taxes and Charges",
+      "options": "Purchase Taxes and Charges",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes_and_charges",
+      "fieldtype": "Link",
+      "label": "Purchase Taxes and Charges Template",
+      "options": "Purchase Taxes and Charges Template",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes_and_charges_added",
+      "fieldtype": "Currency",
+      "label": "Taxes and Charges Added",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes_and_charges_deducted",
+      "fieldtype": "Currency",
+      "label": "Taxes and Charges Deducted",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "taxes_section",
+      "fieldtype": "Section Break",
+      "label": "Taxes and Charges",
+      "options": "fa fa-money",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "tc_name",
+      "fieldtype": "Link",
+      "label": "Terms",
+      "options": "Terms and Conditions",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "terms",
+      "fieldtype": "Text Editor",
+      "label": "Terms and Conditions",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "terms_section_break",
+      "fieldtype": "Section Break",
+      "label": "Terms and Conditions",
+      "options": "fa fa-legal",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "terms_tab",
+      "fieldtype": "Tab Break",
+      "label": "Terms",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "title",
+      "fieldtype": "Data",
+      "label": "Title",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 1,
+      "custom": false
+    },
+    {
+      "fieldname": "to_date",
+      "fieldtype": "Date",
+      "label": "To Date",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total",
+      "fieldtype": "Currency",
+      "label": "Total",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_advance",
+      "fieldtype": "Currency",
+      "label": "Total Advance",
+      "options": "party_account_currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_net_weight",
+      "fieldtype": "Float",
+      "label": "Total Net Weight",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_qty",
+      "fieldtype": "Float",
+      "label": "Total Quantity",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "total_taxes_and_charges",
+      "fieldtype": "Currency",
+      "label": "Total Taxes and Charges",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "totals",
+      "fieldtype": "Section Break",
+      "label": "",
+      "options": "fa fa-money",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "transporter",
+      "fieldtype": "Link",
+      "label": "Transporter",
+      "options": "Supplier",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "transporter_col_break",
+      "fieldtype": "Column Break",
+      "label": "",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "transporter_info",
+      "fieldtype": "Section Break",
+      "label": "Transporter Info",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "transporter_name",
+      "fieldtype": "Small Text",
+      "label": "Transporter Name",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "unrealized_profit_loss_account",
+      "fieldtype": "Link",
+      "label": "Unrealized Profit / Loss Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "update_auto_repeat_reference",
+      "fieldtype": "Button",
+      "label": "Update Auto Repeat Reference",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "update_billed_amount_in_purchase_order",
+      "fieldtype": "Check",
+      "label": "Update Billed Amount in Purchase Order",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "update_billed_amount_in_purchase_receipt",
+      "fieldtype": "Check",
+      "label": "Update Billed Amount in Purchase Receipt",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "update_outstanding_for_self",
+      "fieldtype": "Check",
+      "label": "Update Outstanding for Self",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "update_stock",
+      "fieldtype": "Check",
+      "label": "Update Stock",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "use_company_roundoff_cost_center",
+      "fieldtype": "Check",
+      "label": "Use Company Default Round Off Cost Center",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "use_transaction_date_exchange_rate",
+      "fieldtype": "Check",
+      "label": "Use Transaction Date Exchange Rate",
+      "options": "",
+      "reqd": 0,
+      "read_only": 1,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "vehicle_no",
+      "fieldtype": "Data",
+      "label": "Vehicle No",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": true
+    },
+    {
+      "fieldname": "write_off",
+      "fieldtype": "Section Break",
+      "label": "Write Off",
+      "options": "",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_account",
+      "fieldtype": "Link",
+      "label": "Write Off Account",
+      "options": "Account",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_amount",
+      "fieldtype": "Currency",
+      "label": "Write Off Amount",
+      "options": "currency",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    },
+    {
+      "fieldname": "write_off_cost_center",
+      "fieldtype": "Link",
+      "label": "Write Off Cost Center",
+      "options": "Cost Center",
+      "reqd": 0,
+      "read_only": 0,
+      "hidden": 0,
+      "custom": false
+    }
+  ]
+}
