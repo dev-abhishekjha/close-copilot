@@ -167,6 +167,17 @@ func TestSecretRedacted(t *testing.T) {
 				"exc_type": "ValidationError",
 				"message":  strings.Repeat("a", maxMessage-5) + secret,
 			})
+		case "/api/resource/Echo/exctype":
+			// The secret is a valid identifier, so only redaction keeps it
+			// out of ExcType (which Error() prints verbatim).
+			writeJSON(w, http.StatusExpectationFailed, map[string]any{"exc_type": secret, "message": "x"})
+		case "/api/resource/Echo/split":
+			// Inline markup splits the secret; stripping the tags rejoins it,
+			// and the rejoined secret must be redacted too.
+			writeJSON(w, http.StatusExpectationFailed, map[string]any{
+				"exc_type": "ValidationError",
+				"message":  "key " + secret[:6] + "<b></b>" + secret[6:] + " and " + secret[:9] + "<span>" + secret[9:] + "</span>",
+			})
 		default:
 			writeRaw(w, http.StatusOK, `{"data":{}}`)
 		}
@@ -214,7 +225,7 @@ func TestSecretRedacted(t *testing.T) {
 	}
 	add(logBuf.String())
 
-	for _, path := range []string{"json", "html", "long"} {
+	for _, path := range []string{"json", "html", "long", "split", "exctype"} {
 		_, err := Get[map[string]any](t.Context(), c, "Echo", path)
 		if err == nil {
 			t.Fatalf("Echo/%s: want an error", path)
@@ -224,6 +235,10 @@ func TestSecretRedacted(t *testing.T) {
 		var ae *APIError
 		if errors.As(err, &ae) {
 			add(ae.Message)
+			add(ae.ExcType)
+			if path == "exctype" && ae.ExcType != "" {
+				t.Errorf("Echo/exctype: ExcType = %d bytes, want empty", len(ae.ExcType))
+			}
 		}
 	}
 
@@ -248,13 +263,11 @@ func TestRedirect(t *testing.T) {
 	var (
 		mu   sync.Mutex
 		hits = map[string]int{}
-		auth = map[string]string{}
 	)
 	var mainURLp atomic.Pointer[url.URL]
 	c, srv := newTestClient(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		mu.Lock()
 		hits[r.URL.Path]++
-		auth[r.URL.Path] = r.Header.Get("Authorization")
 		mu.Unlock()
 		mainURL := mainURLp.Load()
 		switch r.URL.Path {
@@ -264,10 +277,20 @@ func TestRedirect(t *testing.T) {
 			http.Redirect(w, r, "http://localhost:"+mainURL.Port()+"/api/resource/X/landed", http.StatusFound)
 		case "/api/resource/X/scheme":
 			http.Redirect(w, r, "https://"+mainURL.Host+"/api/resource/X/landed", http.StatusFound)
-		case "/api/resource/X/same":
+		case "/api/resource/X/same-relative":
 			http.Redirect(w, r, "/api/resource/X/landed", http.StatusFound)
+		case "/api/resource/X/same-absolute":
+			// Same origin, absolute Location: net/http would keep the
+			// Authorization header but send Host 127.0.0.1:<port>, not ERP_SITE.
+			http.Redirect(w, r, mainURL.String()+"/api/resource/X/landed", http.StatusMovedPermanently)
+		case "/api/resource/X/hostile":
+			// Percent-encoded LF and ESC decode into the target's Path.
+			w.Header().Set("Location", "/api/x%0Atime=now%20level=INFO%20msg=approved%1B[2J")
+			w.WriteHeader(http.StatusFound)
+		case "/api/method/x.y":
+			http.Redirect(w, r, "/api/method/x.z", http.StatusTemporaryRedirect)
 		default:
-			writeRaw(w, http.StatusOK, `{"data":{"name":"landed"}}`)
+			writeRaw(w, http.StatusOK, `{"data":{"name":"landed"},"message":"landed"}`)
 		}
 	}), func(cfg *config.Config) {
 		// Put the targets on the httpx allowlist, so the refusal below is
@@ -282,11 +305,18 @@ func TestRedirect(t *testing.T) {
 	}
 	mainURLp.Store(mainURL)
 
-	for _, name := range []string{"port", "host", "scheme"} {
+	// Every redirect is refused: other port, other host, other scheme and
+	// the same origin with a relative or an absolute Location.
+	for _, name := range []string{"port", "host", "scheme", "same-relative", "same-absolute", "hostile"} {
 		t.Run(name, func(t *testing.T) {
 			_, err := Get[map[string]any](t.Context(), c, "X", name)
 			if !errors.Is(err, errRedirectRefused) {
 				t.Fatalf("err = %v, want a refused redirect", err)
+			}
+			for _, r := range err.Error() {
+				if unsafeRune(r) {
+					t.Errorf("redirect error has unsafe rune %U: %q", r, err.Error())
+				}
 			}
 			mu.Lock()
 			defer mu.Unlock()
@@ -295,42 +325,29 @@ func TestRedirect(t *testing.T) {
 			}
 		})
 	}
+	t.Run("method call", func(t *testing.T) {
+		if _, err := Call[string](t.Context(), c, http.MethodPost, "x.y", nil); !errors.Is(err, errRedirectRefused) {
+			t.Fatalf("err = %v, want a refused redirect", err)
+		}
+	})
 	mu.Lock()
-	if hits["/api/resource/X/landed"] != 0 {
-		t.Errorf("a refused redirect still reached its target")
+	if n := hits["/api/resource/X/landed"] + hits["/api/method/x.z"]; n != 0 {
+		t.Errorf("a refused redirect still reached its target %d times", n)
 	}
 	mu.Unlock()
 	if otherHits.Load() != 0 {
 		t.Errorf("the other port received %d requests (and the Authorization header)", otherHits.Load())
 	}
-
-	t.Run("same origin is followed", func(t *testing.T) {
-		doc, err := Get[map[string]any](t.Context(), c, "X", "same")
-		if err != nil {
-			t.Fatal(err)
-		}
-		if doc["name"] != "landed" {
-			t.Errorf("doc = %v", doc)
-		}
-		mu.Lock()
-		defer mu.Unlock()
-		if !strings.Contains(auth["/api/resource/X/landed"], testSecret.reveal()) {
-			t.Error("same-origin redirect lost the Authorization header")
-		}
-	})
 }
 
-func TestCheckRedirectLimit(t *testing.T) {
-	u, _ := url.Parse("http://localhost:8080/a")
-	req := &http.Request{URL: u}
-	via := make([]*http.Request, maxRedirects)
-	for i := range via {
-		via[i] = req
+func TestCheckRedirect(t *testing.T) {
+	first, _ := url.Parse("http://localhost:8080/api/resource/Account")
+	same, _ := url.Parse("http://localhost:8080/api/resource/Account/")
+	orig := &http.Request{Method: http.MethodGet, URL: first}
+	if err := checkRedirect(orig, nil); err != nil {
+		t.Errorf("the original request was refused: %v", err)
 	}
-	if err := checkRedirect(req, via); !errors.Is(err, errRedirectRefused) {
-		t.Errorf("checkRedirect after %d redirects = %v, want refused", maxRedirects, err)
-	}
-	if err := checkRedirect(req, via[:1]); err != nil {
-		t.Errorf("same-origin redirect refused: %v", err)
+	if err := checkRedirect(&http.Request{URL: same}, []*http.Request{orig}); !errors.Is(err, errRedirectRefused) {
+		t.Errorf("same-origin redirect = %v, want refused", err)
 	}
 }

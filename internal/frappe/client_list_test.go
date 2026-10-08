@@ -19,8 +19,9 @@ type glRow struct {
 // pagedGL serves total GL Entry rows, honouring limit_start and
 // limit_page_length, and records each request's query.
 type pagedGL struct {
-	t     *testing.T
-	total int
+	t       *testing.T
+	total   int
+	capRows int // when > 0, never serve more rows per page than this
 
 	mu      sync.Mutex
 	queries []map[string]string
@@ -41,6 +42,9 @@ func (p *pagedGL) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p.mu.Unlock()
 	start, _ := strconv.Atoi(q["limit_start"])
 	n, _ := strconv.Atoi(q["limit_page_length"])
+	if p.capRows > 0 {
+		n = min(n, p.capRows)
+	}
 	var b strings.Builder
 	b.WriteString(`{"data":[`)
 	for i := start; i < min(start+n, p.total); i++ {
@@ -101,7 +105,8 @@ func TestListPagination(t *testing.T) {
 		if rows[1002].Debit.String() != "1234.50" {
 			t.Errorf("debit = %q, want the exact json.Number 1234.50", rows[1002].Debit)
 		}
-		want := [][2]string{{"0", "500"}, {"500", "500"}, {"1000", "500"}}
+		// The short third page is not trusted as the end; an empty page is.
+		want := [][2]string{{"0", "500"}, {"500", "500"}, {"1000", "500"}, {"1003", "500"}}
 		if got := srv.pages(); fmt.Sprint(got) != fmt.Sprint(want) {
 			t.Errorf("pages (limit_start, limit_page_length) = %v, want %v", got, want)
 		}
@@ -146,7 +151,7 @@ func TestListPagination(t *testing.T) {
 		{3, 1003, 3, [][2]string{{"0", "3"}}},
 		{700, 1003, 700, [][2]string{{"0", "500"}, {"500", "200"}}},
 		{500, 1003, 500, [][2]string{{"0", "500"}}},
-		{700, 600, 600, [][2]string{{"0", "500"}, {"500", "200"}}},
+		{700, 600, 600, [][2]string{{"0", "500"}, {"500", "200"}, {"600", "100"}}},
 	}
 	for _, tt := range limits {
 		t.Run(fmt.Sprintf("limit %d of %d", tt.limit, tt.total), func(t *testing.T) {
@@ -158,6 +163,40 @@ func TestListPagination(t *testing.T) {
 			}
 			if len(rows) != tt.want {
 				t.Errorf("got %d rows, want %d", len(rows), tt.want)
+			}
+			if got := srv.pages(); fmt.Sprint(got) != fmt.Sprint(tt.pages) {
+				t.Errorf("pages = %v, want %v", got, tt.pages)
+			}
+		})
+	}
+
+	// A server (or proxy) that caps pages below the requested length must
+	// not make List drop rows silently.
+	capped := []struct {
+		name               string
+		total, capRows, lm int
+		want               int
+		pages              [][2]string
+	}{
+		{"capped at 2 of 4", 4, 2, 0, 4, [][2]string{{"0", "500"}, {"2", "500"}, {"4", "500"}}},
+		{"capped at 2 of 5", 5, 2, 0, 5, [][2]string{{"0", "500"}, {"2", "500"}, {"4", "500"}, {"5", "500"}}},
+		{"capped at 2 with limit 3", 4, 2, 3, 3, [][2]string{{"0", "3"}, {"2", "1"}}},
+	}
+	for _, tt := range capped {
+		t.Run(tt.name, func(t *testing.T) {
+			srv := &pagedGL{t: t, total: tt.total, capRows: tt.capRows}
+			c, _ := newTestClient(t, srv)
+			rows, err := List[glRow](t.Context(), c, "GL Entry", Query{Limit: tt.lm})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if len(rows) != tt.want {
+				t.Fatalf("got %d rows, want %d: a capped page was taken as the last", len(rows), tt.want)
+			}
+			for i, r := range rows {
+				if want := fmt.Sprintf("GLE-%05d", i); r.Name != want {
+					t.Errorf("row %d = %s, want %s", i, r.Name, want)
+				}
 			}
 			if got := srv.pages(); fmt.Sprint(got) != fmt.Sprint(tt.pages) {
 				t.Errorf("pages = %v, want %v", got, tt.pages)

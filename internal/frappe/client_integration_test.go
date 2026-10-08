@@ -9,13 +9,21 @@ package frappe
 //
 // Without the variables every test here skips (see integrationConfig and
 // TestIntegrationSkips). The only write is one ₹1.00 Journal Entry marked
-// with itRemark, which the test submits, cancels and deletes again; a
-// t.Cleanup removes any entry with that remark even when the test fails.
+// with itRemark, which the test submits, cancels and deletes again. A
+// t.Cleanup removes this test's entries even when the test fails; it
+// selects only entries of itCompany owned by the bot user, of voucher type
+// Journal Entry, with total_debit 1 and itRemark, so nothing else on the
+// shared site is touched.
+//
+// Deleting a cancelled voucher needs the site's audit trail off and Accounts
+// Settings delete_linked_ledger_entries on (CC-102 follow-up); see
+// itDeleteHint.
 
 import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net/http"
 	"os"
 	"testing"
 	"time"
@@ -74,31 +82,34 @@ func TestIntegrationJournalEntryRoundTrip(t *testing.T) {
 	bot := itClient(t, cfg, cfg.ERPAPIKey, cfg.ERPAPISecret)
 	ctx := t.Context()
 
-	// The seeder (Administrator) client is a fallback for cleanup only; it
-	// is built lazily and used only if the bot is refused (see itRemove).
+	// The bot's user id scopes the cleanup to entries this test's key made.
+	owner, err := Call[string](ctx, bot, http.MethodGet, "frappe.auth.get_logged_user", nil)
+	if err != nil || owner == "" {
+		t.Fatalf("frappe.auth.get_logged_user: %q, %v", owner, err)
+	}
+
+	// The seeder (Administrator) client is built lazily and used only to
+	// delete the entry this run inserted, and only if Frappe refuses the bot
+	// (see itRemove).
 	seeder := func() *Client { return itClient(t, cfg, cfg.ERPSeedAPIKey, cfg.ERPSeedAPISecret) }
+	var inserted string // the name this run created, once known
 
 	// Clean up leftovers from an earlier failed run, and register the same
 	// cleanup before writing anything, so a failure below never leaves a
 	// draft or submitted entry behind. t.Context() is already cancelled when
 	// cleanups run, so they use their own context.
-	itCleanup(ctx, t, bot, seeder)
+	itCleanup(ctx, t, bot, seeder, owner, "")
 	t.Cleanup(func() {
 		cctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
 		defer cancel()
-		itCleanup(cctx, t, bot, seeder)
+		itCleanup(cctx, t, bot, seeder, owner, inserted)
 		left, err := itRemarked(cctx, bot)
 		if err != nil {
 			t.Errorf("list entries after cleanup: %v", err)
 		} else if len(left) != 0 {
 			t.Errorf("%d Journal Entry with remark %q remain after cleanup: %v", len(left), itRemark, left)
 		}
-		all, err := List[itJournal](cctx, bot, itJE, Query{Fields: []string{"name"}})
-		if err != nil {
-			t.Errorf("count Journal Entries: %v", err)
-			return
-		}
-		t.Logf("after cleanup: %d Journal Entry on the site, %d with remark %q", len(all), len(left), itRemark)
+		itLogCounts(cctx, t, bot, inserted)
 	})
 
 	debit, credit := itPickAccounts(ctx, t, bot)
@@ -124,7 +135,8 @@ func TestIntegrationJournalEntryRoundTrip(t *testing.T) {
 	if name == "" {
 		t.Fatalf("insert returned no name: %v", ins)
 	}
-	t.Logf("inserted %s (Dr %s, Cr %s, %s)", name, debit, credit, date)
+	inserted = name
+	t.Logf("inserted %s as %s (Dr %s, Cr %s, %s)", name, owner, debit, credit, date)
 	itExpectDocstatus(ctx, t, bot, name, 0)
 
 	// frappe.client.submit with the full latest document works on frappe
@@ -153,9 +165,7 @@ func TestIntegrationJournalEntryRoundTrip(t *testing.T) {
 
 	// The bot (Accounts User) holds delete on Journal Entry (erpnext
 	// journal_entry.json), so it deletes the cancelled entry itself; the
-	// seeder key is not needed. Deleting a cancelled voucher also needs the
-	// audit trail off and Accounts Settings delete_linked_ledger_entries on
-	// (see itDeleteHint).
+	// seeder key is not needed.
 	if err := Delete(ctx, bot, itJE, name); err != nil {
 		t.Fatalf("delete cancelled entry with the bot key: %v%s", err, itDeleteHint(err))
 	}
@@ -228,44 +238,64 @@ func itExpectDocstatus(ctx context.Context, t *testing.T, c *Client, name string
 	return got
 }
 
+// itRemarked lists every Journal Entry of itCompany with itRemark,
+// whoever made it. It is only read, for the final assertion.
 func itRemarked(ctx context.Context, c *Client) ([]itJournal, error) {
 	return List[itJournal](ctx, c, itJE, Query{
 		Fields:  []string{"name", "docstatus", "user_remark"},
-		Filters: [][]any{{"user_remark", "=", itRemark}},
+		Filters: [][]any{{"company", "=", itCompany}, {"user_remark", "=", itRemark}},
 		OrderBy: "name asc",
 	})
 }
 
-// itCleanup removes every Journal Entry carrying itRemark: a draft is
+// itOwnEntries lists the entries this test may remove: itCompany, made by
+// owner (the bot user), voucher type Journal Entry, total_debit 1 and
+// itRemark.
+func itOwnEntries(ctx context.Context, c *Client, owner string) ([]itJournal, error) {
+	return List[itJournal](ctx, c, itJE, Query{
+		Fields: []string{"name", "docstatus", "user_remark"},
+		Filters: [][]any{
+			{"company", "=", itCompany},
+			{"owner", "=", owner},
+			{"voucher_type", "=", "Journal Entry"},
+			{"total_debit", "=", 1},
+			{"user_remark", "=", itRemark},
+		},
+		OrderBy: "name asc",
+	})
+}
+
+// itCleanup removes this test's entries (itOwnEntries): a draft is
 // deleted, a submitted one is cancelled and then deleted, a cancelled one is
-// deleted.
-func itCleanup(ctx context.Context, t *testing.T, bot *Client, seeder func() *Client) {
+// deleted. inserted is the name this run created ("" before the insert).
+func itCleanup(ctx context.Context, t *testing.T, bot *Client, seeder func() *Client, owner, inserted string) {
 	t.Helper()
-	left, err := itRemarked(ctx, bot)
+	own, err := itOwnEntries(ctx, bot, owner)
 	if err != nil {
 		t.Errorf("cleanup: list entries: %v", err)
 		return
 	}
-	for _, je := range left {
+	for _, je := range own {
 		if je.Docstatus == 1 {
 			if _, err := Cancel(ctx, bot, itJE, je.Name); err != nil {
 				t.Errorf("cleanup: cancel %s: %v", je.Name, err)
 				continue
 			}
 		}
-		if itRemove(ctx, t, bot, seeder, je.Name) {
+		if itRemove(ctx, t, bot, seeder, je.Name, je.Name == inserted) {
 			t.Logf("cleanup: removed leftover %s (docstatus %d)", je.Name, je.Docstatus)
 		}
 	}
 }
 
 // itRemove deletes name with the bot key and reports whether it is gone.
-// Only if Frappe refuses the bot with a PermissionError does it fall back
-// to the seeder (Administrator) key, and it says so in the test log.
-func itRemove(ctx context.Context, t *testing.T, bot *Client, seeder func() *Client, name string) bool {
+// Only for the entry this run inserted (mayEscalate), and only if Frappe
+// refuses the bot with a PermissionError, does it fall back to the seeder
+// (Administrator) key, and it says so in the test log.
+func itRemove(ctx context.Context, t *testing.T, bot *Client, seeder func() *Client, name string, mayEscalate bool) bool {
 	t.Helper()
 	err := Delete(ctx, bot, itJE, name)
-	if IsPermission(err) {
+	if IsPermission(err) && mayEscalate {
 		t.Logf("cleanup: the bot may not delete %s; using the seeder key", name)
 		err = Delete(ctx, seeder(), itJE, name)
 	}
@@ -287,4 +317,39 @@ func itDeleteHint(err error) string {
 		return " (enable Accounts Settings > \"Delete Accounting and Stock Ledger Entries on deletion of Transaction\" (delete_linked_ledger_entries) on the site)"
 	}
 	return ""
+}
+
+// itLogCounts logs the site's Journal Entry and GL Entry totals and any GL
+// Entry still pointing at inserted, and fails if one does.
+func itLogCounts(ctx context.Context, t *testing.T, c *Client, inserted string) {
+	t.Helper()
+	jes, err := List[itJournal](ctx, c, itJE, Query{Fields: []string{"name"}})
+	if err != nil {
+		t.Errorf("count Journal Entries: %v", err)
+		return
+	}
+	type gle struct {
+		Name string `json:"name"`
+	}
+	gles, err := List[gle](ctx, c, "GL Entry", Query{Fields: []string{"name"}})
+	if err != nil {
+		t.Errorf("count GL Entries: %v", err)
+		return
+	}
+	var linked []gle
+	if inserted != "" {
+		linked, err = List[gle](ctx, c, "GL Entry", Query{
+			Fields:  []string{"name"},
+			Filters: [][]any{{"voucher_type", "=", itJE}, {"voucher_no", "=", inserted}},
+		})
+		if err != nil {
+			t.Errorf("GL Entries of %s: %v", inserted, err)
+			return
+		}
+		if len(linked) != 0 {
+			t.Errorf("%d GL Entry still reference %s", len(linked), inserted)
+		}
+	}
+	t.Logf("after cleanup: %d Journal Entry and %d GL Entry on the site; %d GL Entry reference %q",
+		len(jes), len(gles), len(linked), inserted)
 }

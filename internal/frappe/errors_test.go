@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 // serverMessagesJSON encodes msgs the way Frappe does: a JSON array, in a
@@ -33,6 +34,17 @@ func serverMessagesJSON(t *testing.T, msgs ...string) string {
 func TestAPIError(t *testing.T) {
 	traceback := "Traceback (most recent call last):\n  File \"apps/frappe/frappe/app.py\", line 114, in application\nfrappe.exceptions.ValidationError: boom"
 	excField, _ := json.Marshal([]string{traceback})
+
+	// Hostile text: a newline and a fake log line, ANSI escapes, C1 NEL,
+	// the Unicode line separator, a right-to-left override and markup.
+	const (
+		nel = rune(0x85)
+		rlo = rune(0x202E)
+	)
+	hostile := "Row <b>1</b>: amount < 0 is not allowed\n" +
+		`time=2026-10-08T10:00:00Z level=INFO msg="approved" user=admin` +
+		"\x1b[31mred\x1b[0m" + string(nel) + "next" + string(lineSeparator) + "line" + string(rlo) +
+		"evil<br/>end<!-- hidden -->"
 
 	tests := []struct {
 		name        string
@@ -61,7 +73,7 @@ func TestAPIError(t *testing.T) {
 			status:      http.StatusForbidden,
 			body:        readFixture(t, "permission_error.json"),
 			wantExcType: "PermissionError",
-			wantMessage: "User <strong>copilot-bot@example.com</strong> does not have doctype access via role permission for document <strong>DocType</strong><br>User <strong>copilot-bot@example.com</strong> does not have access to this document",
+			wantMessage: "User copilot-bot@example.com does not have doctype access via role permission for document DocType User copilot-bot@example.com does not have access to this document",
 			permission:  true,
 		},
 		{
@@ -106,7 +118,62 @@ func TestAPIError(t *testing.T) {
 			name:        "bare 403 from a proxy is not a permission error",
 			status:      http.StatusForbidden,
 			body:        "<html><body>403 Forbidden</body></html>",
-			wantMessage: "<html><body>403 Forbidden</body></html>",
+			wantMessage: "403 Forbidden",
+		},
+		{
+			// A crafted exc_type must not pass for PermissionError (or anything
+			// else) and must not reach logs as a fake line or terminal escape.
+			name:        "crafted exc_type is discarded",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "PermissionError\nHTTP 200 OK\x1b[2J", "message": "denied"}),
+			wantExcType: "",
+			wantMessage: "denied",
+		},
+		{
+			name:        "overlong exc_type is discarded",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "ValidationError" + strings.Repeat("X", 60), "message": "x"}),
+			wantExcType: "",
+			wantMessage: "x",
+		},
+		{
+			name:        "server message with HTML, newline, fake log line and ANSI escape",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "ValidationError", "_server_messages": serverMessagesJSON(t, hostile)}),
+			wantExcType: "ValidationError",
+			wantMessage: `Row 1: amount < 0 is not allowed time=2026-10-08T10:00:00Z level=INFO msg="approved" user=admin [31mred [0m next line evil end`,
+			validation:  true,
+		},
+		{
+			// Removing the inner tag rebuilds an outer one; stripping repeats.
+			name:        "nested tags rebuilt by one pass",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "ValidationError", "_server_messages": serverMessagesJSON(t, "<<b>script>alert(1)<<b>/script>")}),
+			wantExcType: "ValidationError",
+			wantMessage: "alert(1)",
+			validation:  true,
+		},
+		{
+			name:        "nested tag with an event handler",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "ValidationError", "_server_messages": serverMessagesJSON(t, "pic <<span>img src=x onerror=alert(1)> end")}),
+			wantExcType: "ValidationError",
+			wantMessage: "pic end",
+			validation:  true,
+		},
+		{
+			name:        "unterminated tag opener loses its <",
+			status:      http.StatusExpectationFailed,
+			body:        mustJSON(t, map[string]any{"exc_type": "ValidationError", "message": "x <script src=y"}),
+			wantExcType: "ValidationError",
+			wantMessage: "x script src=y",
+			validation:  true,
+		},
+		{
+			name:        "hostile text in a non-JSON body",
+			status:      http.StatusBadGateway,
+			body:        hostile,
+			wantMessage: `Row 1: amount < 0 is not allowed time=2026-10-08T10:00:00Z level=INFO msg="approved" user=admin [31mred [0m next line evil end`,
 		},
 		{
 			name:        "403 JSON without exc_type is not a permission error",
@@ -157,6 +224,8 @@ func TestAPIError(t *testing.T) {
 				w.WriteHeader(tt.status)
 				_, _ = w.Write([]byte(tt.body))
 			}))
+			// One attempt only, so a retried 502 doesn't slow the table down.
+			c.maxAttempts = 1
 			_, err := List[map[string]any](t.Context(), c, "Journal Entry", Query{})
 			var ae *APIError
 			if !errors.As(err, &ae) {
@@ -173,6 +242,17 @@ func TestAPIError(t *testing.T) {
 			}
 			if strings.Contains(err.Error(), "Traceback") || strings.Contains(err.Error(), "app.py") {
 				t.Errorf("error keeps the traceback: %v", err)
+			}
+			for _, r := range err.Error() {
+				if unsafeRune(r) {
+					t.Errorf("error text has unsafe rune %U: %q", r, err.Error())
+				}
+			}
+			if strings.ContainsAny(ae.Message, "<>") && !strings.Contains(ae.Message, "< 0") {
+				t.Errorf("message keeps markup: %q", ae.Message)
+			}
+			if tagOpenerRE.MatchString(ae.Message) {
+				t.Errorf("a tag opener survives: %q", ae.Message)
 			}
 			checks := []struct {
 				name string
@@ -205,7 +285,7 @@ func TestAPIError(t *testing.T) {
 		if len(got) > maxMessage+3 || !strings.HasSuffix(got, "...") || !strings.HasPrefix(got, "₹") {
 			t.Errorf("truncate gave %d bytes: %q", len(got), got[:20])
 		}
-		if strings.ContainsRune(got, '�') {
+		if strings.ContainsRune(got, utf8.RuneError) {
 			t.Error("truncate split a rune")
 		}
 	})

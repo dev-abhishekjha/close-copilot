@@ -38,7 +38,6 @@ const (
 	backoffBase    = 250 * time.Millisecond
 	backoffMax     = 4 * time.Second
 	retryAfterCap  = 30 * time.Second
-	maxRedirects   = 10
 )
 
 const redacted = "[redacted]"
@@ -86,8 +85,7 @@ type Client struct {
 // New returns a client for cfg.ERPBaseURL and cfg.ERPSite that
 // authenticates with key and secret (the bot pair ERP_API_KEY and
 // ERP_API_SECRET, or the seeder pair in seeding code). Requests go through
-// internal/httpx with a 15 s timeout, and any redirect that changes scheme,
-// host or port is refused.
+// internal/httpx with a 15 s timeout, and every redirect is refused.
 func New(cfg config.Config, key string, secret Secret) (*Client, error) {
 	if key == "" || secret == "" {
 		return nil, errors.New("frappe: an API key and secret are required")
@@ -169,25 +167,23 @@ func redactSecret(text, secret string) string {
 	return text
 }
 
-// errRedirectRefused is wrapped by the error for a cross-origin redirect.
+// errRedirectRefused is wrapped by the error for any redirect.
 var errRedirectRefused = errors.New("frappe: redirect refused")
 
-// checkRedirect allows a redirect only to the same scheme, host and port as
-// the original request. net/http keeps the Authorization header on a
-// redirect to the same host on another port, and other local ports are on
-// the httpx allowlist, so the origin must match exactly.
+// checkRedirect refuses every redirect. The Frappe REST API answers
+// /api/resource and /api/method directly and never needs one, while a
+// followed redirect is risky: net/http keeps the Authorization header on a
+// redirect to the same host on another port (other local ports are on the
+// httpx allowlist), and a same-origin redirect with an absolute Location
+// keeps Authorization but drops the Host override for ERP_SITE.
 func checkRedirect(req *http.Request, via []*http.Request) error {
 	if len(via) == 0 {
 		return nil
 	}
-	if len(via) >= maxRedirects {
-		return fmt.Errorf("%w: stopped after %d redirects", errRedirectRefused, maxRedirects)
-	}
-	from, to := via[0].URL, req.URL
-	if origin(from) != origin(to) {
-		return fmt.Errorf("%w: %s to %s changes scheme, host or port", errRedirectRefused, origin(from), origin(to))
-	}
-	return nil
+	// Escaped paths, quoted: the decoded Path of a hostile Location can hold
+	// LF or ESC, which must never reach an error message or a log line.
+	return fmt.Errorf("%w: %s %q redirected to %q", errRedirectRefused,
+		via[0].Method, via[0].URL.EscapedPath(), origin(req.URL)+req.URL.EscapedPath())
 }
 
 // origin is scheme://host:port in lower case, with the scheme's default

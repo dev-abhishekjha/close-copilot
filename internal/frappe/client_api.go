@@ -34,10 +34,13 @@ type Query struct {
 // request via limit_start and limit_page_length. List rows never include
 // child tables; use Get or GetMany for those.
 //
+// List stops at the first empty page (or once it has q.Limit rows), never
+// at a merely short one, so a server that caps pages below PageSize can't
+// make it drop rows; the cost is one extra request that returns nothing.
 // A server that ignores limit_start would page forever, so List fails when
-// a full page repeats the previous one byte for byte, or after MaxPages
-// pages. (Two genuinely identical consecutive pages are only possible when
-// Fields omits "name"; include it when selecting few columns.)
+// a page repeats the previous one byte for byte, or after MaxPages pages.
+// (Two genuinely identical consecutive pages are only possible when Fields
+// omits "name"; include it when selecting few columns.)
 func List[T any](ctx context.Context, c *Client, doctype string, q Query) ([]T, error) {
 	path, err := resourcePath(doctype)
 	if err != nil {
@@ -95,16 +98,19 @@ func List[T any](ctx context.Context, c *Client, doctype string, q Query) ([]T, 
 				return nil, fmt.Errorf("frappe: list %s: decode page at limit_start %d: %w", doctype, start, err)
 			}
 		}
-		if len(rows) > 0 && len(rows) >= want && bytes.Equal(resp.Data, prev) {
+		// Only an empty page ends the list. A short page is not proof of
+		// the end: a server (or proxy) that caps page length below what we
+		// asked for would otherwise silently drop the remaining rows.
+		if len(rows) == 0 {
+			return out, nil
+		}
+		if bytes.Equal(resp.Data, prev) {
 			return nil, fmt.Errorf("frappe: list %s: page at limit_start %d repeats the previous page; the server may be ignoring limit_start", doctype, start)
 		}
 		prev = resp.Data
 		out = append(out, rows...)
-		if len(rows) < want || (q.Limit > 0 && len(out) >= q.Limit) {
-			if q.Limit > 0 && len(out) > q.Limit {
-				out = out[:q.Limit]
-			}
-			return out, nil
+		if q.Limit > 0 && len(out) >= q.Limit {
+			return out[:q.Limit], nil
 		}
 		start += len(rows)
 	}
