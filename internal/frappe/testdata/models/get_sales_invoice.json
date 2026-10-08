@@ -1,0 +1,46 @@
+{
+  "data": {
+    "name": "ACC-SINV-2026-00018",
+    "owner": "copilot-bot@example.com",
+    "docstatus": 1,
+    "doctype": "Sales Invoice",
+    "company": "Sharma Traders Pvt Ltd",
+    "customer": "Godavari Retail",
+    "customer_name": "Godavari Retail",
+    "posting_date": "2026-09-20",
+    "net_total": 25000.0,
+    "grand_total": 29500.0,
+    "outstanding_amount": 0.0,
+    "debit_to": "Debtors - STPL",
+    "remarks": "No Remarks",
+    "items": [
+      {
+        "name": "p1q2r3s4t5",
+        "idx": 1,
+        "parent": "ACC-SINV-2026-00018",
+        "parentfield": "items",
+        "doctype": "Sales Invoice Item",
+        "item_code": "PKG-BOX-L",
+        "description": "Corrugated box, large",
+        "income_account": "Sales - STPL",
+        "qty": 500.0,
+        "amount": 25000.0
+      }
+    ],
+    "taxes": [
+      {
+        "name": "u6v7w8x9y0",
+        "idx": 1,
+        "parent": "ACC-SINV-2026-00018",
+        "parentfield": "taxes",
+        "doctype": "Sales Taxes and Charges",
+        "account_head": "Output Tax IGST - STPL",
+        "tax_amount": 4500.0,
+        "charge_type": "On Net Total",
+        "rate": 18.0,
+        "description": "IGST @ 18.0",
+        "gst_tax_type": "igst"
+      }
+    ]
+  }
+}

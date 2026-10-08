@@ -1,0 +1,57 @@
+{
+  "data": {
+    "name": "ACC-JV-2026-00007",
+    "owner": "copilot-bot@example.com",
+    "docstatus": 1,
+    "doctype": "Journal Entry",
+    "company": "Sharma Traders Pvt Ltd",
+    "voucher_type": "Bank Entry",
+    "posting_date": "2026-09-14",
+    "user_remark": "Bank charges for September",
+    "cheque_no": "HDFC-CHG-0914",
+    "cheque_date": "2026-09-14",
+    "total_debit": 1180.5,
+    "total_credit": 1180.5,
+    "title": "Bank Charges - STPL",
+    "accounts": [
+      {
+        "name": "j1k2l3m4n5",
+        "idx": 1,
+        "parent": "ACC-JV-2026-00007",
+        "parentfield": "accounts",
+        "doctype": "Journal Entry Account",
+        "account": "Bank Charges - STPL",
+        "debit_in_account_currency": 1180.5,
+        "credit_in_account_currency": 0.0,
+        "debit": 1180.5,
+        "credit": 0.0,
+        "party_type": null,
+        "party": null,
+        "reference_type": "",
+        "reference_name": null,
+        "cost_center": "Main - STPL",
+        "user_remark": null,
+        "account_currency": "INR"
+      },
+      {
+        "name": "o6p7q8r9s0",
+        "idx": 2,
+        "parent": "ACC-JV-2026-00007",
+        "parentfield": "accounts",
+        "doctype": "Journal Entry Account",
+        "account": "HDFC Bank - STPL",
+        "debit_in_account_currency": 0.0,
+        "credit_in_account_currency": 1180.5,
+        "debit": 0.0,
+        "credit": 1180.5,
+        "party_type": null,
+        "party": null,
+        "reference_type": "",
+        "reference_name": null,
+        "cost_center": "Main - STPL",
+        "user_remark": null,
+        "account_currency": "INR"
+      }
+    ]
+  }
+}
