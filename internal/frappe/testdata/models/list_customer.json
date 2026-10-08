@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "name": "Godavari Retail",
+      "docstatus": 0,
+      "customer_name": "Godavari Retail",
+      "customer_group": "Commercial",
+      "customer_type": "Company",
+      "territory": "India",
+      "gstin": "27YYYYY8888Y1Z8",
+      "gst_category": "Registered Regular",
+      "default_currency": "INR"
+    }
+  ]
+}

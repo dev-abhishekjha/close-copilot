@@ -1,0 +1,72 @@
+{
+  "data": {
+    "name": "ACC-PINV-2026-00031",
+    "owner": "copilot-bot@example.com",
+    "docstatus": 1,
+    "doctype": "Purchase Invoice",
+    "company": "Sharma Traders Pvt Ltd",
+    "supplier": "Kaveri Packaging",
+    "supplier_name": "Kaveri Packaging",
+    "bill_no": "KP/26-27/0412",
+    "bill_date": "2026-09-10",
+    "posting_date": "2026-09-12",
+    "remarks": "Packaging material, September",
+    "credit_to": "Creditors - STPL",
+    "currency": "INR",
+    "net_total": 1000.0,
+    "grand_total": 1180.0,
+    "outstanding_amount": 1180.0,
+    "is_return": 0,
+    "supplier_gstin": "27ZZZZZ9999Z1Z9",
+    "company_gstin": "27XXXXX7777X1Z7",
+    "place_of_supply": "27-Maharashtra",
+    "items": [
+      {
+        "name": "a1b2c3d4e5",
+        "idx": 1,
+        "parent": "ACC-PINV-2026-00031",
+        "parentfield": "items",
+        "parenttype": "Purchase Invoice",
+        "doctype": "Purchase Invoice Item",
+        "item_code": "PKG-BOX-S",
+        "description": "Corrugated box, small",
+        "expense_account": "Cost of Goods Sold - STPL",
+        "qty": 100.0,
+        "rate": 10.0,
+        "amount": 1000.0
+      }
+    ],
+    "taxes": [
+      {
+        "name": "f6g7h8i9j0",
+        "idx": 1,
+        "parent": "ACC-PINV-2026-00031",
+        "parentfield": "taxes",
+        "doctype": "Purchase Taxes and Charges",
+        "account_head": "Input Tax CGST - STPL",
+        "tax_amount": 90.0,
+        "charge_type": "On Net Total",
+        "rate": 9.0,
+        "add_deduct_tax": "Add",
+        "category": "Total",
+        "description": "CGST @ 9.0",
+        "gst_tax_type": "cgst"
+      },
+      {
+        "name": "k1l2m3n4o5",
+        "idx": 2,
+        "parent": "ACC-PINV-2026-00031",
+        "parentfield": "taxes",
+        "doctype": "Purchase Taxes and Charges",
+        "account_head": "Input Tax SGST - STPL",
+        "tax_amount": 90.0,
+        "charge_type": "On Net Total",
+        "rate": 9.0,
+        "add_deduct_tax": "Add",
+        "category": "Total",
+        "description": "SGST @ 9.0",
+        "gst_tax_type": "sgst"
+      }
+    ]
+  }
+}

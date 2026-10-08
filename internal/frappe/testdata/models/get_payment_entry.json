@@ -1,0 +1,38 @@
+{
+  "data": {
+    "name": "ACC-PAY-2026-00009",
+    "owner": "copilot-bot@example.com",
+    "docstatus": 1,
+    "doctype": "Payment Entry",
+    "company": "Sharma Traders Pvt Ltd",
+    "payment_type": "Pay",
+    "party_type": "Supplier",
+    "party": "Kaveri Packaging",
+    "party_name": "Kaveri Packaging",
+    "paid_amount": 1180.0,
+    "received_amount": 1180.0,
+    "paid_from": "HDFC Bank - STPL",
+    "paid_to": "Creditors - STPL",
+    "reference_no": "UTR2026091500123",
+    "reference_date": "2026-09-15",
+    "posting_date": "2026-09-15",
+    "remarks": "Amount INR 1,180.00 paid to Kaveri Packaging",
+    "unallocated_amount": 0.0,
+    "base_paid_amount": 1180.0,
+    "references": [
+      {
+        "name": "z1y2x3w4v5",
+        "idx": 1,
+        "parent": "ACC-PAY-2026-00009",
+        "parentfield": "references",
+        "doctype": "Payment Entry Reference",
+        "reference_doctype": "Purchase Invoice",
+        "reference_name": "ACC-PINV-2026-00031",
+        "allocated_amount": 1180.0,
+        "total_amount": 1180.0,
+        "outstanding_amount": 1180.0,
+        "due_date": "2026-10-10"
+      }
+    ]
+  }
+}

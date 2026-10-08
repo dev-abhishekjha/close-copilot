@@ -1,0 +1,16 @@
+{
+  "data": [
+    {
+      "name": "Kaveri Packaging",
+      "docstatus": 0,
+      "supplier_name": "Kaveri Packaging",
+      "supplier_group": "Raw Material",
+      "supplier_type": "Company",
+      "gstin": "27ZZZZZ9999Z1Z9",
+      "gst_category": "Registered Regular",
+      "pan": "ZZZZZ9999Z",
+      "country": "India",
+      "disabled": 0
+    }
+  ]
+}

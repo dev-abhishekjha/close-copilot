@@ -1,0 +1,46 @@
+{
+  "data": [
+    {
+      "name": "Application of Funds (Assets) - STPL",
+      "docstatus": 0,
+      "account_name": "Application of Funds (Assets)",
+      "company": "Sharma Traders Pvt Ltd",
+      "parent_account": "",
+      "is_group": 1,
+      "root_type": "Asset",
+      "account_type": "",
+      "account_currency": "INR",
+      "lft": 1,
+      "rgt": 80,
+      "modified": "2026-09-01 10:00:00.000000"
+    },
+    {
+      "name": "HDFC Bank - STPL",
+      "docstatus": 0,
+      "account_name": "HDFC Bank",
+      "company": "Sharma Traders Pvt Ltd",
+      "parent_account": "Bank Accounts - STPL",
+      "is_group": 0,
+      "root_type": "Asset",
+      "account_type": "Bank",
+      "account_currency": "INR",
+      "lft": 12,
+      "rgt": 13,
+      "modified": "2026-09-01 10:00:00.000000"
+    },
+    {
+      "name": "Bank Charges - STPL",
+      "docstatus": 0,
+      "account_name": "Bank Charges",
+      "company": "Sharma Traders Pvt Ltd",
+      "parent_account": "Indirect Expenses - STPL",
+      "is_group": 0,
+      "root_type": "Expense",
+      "account_type": "",
+      "account_currency": "INR",
+      "lft": 140,
+      "rgt": 141,
+      "modified": "2026-09-01 10:00:00.000000"
+    }
+  ]
+}

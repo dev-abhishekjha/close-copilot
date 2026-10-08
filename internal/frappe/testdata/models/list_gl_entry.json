@@ -1,0 +1,44 @@
+{
+  "data": [
+    {
+      "name": "ACC-GLE-2026-00041",
+      "docstatus": 1,
+      "company": "Sharma Traders Pvt Ltd",
+      "account": "Bank Charges - STPL",
+      "debit": 1180.5,
+      "credit": 0.0,
+      "posting_date": "2026-09-14",
+      "voucher_type": "Journal Entry",
+      "voucher_no": "ACC-JV-2026-00007",
+      "party_type": "",
+      "party": "",
+      "is_cancelled": 0,
+      "is_opening": "No",
+      "fiscal_year": "2026-2027",
+      "against": "HDFC Bank - STPL",
+      "remarks": "Bank charges for September",
+      "debit_in_account_currency": 1180.5,
+      "creation": "2026-09-14 11:02:03.123456"
+    },
+    {
+      "name": "ACC-GLE-2026-00042",
+      "docstatus": 1,
+      "company": "Sharma Traders Pvt Ltd",
+      "account": "HDFC Bank - STPL",
+      "debit": 0.0,
+      "credit": 1180.5,
+      "posting_date": "2026-09-14",
+      "voucher_type": "Journal Entry",
+      "voucher_no": "ACC-JV-2026-00007",
+      "party_type": null,
+      "party": null,
+      "is_cancelled": 0,
+      "is_opening": "No",
+      "fiscal_year": "2026-2027",
+      "against": "Bank Charges - STPL",
+      "remarks": "Bank charges for September",
+      "debit_in_account_currency": 0.0,
+      "creation": "2026-09-14 11:02:03.123456"
+    }
+  ]
+}
