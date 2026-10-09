@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/abhishekjha/close-copilot/internal/money"
+	"github.com/abhishekjha/close-copilot/internal/seed"
 )
 
 type fakeCheck struct {
@@ -45,10 +46,15 @@ type fakeStore struct {
 	txCount int
 }
 
-func (s *fakeStore) CreateFindings(_ context.Context, findings []Finding) error {
+// CreateFindings fails on a cancelled context, as pgx does, so a runner that
+// persists under errgroup's derived context (cancelled by Wait) fails here.
+func (s *fakeStore) CreateFindings(ctx context.Context, findings []Finding) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.txCount++
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	if s.saveErr != nil {
 		return s.saveErr
 	}
@@ -228,5 +234,75 @@ func TestEmptyChecks(t *testing.T) {
 	}
 	if results != nil {
 		t.Errorf("expected nil results, got %v", results)
+	}
+}
+
+func TestRunnerPersistsWithCallerContext(t *testing.T) {
+	amt := money.Paise(10000)
+	c := &fakeCheck{
+		name: "one",
+		findings: []Finding{{
+			Type:        TypeUnrecordedBankCharge,
+			Severity:    SeverityMedium,
+			Title:       "Bank charge",
+			AmountPaise: &amt,
+			Keys:        map[string]string{"bank_txn_id": "TXN-1"},
+		}},
+	}
+	st := &fakeStore{}
+	runID := uuid.New()
+
+	got, err := NewRunner(st).Run(t.Context(), runID, Inputs{}, c)
+	if err != nil {
+		t.Fatalf("Runner.Run: %v", err)
+	}
+	if len(got) != 1 || len(st.saved) != 1 {
+		t.Fatalf("got %d findings, saved %d; want 1 and 1", len(got), len(st.saved))
+	}
+	if st.saved[0].RunID != runID {
+		t.Errorf("saved RunID = %s, want %s", st.saved[0].RunID, runID)
+	}
+}
+
+func TestRunnerCancelledCallerContext(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	c := &fakeCheck{name: "one", findings: []Finding{{Type: TypeVariance, Keys: map[string]string{"account": "A"}}}}
+
+	_, err := NewRunner(&fakeStore{}).Run(ctx, uuid.New(), Inputs{}, c)
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("err = %v, want context.Canceled", err)
+	}
+}
+
+func TestBankAccountsFor(t *testing.T) {
+	tests := []struct {
+		name string
+		p    seed.Profile
+		want []string
+	}{
+		{
+			name: "profile bank account with company abbr",
+			p:    seed.Profile{ID: "testco", Abbr: "TC", Bank: seed.Bank{Name: "Test Bank", Account: "Test Current 0001"}},
+			want: []string{"Test Current 0001 - TC"},
+		},
+		{
+			name: "other abbr",
+			p:    seed.Profile{ID: "demo", Abbr: "DPL", Bank: seed.Bank{Account: "Demo Bank Current"}},
+			want: []string{"Demo Bank Current - DPL"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			got := BankAccountsFor(tc.p)
+			if len(got) != len(tc.want) {
+				t.Fatalf("BankAccountsFor = %v, want %v", got, tc.want)
+			}
+			for i := range got {
+				if got[i] != tc.want[i] {
+					t.Errorf("BankAccountsFor[%d] = %q, want %q", i, got[i], tc.want[i])
+				}
+			}
+		})
 	}
 }

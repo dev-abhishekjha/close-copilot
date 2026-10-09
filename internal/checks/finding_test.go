@@ -28,7 +28,7 @@ func TestDedupeKey(t *testing.T) {
 				Type: TypeUnrecordedBankCharge,
 				Keys: map[string]string{"bank_txn_id": "TXN-001"},
 			},
-			want: "unrecorded_bank_charge:bank_txn_id=TXN-001;",
+			want: `unrecorded_bank_charge:"bank_txn_id"="TXN-001";`,
 		},
 		{
 			name: "multiple keys sorted deterministically",
@@ -39,7 +39,15 @@ func TestDedupeKey(t *testing.T) {
 					"month":    "2026-09",
 				},
 			},
-			want: "missing_accrual:month=2026-09;supplier=SUP-Acme;",
+			want: `missing_accrual:"month"="2026-09";"supplier"="SUP-Acme";`,
+		},
+		{
+			name: "separators and quotes in values are escaped",
+			f: Finding{
+				Type: TypeVariance,
+				Keys: map[string]string{"account": `a=b;"c"`},
+			},
+			want: `variance:"account"="a=b;\"c\"";`,
 		},
 	}
 
@@ -66,6 +74,33 @@ func TestDedupeKeyMapOrderInvariant(t *testing.T) {
 
 	if DedupeKey(f1) != DedupeKey(f2) {
 		t.Errorf("DedupeKey() not order invariant: %q != %q", DedupeKey(f1), DedupeKey(f2))
+	}
+}
+
+func TestDedupeKeyNoCollision(t *testing.T) {
+	tests := []struct {
+		name string
+		a, b map[string]string
+	}{
+		{
+			name: "separator inside a value",
+			a:    map[string]string{"a": "1;b=2"},
+			b:    map[string]string{"a": "1", "b": "2"},
+		},
+		{
+			name: "equals inside a key",
+			a:    map[string]string{"a=1": "x"},
+			b:    map[string]string{"a": "1=x"},
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			ka := DedupeKey(Finding{Type: TypeVariance, Keys: tc.a})
+			kb := DedupeKey(Finding{Type: TypeVariance, Keys: tc.b})
+			if ka == kb {
+				t.Errorf("DedupeKey collision: %v and %v both give %q", tc.a, tc.b, ka)
+			}
+		})
 	}
 }
 

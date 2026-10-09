@@ -40,153 +40,129 @@ type RecurringSupplier struct {
 	MonthsSeen   []string    `json:"months_seen"`
 }
 
-// DirectBooks implements BooksReader directly against the ERPNext REST API client.
+// CompanyDirectory resolves a company ID ("sharma") to its stored record,
+// whose ERPCompany is the name ERPNext knows the company by.
+// *store.Store implements CompanyDirectory.
+type CompanyDirectory interface {
+	GetCompany(ctx context.Context, id string) (store.Company, error)
+}
+
+var _ CompanyDirectory = (*store.Store)(nil)
+
+// DirectBooks implements BooksReader directly against the ERPNext REST API
+// client. Like the books MCP tools, its methods take the company ID and
+// resolve it to the ERPNext company name through Companies before querying.
 type DirectBooks struct {
-	Client *frappe.Client
+	Client    *frappe.Client
+	Companies CompanyDirectory
 }
 
 var _ BooksReader = (*DirectBooks)(nil)
 
+// erpCompany checks the client and directory, and returns the ERPNext
+// company name for the company ID.
+func (d *DirectBooks) erpCompany(ctx context.Context, company string) (string, error) {
+	if d.Client == nil {
+		return "", errors.New("checks: DirectBooks has nil client")
+	}
+	if d.Companies == nil {
+		return "", errors.New("checks: DirectBooks has nil company directory")
+	}
+	if company == "" {
+		return "", errors.New("checks: DirectBooks: empty company ID")
+	}
+	c, err := d.Companies.GetCompany(ctx, company)
+	if err != nil {
+		return "", fmt.Errorf("checks: resolve company %q: %w", company, err)
+	}
+	if c.ERPCompany == "" {
+		return "", fmt.Errorf("checks: resolve company %q: no ERPNext company name", company)
+	}
+	return c.ERPCompany, nil
+}
+
 // TrialBalance calculates the trial balance for the given period.
 func (d *DirectBooks) TrialBalance(ctx context.Context, company string, from, to time.Time) (books.TB, error) {
-	if d.Client == nil {
-		return books.TB{}, errors.New("checks: DirectBooks has nil client")
+	erp, err := d.erpCompany(ctx, company)
+	if err != nil {
+		return books.TB{}, err
 	}
-	return books.TrialBalance(ctx, books.FrappeLedger{C: d.Client}, company, from, to)
+	return books.TrialBalance(ctx, books.FrappeLedger{C: d.Client}, erp, from, to)
 }
 
 // GLEntries returns non-cancelled GL entries for the given date range.
 func (d *DirectBooks) GLEntries(ctx context.Context, company string, from, to time.Time) ([]frappe.GLEntry, error) {
-	if d.Client == nil {
-		return nil, errors.New("checks: DirectBooks has nil client")
+	erp, err := d.erpCompany(ctx, company)
+	if err != nil {
+		return nil, err
 	}
-	return books.FrappeLedger{C: d.Client}.GLEntries(ctx, company, from, to)
+	return books.FrappeLedger{C: d.Client}.GLEntries(ctx, erp, from, to)
 }
 
-// PurchaseInvoices returns non-cancelled purchase invoices with items and taxes.
+// PurchaseInvoices returns submitted (docstatus 1) purchase invoices with
+// items and taxes. Drafts and cancelled invoices are not in the ledger.
 func (d *DirectBooks) PurchaseInvoices(ctx context.Context, company string, from, to time.Time) ([]frappe.PurchaseInvoice, error) {
-	if d.Client == nil {
-		return nil, errors.New("checks: DirectBooks has nil client")
-	}
-	filters := [][]any{
-		{"company", "=", company},
-		{"docstatus", "!=", 2},
-	}
-	if !from.IsZero() && !to.IsZero() {
-		filters = append(filters, []any{"posting_date", "between", []string{from.Format(time.DateOnly), to.Format(time.DateOnly)}})
-	} else if !to.IsZero() {
-		filters = append(filters, []any{"posting_date", "<=", to.Format(time.DateOnly)})
-	} else if !from.IsZero() {
-		filters = append(filters, []any{"posting_date", ">=", from.Format(time.DateOnly)})
-	}
-
-	rawList, err := frappe.List[frappe.PurchaseInvoiceRaw](ctx, d.Client, frappe.DocTypePurchaseInvoice, frappe.Query{
-		Fields:  []string{"name"},
-		Filters: filters,
-		OrderBy: "posting_date asc, name asc",
-	})
+	erp, err := d.erpCompany(ctx, company)
 	if err != nil {
-		return nil, fmt.Errorf("checks: list purchase invoices: %w", err)
+		return nil, err
 	}
-	if len(rawList) == 0 {
-		return nil, nil
-	}
-
-	names := make([]string, len(rawList))
-	for i, r := range rawList {
-		names[i] = r.Name
-	}
-
-	fullRaws, err := frappe.GetMany[frappe.PurchaseInvoiceRaw](ctx, d.Client, frappe.DocTypePurchaseInvoice, names)
-	if err != nil {
-		return nil, fmt.Errorf("checks: get purchase invoices: %w", err)
-	}
-
-	out := make([]frappe.PurchaseInvoice, len(fullRaws))
-	for i, r := range fullRaws {
-		dom, err := r.Domain()
-		if err != nil {
-			return nil, fmt.Errorf("checks: convert purchase invoice %s: %w", r.Name, err)
-		}
-		out[i] = dom
-	}
-	return out, nil
+	return listSubmitted(ctx, d.Client, frappe.DocTypePurchaseInvoice, erp, from, to,
+		func(r frappe.PurchaseInvoiceRaw) string { return r.Name },
+		frappe.PurchaseInvoiceRaw.Domain)
 }
 
-// SalesInvoices returns non-cancelled sales invoices with items and taxes.
+// SalesInvoices returns submitted (docstatus 1) sales invoices with items
+// and taxes.
 func (d *DirectBooks) SalesInvoices(ctx context.Context, company string, from, to time.Time) ([]frappe.SalesInvoice, error) {
-	if d.Client == nil {
-		return nil, errors.New("checks: DirectBooks has nil client")
-	}
-	filters := [][]any{
-		{"company", "=", company},
-		{"docstatus", "!=", 2},
-	}
-	if !from.IsZero() && !to.IsZero() {
-		filters = append(filters, []any{"posting_date", "between", []string{from.Format(time.DateOnly), to.Format(time.DateOnly)}})
-	} else if !to.IsZero() {
-		filters = append(filters, []any{"posting_date", "<=", to.Format(time.DateOnly)})
-	} else if !from.IsZero() {
-		filters = append(filters, []any{"posting_date", ">=", from.Format(time.DateOnly)})
-	}
-
-	rawList, err := frappe.List[frappe.SalesInvoiceRaw](ctx, d.Client, frappe.DocTypeSalesInvoice, frappe.Query{
-		Fields:  []string{"name"},
-		Filters: filters,
-		OrderBy: "posting_date asc, name asc",
-	})
+	erp, err := d.erpCompany(ctx, company)
 	if err != nil {
-		return nil, fmt.Errorf("checks: list sales invoices: %w", err)
+		return nil, err
 	}
-	if len(rawList) == 0 {
-		return nil, nil
-	}
-
-	names := make([]string, len(rawList))
-	for i, r := range rawList {
-		names[i] = r.Name
-	}
-
-	fullRaws, err := frappe.GetMany[frappe.SalesInvoiceRaw](ctx, d.Client, frappe.DocTypeSalesInvoice, names)
-	if err != nil {
-		return nil, fmt.Errorf("checks: get sales invoices: %w", err)
-	}
-
-	out := make([]frappe.SalesInvoice, len(fullRaws))
-	for i, r := range fullRaws {
-		dom, err := r.Domain()
-		if err != nil {
-			return nil, fmt.Errorf("checks: convert sales invoice %s: %w", r.Name, err)
-		}
-		out[i] = dom
-	}
-	return out, nil
+	return listSubmitted(ctx, d.Client, frappe.DocTypeSalesInvoice, erp, from, to,
+		func(r frappe.SalesInvoiceRaw) string { return r.Name },
+		frappe.SalesInvoiceRaw.Domain)
 }
 
-// PaymentEntries returns non-cancelled payment entries with child reference rows.
+// PaymentEntries returns submitted (docstatus 1) payment entries with
+// child reference rows.
 func (d *DirectBooks) PaymentEntries(ctx context.Context, company string, from, to time.Time) ([]frappe.PaymentEntry, error) {
-	if d.Client == nil {
-		return nil, errors.New("checks: DirectBooks has nil client")
+	erp, err := d.erpCompany(ctx, company)
+	if err != nil {
+		return nil, err
 	}
+	return listSubmitted(ctx, d.Client, frappe.DocTypePaymentEntry, erp, from, to,
+		func(r frappe.PaymentEntryRaw) string { return r.Name },
+		frappe.PaymentEntryRaw.Domain)
+}
+
+// submittedFilters returns the list filters for submitted documents of
+// erpCompany posted between from and to (either may be zero for open).
+func submittedFilters(erpCompany string, from, to time.Time) [][]any {
 	filters := [][]any{
-		{"company", "=", company},
-		{"docstatus", "!=", 2},
+		{"company", "=", erpCompany},
+		{"docstatus", "=", 1},
 	}
-	if !from.IsZero() && !to.IsZero() {
+	switch {
+	case !from.IsZero() && !to.IsZero():
 		filters = append(filters, []any{"posting_date", "between", []string{from.Format(time.DateOnly), to.Format(time.DateOnly)}})
-	} else if !to.IsZero() {
+	case !to.IsZero():
 		filters = append(filters, []any{"posting_date", "<=", to.Format(time.DateOnly)})
-	} else if !from.IsZero() {
+	case !from.IsZero():
 		filters = append(filters, []any{"posting_date", ">=", from.Format(time.DateOnly)})
 	}
+	return filters
+}
 
-	rawList, err := frappe.List[frappe.PaymentEntryRaw](ctx, d.Client, frappe.DocTypePaymentEntry, frappe.Query{
+// listSubmitted lists the names of submitted documents of doctype, fetches
+// each in full (child tables included) and converts it to its domain type.
+func listSubmitted[R, D any](ctx context.Context, c *frappe.Client, doctype, erpCompany string, from, to time.Time, name func(R) string, conv func(R) (D, error)) ([]D, error) {
+	rawList, err := frappe.List[R](ctx, c, doctype, frappe.Query{
 		Fields:  []string{"name"},
-		Filters: filters,
+		Filters: submittedFilters(erpCompany, from, to),
 		OrderBy: "posting_date asc, name asc",
 	})
 	if err != nil {
-		return nil, fmt.Errorf("checks: list payment entries: %w", err)
+		return nil, fmt.Errorf("checks: list %s: %w", doctype, err)
 	}
 	if len(rawList) == 0 {
 		return nil, nil
@@ -194,19 +170,19 @@ func (d *DirectBooks) PaymentEntries(ctx context.Context, company string, from, 
 
 	names := make([]string, len(rawList))
 	for i, r := range rawList {
-		names[i] = r.Name
+		names[i] = name(r)
 	}
 
-	fullRaws, err := frappe.GetMany[frappe.PaymentEntryRaw](ctx, d.Client, frappe.DocTypePaymentEntry, names)
+	fullRaws, err := frappe.GetMany[R](ctx, c, doctype, names)
 	if err != nil {
-		return nil, fmt.Errorf("checks: get payment entries: %w", err)
+		return nil, fmt.Errorf("checks: get %s: %w", doctype, err)
 	}
 
-	out := make([]frappe.PaymentEntry, len(fullRaws))
+	out := make([]D, len(fullRaws))
 	for i, r := range fullRaws {
-		dom, err := r.Domain()
+		dom, err := conv(r)
 		if err != nil {
-			return nil, fmt.Errorf("checks: convert payment entry %s: %w", r.Name, err)
+			return nil, fmt.Errorf("checks: convert %s %s: %w", doctype, name(r), err)
 		}
 		out[i] = dom
 	}
@@ -215,10 +191,11 @@ func (d *DirectBooks) PaymentEntries(ctx context.Context, company string, from, 
 
 // AccountHistory returns the monthly totals for an account over the requested months ending with through.
 func (d *DirectBooks) AccountHistory(ctx context.Context, company, account string, through string, months int) ([]books.MonthTotal, error) {
-	if d.Client == nil {
-		return nil, errors.New("checks: DirectBooks has nil client")
+	erp, err := d.erpCompany(ctx, company)
+	if err != nil {
+		return nil, err
 	}
-	return books.AccountHistory(ctx, books.FrappeLedger{C: d.Client}, company, account, through, months)
+	return books.AccountHistory(ctx, books.FrappeLedger{C: d.Client}, erp, account, through, months)
 }
 
 // RecurringSuppliers identifies suppliers who billed consistently in lookbackMonths before beforeMonth.

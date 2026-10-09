@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -74,7 +75,9 @@ const (
 	ActionNoAction         = "no_action"
 )
 
-// DedupeKey returns a deterministic string key formed by finding type and sorted keys.
+// DedupeKey returns a deterministic string key formed by finding type and
+// sorted keys. Each key and value is quoted (strconv.Quote), so values that
+// contain '=', ';' or quotes cannot make two different key sets collide.
 func DedupeKey(f Finding) string {
 	var b strings.Builder
 	b.WriteString(f.Type)
@@ -88,9 +91,9 @@ func DedupeKey(f Finding) string {
 	}
 	slices.Sort(keys)
 	for _, k := range keys {
-		b.WriteString(k)
+		b.WriteString(strconv.Quote(k))
 		b.WriteByte('=')
-		b.WriteString(f.Keys[k])
+		b.WriteString(strconv.Quote(f.Keys[k]))
 		b.WriteByte(';')
 	}
 	return b.String()
