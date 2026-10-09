@@ -507,3 +507,173 @@ func TestEvidenceErrors(t *testing.T) {
 		t.Errorf("a failed run wrote %v", entries)
 	}
 }
+
+var scenariosDir = filepath.Join("..", "..", "evals", "scenarios")
+
+func TestPlantSubcommand(t *testing.T) {
+	out := t.TempDir()
+	args := []string{
+		"plant",
+		"--suite", "suite-skeleton",
+		"--company", "sharma",
+		"--month", "2026-09",
+		"--small",
+		"--config", configDir,
+		"--scenarios", scenariosDir,
+		"--out", out,
+	}
+
+	code, stdout, errOut := runSeed(t, args...)
+	if code != 0 {
+		t.Fatalf("plant run failed: exit %d, stderr: %s", code, errOut)
+	}
+	if !strings.Contains(stdout, "suite-skeleton") {
+		t.Errorf("output missing suite name: %s", stdout)
+	}
+
+	gtFile := filepath.Join(out, "scenarios", "suite-skeleton", "ground_truth", "sharma-2026-09.json")
+	gt, err := seed.LoadGroundTruth(gtFile)
+	if err != nil {
+		t.Fatalf("LoadGroundTruth(%s): %v", gtFile, err)
+	}
+	if gt.Clean {
+		t.Errorf("sharma-2026-09: want clean == false, got true")
+	}
+	if len(gt.Planted) != 3 {
+		t.Errorf("planted errors: want 3, got %d", len(gt.Planted))
+	}
+}
+
+func TestPlantAllTargets(t *testing.T) {
+	out := t.TempDir()
+	args := []string{
+		"plant",
+		"--suite", "suite-skeleton",
+		"--small",
+		"--config", configDir,
+		"--scenarios", scenariosDir,
+		"--out", out,
+	}
+
+	code, _, errOut := runSeed(t, args...)
+	if code != 0 {
+		t.Fatalf("plant run failed: exit %d, stderr: %s", code, errOut)
+	}
+
+	for _, m := range []string{"2026-08", "2026-09"} {
+		gtFile := filepath.Join(out, "scenarios", "suite-skeleton", "ground_truth", "sharma-"+m+".json")
+		gt, err := seed.LoadGroundTruth(gtFile)
+		if err != nil {
+			t.Fatalf("LoadGroundTruth(%s): %v", gtFile, err)
+		}
+		if m == "2026-08" && !gt.Clean {
+			t.Errorf("sharma-2026-08 clean control: want clean == true")
+		}
+		if m == "2026-09" && gt.Clean {
+			t.Errorf("sharma-2026-09 evaluated: want clean == false")
+		}
+	}
+}
+
+func runAllCmd(t *testing.T, d deps, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
+	var out, errOut bytes.Buffer
+	code = cli.Run("seed", args, &out, &errOut, erpTestEnv, requiredEnv(args), newRunDeps(&out, d))
+	return code, out.String(), errOut.String()
+}
+
+func TestAllSubcommand(t *testing.T) {
+	var bootProfile seed.Profile
+	var gotWorld seed.World
+	var gotOpt seed.BooksOptions
+
+	d := deps{
+		bootstrap: fakeBootstrap(0, &bootProfile),
+		books:     fakeBooks(0, &gotWorld, &gotOpt),
+	}
+
+	out := t.TempDir()
+	args := []string{
+		"all",
+		"--suite", "suite-skeleton",
+		"--small",
+		"--config", configDir,
+		"--scenarios", scenariosDir,
+		"--out", out,
+	}
+
+	code, stdout, errOut := runAllCmd(t, d, args...)
+	if code != 0 {
+		t.Fatalf("seed all failed: exit %d, stderr: %s", code, errOut)
+	}
+	if !strings.Contains(stdout, "suite-skeleton") {
+		t.Errorf("stdout missing suite: %s", stdout)
+	}
+
+	// Verify generated ERP maps
+	for _, m := range []string{"2026-08", "2026-09"} {
+		mapFile := filepath.Join(out, "out", "suite-skeleton", "sharma-"+m, seed.ERPMapFile)
+		if _, err := seed.LoadERPMap(mapFile); err != nil {
+			t.Errorf("missing or invalid erp map %s: %v", mapFile, err)
+		}
+
+		// Verify external evidence
+		bankFile := filepath.Join(out, "external", "sharma", m, seed.BankCSVFile)
+		if _, err := os.Stat(bankFile); err != nil {
+			t.Errorf("missing bank csv %s: %v", bankFile, err)
+		}
+		g2bFile := filepath.Join(out, "external", "sharma", m, seed.GSTR2BFile)
+		if _, err := os.Stat(g2bFile); err != nil {
+			t.Errorf("missing gstr2b json %s: %v", g2bFile, err)
+		}
+
+		// Verify ground truth
+		gtFile := filepath.Join(out, "evals", "scenarios", "suite-skeleton", "ground_truth", "sharma-"+m+".json")
+		if _, err := seed.LoadGroundTruth(gtFile); err != nil {
+			t.Errorf("missing or invalid ground truth %s: %v", gtFile, err)
+		}
+	}
+}
+
+func TestAllIdempotent(t *testing.T) {
+	var bootProfile seed.Profile
+	var gotWorld seed.World
+	var gotOpt seed.BooksOptions
+
+	d := deps{
+		bootstrap: fakeBootstrap(0, &bootProfile),
+		books:     fakeBooks(0, &gotWorld, &gotOpt),
+	}
+
+	out1 := t.TempDir()
+	out2 := t.TempDir()
+
+	args1 := []string{"all", "--suite", "suite-skeleton", "--small", "--config", configDir, "--scenarios", scenariosDir, "--out", out1}
+	args2 := []string{"all", "--suite", "suite-skeleton", "--small", "--config", configDir, "--scenarios", scenariosDir, "--out", out2}
+
+	if code, _, err := runAllCmd(t, d, args1...); code != 0 {
+		t.Fatalf("run 1 failed: exit %d, stderr: %s", code, err)
+	}
+	if code, _, err := runAllCmd(t, d, args2...); code != 0 {
+		t.Fatalf("run 2 failed: exit %d, stderr: %s", code, err)
+	}
+
+	// Compare outputs
+	for _, m := range []string{"2026-08", "2026-09"} {
+		f1 := filepath.Join(out1, "external", "sharma", m, seed.BankCSVFile)
+		f2 := filepath.Join(out2, "external", "sharma", m, seed.BankCSVFile)
+		b1, _ := os.ReadFile(f1)
+		b2, _ := os.ReadFile(f2)
+		if !bytes.Equal(b1, b2) {
+			t.Errorf("bank.csv mismatch for %s", m)
+		}
+
+		g1 := filepath.Join(out1, "evals", "scenarios", "suite-skeleton", "ground_truth", "sharma-"+m+".json")
+		g2 := filepath.Join(out2, "evals", "scenarios", "suite-skeleton", "ground_truth", "sharma-"+m+".json")
+		gtb1, _ := os.ReadFile(g1)
+		gtb2, _ := os.ReadFile(g2)
+		if !bytes.Equal(gtb1, gtb2) {
+			t.Errorf("ground truth mismatch for %s", m)
+		}
+	}
+}

@@ -1,6 +1,6 @@
 // Command seed is the seeder: generates the synthetic world, posts the books to ERPNext, writes bank.csv, gstr2b.json and ground truth.
 //
-// Built in CC-301 to CC-307. Today it has four subcommands:
+// Built in CC-301 to CC-307. It has six subcommands:
 //
 //	seed world --company sharma --month 2026-09 [--small] [--config config/companies]
 //
@@ -30,6 +30,18 @@
 // the previous month's world too, for the invoices filed late. Like world,
 // it needs no ERPNext variables. Every other subcommand only checks its
 // configuration.
+//
+//	seed plant [--company sharma --month 2026-09] [--suite suite-skeleton] [--small]
+//	           [--config config/companies] [--scenarios evals/scenarios] [--out evals]
+//
+// applies planted errors to the world and writes ground truth JSON (CC-306).
+//
+//	seed all [--suite suite-skeleton] [--small] [--config config/companies]
+//	         [--scenarios evals/scenarios] [--out <dir>] [--expect-no-changes]
+//
+// rebuilds everything for all companies and months defined in the suite:
+// bootstraps masters, posts books to ERPNext, writes bank.csv and gstr2b.json,
+// and emits ground truth (CC-307).
 package main
 
 import (
@@ -42,7 +54,10 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
+
+	"go.yaml.in/yaml/v3"
 
 	"github.com/abhishekjha/close-copilot/internal/cli"
 	"github.com/abhishekjha/close-copilot/internal/config"
@@ -84,11 +99,11 @@ func subcommand(args []string) string {
 	return ""
 }
 
-// requiredEnv lists the variables the subcommand in args needs: world and
-// evidence are pure and need none.
+// requiredEnv lists the variables the subcommand in args needs: world, evidence,
+// and plant are pure and need none.
 func requiredEnv(args []string) []string {
 	switch subcommand(args) {
-	case "world", "evidence":
+	case "world", "evidence", "plant":
 		return nil
 	}
 	return erpEnv
@@ -114,10 +129,14 @@ func newRunDeps(stdout io.Writer, d deps) cli.RunFunc {
 				return runBooks(ctx, cfg, log, args[1:], stdout, d)
 			case "evidence":
 				return runEvidence(args[1:], stdout)
+			case "plant":
+				return runPlant(args[1:], stdout)
+			case "all":
+				return runAll(ctx, cfg, log, args[1:], stdout, d)
 			}
 		}
-		log.Info("not implemented yet", "tickets", "CC-306 to CC-307", "args", args)
-		return nil
+		log.Info("unknown subcommand", "args", args)
+		return errors.New("seed: unknown subcommand; available: world, bootstrap, books, evidence, plant, all")
 	}
 }
 
@@ -130,6 +149,19 @@ func loadCompany(dir, company string) (seed.Profile, error) {
 		return seed.Profile{}, fmt.Errorf("%q is not a company id", company)
 	}
 	return seed.LoadProfile(filepath.Join(dir, company+".yaml"))
+}
+
+// loadScenarioConfig reads a scenario YAML file.
+func loadScenarioConfig(path string) (seed.ScenarioConfig, error) {
+	b, err := os.ReadFile(path) //nolint:gosec // G304: path is the scenario file
+	if err != nil {
+		return seed.ScenarioConfig{}, fmt.Errorf("read scenario config: %w", err)
+	}
+	var cfg seed.ScenarioConfig
+	if err := yaml.Unmarshal(b, &cfg); err != nil {
+		return seed.ScenarioConfig{}, fmt.Errorf("parse scenario %s: %w", path, err)
+	}
+	return cfg, nil
 }
 
 func runBootstrap(ctx context.Context, cfg config.Config, log *slog.Logger, args []string, stdout io.Writer, bootstrap bootstrapFunc) error {
@@ -343,7 +375,328 @@ func runEvidence(args []string, stdout io.Writer) error {
 		return fmt.Errorf("evidence: encode summary: %w", err)
 	}
 	if _, err := stdout.Write(append(b, '\n')); err != nil {
-		return fmt.Errorf("evidence: write: %w", err)
+		return fmt.Errorf("evidence: write summary: %w", err)
 	}
 	return nil
+}
+
+type plantSummary struct {
+	Suite       string   `json:"suite"`
+	Files       []string `json:"files"`
+	ErrorsCount int      `json:"errors_count"`
+}
+
+func runPlant(args []string, stdout io.Writer) error {
+	fs := flag.NewFlagSet("seed plant", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	company := fs.String("company", "", "company id, such as sharma")
+	month := fs.String("month", "", "month as YYYY-MM")
+	suite := fs.String("suite", "suite-skeleton", "eval suite scenario name")
+	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
+	configDir := fs.String("config", "config/companies", "directory of company profiles")
+	scenariosDir := fs.String("scenarios", "evals/scenarios", "directory of suite scenario definitions")
+	out := fs.String("out", "evals", "output root directory for ground truth")
+	mapsDir := fs.String("maps", "data/out", "root directory of erp maps")
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("plant: %w", err)
+	}
+	if fs.NArg() > 0 {
+		return fmt.Errorf("plant: unexpected arguments %q", fs.Args())
+	}
+
+	scenarioPath := filepath.Join(*scenariosDir, *suite+".yaml")
+	suiteCfg, err := loadScenarioConfig(scenarioPath)
+	if err != nil {
+		if *suite == "suite-skeleton" {
+			suiteCfg = seed.DefaultSkeletonConfig()
+		} else {
+			return fmt.Errorf("plant: %w", err)
+		}
+	}
+	isSmall := *small || suiteCfg.Small
+
+	type targetCM struct {
+		company, month string
+	}
+	var targets []targetCM
+	if *company != "" && *month != "" {
+		targets = append(targets, targetCM{*company, *month})
+	} else {
+		if suiteCfg.CleanControl.Company != "" && suiteCfg.CleanControl.Month != "" {
+			targets = append(targets, targetCM{suiteCfg.CleanControl.Company, suiteCfg.CleanControl.Month})
+		}
+		for _, ev := range suiteCfg.Evaluated {
+			for _, m := range ev.Months {
+				targets = append(targets, targetCM{ev.Company, m})
+			}
+		}
+	}
+
+	if len(targets) == 0 {
+		return errors.New("plant: no company-month targets found")
+	}
+
+	var writtenFiles []string
+	totalErrors := 0
+
+	for _, tgt := range targets {
+		p, err := loadCompany(*configDir, tgt.company)
+		if err != nil {
+			return fmt.Errorf("plant load company: %w", err)
+		}
+		start, err := seed.ParseMonth(tgt.month)
+		if err != nil {
+			return fmt.Errorf("plant parse month: %w", err)
+		}
+		prevMonth := start.AddDate(0, -1, 0).Format("2006-01")
+		prev, err := seed.Generate(p, prevMonth, seed.Options{Small: isSmall})
+		if err != nil {
+			return fmt.Errorf("plant prev world: %w", err)
+		}
+		w, err := seed.Generate(p, tgt.month, seed.Options{Small: isSmall})
+		if err != nil {
+			return fmt.Errorf("plant world: %w", err)
+		}
+		pw, err := seed.PlantErrors(w, suiteCfg)
+		if err != nil {
+			return fmt.Errorf("plant errors: %w", err)
+		}
+		lines, err := seed.BankLines(pw.BankWorld)
+		if err != nil {
+			return fmt.Errorf("plant bank lines: %w", err)
+		}
+		g2b, err := seed.BuildGSTR2B(p, tgt.month, []seed.World{prev, pw.BankWorld}, seed.DefaultGSTR2BOptions())
+		if err != nil {
+			return fmt.Errorf("plant gstr2b: %w", err)
+		}
+
+		var erpMap seed.ERPMap
+		mapPath := filepath.Join(*mapsDir, *suite, tgt.company+"-"+tgt.month, seed.ERPMapFile)
+		if m, err := seed.LoadERPMap(mapPath); err == nil {
+			erpMap = m
+		}
+
+		gt, err := seed.BuildGroundTruth(seed.GroundTruthOptions{
+			PlantedWorld: pw,
+			BankLines:    lines,
+			ERPMap:       erpMap,
+			GSTR2B:       &g2b,
+		})
+		if err != nil {
+			return fmt.Errorf("plant build ground truth: %w", err)
+		}
+		fPath, err := seed.WriteGroundTruth(*out, gt)
+		if err != nil {
+			return fmt.Errorf("plant write ground truth: %w", err)
+		}
+		writtenFiles = append(writtenFiles, fPath)
+		totalErrors += len(gt.Planted)
+	}
+
+	b, err := json.Marshal(plantSummary{
+		Suite:       *suite,
+		Files:       writtenFiles,
+		ErrorsCount: totalErrors,
+	})
+	if err != nil {
+		return fmt.Errorf("plant summary marshal: %w", err)
+	}
+	_, err = stdout.Write(append(b, '\n'))
+	return err
+}
+
+type allSummary struct {
+	Suite       string   `json:"suite"`
+	Companies   []string `json:"companies"`
+	MonthsCount int      `json:"months_count"`
+	Small       bool     `json:"small"`
+	Status      string   `json:"status"`
+}
+
+func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []string, stdout io.Writer, d deps) error {
+	fs := flag.NewFlagSet("seed all", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	suite := fs.String("suite", "suite-skeleton", "eval suite scenario name")
+	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
+	configDir := fs.String("config", "config/companies", "directory of company profiles")
+	scenariosDir := fs.String("scenarios", "evals/scenarios", "directory of suite scenario definitions")
+	out := fs.String("out", "", "output root directory")
+	expectNoChanges := fs.Bool("expect-no-changes", false, "exit non-zero if any document was created or submitted")
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("all: %w", err)
+	}
+	if fs.NArg() > 0 {
+		return fmt.Errorf("all: unexpected arguments %q", fs.Args())
+	}
+
+	scenarioPath := filepath.Join(*scenariosDir, *suite+".yaml")
+	suiteCfg, err := loadScenarioConfig(scenarioPath)
+	if err != nil {
+		if *suite == "suite-skeleton" {
+			suiteCfg = seed.DefaultSkeletonConfig()
+		} else {
+			return fmt.Errorf("all load scenario: %w", err)
+		}
+	}
+	isSmall := *small || suiteCfg.Small
+
+	mapsRoot := "data/out"
+	externalRoot := "data/external"
+	evalsRoot := "evals"
+	if *out != "" && *out != "data" {
+		mapsRoot = filepath.Join(*out, "out")
+		externalRoot = filepath.Join(*out, "external")
+		evalsRoot = filepath.Join(*out, "evals")
+	}
+
+	var companies []string
+	companySet := make(map[string]bool)
+	addCompany := func(c string) {
+		if c != "" && !companySet[c] {
+			companySet[c] = true
+			companies = append(companies, c)
+		}
+	}
+	if suiteCfg.CleanControl.Company != "" {
+		addCompany(suiteCfg.CleanControl.Company)
+	}
+	for _, ev := range suiteCfg.Evaluated {
+		addCompany(ev.Company)
+	}
+
+	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey.Reveal(), frappe.Secret(cfg.ERPSeedAPISecret.Reveal()))
+	if err != nil {
+		return fmt.Errorf("all frappe client: %w", err)
+	}
+
+	bootReports := make(map[string]seed.BootstrapReport)
+	totalChanges := 0
+	for _, comp := range companies {
+		p, err := loadCompany(*configDir, comp)
+		if err != nil {
+			return fmt.Errorf("all load company %s: %w", comp, err)
+		}
+		log.Info("bootstrapping", "company", p.ID, "erp_company", p.ERPCompany)
+		rep, err := d.bootstrap(ctx, c, p)
+		if err != nil {
+			return fmt.Errorf("all bootstrap %s: %w", comp, err)
+		}
+		totalChanges += rep.Changes()
+		bootReports[comp] = rep
+	}
+
+	monthsProcessed := 0
+	for _, comp := range companies {
+		p, err := loadCompany(*configDir, comp)
+		if err != nil {
+			return fmt.Errorf("all load company %s: %w", comp, err)
+		}
+		rep := bootReports[comp]
+
+		monthSet := make(map[string]bool)
+		var months []string
+		addMonth := func(m string) {
+			if m != "" && !monthSet[m] {
+				monthSet[m] = true
+				months = append(months, m)
+			}
+		}
+
+		for _, m := range suiteCfg.HistoryMonths {
+			addMonth(m)
+		}
+		if suiteCfg.CleanControl.Company == comp {
+			addMonth(suiteCfg.CleanControl.Month)
+		}
+		for _, ev := range suiteCfg.Evaluated {
+			if ev.Company == comp {
+				for _, m := range ev.Months {
+					addMonth(m)
+				}
+			}
+		}
+		slices.Sort(months)
+
+		for _, month := range months {
+			log.Info("processing month", "company", comp, "month", month, "suite", *suite)
+			start, err := seed.ParseMonth(month)
+			if err != nil {
+				return fmt.Errorf("all parse month %s: %w", month, err)
+			}
+			prevMonth := start.AddDate(0, -1, 0).Format("2006-01")
+			prev, err := seed.Generate(p, prevMonth, seed.Options{Small: isSmall})
+			if err != nil {
+				return fmt.Errorf("all generate prev %s: %w", prevMonth, err)
+			}
+			w, err := seed.Generate(p, month, seed.Options{Small: isSmall})
+			if err != nil {
+				return fmt.Errorf("all generate world %s: %w", month, err)
+			}
+
+			pw, err := seed.PlantErrors(w, suiteCfg)
+			if err != nil {
+				return fmt.Errorf("all plant errors %s %s: %w", comp, month, err)
+			}
+
+			mapDir, err := seed.ERPMapDir(mapsRoot, suiteCfg.Suite, comp, month)
+			if err != nil {
+				return fmt.Errorf("all map dir %s %s: %w", comp, month, err)
+			}
+			res, err := d.books(ctx, c, rep, pw.BooksWorld, seed.BooksOptions{Suppliers: p.Suppliers, Log: log, Workers: 1})
+			if err != nil {
+				return fmt.Errorf("all books %s %s: %w", comp, month, err)
+			}
+			totalChanges += res.Changes()
+			if err := seed.WriteERPMap(mapDir, res.Map); err != nil {
+				return fmt.Errorf("all write erp map %s %s: %w", comp, month, err)
+			}
+
+			lines, err := seed.BankLines(pw.BankWorld)
+			if err != nil {
+				return fmt.Errorf("all bank lines %s %s: %w", comp, month, err)
+			}
+			g2b, err := seed.BuildGSTR2B(p, month, []seed.World{prev, pw.BankWorld}, seed.DefaultGSTR2BOptions())
+			if err != nil {
+				return fmt.Errorf("all gstr2b %s %s: %w", comp, month, err)
+			}
+			monthDir := filepath.Join(externalRoot, comp, month)
+			if err := seed.WriteBankCSV(filepath.Join(monthDir, seed.BankCSVFile), lines); err != nil {
+				return fmt.Errorf("all write bank csv %s %s: %w", comp, month, err)
+			}
+			if err := seed.WriteGSTR2B(filepath.Join(monthDir, seed.GSTR2BFile), g2b); err != nil {
+				return fmt.Errorf("all write gstr2b %s %s: %w", comp, month, err)
+			}
+
+			gt, err := seed.BuildGroundTruth(seed.GroundTruthOptions{
+				PlantedWorld: pw,
+				BankLines:    lines,
+				ERPMap:       res.Map,
+				GSTR2B:       &g2b,
+			})
+			if err != nil {
+				return fmt.Errorf("all build ground truth %s %s: %w", comp, month, err)
+			}
+			if _, err := seed.WriteGroundTruth(evalsRoot, gt); err != nil {
+				return fmt.Errorf("all write ground truth %s %s: %w", comp, month, err)
+			}
+			monthsProcessed++
+		}
+	}
+
+	if *expectNoChanges && totalChanges > 0 {
+		return fmt.Errorf("all: --expect-no-changes, but %d documents/records were created or updated", totalChanges)
+	}
+
+	b, err := json.Marshal(allSummary{
+		Suite:       *suite,
+		Companies:   companies,
+		MonthsCount: monthsProcessed,
+		Small:       isSmall,
+		Status:      "ok",
+	})
+	if err != nil {
+		return fmt.Errorf("all summary marshal: %w", err)
+	}
+	_, err = stdout.Write(append(b, '\n'))
+	return err
 }

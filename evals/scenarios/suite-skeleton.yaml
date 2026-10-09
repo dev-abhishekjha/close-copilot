@@ -1,0 +1,8 @@
+suite: suite-skeleton
+history_months: []
+evaluated:
+  - {company: sharma, months: ["2026-09"]}
+clean_control: {company: sharma, month: "2026-08"}
+errors:
+  unrecorded_bank_charge: 3
+small: true

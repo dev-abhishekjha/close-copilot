@@ -91,6 +91,10 @@ up-ingest: ## Also start docling-serve (only needed while ingesting)
 migrate: ## Apply database migrations (CC-401)
 	$(GOOSE) -dir migrations postgres "$(DATABASE_URL)" up
 
+.PHONY: erp-reset
+erp-reset: ## Restore clean bootstrapped database backup in ERPNext (CC-307)
+	docker compose -f $(ERP_COMPOSE) exec -T backend bench --site erp.localhost restore sites/erp.localhost/private/backups/clean-bootstrap-database.sql.gz --db-root-password 123
+
 .PHONY: seed
 seed: ## Seed ERPNext and the evidence files for SUITE (CC-307)
 	$(GO) run ./cmd/seed all --suite $(SUITE)

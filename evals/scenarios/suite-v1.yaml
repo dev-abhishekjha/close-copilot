@@ -1,0 +1,17 @@
+suite: suite-v1
+history_months: ["2026-04", "2026-05", "2026-06"]
+evaluated:
+  - {company: sharma, months: ["2026-07", "2026-08", "2026-09"]}
+  - {company: mehta,  months: ["2026-07", "2026-08", "2026-09"]}
+clean_control: {company: sharma, month: "2026-06"}
+errors:
+  unrecorded_bank_charge: 6
+  duplicate_vendor_payment: 6
+  missing_accrual: 6
+  gstr2b_missing_in_2b: 2
+  gstr2b_amount_mismatch: 2
+  gstr2b_missing_in_books: 2
+  prepaid_not_spread: 4
+  misclassified_expense: 4
+  wrong_period_posting: 4
+  prompt_injection: 4
