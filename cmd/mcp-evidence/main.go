@@ -14,7 +14,9 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/buildinfo"
 	"github.com/abhishekjha/close-copilot/internal/cli"
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/evidence"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
+	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
 func main() {
@@ -37,8 +39,19 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		return fmt.Errorf("mcp-evidence: parse flags: %w", err)
 	}
 
+	if *transport != "http" && *transport != "stdio" {
+		return fmt.Errorf("mcp-evidence: unknown transport %q (want http or stdio)", *transport)
+	}
+
+	st, err := store.Open(ctx, cfg.DatabaseURL.Reveal())
+	if err != nil {
+		return fmt.Errorf("mcp-evidence: connect to database: %w", err)
+	}
+	defer st.Close()
+
 	version := buildinfo.Version
 	evidenceServer := mcpkit.NewServer("close-copilot-evidence", version)
+	evidence.RegisterTools(evidenceServer, st)
 
 	switch *transport {
 	case "stdio":
