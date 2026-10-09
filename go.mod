@@ -4,6 +4,8 @@ module github.com/abhishekjha/close-copilot
 // require Go 1.26.
 go 1.26.0
 
+toolchain go1.27.2
+
 // Dev tools, run with `go tool <name>` (no global installs needed). goose's
 // CLI is run with `go run ...@version` instead (see Makefile) because it
 // links every database driver and would bloat this module's requirements.
