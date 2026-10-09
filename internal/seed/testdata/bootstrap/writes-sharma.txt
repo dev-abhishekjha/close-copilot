@@ -1,0 +1,106 @@
+PUT Company/Sharma Traders Pvt Ltd {"gst_category":"Registered Regular","gstin":"29ZIACS2610I1ZD","pan":"ZIACS2610I"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Sharma Traders Pvt Ltd","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29ZIACS2610I1ZD","is_primary_address":1,"is_your_company_address":1,"links":[{"link_doctype":"Company","link_name":"Sharma Traders Pvt Ltd"}],"pincode":"560001","state":"Karnataka"}
+POST Account {"account_name":"Payment Gateway Clearing","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Current Assets - STPL"}
+POST Account {"account_name":"Gateway Fees","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Bank Charges","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Rent","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Electricity","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Telephone and Internet","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Software Subscriptions","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Prepaid Expenses","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Current Assets - STPL"}
+POST Account {"account_name":"Repairs and Maintenance","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Office Equipment","account_type":"Fixed Asset","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Fixed Assets - STPL"}
+POST Account {"account_name":"Salaries","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"Interest Income","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Income - STPL"}
+POST Account {"account_name":"Professional Charges","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Indirect Expenses - STPL"}
+POST Account {"account_name":"HDFC Current 0001","account_type":"Bank","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Bank Accounts - STPL"}
+POST Account {"account_name":"Input Tax CGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Tax Assets - STPL"}
+POST Account {"account_name":"Input Tax SGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Tax Assets - STPL"}
+POST Account {"account_name":"Input Tax IGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Tax Assets - STPL"}
+POST Account {"account_name":"Output Tax CGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Duties and Taxes - STPL"}
+POST Account {"account_name":"Output Tax SGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Duties and Taxes - STPL"}
+POST Account {"account_name":"Output Tax IGST","account_type":"Tax","company":"Sharma Traders Pvt Ltd","is_group":0,"parent_account":"Duties and Taxes - STPL"}
+PUT GST Settings/GST Settings {"gst_accounts":[{"account_type":"Input","cgst_account":"Input Tax CGST - STPL","company":"Sharma Traders Pvt Ltd","igst_account":"Input Tax IGST - STPL","sgst_account":"Input Tax SGST - STPL"},{"account_type":"Output","cgst_account":"Output Tax CGST - STPL","company":"Sharma Traders Pvt Ltd","igst_account":"Output Tax IGST - STPL","sgst_account":"Output Tax SGST - STPL"}]}
+POST Custom Field {"dt":"Sales Invoice","fieldname":"copilot_ext_id","fieldtype":"Data","label":"Copilot Ext ID","no_copy":1,"read_only":1,"search_index":1}
+POST Custom Field {"dt":"Purchase Invoice","fieldname":"copilot_ext_id","fieldtype":"Data","label":"Copilot Ext ID","no_copy":1,"read_only":1,"search_index":1}
+POST Custom Field {"dt":"Payment Entry","fieldname":"copilot_ext_id","fieldtype":"Data","label":"Copilot Ext ID","no_copy":1,"read_only":1,"search_index":1}
+POST Custom Field {"dt":"Journal Entry","fieldname":"copilot_ext_id","fieldtype":"Data","label":"Copilot Ext ID","no_copy":1,"read_only":1,"search_index":1}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29AANCO3763Y1ZY","pan":"AANCO3763Y","supplier_group":"Local","supplier_name":"Omkar Estates","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Omkar Estates","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29AANCO3763Y1ZY","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Omkar Estates"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29WFQCL5046J1Z0","pan":"WFQCL5046J","supplier_group":"Local","supplier_name":"Lakeview Warehousing LLP","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Lakeview Warehousing LLP","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29WFQCL5046J1Z0","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Lakeview Warehousing LLP"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Unregistered","gstin":"","supplier_group":"Local","supplier_name":"City Power Co","supplier_type":"Company"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29WSFCB1474N1ZM","pan":"WSFCB1474N","supplier_group":"Local","supplier_name":"BlueNet Broadband","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"BlueNet Broadband","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29WSFCB1474N1ZM","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"BlueNet Broadband"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"27DYLCV3017V1Z0","pan":"DYLCV3017V","supplier_group":"Local","supplier_name":"Vaani Telecom Services","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Vaani Telecom Services","address_type":"Billing","city":"Mumbai","country":"India","gst_category":"Registered Regular","gstin":"27DYLCV3017V1Z0","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Vaani Telecom Services"}],"pincode":"400001","state":"Maharashtra"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"27ZIPCC8524K1ZX","pan":"ZIPCC8524K","supplier_group":"Local","supplier_name":"Cloudly SaaS","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Cloudly SaaS","address_type":"Billing","city":"Mumbai","country":"India","gst_category":"Registered Regular","gstin":"27ZIPCC8524K1ZX","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Cloudly SaaS"}],"pincode":"400001","state":"Maharashtra"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29ULNCS7916R1ZY","pan":"ULNCS7916R","supplier_group":"Local","supplier_name":"Stockbook Cloud","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Stockbook Cloud","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29ULNCS7916R1ZY","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Stockbook Cloud"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"27FIWCT1460U1ZK","pan":"FIWCT1460U","supplier_group":"Local","supplier_name":"TechKart Supplies","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"TechKart Supplies","address_type":"Billing","city":"Mumbai","country":"India","gst_category":"Registered Regular","gstin":"27FIWCT1460U1ZK","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"TechKart Supplies"}],"pincode":"400001","state":"Maharashtra"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29WNECD3532M1Z2","pan":"WNECD3532M","supplier_group":"Local","supplier_name":"Deccan Textile Mills","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Deccan Textile Mills","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29WNECD3532M1Z2","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Deccan Textile Mills"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29ORXCK6371L1Z3","pan":"ORXCK6371L","supplier_group":"Local","supplier_name":"Kaveri Packaging Works","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Kaveri Packaging Works","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29ORXCK6371L1Z3","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Kaveri Packaging Works"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"33LQPCS8048A1Z4","pan":"LQPCS8048A","supplier_group":"Local","supplier_name":"Sundaram Steelware","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Sundaram Steelware","address_type":"Billing","city":"Chennai","country":"India","gst_category":"Registered Regular","gstin":"33LQPCS8048A1Z4","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Sundaram Steelware"}],"pincode":"600001","state":"Tamil Nadu"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"24ECWCB3133X1ZI","pan":"ECWCB3133X","supplier_group":"Local","supplier_name":"Bharat Polymers Udyog","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Bharat Polymers Udyog","address_type":"Billing","city":"Ahmedabad","country":"India","gst_category":"Registered Regular","gstin":"24ECWCB3133X1ZI","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Bharat Polymers Udyog"}],"pincode":"380001","state":"Gujarat"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29PHGCS2431D1ZS","pan":"PHGCS2431D","supplier_group":"Local","supplier_name":"Swift Couriers","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Swift Couriers","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29PHGCS2431D1ZS","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Swift Couriers"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29SYJCL1381E1ZL","pan":"SYJCL1381E","supplier_group":"Local","supplier_name":"Ledgerwise Associates","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Ledgerwise Associates","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29SYJCL1381E1ZL","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Ledgerwise Associates"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"29LJRCS1081D1ZC","pan":"LJRCS1081D","supplier_group":"Local","supplier_name":"Securewell Guarding Services","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"Securewell Guarding Services","address_type":"Billing","city":"Bengaluru","country":"India","gst_category":"Registered Regular","gstin":"29LJRCS1081D1ZC","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"Securewell Guarding Services"}],"pincode":"560001","state":"Karnataka"}
+POST Supplier {"country":"India","gst_category":"Registered Regular","gstin":"36VNOCR2477I1ZI","pan":"VNOCR2477I","supplier_group":"Local","supplier_name":"RoadKing Logistics","supplier_type":"Company"}
+POST Address {"address_line1":"1 Synthetic Road","address_title":"RoadKing Logistics","address_type":"Billing","city":"Hyderabad","country":"India","gst_category":"Registered Regular","gstin":"36VNOCR2477I1ZI","is_primary_address":1,"is_your_company_address":0,"links":[{"link_doctype":"Supplier","link_name":"RoadKing Logistics"}],"pincode":"500001","state":"Telangana"}
+POST Supplier {"country":"India","gst_category":"Unregistered","gstin":"","supplier_group":"Local","supplier_name":"QuickFix Repairs","supplier_type":"Company"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-001","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-002","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-003","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-004","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-005","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-006","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-007","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-008","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-009","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-010","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-011","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-012","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-013","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-014","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-015","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-016","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-017","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-018","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-019","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-020","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-021","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-022","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-023","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-024","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-025","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-026","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-027","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-028","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-029","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-030","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-031","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-032","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-033","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-034","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-035","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-036","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-037","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-038","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-039","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Customer {"customer_group":"Commercial","customer_name":"CUST-040","customer_type":"Company","gst_category":"Unregistered","territory":"India"}
+POST Item {"description":"Goods sold to customers","gst_hsn_code":"392490","is_purchase_item":0,"is_sales_item":1,"is_stock_item":0,"item_code":"Trading Goods","item_group":"Products","item_name":"Trading Goods","stock_uom":"Nos"}
+POST Item {"description":"Rent of non-residential premises","gst_hsn_code":"997212","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Rent Service","item_group":"Services","item_name":"Rent Service","stock_uom":"Nos"}
+POST Item {"description":"Utility charges: power, telephone and internet","gst_hsn_code":"998599","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Utility Service","item_group":"Services","item_name":"Utility Service","stock_uom":"Nos"}
+POST Item {"description":"Software subscription","gst_hsn_code":"997331","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Software Subscription","item_group":"Services","item_name":"Software Subscription","stock_uom":"Nos"}
+POST Item {"description":"Goods bought for resale","gst_hsn_code":"392490","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Goods for Resale","item_group":"Products","item_name":"Goods for Resale","stock_uom":"Nos"}
+POST Item {"description":"Professional and business services","gst_hsn_code":"998399","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Professional Service","item_group":"Services","item_name":"Professional Service","stock_uom":"Nos"}
+POST Item {"description":"Laptop for office use (capital asset)","gst_hsn_code":"847130","is_purchase_item":1,"is_sales_item":0,"is_stock_item":0,"item_code":"Laptop","item_group":"Products","item_name":"Laptop","stock_uom":"Nos"}
