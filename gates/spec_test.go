@@ -63,6 +63,7 @@ func TestRepoTemplateAndSpecParse(t *testing.T) {
 // TestCodeownersCoversProtectedPaths keeps .github/CODEOWNERS in step with
 // ProtectedPaths.
 func TestCodeownersCoversProtectedPaths(t *testing.T) {
+	const owner = "@dev-abhishekjha"
 	f, err := os.Open("../.github/CODEOWNERS")
 	if err != nil {
 		t.Fatal(err)
@@ -72,7 +73,7 @@ func TestCodeownersCoversProtectedPaths(t *testing.T) {
 	sc := bufio.NewScanner(f)
 	for sc.Scan() {
 		fields := strings.Fields(sc.Text())
-		if len(fields) >= 2 && !strings.HasPrefix(fields[0], "#") && slices.Contains(fields[1:], "@abhishekjha") {
+		if len(fields) >= 2 && !strings.HasPrefix(fields[0], "#") && slices.Contains(fields[1:], owner) {
 			owned[fields[0]] = true
 		}
 	}
@@ -85,7 +86,7 @@ func TestCodeownersCoversProtectedPaths(t *testing.T) {
 			want = "/" + dir + "/"
 		}
 		if !owned[want] {
-			t.Errorf("CODEOWNERS has no line %q @abhishekjha for protected path %s", want, p)
+			t.Errorf("CODEOWNERS has no line %q %s for protected path %s", want, owner, p)
 		}
 	}
 }

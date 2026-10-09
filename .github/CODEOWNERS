@@ -1,15 +1,15 @@
 # Protected paths (CLAUDE.md, gates.ProtectedPaths). A change to any of them
 # needs the owner's review and the `approved` label; gates/cmd/protected
 # enforces the label and gates/spec_test.go keeps this list in step.
-/evals/golden/                @abhishekjha
-/evals/scenarios/             @abhishekjha
-/evals/baseline.json          @abhishekjha
-/gates/                       @abhishekjha
-/.github/                     @abhishekjha
-/.claude/                     @abhishekjha
-/docs/                        @abhishekjha
-/CLAUDE.md                    @abhishekjha
-/internal/books/admin.go      @abhishekjha
-/internal/approvals/          @abhishekjha
-/internal/mcpkit/auth*.go     @abhishekjha
-/config/users.yaml            @abhishekjha
+/evals/golden/                @dev-abhishekjha
+/evals/scenarios/             @dev-abhishekjha
+/evals/baseline.json          @dev-abhishekjha
+/gates/                       @dev-abhishekjha
+/.github/                     @dev-abhishekjha
+/.claude/                     @dev-abhishekjha
+/docs/                        @dev-abhishekjha
+/CLAUDE.md                    @dev-abhishekjha
+/internal/books/admin.go      @dev-abhishekjha
+/internal/approvals/          @dev-abhishekjha
+/internal/mcpkit/auth*.go     @dev-abhishekjha
+/config/users.yaml            @dev-abhishekjha
