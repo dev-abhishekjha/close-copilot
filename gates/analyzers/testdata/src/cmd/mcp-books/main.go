@@ -6,18 +6,19 @@ import (
 	"os"
 	"syscall"
 
+	"internal/cli"
 	"internal/config"
 )
 
-// required lists the variables the server needs at startup: the name is
-// allowed as an element of this []string literal.
+// In cmd/mcp-books, the name is allowed only as an element of the []string
+// passed to cli.Main. Standalone lists are reported.
 var required = []string{
 	config.EnvMCPTokenAgent,
-	config.EnvMCPTokenAdmin,
+	config.EnvMCPTokenAdmin, // want `reference to config.EnvMCPTokenAdmin in cmd/mcp-books`
 }
 
-// The name is allowed in an array of strings too, even as a literal.
-var requiredArr = [2]string{"MCP_TOKEN_AGENT", "MCP_TOKEN_ADMIN"}
+// Standalone arrays are reported too.
+var requiredArr = [2]string{"MCP_TOKEN_AGENT", "MCP_TOKEN_ADMIN"} // want `string "MCP_TOKEN_ADMIN" in cmd/mcp-books`
 
 func cliMain(name string, vars []string) {}
 
@@ -79,7 +80,8 @@ func value(cfg config.Config) string {
 }
 
 func main() {
-	cliMain("mcp-books", []string{config.EnvERPBaseURL, config.EnvMCPTokenAdmin})
+	cli.Main("mcp-books", []string{config.EnvERPBaseURL, config.EnvMCPTokenAdmin}, nil)
+	cliMain("mcp-books", []string{config.EnvERPBaseURL, config.EnvMCPTokenAdmin}) // want `reference to config.EnvMCPTokenAdmin in cmd/mcp-books`
 	_, _, _, _ = required, requiredArr, alias, byRole
 	_, _, _ = check(), read(), lookup()
 	_, _, _ = everything(), indirect(), leaked

@@ -4,7 +4,11 @@ package web
 import (
 	"context"
 	"net/http"
+
+	"internal/httpx"
 )
+
+var c *http.Client = httpx.New()
 
 type Fetcher struct{ Client *http.Client }
 

@@ -109,11 +109,20 @@ func checkFile(pass *analysis.Pass, f *ast.File, mcpBooks bool) {
 	if mcpBooks {
 		nameRule = allowedBooks
 		ast.Inspect(f, func(n ast.Node) bool {
-			if cl, ok := n.(*ast.CompositeLit); ok && isStringList(pass.TypesInfo.TypeOf(cl)) {
-				for _, e := range cl.Elts {
-					if _, keyed := e.(*ast.KeyValueExpr); !keyed {
-						listed[e] = true
-					}
+			call, ok := n.(*ast.CallExpr)
+			if !ok || len(call.Args) < 2 {
+				return true
+			}
+			if !isCLIMain(pass, call.Fun) {
+				return true
+			}
+			cl, ok := ast.Unparen(call.Args[1]).(*ast.CompositeLit)
+			if !ok || !isStringList(pass.TypesInfo.TypeOf(cl)) {
+				return true
+			}
+			for _, e := range cl.Elts {
+				if _, keyed := e.(*ast.KeyValueExpr); !keyed {
+					listed[e] = true
 				}
 			}
 			return true
@@ -240,4 +249,22 @@ func isConfigAdminField(v *types.Var) bool {
 		}
 	}
 	return false
+}
+
+// isCLIMain reports whether fun resolves to internal/cli.Main.
+func isCLIMain(pass *analysis.Pass, fun ast.Expr) bool {
+	var id *ast.Ident
+	switch e := ast.Unparen(fun).(type) {
+	case *ast.Ident:
+		id = e
+	case *ast.SelectorExpr:
+		id = e.Sel
+	default:
+		return false
+	}
+	fn, ok := pass.TypesInfo.Uses[id].(*types.Func)
+	if !ok || fn.Pkg() == nil {
+		return false
+	}
+	return scope.Is(fn.Pkg().Path(), "internal/cli") && fn.Name() == "Main"
 }
