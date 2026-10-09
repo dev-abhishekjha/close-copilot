@@ -1,0 +1,103 @@
+{
+  "data": [
+    {
+      "name": "Application of Funds (Assets) - TT",
+      "docstatus": 0,
+      "account_name": "Application of Funds (Assets)",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "",
+      "is_group": 1,
+      "root_type": "Asset",
+      "account_type": "",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Bank - TT",
+      "docstatus": 0,
+      "account_name": "Bank",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Application of Funds (Assets) - TT",
+      "is_group": 0,
+      "root_type": "Asset",
+      "account_type": "Bank",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Cash - TT",
+      "docstatus": 0,
+      "account_name": "Cash",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Application of Funds (Assets) - TT",
+      "is_group": 0,
+      "root_type": "Asset",
+      "account_type": "Cash",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Unused - TT",
+      "docstatus": 0,
+      "account_name": "Unused",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Application of Funds (Assets) - TT",
+      "is_group": 0,
+      "root_type": "Asset",
+      "account_type": "",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Creditors - TT",
+      "docstatus": 0,
+      "account_name": "Creditors",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Source of Funds (Liabilities) - TT",
+      "is_group": 0,
+      "root_type": "Liability",
+      "account_type": "Payable",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Capital - TT",
+      "docstatus": 0,
+      "account_name": "Capital",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Equity - TT",
+      "is_group": 0,
+      "root_type": "Equity",
+      "account_type": "",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Sales - TT",
+      "docstatus": 0,
+      "account_name": "Sales",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Income - TT",
+      "is_group": 0,
+      "root_type": "Income",
+      "account_type": "",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Rent - TT",
+      "docstatus": 0,
+      "account_name": "Rent",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Expenses - TT",
+      "is_group": 0,
+      "root_type": "Expense",
+      "account_type": "",
+      "account_currency": "INR"
+    },
+    {
+      "name": "Bank Charges - TT",
+      "docstatus": 0,
+      "account_name": "Bank Charges",
+      "company": "Test Traders Pvt Ltd",
+      "parent_account": "Expenses - TT",
+      "is_group": 0,
+      "root_type": "Expense",
+      "account_type": "",
+      "account_currency": "INR"
+    }
+  ]
+}
