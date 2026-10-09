@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GroundTruth",
+  "type": "object",
+  "required": [
+    "scenario",
+    "company",
+    "month",
+    "clean",
+    "planted",
+    "expected",
+    "investigations"
+  ],
+  "properties": {
+    "scenario": {
+      "type": "string"
+    },
+    "company": {
+      "type": "string"
+    },
+    "month": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}$"
+    },
+    "clean": {
+      "type": "boolean"
+    },
+    "planted": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "type",
+          "keys",
+          "amount_paise"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^E[0-9]{2,}$"
+          },
+          "type": {
+            "type": "string"
+          },
+          "keys": {
+            "type": "object"
+          },
+          "amount_paise": {
+            "type": "integer"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "expected": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "keys"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "keys": {
+            "type": "object"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "investigations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "keys",
+          "expected_resolution"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^X[0-9]{2,}$"
+          },
+          "keys": {
+            "type": "object"
+          },
+          "expected_resolution": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}
