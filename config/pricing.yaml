@@ -1,0 +1,83 @@
+# Token pricing table for Claude models (USD per million tokens).
+# Loaded and validated by internal/llm.LoadPricing (CC-701).
+models:
+  haiku:
+    input_per_million: 1.00
+    output_per_million: 5.00
+    cache_write_per_million: 1.25
+    cache_read_per_million: 0.10
+  claude-3-5-haiku:
+    input_per_million: 1.00
+    output_per_million: 5.00
+    cache_write_per_million: 1.25
+    cache_read_per_million: 0.10
+  claude-3-5-haiku-20241022:
+    input_per_million: 1.00
+    output_per_million: 5.00
+    cache_write_per_million: 1.25
+    cache_read_per_million: 0.10
+  claude-3-5-haiku-latest:
+    input_per_million: 1.00
+    output_per_million: 5.00
+    cache_write_per_million: 1.25
+    cache_read_per_million: 0.10
+  claude-haiku-4-5-20251001:
+    input_per_million: 1.00
+    output_per_million: 5.00
+    cache_write_per_million: 1.25
+    cache_read_per_million: 0.10
+  sonnet:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-5-sonnet:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-5-sonnet-20241022:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-5-sonnet-latest:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-7-sonnet:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-7-sonnet-20250219:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  claude-3-7-sonnet-latest:
+    input_per_million: 3.00
+    output_per_million: 15.00
+    cache_write_per_million: 3.75
+    cache_read_per_million: 0.30
+  opus:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  claude-3-opus:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  claude-3-opus-20240229:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  claude-3-opus-latest:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
