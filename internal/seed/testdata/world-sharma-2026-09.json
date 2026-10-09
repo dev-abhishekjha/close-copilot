@@ -1,0 +1,6063 @@
+{
+  "company": "sharma",
+  "month": "2026-09",
+  "opening_bank": 250000000,
+  "events": [
+    {
+      "ext_id": "EVT-sharma-2026-09-0001",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5466440,
+      "cgst": 136661,
+      "sgst": 136661,
+      "gross": 5739762,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0002",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 866448,
+      "cgst": 21661,
+      "sgst": 21661,
+      "gross": 909770,
+      "narration": "Sale to CUST-012",
+      "meta": {
+        "description": "Goods sold to CUST-012 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0003",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5052801,
+      "cgst": 126320,
+      "sgst": 126320,
+      "gross": 5305441,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0004",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4445718,
+      "cgst": 111143,
+      "sgst": 111143,
+      "gross": 4668004,
+      "narration": "Sale to CUST-002",
+      "meta": {
+        "description": "Goods sold to CUST-002 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0005",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1183333,
+      "cgst": 29583,
+      "sgst": 29583,
+      "gross": 1242499,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0006",
+      "kind": "sale",
+      "date": "2026-09-01",
+      "party": "CUST-004",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5815960,
+      "cgst": 523436,
+      "sgst": 523436,
+      "gross": 6862832,
+      "narration": "Sale to CUST-004",
+      "meta": {
+        "description": "Goods sold to CUST-004 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0007",
+      "kind": "purchase",
+      "date": "2026-09-01",
+      "party": "Omkar Estates",
+      "party_type": "Supplier",
+      "account": "Rent",
+      "taxable": 15000000,
+      "cgst": 1350000,
+      "sgst": 1350000,
+      "gross": 17700000,
+      "invoice_no": "OMK/2026/0933",
+      "narration": "Bill OMK/2026/0933 from Omkar Estates",
+      "meta": {
+        "description": "Rent for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "omkar-estates",
+        "supplier_gstin": "29AANCO3763Y1ZY"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0008",
+      "kind": "purchase",
+      "date": "2026-09-01",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 273534,
+      "cgst": 24618,
+      "sgst": 24618,
+      "gross": 322770,
+      "invoice_no": "SWF/2026/0933",
+      "narration": "Bill SWF/2026/0933 from Swift Couriers",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "swift-couriers",
+        "supplier_gstin": "29PHGCS2431D1ZS"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0009",
+      "kind": "sale",
+      "date": "2026-09-02",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1584186,
+      "cgst": 142577,
+      "sgst": 142577,
+      "gross": 1869340,
+      "narration": "Sale to CUST-021",
+      "meta": {
+        "description": "Goods sold to CUST-021 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0010",
+      "kind": "sale",
+      "date": "2026-09-02",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4340746,
+      "cgst": 390667,
+      "sgst": 390667,
+      "gross": 5122080,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0011",
+      "kind": "sale",
+      "date": "2026-09-02",
+      "party": "CUST-020",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6525560,
+      "cgst": 587300,
+      "sgst": 587300,
+      "gross": 7700160,
+      "narration": "Sale to CUST-020",
+      "meta": {
+        "description": "Goods sold to CUST-020 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0012",
+      "kind": "sale",
+      "date": "2026-09-02",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6926568,
+      "cgst": 623391,
+      "sgst": 623391,
+      "gross": 8173350,
+      "narration": "Sale to CUST-002",
+      "meta": {
+        "description": "Goods sold to CUST-002 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0013",
+      "kind": "sale",
+      "date": "2026-09-02",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3208601,
+      "cgst": 80215,
+      "sgst": 80215,
+      "gross": 3369031,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0014",
+      "kind": "purchase",
+      "date": "2026-09-02",
+      "party": "RoadKing Logistics",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 613459,
+      "igst": 73615,
+      "gross": 687074,
+      "invoice_no": "RDK/2026/0955",
+      "narration": "Bill RDK/2026/0955 from RoadKing Logistics",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 12,
+        "supplier_id": "roadking-logistics",
+        "supplier_gstin": "36VNOCR2477I1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0015",
+      "kind": "receipt",
+      "date": "2026-09-02",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 5305441,
+      "refs": [
+        "EVT-sharma-2026-09-0003"
+      ],
+      "bank_ref": "UTR325145448",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0016",
+      "kind": "receipt",
+      "date": "2026-09-02",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 8173350,
+      "refs": [
+        "EVT-sharma-2026-09-0012"
+      ],
+      "bank_ref": "UTR886222227",
+      "narration": "Receipt from CUST-002",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0017",
+      "kind": "sale",
+      "date": "2026-09-03",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2788467,
+      "cgst": 250962,
+      "sgst": 250962,
+      "gross": 3290391,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0018",
+      "kind": "sale",
+      "date": "2026-09-03",
+      "party": "CUST-038",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6595466,
+      "cgst": 593592,
+      "sgst": 593592,
+      "gross": 7782650,
+      "narration": "Sale to CUST-038",
+      "meta": {
+        "description": "Goods sold to CUST-038 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0019",
+      "kind": "sale",
+      "date": "2026-09-03",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3332580,
+      "cgst": 83315,
+      "sgst": 83315,
+      "gross": 3499210,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0020",
+      "kind": "sale",
+      "date": "2026-09-03",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3361409,
+      "cgst": 302527,
+      "sgst": 302527,
+      "gross": 3966463,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0021",
+      "kind": "sale",
+      "date": "2026-09-03",
+      "party": "CUST-004",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 890383,
+      "cgst": 22260,
+      "sgst": 22260,
+      "gross": 934903,
+      "narration": "Sale to CUST-004",
+      "meta": {
+        "description": "Goods sold to CUST-004 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0022",
+      "kind": "purchase",
+      "date": "2026-09-03",
+      "party": "Stockbook Cloud",
+      "party_type": "Supplier",
+      "account": "Software Subscriptions",
+      "taxable": 450000,
+      "cgst": 40500,
+      "sgst": 40500,
+      "gross": 531000,
+      "invoice_no": "STC/2026/0904",
+      "narration": "Bill STC/2026/0904 from Stockbook Cloud",
+      "meta": {
+        "description": "Monthly subscription for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "stockbook-cloud",
+        "supplier_gstin": "29ULNCS7916R1ZY"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0023",
+      "kind": "purchase",
+      "date": "2026-09-03",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 353415,
+      "cgst": 31807,
+      "sgst": 31807,
+      "gross": 417029,
+      "invoice_no": "SWF/2026/0934",
+      "narration": "Bill SWF/2026/0934 from Swift Couriers",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "swift-couriers",
+        "supplier_gstin": "29PHGCS2431D1ZS"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0024",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 505085,
+      "cgst": 12627,
+      "sgst": 12627,
+      "gross": 530339,
+      "narration": "Sale to CUST-039",
+      "meta": {
+        "description": "Goods sold to CUST-039 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0025",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4087132,
+      "cgst": 102178,
+      "sgst": 102178,
+      "gross": 4291488,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0026",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1211367,
+      "cgst": 30284,
+      "sgst": 30284,
+      "gross": 1271935,
+      "narration": "Sale to CUST-013",
+      "meta": {
+        "description": "Goods sold to CUST-013 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0027",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2595405,
+      "cgst": 64885,
+      "sgst": 64885,
+      "gross": 2725175,
+      "narration": "Sale to CUST-006",
+      "meta": {
+        "description": "Goods sold to CUST-006 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0028",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6944335,
+      "cgst": 173608,
+      "sgst": 173608,
+      "gross": 7291551,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0029",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3246234,
+      "cgst": 292161,
+      "sgst": 292161,
+      "gross": 3830556,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0030",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5450925,
+      "cgst": 490583,
+      "sgst": 490583,
+      "gross": 6432091,
+      "narration": "Sale to CUST-026",
+      "meta": {
+        "description": "Goods sold to CUST-026 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0031",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3014128,
+      "cgst": 271272,
+      "sgst": 271272,
+      "gross": 3556672,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0032",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6046977,
+      "cgst": 151174,
+      "sgst": 151174,
+      "gross": 6349325,
+      "narration": "Sale to CUST-021",
+      "meta": {
+        "description": "Goods sold to CUST-021 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0033",
+      "kind": "sale",
+      "date": "2026-09-04",
+      "party": "CUST-003",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5738873,
+      "cgst": 143472,
+      "sgst": 143472,
+      "gross": 6025817,
+      "narration": "Sale to CUST-003",
+      "meta": {
+        "description": "Goods sold to CUST-003 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0034",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3193199,
+      "cgst": 79830,
+      "sgst": 79830,
+      "gross": 3352859,
+      "narration": "Sale to CUST-036",
+      "meta": {
+        "description": "Goods sold to CUST-036 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0035",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 519832,
+      "cgst": 12996,
+      "sgst": 12996,
+      "gross": 545824,
+      "narration": "Sale to CUST-001",
+      "meta": {
+        "description": "Goods sold to CUST-001 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0036",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6545740,
+      "cgst": 589117,
+      "sgst": 589117,
+      "gross": 7723974,
+      "narration": "Sale to CUST-036",
+      "meta": {
+        "description": "Goods sold to CUST-036 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0037",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5749468,
+      "cgst": 143737,
+      "sgst": 143737,
+      "gross": 6036942,
+      "narration": "Sale to CUST-029",
+      "meta": {
+        "description": "Goods sold to CUST-029 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0038",
+      "kind": "gateway_receipt",
+      "date": "2026-09-05",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6432091,
+      "refs": [
+        "EVT-sharma-2026-09-0030"
+      ],
+      "narration": "Gateway collection from CUST-026",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0039",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 662990,
+      "cgst": 59669,
+      "sgst": 59669,
+      "gross": 782328,
+      "narration": "Sale to CUST-026",
+      "meta": {
+        "description": "Goods sold to CUST-026 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0040",
+      "kind": "sale",
+      "date": "2026-09-05",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6652575,
+      "cgst": 166314,
+      "sgst": 166314,
+      "gross": 6985203,
+      "narration": "Sale to CUST-023",
+      "meta": {
+        "description": "Goods sold to CUST-023 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0041",
+      "kind": "purchase",
+      "date": "2026-09-05",
+      "party": "Lakeview Warehousing LLP",
+      "party_type": "Supplier",
+      "account": "Rent",
+      "taxable": 8500000,
+      "cgst": 765000,
+      "sgst": 765000,
+      "gross": 10030000,
+      "invoice_no": "LKV/2026/0940",
+      "narration": "Bill LKV/2026/0940 from Lakeview Warehousing LLP",
+      "meta": {
+        "description": "Rent for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "lakeview-warehousing",
+        "supplier_gstin": "29WFQCL5046J1Z0"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0042",
+      "kind": "purchase",
+      "date": "2026-09-05",
+      "party": "BlueNet Broadband",
+      "party_type": "Supplier",
+      "account": "Telephone and Internet",
+      "taxable": 381837,
+      "cgst": 34365,
+      "sgst": 34365,
+      "gross": 450567,
+      "invoice_no": "BLN/2026/0931",
+      "narration": "Bill BLN/2026/0931 from BlueNet Broadband",
+      "meta": {
+        "description": "BlueNet Broadband charges for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "bluenet-broadband",
+        "supplier_gstin": "29WSFCB1474N1ZM"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0043",
+      "kind": "sale",
+      "date": "2026-09-06",
+      "party": "CUST-010",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7466790,
+      "cgst": 186670,
+      "sgst": 186670,
+      "gross": 7840130,
+      "narration": "Sale to CUST-010",
+      "meta": {
+        "description": "Goods sold to CUST-010 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0044",
+      "kind": "sale",
+      "date": "2026-09-06",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1077963,
+      "cgst": 97017,
+      "sgst": 97017,
+      "gross": 1271997,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0045",
+      "kind": "sale",
+      "date": "2026-09-06",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1278752,
+      "cgst": 31969,
+      "sgst": 31969,
+      "gross": 1342690,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0046",
+      "kind": "sale",
+      "date": "2026-09-06",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4802920,
+      "cgst": 120073,
+      "sgst": 120073,
+      "gross": 5043066,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0047",
+      "kind": "sale",
+      "date": "2026-09-06",
+      "party": "CUST-019",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1946133,
+      "cgst": 175152,
+      "sgst": 175152,
+      "gross": 2296437,
+      "narration": "Sale to CUST-019",
+      "meta": {
+        "description": "Goods sold to CUST-019 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0048",
+      "kind": "receipt",
+      "date": "2026-09-06",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1869340,
+      "refs": [
+        "EVT-sharma-2026-09-0009"
+      ],
+      "bank_ref": "UTR437109590",
+      "narration": "Receipt from CUST-021",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0049",
+      "kind": "sale",
+      "date": "2026-09-07",
+      "party": "CUST-014",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2205926,
+      "cgst": 55148,
+      "sgst": 55148,
+      "gross": 2316222,
+      "narration": "Sale to CUST-014",
+      "meta": {
+        "description": "Goods sold to CUST-014 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0050",
+      "kind": "sale",
+      "date": "2026-09-07",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3671777,
+      "cgst": 91794,
+      "sgst": 91794,
+      "gross": 3855365,
+      "narration": "Sale to CUST-012",
+      "meta": {
+        "description": "Goods sold to CUST-012 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0051",
+      "kind": "sale",
+      "date": "2026-09-07",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2026966,
+      "cgst": 182427,
+      "sgst": 182427,
+      "gross": 2391820,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0052",
+      "kind": "sale",
+      "date": "2026-09-07",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5479696,
+      "cgst": 136992,
+      "sgst": 136992,
+      "gross": 5753680,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0053",
+      "kind": "gateway_receipt",
+      "date": "2026-09-07",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 545824,
+      "refs": [
+        "EVT-sharma-2026-09-0035"
+      ],
+      "narration": "Gateway collection from CUST-001",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0054",
+      "kind": "sale",
+      "date": "2026-09-07",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5622216,
+      "cgst": 505999,
+      "sgst": 505999,
+      "gross": 6634214,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0055",
+      "kind": "gateway_receipt",
+      "date": "2026-09-07",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3830556,
+      "refs": [
+        "EVT-sharma-2026-09-0029"
+      ],
+      "narration": "Gateway collection from CUST-030",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0056",
+      "kind": "gateway_receipt",
+      "date": "2026-09-07",
+      "party": "CUST-004",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 934903,
+      "refs": [
+        "EVT-sharma-2026-09-0021"
+      ],
+      "narration": "Gateway collection from CUST-004",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0057",
+      "kind": "purchase",
+      "date": "2026-09-07",
+      "party": "Kaveri Packaging Works",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 2013344,
+      "cgst": 120801,
+      "sgst": 120801,
+      "gross": 2254946,
+      "invoice_no": "KVR/2026/0913",
+      "narration": "Bill KVR/2026/0913 from Kaveri Packaging Works",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 12,
+        "supplier_id": "kaveri-packaging",
+        "supplier_gstin": "29ORXCK6371L1Z3"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0058",
+      "kind": "purchase",
+      "date": "2026-09-07",
+      "party": "Bharat Polymers Udyog",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 2676810,
+      "igst": 481826,
+      "gross": 3158636,
+      "invoice_no": "BHR/2026/0907",
+      "narration": "Bill BHR/2026/0907 from Bharat Polymers Udyog",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 18,
+        "supplier_id": "bharat-polymers",
+        "supplier_gstin": "24ECWCB3133X1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0059",
+      "kind": "purchase",
+      "date": "2026-09-07",
+      "party": "QuickFix Repairs",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 82774,
+      "gross": 82774,
+      "invoice_no": "QCK/2026/0913",
+      "narration": "Bill QCK/2026/0913 from QuickFix Repairs",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "supplier_id": "quickfix-repairs"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0060",
+      "kind": "receipt",
+      "date": "2026-09-07",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7723974,
+      "refs": [
+        "EVT-sharma-2026-09-0036"
+      ],
+      "bank_ref": "UTR963019829",
+      "narration": "Receipt from CUST-036",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0061",
+      "kind": "receipt",
+      "date": "2026-09-07",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6634214,
+      "refs": [
+        "EVT-sharma-2026-09-0054"
+      ],
+      "bank_ref": "UTR058654046",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0062",
+      "kind": "receipt",
+      "date": "2026-09-07",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6349325,
+      "refs": [
+        "EVT-sharma-2026-09-0032"
+      ],
+      "bank_ref": "UTR256527293",
+      "narration": "Receipt from CUST-021",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0063",
+      "kind": "gateway_receipt",
+      "date": "2026-09-08",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 909770,
+      "refs": [
+        "EVT-sharma-2026-09-0002"
+      ],
+      "narration": "Gateway collection from CUST-012",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0064",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-024",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1690819,
+      "cgst": 42270,
+      "sgst": 42270,
+      "gross": 1775359,
+      "narration": "Sale to CUST-024",
+      "meta": {
+        "description": "Goods sold to CUST-024 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0065",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4330160,
+      "cgst": 108254,
+      "sgst": 108254,
+      "gross": 4546668,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0066",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 704704,
+      "cgst": 63423,
+      "sgst": 63423,
+      "gross": 831550,
+      "narration": "Sale to CUST-007",
+      "meta": {
+        "description": "Goods sold to CUST-007 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0067",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7520458,
+      "cgst": 676841,
+      "sgst": 676841,
+      "gross": 8874140,
+      "narration": "Sale to CUST-033",
+      "meta": {
+        "description": "Goods sold to CUST-033 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0068",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1349289,
+      "cgst": 33732,
+      "sgst": 33732,
+      "gross": 1416753,
+      "narration": "Sale to CUST-035",
+      "meta": {
+        "description": "Goods sold to CUST-035 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0069",
+      "kind": "gateway_receipt",
+      "date": "2026-09-08",
+      "party": "CUST-004",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6862832,
+      "refs": [
+        "EVT-sharma-2026-09-0006"
+      ],
+      "narration": "Gateway collection from CUST-004",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0070",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-010",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3615809,
+      "cgst": 90395,
+      "sgst": 90395,
+      "gross": 3796599,
+      "narration": "Sale to CUST-010",
+      "meta": {
+        "description": "Goods sold to CUST-010 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0071",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-028",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6458711,
+      "cgst": 161468,
+      "sgst": 161468,
+      "gross": 6781647,
+      "narration": "Sale to CUST-028",
+      "meta": {
+        "description": "Goods sold to CUST-028 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0072",
+      "kind": "sale",
+      "date": "2026-09-08",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1557162,
+      "cgst": 140145,
+      "sgst": 140145,
+      "gross": 1837452,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0073",
+      "kind": "purchase",
+      "date": "2026-09-08",
+      "party": "Sundaram Steelware",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 11495565,
+      "igst": 2069202,
+      "gross": 13564767,
+      "invoice_no": "SND/2026/0911",
+      "narration": "Bill SND/2026/0911 from Sundaram Steelware",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 18,
+        "supplier_id": "sundaram-steelware",
+        "supplier_gstin": "33LQPCS8048A1Z4"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0074",
+      "kind": "receipt",
+      "date": "2026-09-08",
+      "party": "CUST-010",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7840130,
+      "refs": [
+        "EVT-sharma-2026-09-0043"
+      ],
+      "bank_ref": "UTR332874724",
+      "narration": "Receipt from CUST-010",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0075",
+      "kind": "receipt",
+      "date": "2026-09-08",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3369031,
+      "refs": [
+        "EVT-sharma-2026-09-0013"
+      ],
+      "bank_ref": "UTR924536180",
+      "narration": "Receipt from CUST-018",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0076",
+      "kind": "gateway_settlement",
+      "date": "2026-09-08",
+      "account": "HDFC Current 0001",
+      "gross": 6280293,
+      "refs": [
+        "EVT-sharma-2026-09-0038"
+      ],
+      "bank_ref": "PGS7040",
+      "narration": "PG SETTL 0908 BATCH 7040",
+      "meta": {
+        "description": "Gateway settlement of collections 31-08-2026 to 06-09-2026: ₹64,320.91 collected, ₹1,286.42 fee, ₹231.56 GST on the fee",
+        "fee": 128642,
+        "fee_gst": 23156
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0077",
+      "kind": "bank_charge",
+      "date": "2026-09-08",
+      "account": "Bank Charges",
+      "taxable": 100000,
+      "cgst": 9000,
+      "sgst": 9000,
+      "gross": 118000,
+      "narration": "Bank charges for September 2026",
+      "meta": {
+        "description": "HDFC Bank account charges for September 2026, including GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0078",
+      "kind": "sale",
+      "date": "2026-09-09",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 633268,
+      "cgst": 15832,
+      "sgst": 15832,
+      "gross": 664932,
+      "narration": "Sale to CUST-013",
+      "meta": {
+        "description": "Goods sold to CUST-013 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0079",
+      "kind": "sale",
+      "date": "2026-09-09",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3901179,
+      "cgst": 351106,
+      "sgst": 351106,
+      "gross": 4603391,
+      "narration": "Sale to CUST-006",
+      "meta": {
+        "description": "Goods sold to CUST-006 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0080",
+      "kind": "sale",
+      "date": "2026-09-09",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4345755,
+      "cgst": 391118,
+      "sgst": 391118,
+      "gross": 5127991,
+      "narration": "Sale to CUST-035",
+      "meta": {
+        "description": "Goods sold to CUST-035 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0081",
+      "kind": "sale",
+      "date": "2026-09-09",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4503588,
+      "cgst": 405323,
+      "sgst": 405323,
+      "gross": 5314234,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0082",
+      "kind": "gateway_receipt",
+      "date": "2026-09-09",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 5043066,
+      "refs": [
+        "EVT-sharma-2026-09-0046"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0083",
+      "kind": "purchase",
+      "date": "2026-09-09",
+      "party": "Deccan Textile Mills",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 5369869,
+      "cgst": 134247,
+      "sgst": 134247,
+      "gross": 5638363,
+      "invoice_no": "DCC/2026/0935",
+      "narration": "Bill DCC/2026/0935 from Deccan Textile Mills",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 5,
+        "supplier_id": "deccan-textiles",
+        "supplier_gstin": "29WNECD3532M1Z2"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0084",
+      "kind": "receipt",
+      "date": "2026-09-09",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2391820,
+      "refs": [
+        "EVT-sharma-2026-09-0051"
+      ],
+      "bank_ref": "UTR175102731",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0085",
+      "kind": "vendor_payment",
+      "date": "2026-09-09",
+      "party": "Omkar Estates",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 17700000,
+      "invoice_no": "OMK/2026/0933",
+      "refs": [
+        "EVT-sharma-2026-09-0007"
+      ],
+      "bank_ref": "N0818881",
+      "narration": "Payment for OMK/2026/0933 to Omkar Estates",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "omkar-estates"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0086",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7571887,
+      "cgst": 681470,
+      "sgst": 681470,
+      "gross": 8934827,
+      "narration": "Sale to CUST-007",
+      "meta": {
+        "description": "Goods sold to CUST-007 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0087",
+      "kind": "gateway_receipt",
+      "date": "2026-09-10",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8934827,
+      "refs": [
+        "EVT-sharma-2026-09-0086"
+      ],
+      "narration": "Gateway collection from CUST-007",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0088",
+      "kind": "gateway_receipt",
+      "date": "2026-09-10",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 5127991,
+      "refs": [
+        "EVT-sharma-2026-09-0080"
+      ],
+      "narration": "Gateway collection from CUST-035",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0089",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3208319,
+      "cgst": 288749,
+      "sgst": 288749,
+      "gross": 3785817,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0090",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3193048,
+      "cgst": 287374,
+      "sgst": 287374,
+      "gross": 3767796,
+      "narration": "Sale to CUST-031",
+      "meta": {
+        "description": "Goods sold to CUST-031 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0091",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3803187,
+      "cgst": 95080,
+      "sgst": 95080,
+      "gross": 3993347,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0092",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5860772,
+      "cgst": 527469,
+      "sgst": 527469,
+      "gross": 6915710,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0093",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 845894,
+      "cgst": 21147,
+      "sgst": 21147,
+      "gross": 888188,
+      "narration": "Sale to CUST-031",
+      "meta": {
+        "description": "Goods sold to CUST-031 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0094",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-025",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2667253,
+      "cgst": 240053,
+      "sgst": 240053,
+      "gross": 3147359,
+      "narration": "Sale to CUST-025",
+      "meta": {
+        "description": "Goods sold to CUST-025 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0095",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7630771,
+      "cgst": 686769,
+      "sgst": 686769,
+      "gross": 9004309,
+      "narration": "Sale to CUST-026",
+      "meta": {
+        "description": "Goods sold to CUST-026 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0096",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2814550,
+      "cgst": 70364,
+      "sgst": 70364,
+      "gross": 2955278,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0097",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4865138,
+      "cgst": 121628,
+      "sgst": 121628,
+      "gross": 5108394,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0098",
+      "kind": "sale",
+      "date": "2026-09-10",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7565036,
+      "cgst": 189126,
+      "sgst": 189126,
+      "gross": 7943288,
+      "narration": "Sale to CUST-006",
+      "meta": {
+        "description": "Goods sold to CUST-006 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0099",
+      "kind": "purchase",
+      "date": "2026-09-10",
+      "party": "City Power Co",
+      "party_type": "Supplier",
+      "account": "Electricity",
+      "taxable": 2228946,
+      "gross": 2228946,
+      "invoice_no": "CTY/2026/0925",
+      "narration": "Bill CTY/2026/0925 from City Power Co",
+      "meta": {
+        "description": "City Power Co charges for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "supplier_id": "city-power"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0100",
+      "kind": "receipt",
+      "date": "2026-09-10",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4603391,
+      "refs": [
+        "EVT-sharma-2026-09-0079"
+      ],
+      "bank_ref": "UTR877283647",
+      "narration": "Receipt from CUST-006",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0101",
+      "kind": "receipt",
+      "date": "2026-09-10",
+      "party": "CUST-024",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1775359,
+      "refs": [
+        "EVT-sharma-2026-09-0064"
+      ],
+      "bank_ref": "UTR470549431",
+      "narration": "Receipt from CUST-024",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0102",
+      "kind": "receipt",
+      "date": "2026-09-10",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2725175,
+      "refs": [
+        "EVT-sharma-2026-09-0027"
+      ],
+      "bank_ref": "UTR348130356",
+      "narration": "Receipt from CUST-006",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0103",
+      "kind": "receipt",
+      "date": "2026-09-10",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 8874140,
+      "refs": [
+        "EVT-sharma-2026-09-0067"
+      ],
+      "bank_ref": "UTR437379653",
+      "narration": "Receipt from CUST-033",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0104",
+      "kind": "receipt",
+      "date": "2026-09-10",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3556672,
+      "refs": [
+        "EVT-sharma-2026-09-0031"
+      ],
+      "bank_ref": "UTR507712697",
+      "narration": "Receipt from CUST-017",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0105",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6590118,
+      "cgst": 164753,
+      "sgst": 164753,
+      "gross": 6919624,
+      "narration": "Sale to CUST-015",
+      "meta": {
+        "description": "Goods sold to CUST-015 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0106",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3865993,
+      "cgst": 347939,
+      "sgst": 347939,
+      "gross": 4561871,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0107",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4375555,
+      "cgst": 109389,
+      "sgst": 109389,
+      "gross": 4594333,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0108",
+      "kind": "gateway_receipt",
+      "date": "2026-09-11",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1242499,
+      "refs": [
+        "EVT-sharma-2026-09-0005"
+      ],
+      "narration": "Gateway collection from CUST-008",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0109",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4585991,
+      "cgst": 114650,
+      "sgst": 114650,
+      "gross": 4815291,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0110",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7304557,
+      "cgst": 657410,
+      "sgst": 657410,
+      "gross": 8619377,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0111",
+      "kind": "sale",
+      "date": "2026-09-11",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7673340,
+      "cgst": 191834,
+      "sgst": 191834,
+      "gross": 8057008,
+      "narration": "Sale to CUST-001",
+      "meta": {
+        "description": "Goods sold to CUST-001 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0112",
+      "kind": "purchase",
+      "date": "2026-09-11",
+      "party": "QuickFix Repairs",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 113660,
+      "gross": 113660,
+      "invoice_no": "QCK/2026/0914",
+      "narration": "Bill QCK/2026/0914 from QuickFix Repairs",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "supplier_id": "quickfix-repairs"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0113",
+      "kind": "receipt",
+      "date": "2026-09-11",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 530339,
+      "refs": [
+        "EVT-sharma-2026-09-0024"
+      ],
+      "bank_ref": "UTR295477415",
+      "narration": "Receipt from CUST-039",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0114",
+      "kind": "receipt",
+      "date": "2026-09-11",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4594333,
+      "refs": [
+        "EVT-sharma-2026-09-0107"
+      ],
+      "bank_ref": "UTR921416302",
+      "narration": "Receipt from CUST-017",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0115",
+      "kind": "receipt",
+      "date": "2026-09-11",
+      "party": "CUST-019",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2296437,
+      "refs": [
+        "EVT-sharma-2026-09-0047"
+      ],
+      "bank_ref": "UTR901650173",
+      "narration": "Receipt from CUST-019",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0116",
+      "kind": "sale",
+      "date": "2026-09-12",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6444708,
+      "cgst": 580024,
+      "sgst": 580024,
+      "gross": 7604756,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0117",
+      "kind": "gateway_receipt",
+      "date": "2026-09-12",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 4546668,
+      "refs": [
+        "EVT-sharma-2026-09-0065"
+      ],
+      "narration": "Gateway collection from CUST-040",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0118",
+      "kind": "sale",
+      "date": "2026-09-12",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 591906,
+      "cgst": 53272,
+      "sgst": 53272,
+      "gross": 698450,
+      "narration": "Sale to CUST-012",
+      "meta": {
+        "description": "Goods sold to CUST-012 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0119",
+      "kind": "sale",
+      "date": "2026-09-12",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3898983,
+      "cgst": 350908,
+      "sgst": 350908,
+      "gross": 4600799,
+      "narration": "Sale to CUST-039",
+      "meta": {
+        "description": "Goods sold to CUST-039 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0120",
+      "kind": "sale",
+      "date": "2026-09-12",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3554990,
+      "cgst": 88875,
+      "sgst": 88875,
+      "gross": 3732740,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0121",
+      "kind": "gateway_receipt",
+      "date": "2026-09-12",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7943288,
+      "refs": [
+        "EVT-sharma-2026-09-0098"
+      ],
+      "narration": "Gateway collection from CUST-006",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0122",
+      "kind": "sale",
+      "date": "2026-09-12",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2327218,
+      "cgst": 209450,
+      "sgst": 209450,
+      "gross": 2746118,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0123",
+      "kind": "purchase",
+      "date": "2026-09-12",
+      "party": "Vaani Telecom Services",
+      "party_type": "Supplier",
+      "account": "Telephone and Internet",
+      "taxable": 273566,
+      "igst": 49242,
+      "gross": 322808,
+      "invoice_no": "VNT/2026/0908",
+      "narration": "Bill VNT/2026/0908 from Vaani Telecom Services",
+      "meta": {
+        "description": "Vaani Telecom Services charges for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "vaani-telecom",
+        "supplier_gstin": "27DYLCV3017V1Z0"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0124",
+      "kind": "purchase",
+      "date": "2026-09-12",
+      "party": "RoadKing Logistics",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 457934,
+      "igst": 54952,
+      "gross": 512886,
+      "invoice_no": "RDK/2026/0956",
+      "narration": "Bill RDK/2026/0956 from RoadKing Logistics",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 12,
+        "supplier_id": "roadking-logistics",
+        "supplier_gstin": "36VNOCR2477I1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0125",
+      "kind": "receipt",
+      "date": "2026-09-12",
+      "party": "CUST-020",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7700160,
+      "refs": [
+        "EVT-sharma-2026-09-0011"
+      ],
+      "bank_ref": "UTR032835782",
+      "narration": "Receipt from CUST-020",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0126",
+      "kind": "receipt",
+      "date": "2026-09-12",
+      "party": "CUST-010",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3796599,
+      "refs": [
+        "EVT-sharma-2026-09-0070"
+      ],
+      "bank_ref": "UTR272627400",
+      "narration": "Receipt from CUST-010",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0127",
+      "kind": "receipt",
+      "date": "2026-09-12",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 9004309,
+      "refs": [
+        "EVT-sharma-2026-09-0095"
+      ],
+      "bank_ref": "UTR599326657",
+      "narration": "Receipt from CUST-026",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0128",
+      "kind": "sale",
+      "date": "2026-09-13",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6962413,
+      "cgst": 174060,
+      "sgst": 174060,
+      "gross": 7310533,
+      "narration": "Sale to CUST-027",
+      "meta": {
+        "description": "Goods sold to CUST-027 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0129",
+      "kind": "sale",
+      "date": "2026-09-13",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1212499,
+      "cgst": 30312,
+      "sgst": 30312,
+      "gross": 1273123,
+      "narration": "Sale to CUST-027",
+      "meta": {
+        "description": "Goods sold to CUST-027 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0130",
+      "kind": "gateway_receipt",
+      "date": "2026-09-13",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 4668004,
+      "refs": [
+        "EVT-sharma-2026-09-0004"
+      ],
+      "narration": "Gateway collection from CUST-002",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0131",
+      "kind": "gateway_receipt",
+      "date": "2026-09-13",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 5314234,
+      "refs": [
+        "EVT-sharma-2026-09-0081"
+      ],
+      "narration": "Gateway collection from CUST-040",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0132",
+      "kind": "sale",
+      "date": "2026-09-13",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7785974,
+      "cgst": 194649,
+      "sgst": 194649,
+      "gross": 8175272,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0133",
+      "kind": "sale",
+      "date": "2026-09-13",
+      "party": "CUST-014",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1899756,
+      "cgst": 47494,
+      "sgst": 47494,
+      "gross": 1994744,
+      "narration": "Sale to CUST-014",
+      "meta": {
+        "description": "Goods sold to CUST-014 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0134",
+      "kind": "receipt",
+      "date": "2026-09-13",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4291488,
+      "refs": [
+        "EVT-sharma-2026-09-0025"
+      ],
+      "bank_ref": "UTR627817197",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0135",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3428612,
+      "cgst": 308575,
+      "sgst": 308575,
+      "gross": 4045762,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0136",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3389579,
+      "cgst": 84739,
+      "sgst": 84739,
+      "gross": 3559057,
+      "narration": "Sale to CUST-012",
+      "meta": {
+        "description": "Goods sold to CUST-012 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0137",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-019",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3955546,
+      "cgst": 355999,
+      "sgst": 355999,
+      "gross": 4667544,
+      "narration": "Sale to CUST-019",
+      "meta": {
+        "description": "Goods sold to CUST-019 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0138",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3227211,
+      "cgst": 290449,
+      "sgst": 290449,
+      "gross": 3808109,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0139",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 778692,
+      "cgst": 70082,
+      "sgst": 70082,
+      "gross": 918856,
+      "narration": "Sale to CUST-006",
+      "meta": {
+        "description": "Goods sold to CUST-006 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0140",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6190897,
+      "cgst": 154772,
+      "sgst": 154772,
+      "gross": 6500441,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0141",
+      "kind": "sale",
+      "date": "2026-09-14",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7877055,
+      "cgst": 196926,
+      "sgst": 196926,
+      "gross": 8270907,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0142",
+      "kind": "receipt",
+      "date": "2026-09-14",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4561871,
+      "refs": [
+        "EVT-sharma-2026-09-0106"
+      ],
+      "bank_ref": "UTR697327787",
+      "narration": "Receipt from CUST-017",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0143",
+      "kind": "receipt",
+      "date": "2026-09-14",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 698450,
+      "refs": [
+        "EVT-sharma-2026-09-0118"
+      ],
+      "bank_ref": "UTR018269801",
+      "narration": "Receipt from CUST-012",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0144",
+      "kind": "receipt",
+      "date": "2026-09-14",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 5122080,
+      "refs": [
+        "EVT-sharma-2026-09-0010"
+      ],
+      "bank_ref": "UTR681924966",
+      "narration": "Receipt from CUST-040",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0145",
+      "kind": "receipt",
+      "date": "2026-09-14",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3993347,
+      "refs": [
+        "EVT-sharma-2026-09-0091"
+      ],
+      "bank_ref": "UTR268050750",
+      "narration": "Receipt from CUST-008",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0146",
+      "kind": "receipt",
+      "date": "2026-09-14",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3966463,
+      "refs": [
+        "EVT-sharma-2026-09-0020"
+      ],
+      "bank_ref": "UTR829121137",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0147",
+      "kind": "vendor_payment",
+      "date": "2026-09-14",
+      "party": "Deccan Textile Mills",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 5638363,
+      "invoice_no": "DCC/2026/0935",
+      "refs": [
+        "EVT-sharma-2026-09-0083"
+      ],
+      "bank_ref": "N9378469",
+      "narration": "Payment for DCC/2026/0935 to Deccan Textile Mills",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "deccan-textiles"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0148",
+      "kind": "gateway_receipt",
+      "date": "2026-09-15",
+      "party": "CUST-038",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7782650,
+      "refs": [
+        "EVT-sharma-2026-09-0018"
+      ],
+      "narration": "Gateway collection from CUST-038",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0149",
+      "kind": "sale",
+      "date": "2026-09-15",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5161171,
+      "cgst": 464505,
+      "sgst": 464505,
+      "gross": 6090181,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0150",
+      "kind": "sale",
+      "date": "2026-09-15",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1478372,
+      "cgst": 133053,
+      "sgst": 133053,
+      "gross": 1744478,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0151",
+      "kind": "gateway_receipt",
+      "date": "2026-09-15",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1744478,
+      "refs": [
+        "EVT-sharma-2026-09-0150"
+      ],
+      "narration": "Gateway collection from CUST-008",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0152",
+      "kind": "receipt",
+      "date": "2026-09-15",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1271935,
+      "refs": [
+        "EVT-sharma-2026-09-0026"
+      ],
+      "bank_ref": "UTR178372633",
+      "narration": "Receipt from CUST-013",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0153",
+      "kind": "gateway_settlement",
+      "date": "2026-09-15",
+      "account": "HDFC Current 0001",
+      "gross": 54585117,
+      "refs": [
+        "EVT-sharma-2026-09-0053",
+        "EVT-sharma-2026-09-0055",
+        "EVT-sharma-2026-09-0056",
+        "EVT-sharma-2026-09-0063",
+        "EVT-sharma-2026-09-0069",
+        "EVT-sharma-2026-09-0082",
+        "EVT-sharma-2026-09-0087",
+        "EVT-sharma-2026-09-0088",
+        "EVT-sharma-2026-09-0108",
+        "EVT-sharma-2026-09-0117",
+        "EVT-sharma-2026-09-0121",
+        "EVT-sharma-2026-09-0130",
+        "EVT-sharma-2026-09-0131"
+      ],
+      "bank_ref": "PGS1641",
+      "narration": "PG SETTL 0915 BATCH 1641",
+      "meta": {
+        "description": "Gateway settlement of collections 07-09-2026 to 13-09-2026: ₹5,59,044.62 collected, ₹11,180.89 fee, ₹2,012.56 GST on the fee",
+        "fee": 1118089,
+        "fee_gst": 201256
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0154",
+      "kind": "vendor_payment",
+      "date": "2026-09-15",
+      "party": "Sundaram Steelware",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 13564767,
+      "invoice_no": "SND/2026/0911",
+      "refs": [
+        "EVT-sharma-2026-09-0073"
+      ],
+      "bank_ref": "N3823499",
+      "narration": "Payment for SND/2026/0911 to Sundaram Steelware",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "sundaram-steelware"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0155",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3310016,
+      "cgst": 297901,
+      "sgst": 297901,
+      "gross": 3905818,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0156",
+      "kind": "gateway_receipt",
+      "date": "2026-09-16",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1271997,
+      "refs": [
+        "EVT-sharma-2026-09-0044"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0157",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7453502,
+      "cgst": 670815,
+      "sgst": 670815,
+      "gross": 8795132,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0158",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1789734,
+      "cgst": 44743,
+      "sgst": 44743,
+      "gross": 1879220,
+      "narration": "Sale to CUST-012",
+      "meta": {
+        "description": "Goods sold to CUST-012 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0159",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6610652,
+      "cgst": 594959,
+      "sgst": 594959,
+      "gross": 7800570,
+      "narration": "Sale to CUST-031",
+      "meta": {
+        "description": "Goods sold to CUST-031 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0160",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1563199,
+      "cgst": 140688,
+      "sgst": 140688,
+      "gross": 1844575,
+      "narration": "Sale to CUST-021",
+      "meta": {
+        "description": "Goods sold to CUST-021 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0161",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3908034,
+      "cgst": 351723,
+      "sgst": 351723,
+      "gross": 4611480,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0162",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1900316,
+      "cgst": 47508,
+      "sgst": 47508,
+      "gross": 1995332,
+      "narration": "Sale to CUST-035",
+      "meta": {
+        "description": "Goods sold to CUST-035 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0163",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-024",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5239553,
+      "cgst": 471560,
+      "sgst": 471560,
+      "gross": 6182673,
+      "narration": "Sale to CUST-024",
+      "meta": {
+        "description": "Goods sold to CUST-024 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0164",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 463342,
+      "cgst": 41701,
+      "sgst": 41701,
+      "gross": 546744,
+      "narration": "Sale to CUST-001",
+      "meta": {
+        "description": "Goods sold to CUST-001 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0165",
+      "kind": "sale",
+      "date": "2026-09-16",
+      "party": "CUST-038",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6609017,
+      "cgst": 165225,
+      "sgst": 165225,
+      "gross": 6939467,
+      "narration": "Sale to CUST-038",
+      "meta": {
+        "description": "Goods sold to CUST-038 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0166",
+      "kind": "receipt",
+      "date": "2026-09-16",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 5739762,
+      "refs": [
+        "EVT-sharma-2026-09-0001"
+      ],
+      "bank_ref": "UTR993295405",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0167",
+      "kind": "receipt",
+      "date": "2026-09-16",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 831550,
+      "refs": [
+        "EVT-sharma-2026-09-0066"
+      ],
+      "bank_ref": "UTR471584665",
+      "narration": "Receipt from CUST-007",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0168",
+      "kind": "receipt",
+      "date": "2026-09-16",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 5108394,
+      "refs": [
+        "EVT-sharma-2026-09-0097"
+      ],
+      "bank_ref": "UTR548238070",
+      "narration": "Receipt from CUST-030",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0169",
+      "kind": "receipt",
+      "date": "2026-09-16",
+      "party": "CUST-038",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6939467,
+      "refs": [
+        "EVT-sharma-2026-09-0165"
+      ],
+      "bank_ref": "UTR608804812",
+      "narration": "Receipt from CUST-038",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0170",
+      "kind": "vendor_payment",
+      "date": "2026-09-16",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 417029,
+      "invoice_no": "SWF/2026/0934",
+      "refs": [
+        "EVT-sharma-2026-09-0023"
+      ],
+      "bank_ref": "N3021273",
+      "narration": "Payment for SWF/2026/0934 to Swift Couriers",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "swift-couriers"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0171",
+      "kind": "sale",
+      "date": "2026-09-17",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1230244,
+      "cgst": 110722,
+      "sgst": 110722,
+      "gross": 1451688,
+      "narration": "Sale to CUST-023",
+      "meta": {
+        "description": "Goods sold to CUST-023 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0172",
+      "kind": "gateway_receipt",
+      "date": "2026-09-17",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3352859,
+      "refs": [
+        "EVT-sharma-2026-09-0034"
+      ],
+      "narration": "Gateway collection from CUST-036",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0173",
+      "kind": "sale",
+      "date": "2026-09-17",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5039957,
+      "cgst": 125999,
+      "sgst": 125999,
+      "gross": 5291955,
+      "narration": "Sale to CUST-002",
+      "meta": {
+        "description": "Goods sold to CUST-002 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0174",
+      "kind": "sale",
+      "date": "2026-09-17",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2840576,
+      "cgst": 71014,
+      "sgst": 71014,
+      "gross": 2982604,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0175",
+      "kind": "gateway_receipt",
+      "date": "2026-09-17",
+      "party": "CUST-003",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6025817,
+      "refs": [
+        "EVT-sharma-2026-09-0033"
+      ],
+      "narration": "Gateway collection from CUST-003",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0176",
+      "kind": "purchase",
+      "date": "2026-09-17",
+      "party": "Deccan Textile Mills",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 5801928,
+      "cgst": 145048,
+      "sgst": 145048,
+      "gross": 6092024,
+      "invoice_no": "DCC/2026/0936",
+      "narration": "Bill DCC/2026/0936 from Deccan Textile Mills",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 5,
+        "supplier_id": "deccan-textiles",
+        "supplier_gstin": "29WNECD3532M1Z2"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0177",
+      "kind": "purchase",
+      "date": "2026-09-17",
+      "party": "Bharat Polymers Udyog",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 2122328,
+      "igst": 382019,
+      "gross": 2504347,
+      "invoice_no": "BHR/2026/0908",
+      "narration": "Bill BHR/2026/0908 from Bharat Polymers Udyog",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 18,
+        "supplier_id": "bharat-polymers",
+        "supplier_gstin": "24ECWCB3133X1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0178",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4600799,
+      "refs": [
+        "EVT-sharma-2026-09-0119"
+      ],
+      "bank_ref": "UTR476938419",
+      "narration": "Receipt from CUST-039",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0179",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3499210,
+      "refs": [
+        "EVT-sharma-2026-09-0019"
+      ],
+      "bank_ref": "UTR481818190",
+      "narration": "Receipt from CUST-030",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0180",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6036942,
+      "refs": [
+        "EVT-sharma-2026-09-0037"
+      ],
+      "bank_ref": "UTR423889286",
+      "narration": "Receipt from CUST-029",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0181",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 8175272,
+      "refs": [
+        "EVT-sharma-2026-09-0132"
+      ],
+      "bank_ref": "UTR677753813",
+      "narration": "Receipt from CUST-011",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0182",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-025",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3147359,
+      "refs": [
+        "EVT-sharma-2026-09-0094"
+      ],
+      "bank_ref": "UTR219832987",
+      "narration": "Receipt from CUST-025",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0183",
+      "kind": "receipt",
+      "date": "2026-09-17",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 782328,
+      "refs": [
+        "EVT-sharma-2026-09-0039"
+      ],
+      "bank_ref": "UTR315715401",
+      "narration": "Receipt from CUST-026",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0184",
+      "kind": "gateway_receipt",
+      "date": "2026-09-18",
+      "party": "CUST-014",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 2316222,
+      "refs": [
+        "EVT-sharma-2026-09-0049"
+      ],
+      "narration": "Gateway collection from CUST-014",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0185",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5818923,
+      "cgst": 523703,
+      "sgst": 523703,
+      "gross": 6866329,
+      "narration": "Sale to CUST-033",
+      "meta": {
+        "description": "Goods sold to CUST-033 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0186",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5859022,
+      "cgst": 146476,
+      "sgst": 146476,
+      "gross": 6151974,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0187",
+      "kind": "gateway_receipt",
+      "date": "2026-09-18",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8795132,
+      "refs": [
+        "EVT-sharma-2026-09-0157"
+      ],
+      "narration": "Gateway collection from CUST-011",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0188",
+      "kind": "gateway_receipt",
+      "date": "2026-09-18",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7291551,
+      "refs": [
+        "EVT-sharma-2026-09-0028"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0189",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6754054,
+      "cgst": 607865,
+      "sgst": 607865,
+      "gross": 7969784,
+      "narration": "Sale to CUST-036",
+      "meta": {
+        "description": "Goods sold to CUST-036 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0190",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3331038,
+      "cgst": 299793,
+      "sgst": 299793,
+      "gross": 3930624,
+      "narration": "Sale to CUST-015",
+      "meta": {
+        "description": "Goods sold to CUST-015 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0191",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7300281,
+      "cgst": 657025,
+      "sgst": 657025,
+      "gross": 8614331,
+      "narration": "Sale to CUST-033",
+      "meta": {
+        "description": "Goods sold to CUST-033 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0192",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 886254,
+      "cgst": 22156,
+      "sgst": 22156,
+      "gross": 930566,
+      "narration": "Sale to CUST-029",
+      "meta": {
+        "description": "Goods sold to CUST-029 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0193",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5216550,
+      "cgst": 469490,
+      "sgst": 469490,
+      "gross": 6155530,
+      "narration": "Sale to CUST-026",
+      "meta": {
+        "description": "Goods sold to CUST-026 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0194",
+      "kind": "sale",
+      "date": "2026-09-18",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1019936,
+      "cgst": 91794,
+      "sgst": 91794,
+      "gross": 1203524,
+      "narration": "Sale to CUST-029",
+      "meta": {
+        "description": "Goods sold to CUST-029 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0195",
+      "kind": "receipt",
+      "date": "2026-09-18",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1342690,
+      "refs": [
+        "EVT-sharma-2026-09-0045"
+      ],
+      "bank_ref": "UTR453964362",
+      "narration": "Receipt from CUST-008",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0196",
+      "kind": "receipt",
+      "date": "2026-09-18",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3290391,
+      "refs": [
+        "EVT-sharma-2026-09-0017"
+      ],
+      "bank_ref": "UTR810234896",
+      "narration": "Receipt from CUST-030",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0197",
+      "kind": "receipt",
+      "date": "2026-09-18",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6915710,
+      "refs": [
+        "EVT-sharma-2026-09-0092"
+      ],
+      "bank_ref": "UTR894508343",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0198",
+      "kind": "receipt",
+      "date": "2026-09-18",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3808109,
+      "refs": [
+        "EVT-sharma-2026-09-0138"
+      ],
+      "bank_ref": "UTR758160862",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0199",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6367472,
+      "cgst": 573072,
+      "sgst": 573072,
+      "gross": 7513616,
+      "narration": "Sale to CUST-015",
+      "meta": {
+        "description": "Goods sold to CUST-015 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0200",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-032",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 352317,
+      "cgst": 8808,
+      "sgst": 8808,
+      "gross": 369933,
+      "narration": "Sale to CUST-032",
+      "meta": {
+        "description": "Goods sold to CUST-032 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0201",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1790826,
+      "cgst": 44771,
+      "sgst": 44771,
+      "gross": 1880368,
+      "narration": "Sale to CUST-015",
+      "meta": {
+        "description": "Goods sold to CUST-015 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0202",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4921339,
+      "cgst": 123033,
+      "sgst": 123033,
+      "gross": 5167405,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0203",
+      "kind": "gateway_receipt",
+      "date": "2026-09-19",
+      "party": "CUST-036",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7969784,
+      "refs": [
+        "EVT-sharma-2026-09-0189"
+      ],
+      "narration": "Gateway collection from CUST-036",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0204",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6130359,
+      "cgst": 551732,
+      "sgst": 551732,
+      "gross": 7233823,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0205",
+      "kind": "gateway_receipt",
+      "date": "2026-09-19",
+      "party": "CUST-019",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 4667544,
+      "refs": [
+        "EVT-sharma-2026-09-0137"
+      ],
+      "narration": "Gateway collection from CUST-019",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0206",
+      "kind": "gateway_receipt",
+      "date": "2026-09-19",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6985203,
+      "refs": [
+        "EVT-sharma-2026-09-0040"
+      ],
+      "narration": "Gateway collection from CUST-023",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0207",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-032",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6454861,
+      "cgst": 580937,
+      "sgst": 580937,
+      "gross": 7616735,
+      "narration": "Sale to CUST-032",
+      "meta": {
+        "description": "Goods sold to CUST-032 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0208",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7600888,
+      "cgst": 190022,
+      "sgst": 190022,
+      "gross": 7980932,
+      "narration": "Sale to CUST-039",
+      "meta": {
+        "description": "Goods sold to CUST-039 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0209",
+      "kind": "gateway_receipt",
+      "date": "2026-09-19",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8057008,
+      "refs": [
+        "EVT-sharma-2026-09-0111"
+      ],
+      "narration": "Gateway collection from CUST-001",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0210",
+      "kind": "sale",
+      "date": "2026-09-19",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7457790,
+      "cgst": 671201,
+      "sgst": 671201,
+      "gross": 8800192,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0211",
+      "kind": "vendor_payment",
+      "date": "2026-09-19",
+      "party": "Lakeview Warehousing LLP",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 10030000,
+      "invoice_no": "LKV/2026/0940",
+      "refs": [
+        "EVT-sharma-2026-09-0041"
+      ],
+      "bank_ref": "N5351961",
+      "narration": "Payment for LKV/2026/0940 to Lakeview Warehousing LLP",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "lakeview-warehousing"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0212",
+      "kind": "vendor_payment",
+      "date": "2026-09-19",
+      "party": "QuickFix Repairs",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 113660,
+      "invoice_no": "QCK/2026/0914",
+      "refs": [
+        "EVT-sharma-2026-09-0112"
+      ],
+      "bank_ref": "N9917918",
+      "narration": "Payment for QCK/2026/0914 to QuickFix Repairs",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "quickfix-repairs"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0213",
+      "kind": "gateway_receipt",
+      "date": "2026-09-20",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6919624,
+      "refs": [
+        "EVT-sharma-2026-09-0105"
+      ],
+      "narration": "Gateway collection from CUST-015",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0214",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1297521,
+      "cgst": 116777,
+      "sgst": 116777,
+      "gross": 1531075,
+      "narration": "Sale to CUST-035",
+      "meta": {
+        "description": "Goods sold to CUST-035 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0215",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4537680,
+      "cgst": 408391,
+      "sgst": 408391,
+      "gross": 5354462,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0216",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1542758,
+      "cgst": 38569,
+      "sgst": 38569,
+      "gross": 1619896,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0217",
+      "kind": "gateway_receipt",
+      "date": "2026-09-20",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1880368,
+      "refs": [
+        "EVT-sharma-2026-09-0201"
+      ],
+      "narration": "Gateway collection from CUST-015",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0218",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4660561,
+      "cgst": 116514,
+      "sgst": 116514,
+      "gross": 4893589,
+      "narration": "Sale to CUST-037",
+      "meta": {
+        "description": "Goods sold to CUST-037 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0219",
+      "kind": "gateway_receipt",
+      "date": "2026-09-20",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 2982604,
+      "refs": [
+        "EVT-sharma-2026-09-0174"
+      ],
+      "narration": "Gateway collection from CUST-011",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0220",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 378473,
+      "cgst": 34063,
+      "sgst": 34063,
+      "gross": 446599,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0221",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 674128,
+      "cgst": 16853,
+      "sgst": 16853,
+      "gross": 707834,
+      "narration": "Sale to CUST-026",
+      "meta": {
+        "description": "Goods sold to CUST-026 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0222",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2401415,
+      "cgst": 60035,
+      "sgst": 60035,
+      "gross": 2521485,
+      "narration": "Sale to CUST-007",
+      "meta": {
+        "description": "Goods sold to CUST-007 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0223",
+      "kind": "sale",
+      "date": "2026-09-20",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2445991,
+      "cgst": 61150,
+      "sgst": 61150,
+      "gross": 2568291,
+      "narration": "Sale to CUST-027",
+      "meta": {
+        "description": "Goods sold to CUST-027 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0224",
+      "kind": "purchase",
+      "date": "2026-09-20",
+      "party": "TechKart Supplies",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 4866564,
+      "igst": 875982,
+      "gross": 5742546,
+      "invoice_no": "TCH/2026/0920",
+      "narration": "Bill TCH/2026/0920 from TechKart Supplies",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 18,
+        "supplier_id": "techkart",
+        "supplier_gstin": "27FIWCT1460U1ZK"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0225",
+      "kind": "purchase",
+      "date": "2026-09-20",
+      "party": "RoadKing Logistics",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 432014,
+      "igst": 51842,
+      "gross": 483856,
+      "invoice_no": "RDK/2026/0957",
+      "narration": "Bill RDK/2026/0957 from RoadKing Logistics",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 12,
+        "supplier_id": "roadking-logistics",
+        "supplier_gstin": "36VNOCR2477I1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0226",
+      "kind": "receipt",
+      "date": "2026-09-20",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3855365,
+      "refs": [
+        "EVT-sharma-2026-09-0050"
+      ],
+      "bank_ref": "UTR237518869",
+      "narration": "Receipt from CUST-012",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0227",
+      "kind": "receipt",
+      "date": "2026-09-20",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 5753680,
+      "refs": [
+        "EVT-sharma-2026-09-0052"
+      ],
+      "bank_ref": "UTR959463167",
+      "narration": "Receipt from CUST-017",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0228",
+      "kind": "receipt",
+      "date": "2026-09-20",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3767796,
+      "refs": [
+        "EVT-sharma-2026-09-0090"
+      ],
+      "bank_ref": "UTR920534917",
+      "narration": "Receipt from CUST-031",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0229",
+      "kind": "receipt",
+      "date": "2026-09-20",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1203524,
+      "refs": [
+        "EVT-sharma-2026-09-0194"
+      ],
+      "bank_ref": "UTR204592361",
+      "narration": "Receipt from CUST-029",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0230",
+      "kind": "vendor_payment",
+      "date": "2026-09-20",
+      "party": "BlueNet Broadband",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 450567,
+      "invoice_no": "BLN/2026/0931",
+      "refs": [
+        "EVT-sharma-2026-09-0042"
+      ],
+      "bank_ref": "N7072819",
+      "narration": "Payment for BLN/2026/0931 to BlueNet Broadband",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "bluenet-broadband"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0231",
+      "kind": "vendor_payment",
+      "date": "2026-09-20",
+      "party": "Kaveri Packaging Works",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 2254946,
+      "invoice_no": "KVR/2026/0913",
+      "refs": [
+        "EVT-sharma-2026-09-0057"
+      ],
+      "bank_ref": "N3154272",
+      "narration": "Payment for KVR/2026/0913 to Kaveri Packaging Works",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "kaveri-packaging"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0232",
+      "kind": "vendor_payment",
+      "date": "2026-09-20",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 322770,
+      "invoice_no": "SWF/2026/0933",
+      "refs": [
+        "EVT-sharma-2026-09-0008"
+      ],
+      "bank_ref": "N6892167",
+      "narration": "Payment for SWF/2026/0933 to Swift Couriers",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "swift-couriers"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0233",
+      "kind": "gateway_receipt",
+      "date": "2026-09-21",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 664932,
+      "refs": [
+        "EVT-sharma-2026-09-0078"
+      ],
+      "narration": "Gateway collection from CUST-013",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0234",
+      "kind": "gateway_receipt",
+      "date": "2026-09-21",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6866329,
+      "refs": [
+        "EVT-sharma-2026-09-0185"
+      ],
+      "narration": "Gateway collection from CUST-033",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0235",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1070878,
+      "cgst": 26772,
+      "sgst": 26772,
+      "gross": 1124422,
+      "narration": "Sale to CUST-029",
+      "meta": {
+        "description": "Goods sold to CUST-029 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0236",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5722810,
+      "cgst": 515053,
+      "sgst": 515053,
+      "gross": 6752916,
+      "narration": "Sale to CUST-013",
+      "meta": {
+        "description": "Goods sold to CUST-013 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0237",
+      "kind": "gateway_receipt",
+      "date": "2026-09-21",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3785817,
+      "refs": [
+        "EVT-sharma-2026-09-0089"
+      ],
+      "narration": "Gateway collection from CUST-009",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0238",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-025",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5627828,
+      "cgst": 506505,
+      "sgst": 506505,
+      "gross": 6640838,
+      "narration": "Sale to CUST-025",
+      "meta": {
+        "description": "Goods sold to CUST-025 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0239",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3267436,
+      "cgst": 294069,
+      "sgst": 294069,
+      "gross": 3855574,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0240",
+      "kind": "gateway_receipt",
+      "date": "2026-09-21",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1416753,
+      "refs": [
+        "EVT-sharma-2026-09-0068"
+      ],
+      "narration": "Gateway collection from CUST-035",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0241",
+      "kind": "gateway_receipt",
+      "date": "2026-09-21",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 888188,
+      "refs": [
+        "EVT-sharma-2026-09-0093"
+      ],
+      "narration": "Gateway collection from CUST-031",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0242",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4697487,
+      "cgst": 117437,
+      "sgst": 117437,
+      "gross": 4932361,
+      "narration": "Sale to CUST-008",
+      "meta": {
+        "description": "Goods sold to CUST-008 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0243",
+      "kind": "sale",
+      "date": "2026-09-21",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 468055,
+      "cgst": 42125,
+      "sgst": 42125,
+      "gross": 552305,
+      "narration": "Sale to CUST-006",
+      "meta": {
+        "description": "Goods sold to CUST-006 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0244",
+      "kind": "receipt",
+      "date": "2026-09-21",
+      "party": "CUST-032",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 369933,
+      "refs": [
+        "EVT-sharma-2026-09-0200"
+      ],
+      "bank_ref": "UTR161103664",
+      "narration": "Receipt from CUST-032",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0245",
+      "kind": "receipt",
+      "date": "2026-09-21",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1619896,
+      "refs": [
+        "EVT-sharma-2026-09-0216"
+      ],
+      "bank_ref": "UTR368896820",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0246",
+      "kind": "gateway_receipt",
+      "date": "2026-09-22",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6752916,
+      "refs": [
+        "EVT-sharma-2026-09-0236"
+      ],
+      "narration": "Gateway collection from CUST-013",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0247",
+      "kind": "gateway_receipt",
+      "date": "2026-09-22",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1844575,
+      "refs": [
+        "EVT-sharma-2026-09-0160"
+      ],
+      "narration": "Gateway collection from CUST-021",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0248",
+      "kind": "sale",
+      "date": "2026-09-22",
+      "party": "CUST-034",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 684694,
+      "cgst": 17117,
+      "sgst": 17117,
+      "gross": 718928,
+      "narration": "Sale to CUST-034",
+      "meta": {
+        "description": "Goods sold to CUST-034 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0249",
+      "kind": "gateway_receipt",
+      "date": "2026-09-22",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8614331,
+      "refs": [
+        "EVT-sharma-2026-09-0191"
+      ],
+      "narration": "Gateway collection from CUST-033",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0250",
+      "kind": "sale",
+      "date": "2026-09-22",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7043261,
+      "cgst": 633893,
+      "sgst": 633893,
+      "gross": 8311047,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0251",
+      "kind": "gateway_receipt",
+      "date": "2026-09-22",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 918856,
+      "refs": [
+        "EVT-sharma-2026-09-0139"
+      ],
+      "narration": "Gateway collection from CUST-006",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0252",
+      "kind": "purchase",
+      "date": "2026-09-22",
+      "party": "QuickFix Repairs",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 143312,
+      "gross": 143312,
+      "invoice_no": "QCK/2026/0915",
+      "narration": "Bill QCK/2026/0915 from QuickFix Repairs",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "supplier_id": "quickfix-repairs"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0253",
+      "kind": "receipt",
+      "date": "2026-09-22",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1531075,
+      "refs": [
+        "EVT-sharma-2026-09-0214"
+      ],
+      "bank_ref": "UTR238819925",
+      "narration": "Receipt from CUST-035",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0254",
+      "kind": "receipt",
+      "date": "2026-09-22",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1837452,
+      "refs": [
+        "EVT-sharma-2026-09-0072"
+      ],
+      "bank_ref": "UTR342375321",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0255",
+      "kind": "gateway_settlement",
+      "date": "2026-09-22",
+      "account": "HDFC Current 0001",
+      "gross": 76201030,
+      "refs": [
+        "EVT-sharma-2026-09-0148",
+        "EVT-sharma-2026-09-0151",
+        "EVT-sharma-2026-09-0156",
+        "EVT-sharma-2026-09-0172",
+        "EVT-sharma-2026-09-0175",
+        "EVT-sharma-2026-09-0184",
+        "EVT-sharma-2026-09-0187",
+        "EVT-sharma-2026-09-0188",
+        "EVT-sharma-2026-09-0203",
+        "EVT-sharma-2026-09-0205",
+        "EVT-sharma-2026-09-0206",
+        "EVT-sharma-2026-09-0209",
+        "EVT-sharma-2026-09-0213",
+        "EVT-sharma-2026-09-0217",
+        "EVT-sharma-2026-09-0219"
+      ],
+      "bank_ref": "PGS3633",
+      "narration": "PG SETTL 0922 BATCH 3633",
+      "meta": {
+        "description": "Gateway settlement of collections 14-09-2026 to 20-09-2026: ₹7,80,428.41 collected, ₹15,608.57 fee, ₹2,809.54 GST on the fee",
+        "fee": 1560857,
+        "fee_gst": 280954
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0256",
+      "kind": "vendor_payment",
+      "date": "2026-09-22",
+      "party": "RoadKing Logistics",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 687074,
+      "invoice_no": "RDK/2026/0955",
+      "refs": [
+        "EVT-sharma-2026-09-0014"
+      ],
+      "bank_ref": "N7528695",
+      "narration": "Payment for RDK/2026/0955 to RoadKing Logistics",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "roadking-logistics"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0257",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5210584,
+      "cgst": 130265,
+      "sgst": 130265,
+      "gross": 5471114,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0258",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6583824,
+      "cgst": 164596,
+      "sgst": 164596,
+      "gross": 6913016,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0259",
+      "kind": "gateway_receipt",
+      "date": "2026-09-23",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3905818,
+      "refs": [
+        "EVT-sharma-2026-09-0155"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0260",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7201676,
+      "cgst": 648151,
+      "sgst": 648151,
+      "gross": 8497978,
+      "narration": "Sale to CUST-040",
+      "meta": {
+        "description": "Goods sold to CUST-040 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0261",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1100154,
+      "cgst": 99014,
+      "sgst": 99014,
+      "gross": 1298182,
+      "narration": "Sale to CUST-005",
+      "meta": {
+        "description": "Goods sold to CUST-005 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0262",
+      "kind": "gateway_receipt",
+      "date": "2026-09-23",
+      "party": "CUST-008",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 4815291,
+      "refs": [
+        "EVT-sharma-2026-09-0109"
+      ],
+      "narration": "Gateway collection from CUST-008",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0263",
+      "kind": "gateway_receipt",
+      "date": "2026-09-23",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8619377,
+      "refs": [
+        "EVT-sharma-2026-09-0110"
+      ],
+      "narration": "Gateway collection from CUST-011",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0264",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2056970,
+      "cgst": 51424,
+      "sgst": 51424,
+      "gross": 2159818,
+      "narration": "Sale to CUST-029",
+      "meta": {
+        "description": "Goods sold to CUST-029 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0265",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3627086,
+      "cgst": 90677,
+      "sgst": 90677,
+      "gross": 3808440,
+      "narration": "Sale to CUST-016",
+      "meta": {
+        "description": "Goods sold to CUST-016 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0266",
+      "kind": "sale",
+      "date": "2026-09-23",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 362196,
+      "cgst": 32598,
+      "sgst": 32598,
+      "gross": 427392,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0267",
+      "kind": "gateway_receipt",
+      "date": "2026-09-23",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 2746118,
+      "refs": [
+        "EVT-sharma-2026-09-0122"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0268",
+      "kind": "purchase",
+      "date": "2026-09-23",
+      "party": "Deccan Textile Mills",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 6295711,
+      "cgst": 157393,
+      "sgst": 157393,
+      "gross": 6610497,
+      "invoice_no": "DCC/2026/0937",
+      "narration": "Bill DCC/2026/0937 from Deccan Textile Mills",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 5,
+        "supplier_id": "deccan-textiles",
+        "supplier_gstin": "29WNECD3532M1Z2"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0269",
+      "kind": "purchase",
+      "date": "2026-09-23",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 319528,
+      "cgst": 28758,
+      "sgst": 28758,
+      "gross": 377044,
+      "invoice_no": "SWF/2026/0935",
+      "narration": "Bill SWF/2026/0935 from Swift Couriers",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "swift-couriers",
+        "supplier_gstin": "29PHGCS2431D1ZS"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0270",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7604756,
+      "refs": [
+        "EVT-sharma-2026-09-0116"
+      ],
+      "bank_ref": "UTR513318631",
+      "narration": "Receipt from CUST-018",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0271",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7513616,
+      "refs": [
+        "EVT-sharma-2026-09-0199"
+      ],
+      "bank_ref": "UTR859914638",
+      "narration": "Receipt from CUST-015",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0272",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1273123,
+      "refs": [
+        "EVT-sharma-2026-09-0129"
+      ],
+      "bank_ref": "UTR640882472",
+      "narration": "Receipt from CUST-027",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0273",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3559057,
+      "refs": [
+        "EVT-sharma-2026-09-0136"
+      ],
+      "bank_ref": "UTR180484256",
+      "narration": "Receipt from CUST-012",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0274",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-028",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6781647,
+      "refs": [
+        "EVT-sharma-2026-09-0071"
+      ],
+      "bank_ref": "UTR130423334",
+      "narration": "Receipt from CUST-028",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0275",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 8800192,
+      "refs": [
+        "EVT-sharma-2026-09-0210"
+      ],
+      "bank_ref": "UTR242676800",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0276",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 427392,
+      "refs": [
+        "EVT-sharma-2026-09-0266"
+      ],
+      "bank_ref": "UTR022978575",
+      "narration": "Receipt from CUST-017",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0277",
+      "kind": "receipt",
+      "date": "2026-09-23",
+      "party": "CUST-026",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 707834,
+      "refs": [
+        "EVT-sharma-2026-09-0221"
+      ],
+      "bank_ref": "UTR096813024",
+      "narration": "Receipt from CUST-026",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0278",
+      "kind": "vendor_payment",
+      "date": "2026-09-23",
+      "party": "Stockbook Cloud",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 531000,
+      "invoice_no": "STC/2026/0904",
+      "refs": [
+        "EVT-sharma-2026-09-0022"
+      ],
+      "bank_ref": "N3750934",
+      "narration": "Payment for STC/2026/0904 to Stockbook Cloud",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "stockbook-cloud"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0279",
+      "kind": "sale",
+      "date": "2026-09-24",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2998654,
+      "cgst": 269879,
+      "sgst": 269879,
+      "gross": 3538412,
+      "narration": "Sale to CUST-002",
+      "meta": {
+        "description": "Goods sold to CUST-002 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0280",
+      "kind": "gateway_receipt",
+      "date": "2026-09-24",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3538412,
+      "refs": [
+        "EVT-sharma-2026-09-0279"
+      ],
+      "narration": "Gateway collection from CUST-002",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0281",
+      "kind": "sale",
+      "date": "2026-09-24",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4598900,
+      "cgst": 114973,
+      "sgst": 114973,
+      "gross": 4828846,
+      "narration": "Sale to CUST-030",
+      "meta": {
+        "description": "Goods sold to CUST-030 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0282",
+      "kind": "gateway_receipt",
+      "date": "2026-09-24",
+      "party": "CUST-032",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7616735,
+      "refs": [
+        "EVT-sharma-2026-09-0207"
+      ],
+      "narration": "Gateway collection from CUST-032",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0283",
+      "kind": "receipt",
+      "date": "2026-09-24",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4828846,
+      "refs": [
+        "EVT-sharma-2026-09-0281"
+      ],
+      "bank_ref": "UTR198800541",
+      "narration": "Receipt from CUST-030",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0284",
+      "kind": "receipt",
+      "date": "2026-09-24",
+      "party": "CUST-012",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1879220,
+      "refs": [
+        "EVT-sharma-2026-09-0158"
+      ],
+      "bank_ref": "UTR498471798",
+      "narration": "Receipt from CUST-012",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0285",
+      "kind": "receipt",
+      "date": "2026-09-24",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2159818,
+      "refs": [
+        "EVT-sharma-2026-09-0264"
+      ],
+      "bank_ref": "UTR038096870",
+      "narration": "Receipt from CUST-029",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0286",
+      "kind": "vendor_payment",
+      "date": "2026-09-24",
+      "party": "City Power Co",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 2228946,
+      "invoice_no": "CTY/2026/0925",
+      "refs": [
+        "EVT-sharma-2026-09-0099"
+      ],
+      "bank_ref": "N4487509",
+      "narration": "Payment for CTY/2026/0925 to City Power Co",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "city-power"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0287",
+      "kind": "vendor_payment",
+      "date": "2026-09-24",
+      "party": "Vaani Telecom Services",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 322808,
+      "invoice_no": "VNT/2026/0908",
+      "refs": [
+        "EVT-sharma-2026-09-0123"
+      ],
+      "bank_ref": "N5258609",
+      "narration": "Payment for VNT/2026/0908 to Vaani Telecom Services",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "vaani-telecom"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0288",
+      "kind": "vendor_payment",
+      "date": "2026-09-24",
+      "party": "Bharat Polymers Udyog",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 3158636,
+      "invoice_no": "BHR/2026/0907",
+      "refs": [
+        "EVT-sharma-2026-09-0058"
+      ],
+      "bank_ref": "N5174077",
+      "narration": "Payment for BHR/2026/0907 to Bharat Polymers Udyog",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "bharat-polymers"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0289",
+      "kind": "vendor_payment",
+      "date": "2026-09-24",
+      "party": "RoadKing Logistics",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 512886,
+      "invoice_no": "RDK/2026/0956",
+      "refs": [
+        "EVT-sharma-2026-09-0124"
+      ],
+      "bank_ref": "N5496358",
+      "narration": "Payment for RDK/2026/0956 to RoadKing Logistics",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "roadking-logistics"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0290",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 550635,
+      "cgst": 49557,
+      "sgst": 49557,
+      "gross": 649749,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0291",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-032",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 521581,
+      "cgst": 13040,
+      "sgst": 13040,
+      "gross": 547661,
+      "narration": "Sale to CUST-032",
+      "meta": {
+        "description": "Goods sold to CUST-032 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0292",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7049297,
+      "cgst": 634437,
+      "sgst": 634437,
+      "gross": 8318171,
+      "narration": "Sale to CUST-035",
+      "meta": {
+        "description": "Goods sold to CUST-035 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0293",
+      "kind": "gateway_receipt",
+      "date": "2026-09-25",
+      "party": "CUST-037",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3732740,
+      "refs": [
+        "EVT-sharma-2026-09-0120"
+      ],
+      "narration": "Gateway collection from CUST-037",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0294",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 6996221,
+      "cgst": 174906,
+      "sgst": 174906,
+      "gross": 7346033,
+      "narration": "Sale to CUST-011",
+      "meta": {
+        "description": "Goods sold to CUST-011 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0295",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1392132,
+      "cgst": 34803,
+      "sgst": 34803,
+      "gross": 1461738,
+      "narration": "Sale to CUST-017",
+      "meta": {
+        "description": "Goods sold to CUST-017 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0296",
+      "kind": "sale",
+      "date": "2026-09-25",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 708913,
+      "cgst": 63802,
+      "sgst": 63802,
+      "gross": 836517,
+      "narration": "Sale to CUST-031",
+      "meta": {
+        "description": "Goods sold to CUST-031 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0297",
+      "kind": "purchase",
+      "date": "2026-09-25",
+      "party": "Ledgerwise Associates",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 2500000,
+      "cgst": 225000,
+      "sgst": 225000,
+      "gross": 2950000,
+      "invoice_no": "LDG/2026/0955",
+      "narration": "Bill LDG/2026/0955 from Ledgerwise Associates",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "ledgerwise-associates",
+        "supplier_gstin": "29SYJCL1381E1ZL"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0298",
+      "kind": "receipt",
+      "date": "2026-09-25",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 4045762,
+      "refs": [
+        "EVT-sharma-2026-09-0135"
+      ],
+      "bank_ref": "UTR348765462",
+      "narration": "Receipt from CUST-040",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0299",
+      "kind": "receipt",
+      "date": "2026-09-25",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 3808440,
+      "refs": [
+        "EVT-sharma-2026-09-0265"
+      ],
+      "bank_ref": "UTR829060112",
+      "narration": "Receipt from CUST-016",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0300",
+      "kind": "receipt",
+      "date": "2026-09-25",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2955278,
+      "refs": [
+        "EVT-sharma-2026-09-0096"
+      ],
+      "bank_ref": "UTR832391389",
+      "narration": "Receipt from CUST-005",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0301",
+      "kind": "receipt",
+      "date": "2026-09-25",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 546744,
+      "refs": [
+        "EVT-sharma-2026-09-0164"
+      ],
+      "bank_ref": "UTR763130595",
+      "narration": "Receipt from CUST-001",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0302",
+      "kind": "vendor_payment",
+      "date": "2026-09-25",
+      "party": "Bharat Polymers Udyog",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 2504347,
+      "invoice_no": "BHR/2026/0908",
+      "refs": [
+        "EVT-sharma-2026-09-0177"
+      ],
+      "bank_ref": "N0036491",
+      "narration": "Payment for BHR/2026/0908 to Bharat Polymers Udyog",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "bharat-polymers"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0303",
+      "kind": "sale",
+      "date": "2026-09-26",
+      "party": "CUST-018",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2614989,
+      "cgst": 235349,
+      "sgst": 235349,
+      "gross": 3085687,
+      "narration": "Sale to CUST-018",
+      "meta": {
+        "description": "Goods sold to CUST-018 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0304",
+      "kind": "sale",
+      "date": "2026-09-26",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 2208385,
+      "cgst": 55210,
+      "sgst": 55210,
+      "gross": 2318805,
+      "narration": "Sale to CUST-023",
+      "meta": {
+        "description": "Goods sold to CUST-023 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0305",
+      "kind": "gateway_receipt",
+      "date": "2026-09-26",
+      "party": "CUST-002",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 5291955,
+      "refs": [
+        "EVT-sharma-2026-09-0173"
+      ],
+      "narration": "Gateway collection from CUST-002",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0306",
+      "kind": "sale",
+      "date": "2026-09-26",
+      "party": "CUST-025",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3786161,
+      "cgst": 340754,
+      "sgst": 340754,
+      "gross": 4467669,
+      "narration": "Sale to CUST-025",
+      "meta": {
+        "description": "Goods sold to CUST-025 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0307",
+      "kind": "gateway_receipt",
+      "date": "2026-09-26",
+      "party": "CUST-007",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 2521485,
+      "refs": [
+        "EVT-sharma-2026-09-0222"
+      ],
+      "narration": "Gateway collection from CUST-007",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0308",
+      "kind": "receipt",
+      "date": "2026-09-26",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1451688,
+      "refs": [
+        "EVT-sharma-2026-09-0171"
+      ],
+      "bank_ref": "UTR643274986",
+      "narration": "Receipt from CUST-023",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0309",
+      "kind": "receipt",
+      "date": "2026-09-26",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7310533,
+      "refs": [
+        "EVT-sharma-2026-09-0128"
+      ],
+      "bank_ref": "UTR135771866",
+      "narration": "Receipt from CUST-027",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0310",
+      "kind": "sale",
+      "date": "2026-09-27",
+      "party": "CUST-003",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5795012,
+      "cgst": 521551,
+      "sgst": 521551,
+      "gross": 6838114,
+      "narration": "Sale to CUST-003",
+      "meta": {
+        "description": "Goods sold to CUST-003 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0311",
+      "kind": "sale",
+      "date": "2026-09-27",
+      "party": "CUST-020",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 567442,
+      "cgst": 14186,
+      "sgst": 14186,
+      "gross": 595814,
+      "narration": "Sale to CUST-020",
+      "meta": {
+        "description": "Goods sold to CUST-020 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0312",
+      "kind": "gateway_receipt",
+      "date": "2026-09-27",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3855574,
+      "refs": [
+        "EVT-sharma-2026-09-0239"
+      ],
+      "narration": "Gateway collection from CUST-009",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0313",
+      "kind": "gateway_receipt",
+      "date": "2026-09-27",
+      "party": "CUST-015",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 3930624,
+      "refs": [
+        "EVT-sharma-2026-09-0190"
+      ],
+      "narration": "Gateway collection from CUST-015",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0314",
+      "kind": "gateway_receipt",
+      "date": "2026-09-27",
+      "party": "CUST-017",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1461738,
+      "refs": [
+        "EVT-sharma-2026-09-0295"
+      ],
+      "narration": "Gateway collection from CUST-017",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0315",
+      "kind": "gateway_receipt",
+      "date": "2026-09-27",
+      "party": "CUST-006",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 552305,
+      "refs": [
+        "EVT-sharma-2026-09-0243"
+      ],
+      "narration": "Gateway collection from CUST-006",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0316",
+      "kind": "receipt",
+      "date": "2026-09-27",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2318805,
+      "refs": [
+        "EVT-sharma-2026-09-0304"
+      ],
+      "bank_ref": "UTR396106299",
+      "narration": "Receipt from CUST-023",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0317",
+      "kind": "receipt",
+      "date": "2026-09-27",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7980932,
+      "refs": [
+        "EVT-sharma-2026-09-0208"
+      ],
+      "bank_ref": "UTR080168632",
+      "narration": "Receipt from CUST-039",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0318",
+      "kind": "receipt",
+      "date": "2026-09-27",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 836517,
+      "refs": [
+        "EVT-sharma-2026-09-0296"
+      ],
+      "bank_ref": "UTR238073140",
+      "narration": "Receipt from CUST-031",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0319",
+      "kind": "receipt",
+      "date": "2026-09-27",
+      "party": "CUST-027",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 2568291,
+      "refs": [
+        "EVT-sharma-2026-09-0223"
+      ],
+      "bank_ref": "UTR127764951",
+      "narration": "Receipt from CUST-027",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0320",
+      "kind": "vendor_payment",
+      "date": "2026-09-27",
+      "party": "QuickFix Repairs",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 82774,
+      "invoice_no": "QCK/2026/0913",
+      "refs": [
+        "EVT-sharma-2026-09-0059"
+      ],
+      "bank_ref": "N6669003",
+      "narration": "Payment for QCK/2026/0913 to QuickFix Repairs",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "quickfix-repairs"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0321",
+      "kind": "sale",
+      "date": "2026-09-28",
+      "party": "CUST-020",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 572257,
+      "cgst": 14306,
+      "sgst": 14306,
+      "gross": 600869,
+      "narration": "Sale to CUST-020",
+      "meta": {
+        "description": "Goods sold to CUST-020 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0322",
+      "kind": "sale",
+      "date": "2026-09-28",
+      "party": "CUST-039",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5210446,
+      "cgst": 468940,
+      "sgst": 468940,
+      "gross": 6148326,
+      "narration": "Sale to CUST-039",
+      "meta": {
+        "description": "Goods sold to CUST-039 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0323",
+      "kind": "gateway_receipt",
+      "date": "2026-09-28",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 7346033,
+      "refs": [
+        "EVT-sharma-2026-09-0294"
+      ],
+      "narration": "Gateway collection from CUST-011",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0324",
+      "kind": "gateway_receipt",
+      "date": "2026-09-28",
+      "party": "CUST-014",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 1994744,
+      "refs": [
+        "EVT-sharma-2026-09-0133"
+      ],
+      "narration": "Gateway collection from CUST-014",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0325",
+      "kind": "gateway_receipt",
+      "date": "2026-09-28",
+      "party": "CUST-005",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8270907,
+      "refs": [
+        "EVT-sharma-2026-09-0141"
+      ],
+      "narration": "Gateway collection from CUST-005",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0326",
+      "kind": "purchase",
+      "date": "2026-09-28",
+      "party": "Securewell Guarding Services",
+      "party_type": "Supplier",
+      "account": "Professional Charges",
+      "taxable": 3481124,
+      "cgst": 313301,
+      "sgst": 313301,
+      "gross": 4107726,
+      "invoice_no": "SCR/2026/0901",
+      "narration": "Bill SCR/2026/0901 from Securewell Guarding Services",
+      "meta": {
+        "description": "Services for September 2026. Service period: 01-09-2026 to 30-09-2026",
+        "service_from": "2026-09-01",
+        "service_to": "2026-09-30",
+        "gst_rate": 18,
+        "supplier_id": "securewell-guards",
+        "supplier_gstin": "29LJRCS1081D1ZC"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0327",
+      "kind": "receipt",
+      "date": "2026-09-28",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1124422,
+      "refs": [
+        "EVT-sharma-2026-09-0235"
+      ],
+      "bank_ref": "UTR572094257",
+      "narration": "Receipt from CUST-029",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0328",
+      "kind": "receipt",
+      "date": "2026-09-28",
+      "party": "CUST-031",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 7800570,
+      "refs": [
+        "EVT-sharma-2026-09-0159"
+      ],
+      "bank_ref": "UTR570078361",
+      "narration": "Receipt from CUST-031",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0329",
+      "kind": "sale",
+      "date": "2026-09-29",
+      "party": "CUST-001",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4503004,
+      "cgst": 405270,
+      "sgst": 405270,
+      "gross": 5313544,
+      "narration": "Sale to CUST-001",
+      "meta": {
+        "description": "Goods sold to CUST-001 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0330",
+      "kind": "gateway_receipt",
+      "date": "2026-09-29",
+      "party": "CUST-040",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 8497978,
+      "refs": [
+        "EVT-sharma-2026-09-0260"
+      ],
+      "narration": "Gateway collection from CUST-040",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0331",
+      "kind": "sale",
+      "date": "2026-09-29",
+      "party": "CUST-023",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 1357134,
+      "cgst": 122142,
+      "sgst": 122142,
+      "gross": 1601418,
+      "narration": "Sale to CUST-023",
+      "meta": {
+        "description": "Goods sold to CUST-023 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0332",
+      "kind": "sale",
+      "date": "2026-09-29",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3712816,
+      "cgst": 334153,
+      "sgst": 334153,
+      "gross": 4381122,
+      "narration": "Sale to CUST-033",
+      "meta": {
+        "description": "Goods sold to CUST-033 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0333",
+      "kind": "sale",
+      "date": "2026-09-29",
+      "party": "CUST-013",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 3278722,
+      "cgst": 295085,
+      "sgst": 295085,
+      "gross": 3868892,
+      "narration": "Sale to CUST-013",
+      "meta": {
+        "description": "Goods sold to CUST-013 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0334",
+      "kind": "gateway_receipt",
+      "date": "2026-09-29",
+      "party": "CUST-016",
+      "party_type": "Customer",
+      "account": "Payment Gateway Clearing",
+      "gross": 6500441,
+      "refs": [
+        "EVT-sharma-2026-09-0140"
+      ],
+      "narration": "Gateway collection from CUST-016",
+      "meta": {
+        "description": "Collected through the payment gateway"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0335",
+      "kind": "purchase",
+      "date": "2026-09-29",
+      "party": "Bharat Polymers Udyog",
+      "party_type": "Supplier",
+      "account": "Cost of Goods Sold",
+      "taxable": 2523850,
+      "igst": 454293,
+      "gross": 2978143,
+      "invoice_no": "BHR/2026/0909",
+      "narration": "Bill BHR/2026/0909 from Bharat Polymers Udyog",
+      "meta": {
+        "description": "Goods for resale",
+        "gst_rate": 18,
+        "supplier_id": "bharat-polymers",
+        "supplier_gstin": "24ECWCB3133X1ZI"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0336",
+      "kind": "receipt",
+      "date": "2026-09-29",
+      "party": "CUST-011",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 649749,
+      "refs": [
+        "EVT-sharma-2026-09-0290"
+      ],
+      "bank_ref": "UTR582267525",
+      "narration": "Receipt from CUST-011",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0337",
+      "kind": "receipt",
+      "date": "2026-09-29",
+      "party": "CUST-029",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 930566,
+      "refs": [
+        "EVT-sharma-2026-09-0192"
+      ],
+      "bank_ref": "UTR173605805",
+      "narration": "Receipt from CUST-029",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0338",
+      "kind": "receipt",
+      "date": "2026-09-29",
+      "party": "CUST-035",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 1995332,
+      "refs": [
+        "EVT-sharma-2026-09-0162"
+      ],
+      "bank_ref": "UTR323250426",
+      "narration": "Receipt from CUST-035",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0339",
+      "kind": "gateway_settlement",
+      "date": "2026-09-29",
+      "account": "HDFC Current 0001",
+      "gross": 82350425,
+      "refs": [
+        "EVT-sharma-2026-09-0233",
+        "EVT-sharma-2026-09-0234",
+        "EVT-sharma-2026-09-0237",
+        "EVT-sharma-2026-09-0240",
+        "EVT-sharma-2026-09-0241",
+        "EVT-sharma-2026-09-0246",
+        "EVT-sharma-2026-09-0247",
+        "EVT-sharma-2026-09-0249",
+        "EVT-sharma-2026-09-0251",
+        "EVT-sharma-2026-09-0259",
+        "EVT-sharma-2026-09-0262",
+        "EVT-sharma-2026-09-0263",
+        "EVT-sharma-2026-09-0267",
+        "EVT-sharma-2026-09-0280",
+        "EVT-sharma-2026-09-0282",
+        "EVT-sharma-2026-09-0293",
+        "EVT-sharma-2026-09-0305",
+        "EVT-sharma-2026-09-0307",
+        "EVT-sharma-2026-09-0312",
+        "EVT-sharma-2026-09-0313",
+        "EVT-sharma-2026-09-0314",
+        "EVT-sharma-2026-09-0315"
+      ],
+      "bank_ref": "PGS5961",
+      "narration": "PG SETTL 0929 BATCH 5961",
+      "meta": {
+        "description": "Gateway settlement of collections 21-09-2026 to 27-09-2026: ₹8,43,408.69 collected, ₹16,868.17 fee, ₹3,036.27 GST on the fee",
+        "fee": 1686817,
+        "fee_gst": 303627
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0340",
+      "kind": "sale",
+      "date": "2026-09-30",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 7746611,
+      "cgst": 193665,
+      "sgst": 193665,
+      "gross": 8133941,
+      "narration": "Sale to CUST-009",
+      "meta": {
+        "description": "Goods sold to CUST-009 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0341",
+      "kind": "sale",
+      "date": "2026-09-30",
+      "party": "CUST-019",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5037810,
+      "cgst": 125945,
+      "sgst": 125945,
+      "gross": 5289700,
+      "narration": "Sale to CUST-019",
+      "meta": {
+        "description": "Goods sold to CUST-019 at 5% GST",
+        "gst_rate": 5
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0342",
+      "kind": "sale",
+      "date": "2026-09-30",
+      "party": "CUST-033",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 5190583,
+      "cgst": 467152,
+      "sgst": 467152,
+      "gross": 6124887,
+      "narration": "Sale to CUST-033",
+      "meta": {
+        "description": "Goods sold to CUST-033 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0343",
+      "kind": "sale",
+      "date": "2026-09-30",
+      "party": "CUST-021",
+      "party_type": "Customer",
+      "account": "Sales",
+      "taxable": 4149285,
+      "cgst": 373436,
+      "sgst": 373436,
+      "gross": 4896157,
+      "narration": "Sale to CUST-021",
+      "meta": {
+        "description": "Goods sold to CUST-021 at 18% GST",
+        "gst_rate": 18
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0344",
+      "kind": "purchase",
+      "date": "2026-09-30",
+      "party": "Cloudly SaaS",
+      "party_type": "Supplier",
+      "account": "Prepaid Expenses",
+      "taxable": 12000000,
+      "igst": 2160000,
+      "gross": 14160000,
+      "invoice_no": "CLD/2026/0905",
+      "narration": "Bill CLD/2026/0905 from Cloudly SaaS",
+      "meta": {
+        "description": "Annual subscription renewal, 12 months. Service period: 01-09-2026 to 31-08-2027",
+        "service_from": "2026-09-01",
+        "service_to": "2027-08-31",
+        "gst_rate": 18,
+        "supplier_id": "cloudly",
+        "supplier_gstin": "27ZIPCC8524K1ZX"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0345",
+      "kind": "prepaid_amortisation",
+      "date": "2026-09-30",
+      "account": "Software Subscriptions",
+      "gross": 1000000,
+      "refs": [
+        "EVT-sharma-2026-09-0344"
+      ],
+      "narration": "Amortisation of Cloudly SaaS annual subscription, month 1 of 12",
+      "meta": {
+        "description": "One twelfth of the annual subscription from Prepaid Expenses. Service period: 01-09-2026 to 31-08-2027",
+        "service_from": "2026-09-01",
+        "service_to": "2027-08-31",
+        "supplier_id": "cloudly"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0346",
+      "kind": "receipt",
+      "date": "2026-09-30",
+      "party": "CUST-009",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 6090181,
+      "refs": [
+        "EVT-sharma-2026-09-0149"
+      ],
+      "bank_ref": "UTR969124936",
+      "narration": "Receipt from CUST-009",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0347",
+      "kind": "receipt",
+      "date": "2026-09-30",
+      "party": "CUST-030",
+      "party_type": "Customer",
+      "account": "HDFC Current 0001",
+      "gross": 446599,
+      "refs": [
+        "EVT-sharma-2026-09-0220"
+      ],
+      "bank_ref": "UTR208631353",
+      "narration": "Receipt from CUST-030",
+      "meta": {
+        "description": "Paid directly to the bank"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0348",
+      "kind": "interest",
+      "date": "2026-09-30",
+      "account": "Interest Income",
+      "gross": 1984875,
+      "narration": "Interest credit for the quarter ending September 2026",
+      "meta": {
+        "description": "Quarterly interest on the current account balance"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0349",
+      "kind": "vendor_payment",
+      "date": "2026-09-30",
+      "party": "Swift Couriers",
+      "party_type": "Supplier",
+      "account": "HDFC Current 0001",
+      "gross": 377044,
+      "invoice_no": "SWF/2026/0935",
+      "refs": [
+        "EVT-sharma-2026-09-0269"
+      ],
+      "bank_ref": "N9560213",
+      "narration": "Payment for SWF/2026/0935 to Swift Couriers",
+      "meta": {
+        "description": "NEFT to supplier",
+        "supplier_id": "swift-couriers"
+      }
+    },
+    {
+      "ext_id": "EVT-sharma-2026-09-0350",
+      "kind": "payroll",
+      "date": "2026-09-30",
+      "account": "Salaries",
+      "gross": 60000000,
+      "bank_ref": "SAL375156",
+      "narration": "Salaries for September 2026",
+      "meta": {
+        "description": "Net salaries paid by bank transfer for September 2026"
+      }
+    }
+  ],
+  "closing_bank": 651957910
+}
