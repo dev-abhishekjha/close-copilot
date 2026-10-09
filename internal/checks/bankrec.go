@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"slices"
+	"sort"
 	"strings"
 	"time"
 
@@ -19,6 +21,10 @@ var (
 	// maxBankChargePaise is ₹10,000 in paise (1,000,000 paise).
 	maxBankChargePaise = money.Paise(1000000)
 )
+
+// minRemarksRefLen is the shortest bank ref that may match a voucher by
+// appearing inside its remarks; shorter refs match too easily by accident.
+const minRemarksRefLen = 6
 
 // BankVoucher represents the net effect of a voucher on the company's bank account.
 type BankVoucher struct {
@@ -58,6 +64,9 @@ func (b *BankRecCheck) Name() string {
 
 // Run executes bank reconciliation for the specified company and month.
 func (b *BankRecCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
+	if len(in.BankAccounts) == 0 {
+		return nil, fmt.Errorf("checks: bankrec for company %q: no bank accounts in inputs", in.Company)
+	}
 	startMonth, err := time.Parse("2006-01", in.Month)
 	if err != nil {
 		return nil, fmt.Errorf("checks: bankrec invalid month %q: %w", in.Month, err)
@@ -76,8 +85,8 @@ func (b *BankRecCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 		return nil, fmt.Errorf("checks: bankrec load gl entries: %w", err)
 	}
 
-	// Filter to bank account GL entries
-	bankGLEntries := filterBankGLEntries(glEntries)
+	// Keep only GL entries on the company's bank accounts
+	bankGLEntries := filterBankGLEntries(glEntries, in.BankAccounts)
 
 	// Build vouchers map from GL entries
 	vouchersMap := make(map[string]*BankVoucher)
@@ -99,15 +108,16 @@ func (b *BankRecCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 
 	// Enrich with Payment Entry references if available
 	payments, err := in.Books.PaymentEntries(ctx, in.Company, startMonth, endMonth)
-	if err == nil {
-		for _, p := range payments {
-			if v, ok := vouchersMap[p.Name]; ok {
-				if p.ReferenceNo != "" {
-					v.ReferenceNo = p.ReferenceNo
-				}
-				if v.Party == "" && p.Party != "" {
-					v.Party = p.Party
-				}
+	if err != nil {
+		return nil, fmt.Errorf("checks: bankrec load payment entries: %w", err)
+	}
+	for _, p := range payments {
+		if v, ok := vouchersMap[p.Name]; ok {
+			if p.ReferenceNo != "" {
+				v.ReferenceNo = p.ReferenceNo
+			}
+			if v.Party == "" && p.Party != "" {
+				v.Party = p.Party
 			}
 		}
 	}
@@ -116,6 +126,14 @@ func (b *BankRecCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 	for _, v := range vouchersMap {
 		vouchers = append(vouchers, *v)
 	}
+	// Map iteration order is random; sort so matching and findings are
+	// deterministic.
+	sort.Slice(vouchers, func(i, j int) bool {
+		if !vouchers[i].PostingDate.Equal(vouchers[j].PostingDate) {
+			return vouchers[i].PostingDate.Before(vouchers[j].PostingDate)
+		}
+		return vouchers[i].VoucherNo < vouchers[j].VoucherNo
+	})
 
 	windowDays := in.Rules.BankMatch.DateWindowDays
 	if windowDays <= 0 {
@@ -167,57 +185,41 @@ func MatchBankLines(bankLines []store.BankLine, vouchers []BankVoucher, windowDa
 		}
 	}
 
-	// Pass 2: exact amount within date window
-	for _, line := range bankLines {
+	// Pass 2: exact amount within the date window. Each amount bucket is
+	// paired by pairBucket, which keeps as many pairs as possible and
+	// among those prefers the closest dates, then the most similar
+	// narrations, independent of input order.
+	linesByAmount := make(map[money.Paise][]int)
+	var amountOrder []money.Paise
+	for i, line := range bankLines {
 		if matchedBank[line.TxnID] {
 			continue
 		}
-
-		candidates := byAmount[line.AmountPaise]
-		var bestVoucher *BankVoucher
-		var bestDiffDays int
-		var bestSimScore int
-
-		for _, v := range candidates {
-			if matchedVouchers[v.VoucherNo] {
-				continue
-			}
-
-			diffDays := daysDiff(line.TxnDate, v.PostingDate)
-			if diffDays > windowDays {
-				continue
-			}
-
-			sim := jaroWinklerScore(line.Narration, v.Party+" "+v.Remarks)
-
-			if bestVoucher == nil {
-				bestVoucher = v
-				bestDiffDays = diffDays
-				bestSimScore = sim
-				continue
-			}
-
-			// Tie-breaker 1: closest date
-			if diffDays < bestDiffDays {
-				bestVoucher = v
-				bestDiffDays = diffDays
-				bestSimScore = sim
-			} else if diffDays == bestDiffDays {
-				// Tie-breaker 2: highest narration similarity
-				if sim > bestSimScore {
-					bestVoucher = v
-					bestDiffDays = diffDays
-					bestSimScore = sim
-				}
+		if _, seen := linesByAmount[line.AmountPaise]; !seen {
+			amountOrder = append(amountOrder, line.AmountPaise)
+		}
+		linesByAmount[line.AmountPaise] = append(linesByAmount[line.AmountPaise], i)
+	}
+	for _, amt := range amountOrder {
+		var open []*BankVoucher
+		for _, v := range byAmount[amt] {
+			if !matchedVouchers[v.VoucherNo] {
+				open = append(open, v)
 			}
 		}
-
-		if bestVoucher != nil {
-			matchedVouchers[bestVoucher.VoucherNo] = true
-			matchedBank[line.TxnID] = true
+		if len(open) == 0 {
+			continue
+		}
+		lines := make([]*store.BankLine, 0, len(linesByAmount[amt]))
+		for _, li := range linesByAmount[amt] {
+			lines = append(lines, &bankLines[li])
+		}
+		for _, p := range pairBucket(lines, open, windowDays) {
+			matchedVouchers[p.voucher.VoucherNo] = true
+			matchedBank[p.line.TxnID] = true
 			matches = append(matches, BankMatch{
-				BankLine: line,
-				Voucher:  *bestVoucher,
+				BankLine: *p.line,
+				Voucher:  *p.voucher,
 				Pass:     2,
 			})
 		}
@@ -245,6 +247,104 @@ func MatchBankLines(bankLines []store.BankLine, vouchers []BankVoucher, windowDa
 	}
 }
 
+type bucketPair struct {
+	line    *store.BankLine
+	voucher *BankVoucher
+}
+
+// bucketScore ranks a partial matching: more pairs first, then a smaller
+// total date gap in days, then a higher total narration similarity.
+type bucketScore struct {
+	pairs int
+	days  int
+	sim   int
+}
+
+func (a bucketScore) better(b bucketScore) bool {
+	if a.pairs != b.pairs {
+		return a.pairs > b.pairs
+	}
+	if a.days != b.days {
+		return a.days < b.days
+	}
+	return a.sim > b.sim
+}
+
+// pairBucket pairs bank lines with vouchers of the same amount whose dates
+// are within windowDays. With every pair allowed the same window, an optimal
+// matching never crosses in date order, so a dynamic program over both lists
+// sorted by date finds the best one exactly. It runs in O(lines*vouchers) for
+// the bucket; buckets are small because amounts rarely repeat.
+func pairBucket(lines []*store.BankLine, vouchers []*BankVoucher, windowDays int) []bucketPair {
+	ls := slices.Clone(lines)
+	vs := slices.Clone(vouchers)
+	sort.SliceStable(ls, func(i, j int) bool {
+		if !ls[i].TxnDate.Equal(ls[j].TxnDate) {
+			return ls[i].TxnDate.Before(ls[j].TxnDate)
+		}
+		return ls[i].TxnID < ls[j].TxnID
+	})
+	sort.SliceStable(vs, func(i, j int) bool {
+		if !vs[i].PostingDate.Equal(vs[j].PostingDate) {
+			return vs[i].PostingDate.Before(vs[j].PostingDate)
+		}
+		return vs[i].VoucherNo < vs[j].VoucherNo
+	})
+
+	const (
+		takePair = iota
+		skipLine
+		skipVoucher
+	)
+	n, m := len(ls), len(vs)
+	cols := m + 1
+	choice := make([]byte, (n+1)*cols)
+	prev := make([]bucketScore, cols)
+	cur := make([]bucketScore, cols)
+	for j := 1; j <= m; j++ {
+		choice[j] = skipVoucher
+	}
+	for i := 1; i <= n; i++ {
+		cur[0] = bucketScore{}
+		choice[i*cols] = skipLine
+		for j := 1; j <= m; j++ {
+			best, how := prev[j], byte(skipLine)
+			if s := cur[j-1]; s.better(best) {
+				best, how = s, skipVoucher
+			}
+			l, v := ls[i-1], vs[j-1]
+			if d := daysDiff(l.TxnDate, v.PostingDate); d <= windowDays {
+				s := prev[j-1]
+				s.pairs++
+				s.days += d
+				s.sim += jaroWinklerScore(l.Narration, v.Party+" "+v.Remarks)
+				if !best.better(s) {
+					best, how = s, takePair
+				}
+			}
+			cur[j] = best
+			choice[i*cols+j] = how
+		}
+		prev, cur = cur, prev
+	}
+
+	var out []bucketPair
+	for i, j := n, m; i > 0 && j > 0; {
+		switch choice[i*cols+j] {
+		case takePair:
+			out = append(out, bucketPair{line: ls[i-1], voucher: vs[j-1]})
+			i--
+			j--
+		case skipLine:
+			i--
+		default:
+			j--
+		}
+	}
+	slices.Reverse(out)
+	return out
+}
+
 func matchesReference(bankRef string, v *BankVoucher) bool {
 	if bankRef == "" {
 		return false
@@ -255,7 +355,8 @@ func matchesReference(bankRef string, v *BankVoucher) bool {
 	if strings.EqualFold(bankRef, v.VoucherNo) {
 		return true
 	}
-	if v.Remarks != "" && strings.Contains(strings.ToLower(v.Remarks), strings.ToLower(bankRef)) {
+	if len(bankRef) >= minRemarksRefLen && v.Remarks != "" &&
+		strings.Contains(strings.ToLower(v.Remarks), strings.ToLower(bankRef)) {
 		return true
 	}
 	return false
@@ -356,24 +457,20 @@ func classifyFindings(res BankRecResult, company string) []Finding {
 	return findings
 }
 
-func filterBankGLEntries(entries []frappe.GLEntry) []frappe.GLEntry {
+// filterBankGLEntries returns the entries posted to one of the named bank
+// accounts (exact ERPNext account names).
+func filterBankGLEntries(entries []frappe.GLEntry, bankAccounts []string) []frappe.GLEntry {
+	accounts := make(map[string]struct{}, len(bankAccounts))
+	for _, a := range bankAccounts {
+		accounts[a] = struct{}{}
+	}
 	var bankEntries []frappe.GLEntry
 	for _, e := range entries {
-		if isBankAccount(e.Account) {
+		if _, ok := accounts[e.Account]; ok {
 			bankEntries = append(bankEntries, e)
 		}
 	}
-	if len(bankEntries) > 0 {
-		return bankEntries
-	}
-	return entries
-}
-
-func isBankAccount(account string) bool {
-	lower := strings.ToLower(account)
-	return strings.Contains(lower, "bank") || strings.Contains(lower, "current") ||
-		strings.Contains(lower, "hdfc") || strings.Contains(lower, "icici") ||
-		strings.Contains(lower, "sbi") || strings.Contains(lower, "axis")
+	return bankEntries
 }
 
 func daysDiff(t1, t2 time.Time) int {
