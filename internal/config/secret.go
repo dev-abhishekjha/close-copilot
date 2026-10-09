@@ -12,26 +12,41 @@ const redacted = "[redacted]"
 
 // Secret holds a credential read from the environment. Its fmt, slog, JSON
 // and text forms show "[redacted]" when set and "" when empty, so a Config
-// can be logged or printed whole. The field is unexported so string(s) does
-// not compile; Reveal is the only way to the raw value.
+// can be logged or printed whole. Reveal is the only way to the raw value.
+//
+// The value sits behind a pointer. fmt does not call Format or String on a
+// value it reaches through an unexported struct field, and it prints %p
+// operands before any Formatter runs; in both cases reflection walks the
+// struct and finds only an address, never the string.
 //
 // Secret has no UnmarshalJSON or UnmarshalText: secrets come only from the
 // environment (see Load).
-type Secret struct{ v string }
+type Secret struct{ p *string }
 
-// NewSecret wraps s. Tests use it to build a Config by hand.
-func NewSecret(s string) Secret { return Secret{v: s} }
+// NewSecret wraps s. NewSecret("") is the zero Secret. Tests use it to build
+// a Config by hand.
+func NewSecret(s string) Secret {
+	if s == "" {
+		return Secret{}
+	}
+	return Secret{p: &s}
+}
 
 // Reveal returns the raw value. Call it only where the credential is used,
 // for example to build an Authorization header or open a connection.
-func (s Secret) Reveal() string { return s.v }
+func (s Secret) Reveal() string {
+	if s.p == nil {
+		return ""
+	}
+	return *s.p
+}
 
 // IsZero reports whether the secret is empty.
-func (s Secret) IsZero() bool { return s.v == "" }
+func (s Secret) IsZero() bool { return s.p == nil }
 
 // masked is the printable form: "[redacted]" when set, "" when empty.
 func (s Secret) masked() string {
-	if s.v == "" {
+	if s.IsZero() {
 		return ""
 	}
 	return redacted

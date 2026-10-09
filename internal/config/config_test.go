@@ -151,7 +151,7 @@ func TestSecret(t *testing.T) {
 		t.Error("empty secret: want Reveal \"\" and IsZero")
 	}
 
-	verbs := []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%X", "%d", "%10s", "%-10v", "%T"}
+	verbs := []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%X", "%d", "%10s", "%-10v", "%T", "%p"}
 	for _, tc := range []struct {
 		name string
 		s    Secret
@@ -205,12 +205,31 @@ func TestSecret(t *testing.T) {
 				t.Errorf("MarshalText = %q, %v; want %q", txt, err, tc.want)
 			}
 
+			// %p bypasses Format; fmt walks the struct and finds only an address.
+			if got := outputs["%p"]; tc.s.IsZero() && strings.Contains(got, "0x") {
+				t.Errorf("%%p of an empty secret = %q, want no address", got)
+			}
+
+			// Reached through an unexported field, fmt prints by reflection
+			// and never calls Format; slog's text handler does the same.
+			type holder struct{ s Secret }
+			h := holder{tc.s}
+			for _, v := range []string{"%v", "%+v", "%#v", "%s", "%x", "%p"} {
+				outputs["holder"+v] = fmt.Sprintf(v, h)
+				outputs["holder"+v+"&"] = fmt.Sprintf(v, &h)
+			}
+			outputs["holderText"] = slogText(slog.Any("h", h))
+
 			for k, out := range outputs {
 				if strings.Contains(out, raw) {
 					t.Errorf("%s leaks the secret: %q", k, out)
 				}
 			}
 		})
+	}
+
+	if NewSecret("") != (Secret{}) {
+		t.Error("NewSecret(\"\") is not the zero Secret")
 	}
 
 	// Secrets come only from the environment: no decoding.
@@ -325,6 +344,33 @@ func TestConfigRedacted(t *testing.T) {
 		"json&":        mustJSON(t, &cfg),
 	}
 
+	// A Config or Secret held in an unexported field is printed by
+	// reflection, without Format or LogValue: only addresses may show.
+	type holder struct {
+		cfg Config
+		sec Secret
+		ptr *Config
+	}
+	h := holder{cfg: cfg, sec: cfg.MCPTokenAdmin, ptr: &cfg}
+	hidden := map[string]string{
+		"holderSlogText":  slogText(slog.Any("h", h)),
+		"holderSlogText&": slogText(slog.Any("h", &h)),
+		"holderSlogKV":    slogTextKV("h", h),
+		"holderSlogJSON":  slogJSON(t, slog.Any("h", h)),
+		"holderSlogJSON&": slogJSON(t, slog.Any("h", &h)),
+		"cfg%p":           fmt.Sprintf("%p", cfg),
+		"cfg%p&":          fmt.Sprintf("%p", &cfg),
+	}
+	for _, v := range []string{"%v", "%+v", "%#v", "%s", "%x", "%p"} {
+		hidden["holder"+v] = fmt.Sprintf(v, h)
+		hidden["holder"+v+"&"] = fmt.Sprintf(v, &h)
+	}
+	for name, out := range hidden {
+		if strings.Contains(out, "marker-") {
+			t.Errorf("%s leaks a secret: %s", name, out)
+		}
+	}
+
 	for name, out := range outputs {
 		for key, marker := range secretMarkers {
 			if strings.Contains(out, marker) || strings.Contains(out, "marker-") {
@@ -355,6 +401,64 @@ func TestConfigRedacted(t *testing.T) {
 	}
 	if len(group) != reflect.TypeOf(Config{}).NumField() {
 		t.Errorf("LogValue lists %d settings, Config has %d fields", len(group), reflect.TypeOf(Config{}).NumField())
+	}
+}
+
+func TestConfigRedactsURLs(t *testing.T) {
+	const leaky = "https://marker-user:marker-pass@host.visible.test:8443/mcp?api_key=marker-query#marker-frag"
+	var cfg Config
+	urls := []*string{&cfg.ERPBaseURL, &cfg.BooksMCPURL, &cfg.EvidenceMCPURL,
+		&cfg.TEIEmbedURL, &cfg.TEIRerankURL, &cfg.DoclingURL, &cfg.OTLPEndpoint}
+	for _, u := range urls {
+		*u = leaky
+	}
+	outputs := map[string]string{
+		"%v":       fmt.Sprintf("%v", cfg),
+		"%+v":      fmt.Sprintf("%+v", cfg),
+		"%#v&":     fmt.Sprintf("%#v", &cfg),
+		"slogJSON": slogJSON(t, slog.Any("cfg", cfg)),
+		"slogText": slogText(slog.Any("cfg", &cfg)),
+		"json":     mustJSON(t, cfg),
+	}
+	const want = "https://xxxxx:xxxxx@host.visible.test:8443/mcp?[redacted]#[redacted]"
+	for name, out := range outputs {
+		if strings.Contains(out, "marker-") {
+			t.Errorf("%s leaks URL credentials: %s", name, out)
+		}
+		if n := strings.Count(out, "host.visible.test:8443/mcp"); n != len(urls) {
+			t.Errorf("%s shows %d of %d URL hosts: %s", name, n, len(urls), out)
+		}
+	}
+	group := map[string]string{}
+	for _, a := range cfg.LogValue().Group() {
+		group[a.Key] = a.Value.String()
+	}
+	for _, k := range []string{"ERPBaseURL", "BooksMCPURL", "EvidenceMCPURL", "TEIEmbedURL", "TEIRerankURL", "DoclingURL", "OTLPEndpoint"} {
+		if group[k] != want {
+			t.Errorf("LogValue %s = %q, want %q", k, group[k], want)
+		}
+	}
+}
+
+func TestRedactURL(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{"", ""},
+		{"http://localhost:8080", "http://localhost:8080"},
+		{"http://books.visible.test/mcp", "http://books.visible.test/mcp"},
+		{"https://u:p@h.test/", "https://xxxxx:xxxxx@h.test/"},
+		{"https://token@h.test", "https://xxxxx@h.test"},
+		{"https://h.test/?api_key=x", "https://h.test/?[redacted]"},
+		{"https://h.test/?", "https://h.test/?[redacted]"},
+		{"https://h.test/p#access_token=x", "https://h.test/p#[redacted]"},
+		{"localhost:4318", "localhost:4318"},
+		{"u:p@h.test:4318", "xxxxx@h.test:4318"},
+		{"tok@h.test", "xxxxx@h.test"},
+		{"http://h.test/%zz", unparseableURL},
+		{"://nope", unparseableURL},
+	} {
+		if got := redactURL(tc.in); got != tc.want {
+			t.Errorf("redactURL(%q) = %q, want %q", tc.in, got, tc.want)
+		}
 	}
 }
 

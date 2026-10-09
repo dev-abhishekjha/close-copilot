@@ -7,9 +7,13 @@
 package config
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"log/slog"
+	"net/url"
 	"os"
 	"sort"
 	"strconv"
@@ -97,19 +101,20 @@ type Config struct {
 	DataDir string
 }
 
-// LogValue implements slog.LogValuer. It lists the non-secret settings and
-// shows each secret only as set ("[redacted]") or unset ("").
-func (c Config) LogValue() slog.Value {
-	return slog.GroupValue(
-		slog.String("ERPBaseURL", c.ERPBaseURL),
+// view is the one printable form of a Config, shared by LogValue, Format and
+// MarshalJSON. It lists the non-secret settings, shows each secret only as
+// set ("[redacted]") or unset (""), and passes every URL through redactURL.
+func (c Config) view() []slog.Attr {
+	return []slog.Attr{
+		slog.String("ERPBaseURL", redactURL(c.ERPBaseURL)),
 		slog.String("ERPSite", c.ERPSite),
 		slog.String("ERPAPIKey", c.ERPAPIKey.masked()),
 		slog.String("ERPAPISecret", c.ERPAPISecret.masked()),
 		slog.String("ERPSeedAPIKey", c.ERPSeedAPIKey.masked()),
 		slog.String("ERPSeedAPISecret", c.ERPSeedAPISecret.masked()),
 		slog.String("DatabaseURL", c.DatabaseURL.masked()),
-		slog.String("BooksMCPURL", c.BooksMCPURL),
-		slog.String("EvidenceMCPURL", c.EvidenceMCPURL),
+		slog.String("BooksMCPURL", redactURL(c.BooksMCPURL)),
+		slog.String("EvidenceMCPURL", redactURL(c.EvidenceMCPURL)),
 		slog.String("MCPTokenAgent", c.MCPTokenAgent.masked()),
 		slog.String("MCPTokenAdmin", c.MCPTokenAdmin.masked()),
 		slog.String("MCPScopeKey", c.MCPScopeKey.masked()),
@@ -120,15 +125,115 @@ func (c Config) LogValue() slog.Value {
 		slog.String("LLMModelStrong", c.LLMModelStrong),
 		slog.Float64("LLMDailyBudgetUSD", c.LLMDailyBudgetUSD),
 		slog.String("PseudonymKey", c.PseudonymKey.masked()),
-		slog.String("TEIEmbedURL", c.TEIEmbedURL),
-		slog.String("TEIRerankURL", c.TEIRerankURL),
-		slog.String("DoclingURL", c.DoclingURL),
-		slog.String("OTLPEndpoint", c.OTLPEndpoint),
+		slog.String("TEIEmbedURL", redactURL(c.TEIEmbedURL)),
+		slog.String("TEIRerankURL", redactURL(c.TEIRerankURL)),
+		slog.String("DoclingURL", redactURL(c.DoclingURL)),
+		slog.String("OTLPEndpoint", redactURL(c.OTLPEndpoint)),
 		slog.String("OTLPHeaders", c.OTLPHeaders.masked()),
 		slog.String("AppAddr", c.AppAddr),
 		slog.String("AppSessionKey", c.AppSessionKey.masked()),
 		slog.String("DataDir", c.DataDir),
-	)
+	}
+}
+
+// LogValue implements slog.LogValuer. It lists the non-secret settings and
+// shows each secret only as set ("[redacted]") or unset ("").
+func (c Config) LogValue() slog.Value { return slog.GroupValue(c.view()...) }
+
+// Format implements fmt.Formatter: every verb, including %v, %+v and %#v,
+// prints the redacted view as {Name:value ...}.
+func (c Config) Format(f fmt.State, _ rune) {
+	var b strings.Builder
+	b.WriteByte('{')
+	for i, a := range c.view() {
+		if i > 0 {
+			b.WriteByte(' ')
+		}
+		b.WriteString(a.Key)
+		b.WriteByte(':')
+		b.WriteString(a.Value.String())
+	}
+	b.WriteByte('}')
+	_, _ = io.WriteString(f, b.String())
+}
+
+// MarshalJSON implements json.Marshaler with the redacted view, in field
+// order.
+func (c Config) MarshalJSON() ([]byte, error) {
+	var b bytes.Buffer
+	b.WriteByte('{')
+	for i, a := range c.view() {
+		if i > 0 {
+			b.WriteByte(',')
+		}
+		k, err := json.Marshal(a.Key)
+		if err != nil {
+			return nil, fmt.Errorf("config: encode %s: %w", a.Key, err)
+		}
+		v, err := json.Marshal(a.Value.Any())
+		if err != nil {
+			return nil, fmt.Errorf("config: encode %s: %w", a.Key, err)
+		}
+		b.Write(k)
+		b.WriteByte(':')
+		b.Write(v)
+	}
+	b.WriteByte('}')
+	return b.Bytes(), nil
+}
+
+// Placeholders redactURL substitutes.
+const (
+	maskedUserinfo = "xxxxx" // url.URL.Redacted's placeholder; brackets would be escaped in userinfo
+	unparseableURL = "[unparseable]"
+)
+
+// redactURL is raw with any userinfo masked and any query string or fragment
+// replaced by "?[redacted]" / "#[redacted]", since either can carry a token
+// (https://u:p@host, ?api_key=). A value url.Parse rejects shows
+// "[unparseable]"; an empty value stays empty.
+func redactURL(raw string) string {
+	if raw == "" {
+		return ""
+	}
+	u, err := url.Parse(raw)
+	if err != nil {
+		return unparseableURL
+	}
+	hadQuery := u.RawQuery != "" || u.ForceQuery
+	hadFragment := u.Fragment != "" || u.RawFragment != ""
+	u.RawQuery, u.ForceQuery = "", false
+	u.Fragment, u.RawFragment = "", ""
+
+	if u.User != nil {
+		// The username can be the credential on its own (https://token@host).
+		if _, ok := u.User.Password(); ok {
+			u.User = url.UserPassword(maskedUserinfo, maskedUserinfo)
+		} else {
+			u.User = url.User(maskedUserinfo)
+		}
+	}
+	out := u.Redacted()
+	// Without "//" there is no parsed authority: "u:p@host:1" parses as
+	// scheme "u" and "u@host" as a path. Mask everything before the last '@'.
+	if u.Host == "" {
+		out = maskBeforeAt(out)
+	}
+	if hadQuery {
+		out += "?" + redacted
+	}
+	if hadFragment {
+		out += "#" + redacted
+	}
+	return out
+}
+
+// maskBeforeAt replaces everything before the last '@' in s.
+func maskBeforeAt(s string) string {
+	if i := strings.LastIndexByte(s, '@'); i >= 0 {
+		return maskedUserinfo + s[i:]
+	}
+	return s
 }
 
 // defaults apply when a variable is unset or empty.
