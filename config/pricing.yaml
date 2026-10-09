@@ -1,5 +1,15 @@
 # Token pricing table for Claude models (USD per million tokens).
 # Loaded and validated by internal/llm.LoadPricing (CC-701).
+#
+# Lookup fails closed: a model with no row here is an error (llm.ErrUnpricedModel),
+# never a zero cost. Matching is exact or case-insensitive; there is no family
+# fallback. cache_write_per_million is the 5-minute ephemeral rate (1.25x input),
+# which is what the Anthropic provider requests.
+#
+# The rows named haiku, sonnet and opus are matched only when a call reports
+# that exact name (for example a CLI alias with no resolved model). They are not
+# a fallback for other model IDs, and they carry the older, higher rates on
+# purpose so they err expensive.
 models:
   haiku:
     input_per_million: 1.00
@@ -77,6 +87,45 @@ models:
     cache_write_per_million: 18.75
     cache_read_per_million: 1.50
   claude-3-opus-latest:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+
+  # Current models. Rows without a published, owner-confirmed list price use
+  # the Opus row so spend is never undercounted against LLM_DAILY_BUDGET_USD.
+  #
+  # claude-haiku-4-5-20251001 (above) matches the published $1/$5 list price and
+  # the cost Claude Code 2.1.295 reports.
+  #
+  # claude-haiku-5-5 and claude-sonnet-5-5: unconfirmed, owner to verify. Rates
+  # derived from the modelUsage.costUSD that Claude Code 2.1.295 reports
+  # (costBasis "list"), probed 2026-10-09 with two token mixes per model; both
+  # mixes fit input x1, output x5, cache write x1.25 (5m) / x2 (1h), cache read
+  # x0.1 exactly:
+  #   claude-haiku-5-5:  input 0.10, output 0.50, cache write 0.125, cache read 0.01
+  #   claude-sonnet-5-5: input 2.00, output 10.00, cache write 2.50, cache read 0.20
+  # Until confirmed they are priced at the Opus row.
+  claude-haiku-5-5:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  claude-sonnet-5-5:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  # claude-opus-5-5: the reported cost did not fit one rate cleanly (about $4/M
+  # input). Not sure of the price, so it uses the Opus row and errs expensive.
+  claude-opus-5-5:
+    input_per_million: 15.00
+    output_per_million: 75.00
+    cache_write_per_million: 18.75
+    cache_read_per_million: 1.50
+  # claude-fable-5-1: not available on the probing account (api_error), so it
+  # has no sourced price. It uses the Opus row and errs expensive.
+  claude-fable-5-1:
     input_per_million: 15.00
     output_per_million: 75.00
     cache_write_per_million: 18.75
