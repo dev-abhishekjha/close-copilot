@@ -36,6 +36,55 @@ tasks:
     files:
       - "gates/analyzers/**"
     check: "Analyzer tests flag each forbidden pattern in testdata"
+  # CC-003 is not in the tickets doc. It comes from the remote being created after
+  # CC-001; its approved spec is held in tmp/held-specs/CC-003.md.
+  - id: CC-003
+    title: "Module path and CODEOWNERS for the GitHub remote"
+    phase: 0
+    owner: implementer
+    risk: standard
+    human_review: true
+    depends_on: [CC-001]
+    needs_erpnext: false
+    files:
+      - "tasks/graph.yaml"
+      - ".github/CODEOWNERS"
+      - ".golangci.yml"
+      - "Makefile"
+      - "cmd/*/main.go"
+      - "gates/cmd/*/main.go"
+      - "gates/spec_test.go"
+      - "internal/buildinfo/buildinfo.go"
+      - "internal/cli/**"
+    check: "go.mod and CODEOWNERS name dev-abhishekjha; make check green"
+  # Hardening tickets CC-004, CC-005, CC-104 and CC-205 are not in the tickets
+  # doc either. Their ticket text is in tasks/hardening.md.
+  - id: CC-004
+    title: "Harden the merge gates, CI and guard hook"
+    phase: 0
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-003]
+    needs_erpnext: false
+    files:
+      - "gates/*.go"
+      - "gates/cmd/**"
+      - "gates/testdata/**"
+      - ".github/**"
+      - ".claude/hooks/guard-edit.sh"
+    check: "A PR that weakens a gate is still judged by the base-ref gate; approval is pinned to a SHA"
+  - id: CC-005
+    title: "Close the static analyzer gaps"
+    phase: 0
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-002]
+    needs_erpnext: false
+    files:
+      - "gates/analyzers/**"
+    check: "Analyzer tests flag each indirect egress, transitive import and admintoken case"
   - id: CC-101
     title: "Repo skeleton, tooling and CI"
     phase: 0
@@ -75,6 +124,17 @@ tasks:
       - "docs/discovery.md"
       - "config/rules.yaml"
     check: "Two summaries, three linked backlog changes"
+  - id: CC-104
+    title: "Redact secrets in config"
+    phase: 1
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-101]
+    needs_erpnext: false
+    files:
+      - "internal/config/**"
+    check: "No secret appears in %v, %#v, slog or JSON output of a populated Config"
   - id: CC-201
     title: "API users, keys and schema discovery"
     phase: 0
@@ -125,6 +185,22 @@ tasks:
     files:
       - "internal/books/reports*.go"
     check: "Debits equal credits; ties to ERPNext's report"
+  - id: CC-205
+    title: "Harden the Frappe client, probe and API-user script"
+    phase: 1
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: true
+    depends_on: [CC-202]
+    needs_erpnext: true
+    files:
+      - "internal/frappe/**"
+      - "cmd/probe/**"
+      - "deploy/erpnext/api-users.sh"
+      - "deploy/erpnext/lib.sh"
+      - ".env.example"
+      - "docs/erpnext-schema/README.md"
+    check: "Injection shapes in fields/order_by are refused; default deadline; probe uses the hardened client"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
@@ -261,7 +337,7 @@ tasks:
     owner: integration-engineer
     risk: data-sensitive
     human_review: false
-    depends_on: [CC-501, CC-204]
+    depends_on: [CC-501, CC-204, CC-205]
     needs_erpnext: true
     phase_2_pass: true
     files:
@@ -322,7 +398,7 @@ tasks:
     owner: llm-engineer
     risk: data-sensitive
     human_review: false
-    depends_on: [CC-101]
+    depends_on: [CC-101, CC-104]
     needs_erpnext: false
     files:
       - "internal/llm/**"
@@ -559,7 +635,7 @@ tasks:
     owner: implementer
     risk: data-sensitive
     human_review: false
-    depends_on: [CC-703]
+    depends_on: [CC-703, CC-104]
     needs_erpnext: false
     files:
       - "internal/telemetry/**"
