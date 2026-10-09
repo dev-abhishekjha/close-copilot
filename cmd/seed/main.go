@@ -1,6 +1,6 @@
 // Command seed is the seeder: generates the synthetic world, posts the books to ERPNext, writes bank.csv, gstr2b.json and ground truth.
 //
-// Built in CC-301 to CC-307. Today it has three subcommands:
+// Built in CC-301 to CC-307. Today it has four subcommands:
 //
 //	seed world --company sharma --month 2026-09 [--small] [--config config/companies]
 //
@@ -19,8 +19,17 @@
 // (CC-304). It runs Bootstrap first, which must report zero changes, then
 // generates the world, posts it, prints the result as JSON and writes
 // <out>/<suite>/<company>-<month>/erp_map.json. With --expect-no-changes it
-// exits non-zero if any document was created or submitted. Every other
-// subcommand only checks its configuration.
+// exits non-zero if any document was created or submitted.
+//
+//	seed evidence --company sharma --month 2026-09 [--small]
+//	              [--config config/companies] [--out data/external]
+//
+// writes the month's bank statement and GSTR-2B, derived from the true
+// world and never from the books, to <out>/<company>/<month>/bank.csv and
+// gstr2b.json (CC-305), and prints a one-line JSON summary. It generates
+// the previous month's world too, for the invoices filed late. Like world,
+// it needs no ERPNext variables. Every other subcommand only checks its
+// configuration.
 package main
 
 import (
@@ -75,10 +84,11 @@ func subcommand(args []string) string {
 	return ""
 }
 
-// requiredEnv lists the variables the subcommand in args needs: world is
-// pure and needs none.
+// requiredEnv lists the variables the subcommand in args needs: world and
+// evidence are pure and need none.
 func requiredEnv(args []string) []string {
-	if subcommand(args) == "world" {
+	switch subcommand(args) {
+	case "world", "evidence":
 		return nil
 	}
 	return erpEnv
@@ -102,9 +112,11 @@ func newRunDeps(stdout io.Writer, d deps) cli.RunFunc {
 				return runBootstrap(ctx, cfg, log, args[1:], stdout, d.bootstrap)
 			case "books":
 				return runBooks(ctx, cfg, log, args[1:], stdout, d)
+			case "evidence":
+				return runEvidence(args[1:], stdout)
 			}
 		}
-		log.Info("not implemented yet", "tickets", "CC-305 to CC-307", "args", args)
+		log.Info("not implemented yet", "tickets", "CC-306 to CC-307", "args", args)
 		return nil
 	}
 }
@@ -252,6 +264,86 @@ func runBooks(ctx context.Context, cfg config.Config, log *slog.Logger, args []s
 	}
 	if n := res.Changes(); *expectNoChanges && n > 0 {
 		return fmt.Errorf("books: --expect-no-changes, but %d documents were created or submitted", n)
+	}
+	return nil
+}
+
+// evidenceSummary is the line seed evidence prints. Amounts are rupees.
+type evidenceSummary struct {
+	Company   string      `json:"company"`
+	Month     string      `json:"month"`
+	BankLines int         `json:"bank_lines"`
+	Opening   json.Number `json:"opening"`
+	Closing   json.Number `json:"closing"`
+	Invoices  int         `json:"invoices"`
+	Late      int         `json:"late"`
+	Deferred  int         `json:"deferred"`
+}
+
+func runEvidence(args []string, stdout io.Writer) error {
+	fs := flag.NewFlagSet("seed evidence", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	company := fs.String("company", "", "company id, such as sharma")
+	month := fs.String("month", "", "month as YYYY-MM")
+	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
+	dir := fs.String("config", "config/companies", "directory of company profiles")
+	out := fs.String("out", "data/external", "output root")
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	if fs.NArg() > 0 {
+		return fmt.Errorf("evidence: unexpected arguments %q", fs.Args())
+	}
+	if *company == "" || *month == "" {
+		return errors.New("evidence: --company and --month are required")
+	}
+	start, err := seed.ParseMonth(*month)
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	p, err := loadCompany(*dir, *company)
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	opt := seed.Options{Small: *small}
+	prev, err := seed.Generate(p, start.AddDate(0, -1, 0).Format("2006-01"), opt)
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	w, err := seed.Generate(p, *month, opt)
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	lines, err := seed.BankLines(w)
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	g, err := seed.BuildGSTR2B(p, *month, []seed.World{prev, w}, seed.DefaultGSTR2BOptions())
+	if err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	monthDir := filepath.Join(*out, p.ID, *month)
+	if err := seed.WriteBankCSV(filepath.Join(monthDir, seed.BankCSVFile), lines); err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	if err := seed.WriteGSTR2B(filepath.Join(monthDir, seed.GSTR2BFile), g); err != nil {
+		return fmt.Errorf("evidence: %w", err)
+	}
+	b, err := json.Marshal(evidenceSummary{
+		Company:   p.ID,
+		Month:     *month,
+		BankLines: len(lines),
+		Opening:   json.Number(w.OpeningBank.Rupees()),
+		Closing:   json.Number(w.ClosingBank.Rupees()),
+		Invoices:  len(g.Included),
+		Late:      len(g.Late),
+		Deferred:  len(g.Deferred),
+	})
+	if err != nil {
+		return fmt.Errorf("evidence: encode summary: %w", err)
+	}
+	if _, err := stdout.Write(append(b, '\n')); err != nil {
+		return fmt.Errorf("evidence: write: %w", err)
 	}
 	return nil
 }
