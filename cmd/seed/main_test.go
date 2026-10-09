@@ -103,8 +103,10 @@ func TestWorldErrors(t *testing.T) {
 }
 
 func TestRequiredEnv(t *testing.T) {
-	if got := requiredEnv([]string{"world", "--company", "sharma"}); len(got) != 0 {
-		t.Errorf("world requires %v, want nothing", got)
+	for _, sub := range []string{"world", "evidence"} {
+		if got := requiredEnv([]string{sub, "--company", "sharma"}); len(got) != 0 {
+			t.Errorf("%s requires %v, want nothing", sub, got)
+		}
 	}
 	for _, args := range [][]string{nil, {"books"}, {"all"}, {"--version"}} {
 		got := requiredEnv(args)
@@ -389,6 +391,112 @@ func TestBooksErrors(t *testing.T) {
 		}
 		if stdout != "" {
 			t.Errorf("%s: printed %q on failure", tc.name, stdout)
+		}
+	}
+	entries, err := os.ReadDir(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 0 {
+		t.Errorf("a failed run wrote %v", entries)
+	}
+}
+
+func TestEvidenceWritesBothFiles(t *testing.T) {
+	out := t.TempDir()
+	args := []string{"evidence", "--company", "sharma", "--month", "2026-09", "--small", "--config", configDir, "--out", out}
+	code, stdout, errOut := runSeed(t, args...)
+	if code != 0 {
+		t.Fatalf("exit %d, stderr:\n%s", code, errOut)
+	}
+	if strings.Count(stdout, "\n") != 1 || !strings.HasSuffix(stdout, "}\n") {
+		t.Errorf("summary is not one JSON line: %q", stdout)
+	}
+	var sum evidenceSummary
+	if err := json.Unmarshal([]byte(stdout), &sum); err != nil {
+		t.Fatalf("summary: %v", err)
+	}
+
+	p, err := seed.LoadProfile(filepath.Join(configDir, "sharma.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	prev, err := seed.Generate(p, "2026-08", seed.Options{Small: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := seed.Generate(p, "2026-09", seed.Options{Small: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	lines, err := seed.BankLines(w)
+	if err != nil {
+		t.Fatal(err)
+	}
+	g, err := seed.BuildGSTR2B(p, "2026-09", []seed.World{prev, w}, seed.DefaultGSTR2BOptions())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if sum.Company != "sharma" || sum.Month != "2026-09" || sum.BankLines != len(lines) ||
+		sum.Opening.String() != w.OpeningBank.Rupees() || sum.Closing.String() != w.ClosingBank.Rupees() ||
+		sum.Invoices != len(g.Included) || sum.Late != len(g.Late) || sum.Deferred != len(g.Deferred) {
+		t.Errorf("summary %+v", sum)
+	}
+
+	dir := filepath.Join(out, "sharma", "2026-09")
+	golden := filepath.Join("..", "..", "internal", "seed", "testdata", "evidence")
+	for file, want := range map[string]string{
+		seed.BankCSVFile: filepath.Join(golden, "bank-sharma-2026-09-small.csv"),
+		seed.GSTR2BFile:  filepath.Join(golden, "gstr2b-sharma-2026-09-small.json"),
+	} {
+		got, err := os.ReadFile(filepath.Join(dir, file)) //nolint:gosec // G304: test temp dir
+		if err != nil {
+			t.Fatal(err)
+		}
+		exp, err := os.ReadFile(want) //nolint:gosec // G304: repo testdata
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(got, exp) {
+			t.Errorf("%s differs from %s", file, want)
+		}
+	}
+	entries, err := os.ReadDir(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 2 {
+		t.Errorf("wrote %d entries, want bank.csv and gstr2b.json only", len(entries))
+	}
+
+	// A second run gives identical files.
+	if code, _, errOut := runSeed(t, args...); code != 0 {
+		t.Fatalf("second run: exit %d, stderr:\n%s", code, errOut)
+	}
+}
+
+func TestEvidenceErrors(t *testing.T) {
+	out := t.TempDir()
+	base := []string{"--config", configDir, "--out", out}
+	cases := [][]string{
+		{"evidence"},
+		{"evidence", "--company", "sharma"},
+		{"evidence", "--month", "2026-09"},
+		{"evidence", "--company", "sharma", "--month", "2026-13"},
+		{"evidence", "--company", "sharma", "--month", "../../x"},
+		{"evidence", "--company", "nobody", "--month", "2026-09"},
+		{"evidence", "--company", "../sharma", "--month", "2026-09"},
+		{"evidence", "--company", "sharma", "--month", "2026-09", "extra"},
+		{"evidence", "--bogus"},
+	}
+	for _, c := range cases {
+		args := append(slices.Clone(c[:1]), append(slices.Clone(base), c[1:]...)...)
+		code, stdout, _ := runSeed(t, args...)
+		if code != 1 {
+			t.Errorf("%v: exit %d, want 1", c, code)
+		}
+		if stdout != "" {
+			t.Errorf("%v: printed %q on failure", c, stdout)
 		}
 	}
 	entries, err := os.ReadDir(out)

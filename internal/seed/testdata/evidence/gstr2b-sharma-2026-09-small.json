@@ -1,0 +1,250 @@
+{
+  "data": {
+    "gstin": "29ZIACS2610I1ZD",
+    "rtnprd": "092026",
+    "docdata": {
+      "b2b": [
+        {
+          "ctin": "24ECWCB3133X1ZI",
+          "trdnm": "Bharat Polymers Udyog",
+          "inv": [
+            {
+              "inum": "BHR/2026/0935",
+              "dt": "11-09-2026",
+              "val": 71908.63,
+              "txval": 60939.52,
+              "igst": 10969.11,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "27DYLCV3017V1Z0",
+          "trdnm": "Vaani Telecom Services",
+          "inv": [
+            {
+              "inum": "VNT/2026/0906",
+              "dt": "12-09-2026",
+              "val": 3449.29,
+              "txval": 2923.13,
+              "igst": 526.16,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "27FIWCT1460U1ZK",
+          "trdnm": "TechKart Supplies",
+          "inv": [
+            {
+              "inum": "TCH/2026/0955",
+              "dt": "06-09-2026",
+              "val": 80876.75,
+              "txval": 68539.62,
+              "igst": 12337.13,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "27ZIPCC8524K1ZX",
+          "trdnm": "Cloudly SaaS",
+          "inv": [
+            {
+              "inum": "CLD/2026/0908",
+              "dt": "03-09-2026",
+              "val": 141600.00,
+              "txval": 120000.00,
+              "igst": 21600.00,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29AANCO3763Y1ZY",
+          "trdnm": "Omkar Estates",
+          "inv": [
+            {
+              "inum": "OMK/2026/0926",
+              "dt": "01-09-2026",
+              "val": 177000.00,
+              "txval": 150000.00,
+              "igst": 0.00,
+              "cgst": 13500.00,
+              "sgst": 13500.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29LJRCS1081D1ZC",
+          "trdnm": "Securewell Guarding Services",
+          "inv": [
+            {
+              "inum": "SCR/2026/0936",
+              "dt": "28-09-2026",
+              "val": 36486.25,
+              "txval": 30920.55,
+              "igst": 0.00,
+              "cgst": 2782.85,
+              "sgst": 2782.85,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29ORXCK6371L1Z3",
+          "trdnm": "Kaveri Packaging Works",
+          "inv": [
+            {
+              "inum": "KVR/2026/0937",
+              "dt": "01-09-2026",
+              "val": 21446.92,
+              "txval": 19149.04,
+              "igst": 0.00,
+              "cgst": 1148.94,
+              "sgst": 1148.94,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29PHGCS2431D1ZS",
+          "trdnm": "Swift Couriers",
+          "inv": [
+            {
+              "inum": "SWF/2026/0919",
+              "dt": "22-09-2026",
+              "val": 19640.52,
+              "txval": 16644.50,
+              "igst": 0.00,
+              "cgst": 1498.01,
+              "sgst": 1498.01,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29SYJCL1381E1ZL",
+          "trdnm": "Ledgerwise Associates",
+          "inv": [
+            {
+              "inum": "LDG/2026/0918",
+              "dt": "25-09-2026",
+              "val": 29500.00,
+              "txval": 25000.00,
+              "igst": 0.00,
+              "cgst": 2250.00,
+              "sgst": 2250.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29ULNCS7916R1ZY",
+          "trdnm": "Stockbook Cloud",
+          "inv": [
+            {
+              "inum": "STC/2026/0906",
+              "dt": "03-09-2026",
+              "val": 5310.00,
+              "txval": 4500.00,
+              "igst": 0.00,
+              "cgst": 405.00,
+              "sgst": 405.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29WFQCL5046J1Z0",
+          "trdnm": "Lakeview Warehousing LLP",
+          "inv": [
+            {
+              "inum": "LKV/2026/0926",
+              "dt": "05-09-2026",
+              "val": 100300.00,
+              "txval": 85000.00,
+              "igst": 0.00,
+              "cgst": 7650.00,
+              "sgst": 7650.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29WNECD3532M1Z2",
+          "trdnm": "Deccan Textile Mills",
+          "inv": [
+            {
+              "inum": "DCC/2026/0911",
+              "dt": "24-09-2026",
+              "val": 106696.41,
+              "txval": 101615.63,
+              "igst": 0.00,
+              "cgst": 2540.39,
+              "sgst": 2540.39,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "29WSFCB1474N1ZM",
+          "trdnm": "BlueNet Broadband",
+          "inv": [
+            {
+              "inum": "BLN/2026/0918",
+              "dt": "05-09-2026",
+              "val": 4870.66,
+              "txval": 4127.68,
+              "igst": 0.00,
+              "cgst": 371.49,
+              "sgst": 371.49,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "33LQPCS8048A1Z4",
+          "trdnm": "Sundaram Steelware",
+          "inv": [
+            {
+              "inum": "SND/2026/0903",
+              "dt": "15-09-2026",
+              "val": 127481.01,
+              "txval": 108034.75,
+              "igst": 19446.26,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        },
+        {
+          "ctin": "36VNOCR2477I1ZI",
+          "trdnm": "RoadKing Logistics",
+          "inv": [
+            {
+              "inum": "RDK/2026/0952",
+              "dt": "20-09-2026",
+              "val": 19180.63,
+              "txval": 17125.56,
+              "igst": 2055.07,
+              "cgst": 0.00,
+              "sgst": 0.00,
+              "itcavl": "Y"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
