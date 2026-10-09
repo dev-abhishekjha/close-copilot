@@ -245,10 +245,10 @@ func testConfig(srv *httptest.Server) config.Config {
 	return config.Config{
 		ERPBaseURL:       srv.URL,
 		ERPSite:          testSite,
-		ERPAPIKey:        testBotKey,
-		ERPAPISecret:     testBotSecret,
-		ERPSeedAPIKey:    testSeedKey,
-		ERPSeedAPISecret: testSeedSecret,
+		ERPAPIKey:        config.NewSecret(testBotKey),
+		ERPAPISecret:     config.NewSecret(testBotSecret),
+		ERPSeedAPIKey:    config.NewSecret(testSeedKey),
+		ERPSeedAPISecret: config.NewSecret(testSeedSecret),
 	}
 }
 

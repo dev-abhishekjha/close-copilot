@@ -81,7 +81,7 @@ func TestIntegrationSkips(t *testing.T) {
 
 	t.Run("all set", func(t *testing.T) {
 		cfg := integrationConfig(t, func(k string) (string, bool) { v, ok := full[k]; return v, ok })
-		if cfg.ERPBaseURL != "http://localhost:8080" || cfg.ERPSeedAPIKey != "x" {
+		if cfg.ERPBaseURL != "http://localhost:8080" || cfg.ERPSeedAPIKey.Reveal() != "x" {
 			t.Errorf("cfg not loaded: base %q", cfg.ERPBaseURL)
 		}
 	})

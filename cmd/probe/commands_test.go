@@ -25,7 +25,7 @@ func TestAuth(t *testing.T) {
 
 	// The seeder's key in the bot's place logs in as Administrator.
 	cfg := testConfig(srv)
-	cfg.ERPAPIKey, cfg.ERPAPISecret = testSeedKey, testSeedSecret
+	cfg.ERPAPIKey, cfg.ERPAPISecret = config.NewSecret(testSeedKey), config.NewSecret(testSeedSecret)
 	r = runProbe(t, cfg, "auth")
 	if r.err == nil || !strings.Contains(r.err.Error(), `"Administrator"`) {
 		t.Errorf("want an error naming Administrator, got %v", r.err)
@@ -40,7 +40,7 @@ func TestAuthBadSecretNeverLeaks(t *testing.T) {
 	f.echoAuthInErrors = true
 	srv := f.start()
 	cfg := testConfig(srv)
-	cfg.ERPAPISecret = testBotSecret + "-wrong"
+	cfg.ERPAPISecret = config.NewSecret(testBotSecret + "-wrong")
 
 	r := runProbe(t, cfg, "auth") // runProbe asserts no secret in stdout, logs or error
 	if r.err == nil || !strings.Contains(r.err.Error(), "401") || !strings.Contains(r.err.Error(), "AuthenticationError") {
@@ -132,7 +132,7 @@ func TestPermsFailures(t *testing.T) {
 func TestPermsRefusesOtherUsersKey(t *testing.T) {
 	f := newFake(t)
 	cfg := testConfig(f.start())
-	cfg.ERPAPIKey, cfg.ERPAPISecret = testSeedKey, testSeedSecret
+	cfg.ERPAPIKey, cfg.ERPAPISecret = config.NewSecret(testSeedKey), config.NewSecret(testSeedSecret)
 	r := runProbe(t, cfg, "perms")
 	if r.err == nil || !strings.Contains(r.err.Error(), "not running the checks") {
 		t.Fatalf("want a refusal to run, got %v", r.err)
@@ -226,7 +226,7 @@ func TestSchemaUsesSeederWhenBotRefused(t *testing.T) {
 func TestSchemaWithoutSeederKey(t *testing.T) {
 	f := newFake(t)
 	cfg := testConfig(f.start())
-	cfg.ERPSeedAPIKey, cfg.ERPSeedAPISecret = "", ""
+	cfg.ERPSeedAPIKey, cfg.ERPSeedAPISecret = config.Secret{}, config.Secret{}
 	out := filepath.Join(t.TempDir(), "out")
 
 	r := runProbe(t, cfg, "schema", "--out", out)
@@ -256,7 +256,7 @@ func TestSchemaEchoedErrorsNeverLeak(t *testing.T) {
 	f := newFake(t)
 	f.echoAuthInErrors = true
 	cfg := testConfig(f.start())
-	cfg.ERPSeedAPISecret = testSeedSecret + "-wrong" // the seeder gets 401s quoting its header
+	cfg.ERPSeedAPISecret = config.NewSecret(testSeedSecret + "-wrong") // the seeder gets 401s quoting its header
 	r := runProbe(t, cfg, "schema", "--out", t.TempDir())
 	if r.err == nil || !strings.Contains(r.err.Error(), "401") {
 		t.Fatalf("want a 401, got %v", r.err)

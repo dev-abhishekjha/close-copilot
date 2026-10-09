@@ -148,7 +148,7 @@ func runBootstrap(ctx context.Context, cfg config.Config, log *slog.Logger, args
 	if err != nil {
 		return fmt.Errorf("bootstrap: %w", err)
 	}
-	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey, frappe.Secret(cfg.ERPSeedAPISecret))
+	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey.Reveal(), frappe.Secret(cfg.ERPSeedAPISecret.Reveal()))
 	if err != nil {
 		return fmt.Errorf("bootstrap: %w", err)
 	}
@@ -235,7 +235,7 @@ func runBooks(ctx context.Context, cfg config.Config, log *slog.Logger, args []s
 	if err != nil {
 		return fmt.Errorf("books: %w", err)
 	}
-	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey, frappe.Secret(cfg.ERPSeedAPISecret))
+	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey.Reveal(), frappe.Secret(cfg.ERPSeedAPISecret.Reveal()))
 	if err != nil {
 		return fmt.Errorf("books: %w", err)
 	}
