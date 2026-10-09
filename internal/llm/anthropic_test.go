@@ -3,9 +3,13 @@ package llm
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -173,7 +177,7 @@ func TestAnthropicProvider_RetriesOnRateLimitAndErrors(t *testing.T) {
 		AnthropicAPIKey: config.NewSecret("dummy-key"),
 	}
 
-	provider, err := NewAnthropicProvider(cfg, nil,
+	provider, err := NewAnthropicProvider(cfg, anthropicTestPricing(),
 		WithBaseURL(srv.URL),
 		WithHTTPClient(srv.Client()),
 		WithInitialBackoff(2*time.Millisecond),
@@ -227,5 +231,217 @@ func TestAnthropicProvider_NonRetryableError(t *testing.T) {
 	}
 	if atomic.LoadInt32(&attempts) != 1 {
 		t.Errorf("expected exactly 1 attempt on 400 error, got %d", atomic.LoadInt32(&attempts))
+	}
+}
+
+func anthropicTestPricing() *PricingTable {
+	return &PricingTable{Models: map[string]ModelPricing{
+		"claude-3-5-haiku-20241022": {Input: 1, Output: 5, CacheWrite: 1.25, CacheRead: 0.1},
+		"claude-haiku-4-5-20251001": {Input: 1, Output: 5, CacheWrite: 1.25, CacheRead: 0.1},
+	}}
+}
+
+const okMessage = `{
+	"id": "msg_ok", "type": "message", "role": "assistant",
+	"model": "claude-haiku-4-5-20251001",
+	"content": [{"type":"text","text":"ok"}],
+	"stop_reason": "end_turn",
+	"usage": {"input_tokens": 10, "output_tokens": 5}
+}`
+
+// scriptedServer answers each request with the next status/header pair and
+// then okBody; it counts requests.
+func scriptedServer(t *testing.T, statuses []int, retryAfter []string, okBody string) (*httptest.Server, *int32) {
+	t.Helper()
+	var n int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		i := int(atomic.AddInt32(&n, 1)) - 1
+		w.Header().Set("Content-Type", "application/json")
+		if i < len(statuses) {
+			if i < len(retryAfter) && retryAfter[i] != "" {
+				w.Header().Set("Retry-After", retryAfter[i])
+			}
+			w.WriteHeader(statuses[i])
+			_, _ = w.Write([]byte(`{"type":"error","error":{"type":"overloaded_error","message":"busy"}}`))
+			return
+		}
+		_, _ = w.Write([]byte(okBody))
+	}))
+	t.Cleanup(srv.Close)
+	return srv, &n
+}
+
+func newTestProvider(t *testing.T, srv *httptest.Server, opts ...AnthropicOption) *AnthropicProvider {
+	t.Helper()
+	all := append([]AnthropicOption{WithBaseURL(srv.URL), WithHTTPClient(srv.Client())}, opts...)
+	p, err := NewAnthropicProvider(config.Config{AnthropicAPIKey: config.NewSecret("k")}, anthropicTestPricing(), all...)
+	if err != nil {
+		t.Fatalf("NewAnthropicProvider: %v", err)
+	}
+	return p
+}
+
+func pingRequest() Request {
+	return Request{Model: "claude-haiku-4-5-20251001", Messages: []Message{NewUserTextMessage("ping")}}
+}
+
+func TestAnthropicProvider_RetryAfterBeyondCapStops(t *testing.T) {
+	for _, ra := range []string{"86400", "1e300", "31"} {
+		t.Run(ra, func(t *testing.T) {
+			srv, n := scriptedServer(t, []int{429}, []string{ra}, okMessage)
+			p := newTestProvider(t, srv, WithInitialBackoff(time.Millisecond), WithMaxRetries(3))
+
+			start := time.Now()
+			_, err := p.Complete(context.Background(), pingRequest())
+			if err == nil {
+				t.Fatal("expected the 429 to be returned")
+			}
+			if time.Since(start) > 2*time.Second {
+				t.Errorf("slept %s on Retry-After %s", time.Since(start), ra)
+			}
+			if got := atomic.LoadInt32(n); got != 1 {
+				t.Errorf("expected 1 attempt, got %d", got)
+			}
+		})
+	}
+}
+
+func TestAnthropicProvider_InvalidRetryAfterFallsBack(t *testing.T) {
+	for _, ra := range []string{"NaN", "+Inf", "-Inf", "-5", "soon"} {
+		t.Run(ra, func(t *testing.T) {
+			srv, n := scriptedServer(t, []int{529}, []string{ra}, okMessage)
+			p := newTestProvider(t, srv, WithInitialBackoff(time.Millisecond), WithMaxRetries(2))
+
+			start := time.Now()
+			resp, err := p.Complete(context.Background(), pingRequest())
+			if err != nil {
+				t.Fatalf("expected success after retry, got %v", err)
+			}
+			if resp.Text != "ok" || atomic.LoadInt32(n) != 2 {
+				t.Errorf("text %q after %d attempts", resp.Text, atomic.LoadInt32(n))
+			}
+			if time.Since(start) > 2*time.Second {
+				t.Errorf("invalid Retry-After %s should use the short exponential backoff, took %s", ra, time.Since(start))
+			}
+		})
+	}
+}
+
+func TestParseRetryAfter(t *testing.T) {
+	now := time.Date(2026, 10, 9, 12, 0, 0, 0, time.UTC)
+	cases := []struct {
+		in   string
+		want time.Duration
+		ok   bool
+	}{
+		{"", 0, false},
+		{"0", 0, true},
+		{"1.5", 1500 * time.Millisecond, true},
+		{"NaN", 0, false},
+		{"Inf", 0, false},
+		{"-1", 0, false},
+		{"1e300", time.Duration(math.MaxInt64), true},
+		{now.Add(10 * time.Second).Format(http.TimeFormat), 10 * time.Second, true},
+		{now.Add(-10 * time.Second).Format(http.TimeFormat), 0, false},
+	}
+	for _, c := range cases {
+		got, ok := parseRetryAfter(c.in, now)
+		if got != c.want || ok != c.ok {
+			t.Errorf("parseRetryAfter(%q) = %v, %v; want %v, %v", c.in, got, ok, c.want, c.ok)
+		}
+	}
+}
+
+func TestExpBackoffNeverOverflows(t *testing.T) {
+	maxB := 30 * time.Second
+	for _, initial := range []time.Duration{time.Millisecond, 20 * time.Second, time.Duration(math.MaxInt64 / 3)} {
+		for attempt := 0; attempt <= 70; attempt++ {
+			got := expBackoff(min(initial, maxB), maxB, attempt)
+			if got <= 0 || got > maxB {
+				t.Fatalf("expBackoff(%v, %d) = %v", initial, attempt, got)
+			}
+		}
+	}
+	if got := expBackoff(time.Millisecond, maxB, 3); got != 8*time.Millisecond {
+		t.Errorf("expBackoff(1ms, 3) = %v, want 8ms", got)
+	}
+}
+
+func TestAnthropicProvider_MaxRetriesClamped(t *testing.T) {
+	t.Run("negative means one attempt", func(t *testing.T) {
+		srv, n := scriptedServer(t, []int{500, 500}, nil, okMessage)
+		p := newTestProvider(t, srv, WithInitialBackoff(time.Millisecond), WithMaxRetries(-1))
+		_, err := p.Complete(context.Background(), pingRequest())
+		if err == nil {
+			t.Fatal("expected an error")
+		}
+		if strings.Contains(err.Error(), "%!") {
+			t.Errorf("malformed error: %v", err)
+		}
+		if got := atomic.LoadInt32(n); got != 1 {
+			t.Errorf("expected 1 attempt, got %d", got)
+		}
+	})
+
+	t.Run("large is capped at five retries", func(t *testing.T) {
+		srv, n := scriptedServer(t, []int{500, 500, 500, 500, 500, 500, 500, 500, 500, 500}, nil, okMessage)
+		p := newTestProvider(t, srv, WithInitialBackoff(time.Millisecond), WithMaxRetries(100))
+		if _, err := p.Complete(context.Background(), pingRequest()); err == nil {
+			t.Fatal("expected an error")
+		}
+		if got := atomic.LoadInt32(n); got != 1+maxRetriesCap {
+			t.Errorf("expected %d attempts, got %d", 1+maxRetriesCap, got)
+		}
+	})
+}
+
+func toolUseMessage(name string) string {
+	return fmt.Sprintf(`{
+		"id": "msg_t", "type": "message", "role": "assistant",
+		"model": "claude-haiku-4-5-20251001",
+		"content": [{"type":"tool_use","id":"toolu_1","name":%q,"input":{}}],
+		"stop_reason": "tool_use",
+		"usage": {"input_tokens": 10, "output_tokens": 5}
+	}`, name)
+}
+
+func TestAnthropicProvider_RejectsToolNotOffered(t *testing.T) {
+	srv, _ := scriptedServer(t, nil, nil, toolUseMessage("post_journal_entry"))
+	p := newTestProvider(t, srv)
+	req := pingRequest()
+	req.Tools = []ToolSpec{{Name: "emit_explanation", InputSchema: json.RawMessage(`{"type":"object"}`)}}
+	resp, err := p.Complete(context.Background(), req)
+	if !errors.Is(err, ErrUnknownTool) {
+		t.Fatalf("expected ErrUnknownTool, got %v", err)
+	}
+	if len(resp.ToolCalls) != 0 {
+		t.Errorf("no tool call may be returned, got %+v", resp.ToolCalls)
+	}
+}
+
+func TestAnthropicProvider_ForceToolNotOffered(t *testing.T) {
+	srv, n := scriptedServer(t, nil, nil, okMessage)
+	p := newTestProvider(t, srv)
+	req := pingRequest()
+	req.Tools = []ToolSpec{{Name: "emit_explanation", InputSchema: json.RawMessage(`{"type":"object"}`)}}
+	req.ForceTool = "post_journal_entry"
+	if _, err := p.Complete(context.Background(), req); !errors.Is(err, ErrUnknownTool) {
+		t.Fatalf("expected ErrUnknownTool, got %v", err)
+	}
+	if got := atomic.LoadInt32(n); got != 0 {
+		t.Errorf("no request may be sent, got %d", got)
+	}
+}
+
+func TestAnthropicProvider_UnpricedModel(t *testing.T) {
+	body := strings.Replace(okMessage, "claude-haiku-4-5-20251001", "claude-unlisted-9", 1)
+	srv, _ := scriptedServer(t, nil, nil, body)
+	p := newTestProvider(t, srv)
+	resp, err := p.Complete(context.Background(), pingRequest())
+	if !errors.Is(err, ErrUnpricedModel) {
+		t.Fatalf("expected ErrUnpricedModel, got %v", err)
+	}
+	if resp.Model != "claude-unlisted-9" || resp.Usage.InputTokens != 10 || resp.Usage.CostUSD != 0 {
+		t.Errorf("usage should be reported unpriced: %+v", resp)
 	}
 }

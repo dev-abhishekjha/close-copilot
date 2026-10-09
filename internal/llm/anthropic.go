@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -23,6 +24,9 @@ const (
 	defaultInitialBackoff = 500 * time.Millisecond
 	defaultMaxBackoff     = 30 * time.Second
 	defaultMaxTokens      = 4096
+
+	// maxRetriesCap bounds WithMaxRetries; values outside 0..maxRetriesCap are clamped.
+	maxRetriesCap = 5
 )
 
 // AnthropicOption customizes the Anthropic provider.
@@ -35,20 +39,12 @@ type anthropicConfig struct {
 	maxRetries     int
 	initialBackoff time.Duration
 	maxBackoff     time.Duration
-	apiKeyOverride string
 }
 
 // WithBaseURL overrides the API base URL (useful in tests with httptest.Server).
 func WithBaseURL(url string) AnthropicOption {
 	return func(c *anthropicConfig) {
 		c.baseURL = url
-	}
-}
-
-// WithHTTPClient overrides the outbound HTTP client (useful in tests).
-func WithHTTPClient(client *http.Client) AnthropicOption {
-	return func(c *anthropicConfig) {
-		c.httpClient = client
 	}
 }
 
@@ -59,14 +55,16 @@ func WithCallTimeout(d time.Duration) AnthropicOption {
 	}
 }
 
-// WithMaxRetries sets the maximum number of retry attempts for 429/500/529.
+// WithMaxRetries sets the number of retries after the first attempt for
+// 429/500/529. It is clamped to 0..5; a negative value means no retries.
 func WithMaxRetries(retries int) AnthropicOption {
 	return func(c *anthropicConfig) {
 		c.maxRetries = retries
 	}
 }
 
-// WithInitialBackoff sets the starting backoff duration before retrying.
+// WithInitialBackoff sets the starting backoff duration before retrying. A
+// non-positive value keeps the default.
 func WithInitialBackoff(d time.Duration) AnthropicOption {
 	return func(c *anthropicConfig) {
 		c.initialBackoff = d
@@ -94,6 +92,14 @@ func NewAnthropicProvider(cfg config.Config, pricing *PricingTable, opts ...Anth
 	for _, opt := range opts {
 		opt(&c)
 	}
+	c.maxRetries = min(max(c.maxRetries, 0), maxRetriesCap)
+	if c.initialBackoff <= 0 {
+		c.initialBackoff = defaultInitialBackoff
+	}
+	if c.maxBackoff <= 0 {
+		c.maxBackoff = defaultMaxBackoff
+	}
+	c.initialBackoff = min(c.initialBackoff, c.maxBackoff)
 
 	httpClient := c.httpClient
 	if httpClient == nil {
@@ -105,9 +111,6 @@ func NewAnthropicProvider(cfg config.Config, pricing *PricingTable, opts ...Anth
 	}
 
 	apiKey := cfg.AnthropicAPIKey.Reveal()
-	if c.apiKeyOverride != "" {
-		apiKey = c.apiKeyOverride
-	}
 
 	var sdkOpts []option.RequestOption
 	sdkOpts = append(sdkOpts,
@@ -135,36 +138,49 @@ func NewAnthropicProvider(cfg config.Config, pricing *PricingTable, opts ...Anth
 
 // Complete executes an LLM request against the Anthropic Messages API with retries,
 // tool mapping, and prompt caching.
+//
+// It retries 429, 500 and 529 up to the configured count with exponential
+// backoff capped at maxBackoff. A Retry-After header is honoured when it is
+// finite and non-negative; one longer than maxBackoff ends the retries and the
+// error is returned rather than sleeping past the cap.
 func (p *AnthropicProvider) Complete(ctx context.Context, req Request) (Response, error) {
+	if err := validateTools(req); err != nil {
+		return Response{}, err
+	}
 	params, err := p.buildParams(req)
 	if err != nil {
 		return Response{}, err
 	}
 
+	attempts := 0
 	var lastErr error
 	for attempt := 0; attempt <= p.maxRetries; attempt++ {
+		attempts++
 		callCtx, cancel := context.WithTimeout(ctx, p.callTimeout)
 		msg, err := p.client.Messages.New(callCtx, params)
 		cancel()
 
 		if err == nil {
-			return p.buildResponse(msg, req.Model), nil
+			return p.buildResponse(msg, req)
 		}
 
 		lastErr = err
-		if !p.isRetryable(err) || attempt == p.maxRetries {
+		if ctx.Err() != nil || !p.isRetryable(err) || attempt == p.maxRetries {
 			break
 		}
 
-		backoff := p.backoffFor(err, attempt)
+		backoff, ok := p.backoffFor(err, attempt)
+		if !ok {
+			break
+		}
 		select {
 		case <-ctx.Done():
-			return Response{}, ctx.Err()
+			return Response{}, fmt.Errorf("llm anthropic completion: %w", ctx.Err())
 		case <-time.After(backoff):
 		}
 	}
 
-	return Response{}, fmt.Errorf("llm anthropic completion failed: %w", lastErr)
+	return Response{}, fmt.Errorf("llm anthropic completion failed after %d attempt(s): %w", attempts, lastErr)
 }
 
 func (p *AnthropicProvider) buildParams(req Request) (anthropic.MessageNewParams, error) {
@@ -249,13 +265,16 @@ func (p *AnthropicProvider) buildParams(req Request) (anthropic.MessageNewParams
 	return params, nil
 }
 
-func (p *AnthropicProvider) buildResponse(msg *anthropic.Message, model string) Response {
+func (p *AnthropicProvider) buildResponse(msg *anthropic.Message, req Request) (Response, error) {
 	var resp Response
 	for _, block := range msg.Content {
 		switch b := block.AsAny().(type) {
 		case anthropic.TextBlock:
 			resp.Text += b.Text
 		case anthropic.ToolUseBlock:
+			if err := checkToolName(req, b.Name); err != nil {
+				return Response{}, err
+			}
 			resp.ToolCalls = append(resp.ToolCalls, ToolCall{
 				ID:   b.ID,
 				Name: b.Name,
@@ -264,6 +283,10 @@ func (p *AnthropicProvider) buildResponse(msg *anthropic.Message, model string) 
 		}
 	}
 
+	resp.Model = string(msg.Model)
+	if resp.Model == "" {
+		resp.Model = req.Model
+	}
 	resp.StopReason = string(msg.StopReason)
 	resp.Usage = Usage{
 		InputTokens:      msg.Usage.InputTokens,
@@ -272,15 +295,12 @@ func (p *AnthropicProvider) buildResponse(msg *anthropic.Message, model string) 
 		CacheReadTokens:  msg.Usage.CacheReadInputTokens,
 	}
 
-	if p.pricing != nil {
-		effectiveModel := string(msg.Model)
-		if effectiveModel == "" {
-			effectiveModel = model
-		}
-		resp.Usage.CostUSD = p.pricing.Cost(effectiveModel, resp.Usage)
+	cost, err := p.pricing.Cost(resp.Model, resp.Usage)
+	if err != nil {
+		return resp, err
 	}
-
-	return resp
+	resp.Usage.CostUSD = cost
+	return resp, nil
 }
 
 func (p *AnthropicProvider) isRetryable(err error) bool {
@@ -291,25 +311,56 @@ func (p *AnthropicProvider) isRetryable(err error) bool {
 	return false
 }
 
-func (p *AnthropicProvider) backoffFor(err error, attempt int) time.Duration {
+// backoffFor returns how long to wait before retry number attempt+1. ok is
+// false when the server asked for a wait longer than maxBackoff, in which case
+// the caller stops retrying.
+func (p *AnthropicProvider) backoffFor(err error, attempt int) (time.Duration, bool) {
 	var apiErr *anthropic.Error
 	if errors.As(err, &apiErr) && apiErr.Response != nil {
-		if ra := apiErr.Response.Header.Get("Retry-After"); ra != "" {
-			if secs, parseErr := strconv.ParseFloat(ra, 64); parseErr == nil && secs > 0 {
-				return time.Duration(secs * float64(time.Second))
+		if d, ok := parseRetryAfter(apiErr.Response.Header.Get("Retry-After"), time.Now()); ok {
+			if d > p.maxBackoff {
+				return 0, false
 			}
-			if t, parseErr := http.ParseTime(ra); parseErr == nil {
-				d := time.Until(t)
-				if d > 0 {
-					return d
-				}
-			}
+			return d, true
 		}
 	}
+	return expBackoff(p.initialBackoff, p.maxBackoff, attempt), true
+}
 
-	backoff := p.initialBackoff * time.Duration(1<<attempt)
-	if backoff > p.maxBackoff {
-		backoff = p.maxBackoff
+// parseRetryAfter reads delay-seconds or an HTTP date. NaN, infinities,
+// negative values and dates in the past are ignored (ok false). Very large
+// values are returned saturated at math.MaxInt64 so the caller's cap applies
+// without overflow.
+func parseRetryAfter(v string, now time.Time) (time.Duration, bool) {
+	if v == "" {
+		return 0, false
 	}
-	return backoff
+	if secs, err := strconv.ParseFloat(v, 64); err == nil {
+		if math.IsNaN(secs) || math.IsInf(secs, 0) || secs < 0 {
+			return 0, false
+		}
+		if secs >= float64(math.MaxInt64)/float64(time.Second) {
+			return time.Duration(math.MaxInt64), true
+		}
+		return time.Duration(secs * float64(time.Second)), true
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		if d := t.Sub(now); d >= 0 {
+			return d, true
+		}
+	}
+	return 0, false
+}
+
+// expBackoff doubles initial once per attempt, saturating at maxBackoff so the
+// shift can never overflow.
+func expBackoff(initial, maxBackoff time.Duration, attempt int) time.Duration {
+	b := initial
+	for i := 0; i < attempt; i++ {
+		if b >= maxBackoff/2 {
+			return maxBackoff
+		}
+		b *= 2
+	}
+	return min(b, maxBackoff)
 }

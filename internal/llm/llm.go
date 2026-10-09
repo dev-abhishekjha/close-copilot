@@ -6,9 +6,24 @@ package llm
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"strings"
+	"unicode"
+	"unicode/utf8"
 )
 
+// ErrUnknownTool reports a tool name that the request did not offer, either as
+// ForceTool or in a model's tool call. Providers reject such calls rather than
+// pass them on to a dispatcher.
+var ErrUnknownTool = errors.New("llm: tool not offered in request")
+
 // Provider executes structured LLM requests.
+//
+// A completed call whose model has no pricing row returns the Response (with
+// token usage and Model set, CostUSD zero) together with an error wrapping
+// ErrUnpricedModel. Callers must treat that as a failure; the usage is there
+// only so the spend can still be recorded.
 type Provider interface {
 	Complete(ctx context.Context, req Request) (Response, error)
 }
@@ -102,8 +117,73 @@ type Usage struct {
 
 // Response is the model completion output.
 type Response struct {
+	Model      string     `json:"model,omitempty"` // resolved model that served the call
 	Text       string     `json:"text,omitempty"`
 	ToolCalls  []ToolCall `json:"tool_calls,omitempty"`
 	StopReason string     `json:"stop_reason,omitempty"`
 	Usage      Usage      `json:"usage"`
+}
+
+// validateTools checks that tool names are present and unique, and that
+// ForceTool names an offered tool.
+func validateTools(req Request) error {
+	seen := make(map[string]bool, len(req.Tools))
+	for _, t := range req.Tools {
+		if t.Name == "" {
+			return errors.New("llm: tool with empty name")
+		}
+		if seen[t.Name] {
+			return fmt.Errorf("llm: duplicate tool %q", t.Name)
+		}
+		seen[t.Name] = true
+	}
+	if req.ForceTool != "" && !seen[req.ForceTool] {
+		return fmt.Errorf("%w: ForceTool %q", ErrUnknownTool, req.ForceTool)
+	}
+	return nil
+}
+
+// checkToolName reports whether name was offered in req.Tools.
+func checkToolName(req Request, name string) error {
+	for _, t := range req.Tools {
+		if t.Name == name {
+			return nil
+		}
+	}
+	return fmt.Errorf("%w: model called %s", ErrUnknownTool, clip([]byte(name), 64))
+}
+
+// maxErrorSnippet bounds how much subprocess or model output an error carries.
+const maxErrorSnippet = 512
+
+// snippet renders untrusted output for an error message: control characters are
+// replaced and the text is cut to maxErrorSnippet bytes, with the total length
+// noted when cut. Model output can be derived from ledger, bank or document
+// text, so errors never carry it whole.
+func snippet(b []byte) string {
+	return clip(b, maxErrorSnippet)
+}
+
+func clip(b []byte, limit int) string {
+	var sb strings.Builder
+	truncated := false
+	for i := 0; i < len(b); {
+		r, size := utf8.DecodeRune(b[i:])
+		switch {
+		case r == utf8.RuneError && size == 1:
+			r = '?'
+		case unicode.IsControl(r) || r == '\u2028' || r == '\u2029':
+			r = ' '
+		}
+		if sb.Len()+utf8.RuneLen(r) > limit {
+			truncated = true
+			break
+		}
+		sb.WriteRune(r)
+		i += size
+	}
+	if truncated {
+		return fmt.Sprintf("%q...(%d bytes total)", sb.String(), len(b))
+	}
+	return fmt.Sprintf("%q", sb.String())
 }

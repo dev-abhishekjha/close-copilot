@@ -3,9 +3,13 @@
 package llm
 
 import (
+	"bufio"
+	"bytes"
 	"context"
 	"encoding/json"
 	"os"
+	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -33,7 +37,7 @@ func TestLiveAnthropicToolCall(t *testing.T) {
 
 	model := os.Getenv("LLM_MODEL_FAST")
 	if model == "" {
-		model = "claude-3-5-haiku-20241022"
+		model = "claude-haiku-4-5-20251001"
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
@@ -134,4 +138,81 @@ func TestLiveClaudeCLIStructuredCall(t *testing.T) {
 	}
 	t.Logf("Live Claude CLI call succeeded. Tool: %s, Args: %s, Usage: %+v",
 		resp.ToolCalls[0].Name, string(resp.ToolCalls[0].Args), resp.Usage)
+}
+
+// TestLiveClaudeCLIIsolation runs the provider's exact command with
+// stream-json output and checks the CLI's init event: no tools, no MCP
+// servers, no slash commands or skills, and the empty temp working directory.
+func TestLiveClaudeCLIIsolation(t *testing.T) {
+	cliPath := os.Getenv("CLAUDE_CLI_PATH")
+	if cliPath == "" {
+		cliPath = "claude"
+	}
+	cli := NewClaudeCLI(cliPath, &OSProcessRunner{}, nil)
+	cmd, cleanup, err := cli.prepare(Request{
+		Model:    "haiku",
+		System:   []Block{{Text: "Reply with the single word ok."}},
+		Messages: []Message{NewUserTextMessage("ping")},
+	})
+	if err != nil {
+		t.Fatalf("prepare: %v", err)
+	}
+	defer cleanup()
+
+	i := slices.Index(cmd.Args, "--output-format")
+	if i < 0 {
+		t.Fatalf("no --output-format in %q", cmd.Args)
+	}
+	cmd.Args[i+1] = "stream-json"
+	cmd.Args = append(cmd.Args, "--verbose") // stream-json with -p requires --verbose
+
+	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+	defer cancel()
+	stdout, stderr, err := (&OSProcessRunner{}).Run(ctx, cmd)
+	if err != nil && bytes.Contains(stderr, []byte("unknown option")) {
+		t.Fatalf("the CLI rejected an isolation flag: %s", snippet(stderr))
+	}
+	if err != nil {
+		t.Skipf("live claude CLI call failed (probably not authenticated or installed): %v", err)
+	}
+
+	var init struct {
+		Type          string            `json:"type"`
+		Subtype       string            `json:"subtype"`
+		Cwd           string            `json:"cwd"`
+		Tools         []string          `json:"tools"`
+		MCPServers    []json.RawMessage `json:"mcp_servers"`
+		SlashCommands []string          `json:"slash_commands"`
+		Skills        []string          `json:"skills"`
+		APIKeySource  string            `json:"apiKeySource"`
+	}
+	found := false
+	sc := bufio.NewScanner(bytes.NewReader(stdout))
+	sc.Buffer(make([]byte, 0, 64<<10), maxCLIStdout)
+	for sc.Scan() {
+		if err := json.Unmarshal(sc.Bytes(), &init); err == nil && init.Type == "system" && init.Subtype == "init" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("no init event in stream-json output")
+	}
+	if init.Tools == nil || len(init.Tools) != 0 {
+		t.Errorf("expected zero tools, got %v", init.Tools)
+	}
+	if init.MCPServers == nil || len(init.MCPServers) != 0 {
+		t.Errorf("expected zero MCP servers, got %d", len(init.MCPServers))
+	}
+	if len(init.SlashCommands) != 0 || len(init.Skills) != 0 {
+		t.Errorf("expected no slash commands or skills, got %v / %v", init.SlashCommands, init.Skills)
+	}
+	if init.APIKeySource != "" && init.APIKeySource != "none" {
+		t.Errorf("CLI picked up an API key from %q; the subprocess env must not carry one", init.APIKeySource)
+	}
+	wantDir, _ := filepath.EvalSymlinks(cmd.Dir)
+	gotDir, _ := filepath.EvalSymlinks(init.Cwd)
+	if gotDir != wantDir {
+		t.Errorf("cwd = %q, want the empty temp dir %q", init.Cwd, cmd.Dir)
+	}
 }

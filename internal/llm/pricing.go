@@ -3,6 +3,7 @@ package llm
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -18,28 +19,36 @@ type ModelPricing struct {
 	CacheRead  float64 `yaml:"cache_read_per_million"`
 }
 
+// ErrUnpricedModel reports a model with no row in the pricing table. Costing
+// fails closed: an unknown model is an error, never a silent zero, so a call on
+// an unpriced model cannot slip under the daily budget. Add a row to
+// config/pricing.yaml to price a new model.
+var ErrUnpricedModel = errors.New("llm: model has no pricing row")
+
 // PricingTable holds pricing definitions for all known models.
 type PricingTable struct {
 	Models map[string]ModelPricing `yaml:"models"`
 }
 
 // Cost computes the USD cost for the given token usage on a model.
-// It resolves exact names, lowercased names, and model family aliases
-// (haiku, sonnet, opus).
-func (pt *PricingTable) Cost(model string, u Usage) float64 {
+//
+// The model must match a row exactly or case-insensitively; there is no family
+// fallback, so "claude-haiku-9" does not borrow the "haiku" row. A nil or empty
+// table, or a model with no row, returns an error wrapping ErrUnpricedModel.
+func (pt *PricingTable) Cost(model string, u Usage) (float64, error) {
 	if pt == nil || len(pt.Models) == 0 {
-		return 0.0
+		return 0, fmt.Errorf("%w: no pricing table loaded (model %q)", ErrUnpricedModel, model)
 	}
 
 	p, ok := pt.lookup(model)
 	if !ok {
-		return 0.0
+		return 0, fmt.Errorf("%w: %q", ErrUnpricedModel, model)
 	}
 
 	return (float64(u.InputTokens)*p.Input +
 		float64(u.OutputTokens)*p.Output +
 		float64(u.CacheWriteTokens)*p.CacheWrite +
-		float64(u.CacheReadTokens)*p.CacheRead) / 1_000_000.0
+		float64(u.CacheReadTokens)*p.CacheRead) / 1_000_000.0, nil
 }
 
 func (pt *PricingTable) lookup(model string) (ModelPricing, bool) {
@@ -47,27 +56,11 @@ func (pt *PricingTable) lookup(model string) (ModelPricing, bool) {
 		return p, true
 	}
 	lower := strings.ToLower(strings.TrimSpace(model))
-	if p, ok := pt.Models[lower]; ok {
-		return p, true
+	if lower == "" {
+		return ModelPricing{}, false
 	}
-
-	// Family fallbacks
-	switch {
-	case strings.Contains(lower, "haiku"):
-		if p, ok := pt.Models["haiku"]; ok {
-			return p, true
-		}
-	case strings.Contains(lower, "sonnet"):
-		if p, ok := pt.Models["sonnet"]; ok {
-			return p, true
-		}
-	case strings.Contains(lower, "opus"):
-		if p, ok := pt.Models["opus"]; ok {
-			return p, true
-		}
-	}
-
-	return ModelPricing{}, false
+	p, ok := pt.Models[lower]
+	return p, ok
 }
 
 // LoadPricing reads and validates a pricing table YAML file.
@@ -95,8 +88,11 @@ func LoadPricing(path string) (*PricingTable, error) {
 
 	var errs []error
 	for name, p := range pt.Models {
-		if p.Input < 0 || p.Output < 0 || p.CacheWrite < 0 || p.CacheRead < 0 {
-			errs = append(errs, fmt.Errorf("model %q has negative pricing: %+v", name, p))
+		for _, v := range []float64{p.Input, p.Output, p.CacheWrite, p.CacheRead} {
+			if v < 0 || math.IsNaN(v) || math.IsInf(v, 0) {
+				errs = append(errs, fmt.Errorf("model %q has invalid pricing: %+v", name, p))
+				break
+			}
 		}
 	}
 	if len(errs) > 0 {
