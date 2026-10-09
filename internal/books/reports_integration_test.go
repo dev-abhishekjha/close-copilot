@@ -58,7 +58,7 @@ func integrationConfig(t *testing.T) config.Config {
 
 func botLedger(t *testing.T, cfg config.Config) FrappeLedger {
 	t.Helper()
-	bot, err := frappe.New(cfg, cfg.ERPAPIKey, frappe.Secret(cfg.ERPAPISecret))
+	bot, err := frappe.New(cfg, cfg.ERPAPIKey.Reveal(), frappe.Secret(cfg.ERPAPISecret.Reveal()))
 	if err != nil {
 		t.Fatalf("frappe.New (bot): %v", err)
 	}

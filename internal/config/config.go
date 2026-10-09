@@ -9,6 +9,7 @@ package config
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"sort"
 	"strconv"
@@ -57,42 +58,77 @@ const (
 )
 
 // Config holds every setting the binaries use. Fields a binary didn't mark
-// as required may be empty.
+// as required may be empty. Credentials are Secret, so printing, logging or
+// JSON-encoding a Config never shows them (CC-104).
 type Config struct {
 	ERPBaseURL       string
 	ERPSite          string
-	ERPAPIKey        string
-	ERPAPISecret     string
-	ERPSeedAPIKey    string
-	ERPSeedAPISecret string
+	ERPAPIKey        Secret
+	ERPAPISecret     Secret
+	ERPSeedAPIKey    Secret
+	ERPSeedAPISecret Secret
 
-	DatabaseURL string
+	DatabaseURL Secret // carries the Postgres password
 
 	BooksMCPURL    string
 	EvidenceMCPURL string
-	MCPTokenAgent  string
-	MCPTokenAdmin  string
-	MCPScopeKey    string
+	MCPTokenAgent  Secret
+	MCPTokenAdmin  Secret
+	MCPScopeKey    Secret
 
 	LLMProvider       string
 	ClaudeCLIPath     string
-	AnthropicAPIKey   string
+	AnthropicAPIKey   Secret
 	LLMModelFast      string
 	LLMModelStrong    string
 	LLMDailyBudgetUSD float64
-	PseudonymKey      string
+	PseudonymKey      Secret
 
 	TEIEmbedURL  string
 	TEIRerankURL string
 	DoclingURL   string
 
 	OTLPEndpoint string
-	OTLPHeaders  string
+	OTLPHeaders  Secret // carries exporter auth
 
 	AppAddr       string
-	AppSessionKey string
+	AppSessionKey Secret
 
 	DataDir string
+}
+
+// LogValue implements slog.LogValuer. It lists the non-secret settings and
+// shows each secret only as set ("[redacted]") or unset ("").
+func (c Config) LogValue() slog.Value {
+	return slog.GroupValue(
+		slog.String("ERPBaseURL", c.ERPBaseURL),
+		slog.String("ERPSite", c.ERPSite),
+		slog.String("ERPAPIKey", c.ERPAPIKey.masked()),
+		slog.String("ERPAPISecret", c.ERPAPISecret.masked()),
+		slog.String("ERPSeedAPIKey", c.ERPSeedAPIKey.masked()),
+		slog.String("ERPSeedAPISecret", c.ERPSeedAPISecret.masked()),
+		slog.String("DatabaseURL", c.DatabaseURL.masked()),
+		slog.String("BooksMCPURL", c.BooksMCPURL),
+		slog.String("EvidenceMCPURL", c.EvidenceMCPURL),
+		slog.String("MCPTokenAgent", c.MCPTokenAgent.masked()),
+		slog.String("MCPTokenAdmin", c.MCPTokenAdmin.masked()),
+		slog.String("MCPScopeKey", c.MCPScopeKey.masked()),
+		slog.String("LLMProvider", c.LLMProvider),
+		slog.String("ClaudeCLIPath", c.ClaudeCLIPath),
+		slog.String("AnthropicAPIKey", c.AnthropicAPIKey.masked()),
+		slog.String("LLMModelFast", c.LLMModelFast),
+		slog.String("LLMModelStrong", c.LLMModelStrong),
+		slog.Float64("LLMDailyBudgetUSD", c.LLMDailyBudgetUSD),
+		slog.String("PseudonymKey", c.PseudonymKey.masked()),
+		slog.String("TEIEmbedURL", c.TEIEmbedURL),
+		slog.String("TEIRerankURL", c.TEIRerankURL),
+		slog.String("DoclingURL", c.DoclingURL),
+		slog.String("OTLPEndpoint", c.OTLPEndpoint),
+		slog.String("OTLPHeaders", c.OTLPHeaders.masked()),
+		slog.String("AppAddr", c.AppAddr),
+		slog.String("AppSessionKey", c.AppSessionKey.masked()),
+		slog.String("DataDir", c.DataDir),
+	)
 }
 
 // defaults apply when a variable is unset or empty.
@@ -116,33 +152,35 @@ func FromEnv(required ...string) (Config, error) {
 // non-empty value; all missing names are reported together.
 func Load(lookup Lookup, required ...string) (Config, error) {
 	var c Config
-	fields := map[string]*string{
-		EnvERPBaseURL:       &c.ERPBaseURL,
-		EnvERPSite:          &c.ERPSite,
+	plain := map[string]*string{
+		EnvERPBaseURL:     &c.ERPBaseURL,
+		EnvERPSite:        &c.ERPSite,
+		EnvBooksMCPURL:    &c.BooksMCPURL,
+		EnvEvidenceMCPURL: &c.EvidenceMCPURL,
+		EnvLLMProvider:    &c.LLMProvider,
+		EnvClaudeCLIPath:  &c.ClaudeCLIPath,
+		EnvLLMModelFast:   &c.LLMModelFast,
+		EnvLLMModelStrong: &c.LLMModelStrong,
+		EnvTEIEmbedURL:    &c.TEIEmbedURL,
+		EnvTEIRerankURL:   &c.TEIRerankURL,
+		EnvDoclingURL:     &c.DoclingURL,
+		EnvOTLPEndpoint:   &c.OTLPEndpoint,
+		EnvAppAddr:        &c.AppAddr,
+		EnvDataDir:        &c.DataDir,
+	}
+	secrets := map[string]*Secret{
 		EnvERPAPIKey:        &c.ERPAPIKey,
 		EnvERPAPISecret:     &c.ERPAPISecret,
 		EnvERPSeedAPIKey:    &c.ERPSeedAPIKey,
 		EnvERPSeedAPISecret: &c.ERPSeedAPISecret,
 		EnvDatabaseURL:      &c.DatabaseURL,
-		EnvBooksMCPURL:      &c.BooksMCPURL,
-		EnvEvidenceMCPURL:   &c.EvidenceMCPURL,
 		EnvMCPTokenAgent:    &c.MCPTokenAgent,
 		EnvMCPTokenAdmin:    &c.MCPTokenAdmin,
 		EnvMCPScopeKey:      &c.MCPScopeKey,
-		EnvLLMProvider:      &c.LLMProvider,
-		EnvClaudeCLIPath:    &c.ClaudeCLIPath,
 		EnvAnthropicAPIKey:  &c.AnthropicAPIKey,
-		EnvLLMModelFast:     &c.LLMModelFast,
-		EnvLLMModelStrong:   &c.LLMModelStrong,
 		EnvPseudonymKey:     &c.PseudonymKey,
-		EnvTEIEmbedURL:      &c.TEIEmbedURL,
-		EnvTEIRerankURL:     &c.TEIRerankURL,
-		EnvDoclingURL:       &c.DoclingURL,
-		EnvOTLPEndpoint:     &c.OTLPEndpoint,
 		EnvOTLPHeaders:      &c.OTLPHeaders,
-		EnvAppAddr:          &c.AppAddr,
 		EnvAppSessionKey:    &c.AppSessionKey,
-		EnvDataDir:          &c.DataDir,
 	}
 
 	get := func(key string) string {
@@ -154,20 +192,34 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 		return v
 	}
 
-	for key, dst := range fields {
+	for key, dst := range plain {
 		*dst = get(key)
+	}
+	for key, dst := range secrets {
+		*dst = NewSecret(get(key))
+	}
+
+	// isEmpty reports whether a known variable loaded empty.
+	isEmpty := func(key string) (empty, known bool) {
+		if dst, ok := plain[key]; ok {
+			return *dst == "", true
+		}
+		if dst, ok := secrets[key]; ok {
+			return dst.IsZero(), true
+		}
+		return false, false
 	}
 
 	var errs []error
 
 	var missing []string
 	for _, key := range required {
-		dst, known := fields[key]
+		empty, known := isEmpty(key)
 		if !known && key != EnvLLMDailyBudget {
 			errs = append(errs, fmt.Errorf("config: unknown variable %q marked as required", key))
 			continue
 		}
-		if known && *dst == "" {
+		if known && empty {
 			missing = append(missing, key)
 		}
 	}
@@ -210,12 +262,12 @@ func (c Config) CheckLLM() error {
 		return nil
 	}
 	var missing []string
-	for key, v := range map[string]string{
-		EnvAnthropicAPIKey: c.AnthropicAPIKey,
-		EnvLLMModelFast:    c.LLMModelFast,
-		EnvLLMModelStrong:  c.LLMModelStrong,
+	for key, empty := range map[string]bool{
+		EnvAnthropicAPIKey: c.AnthropicAPIKey.IsZero(),
+		EnvLLMModelFast:    c.LLMModelFast == "",
+		EnvLLMModelStrong:  c.LLMModelStrong == "",
 	} {
-		if v == "" {
+		if empty {
 			missing = append(missing, key)
 		}
 	}

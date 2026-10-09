@@ -184,12 +184,12 @@ func schemaClient(ctx context.Context, cfg config.Config, log *slog.Logger, bot 
 			return nil, fmt.Errorf("probe schema: %w", err)
 		}
 	}
-	if cfg.ERPSeedAPIKey == "" || cfg.ERPSeedAPISecret == "" {
+	if cfg.ERPSeedAPIKey.IsZero() || cfg.ERPSeedAPISecret.IsZero() {
 		return nil, fmt.Errorf("probe schema: the bot (Accounts User) is refused on DocType or Custom Field meta and %s/%s are not set",
 			config.EnvERPSeedAPIKey, config.EnvERPSeedAPISecret)
 	}
 	log.Info("the bot (Accounts User) is refused on DocType or Custom Field meta; using the seeder key for schema only")
-	return newClient(cfg, cfg.ERPSeedAPIKey, cfg.ERPSeedAPISecret)
+	return newClient(cfg, cfg.ERPSeedAPIKey.Reveal(), cfg.ERPSeedAPISecret.Reveal())
 }
 
 // probeMeta lists one row of a meta DocType to test read access.

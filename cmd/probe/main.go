@@ -43,7 +43,7 @@ func dispatch(ctx context.Context, cfg config.Config, log *slog.Logger, args []s
 	if len(args) == 0 {
 		return fmt.Errorf("probe: no subcommand; %s", usage)
 	}
-	bot, err := newClient(cfg, cfg.ERPAPIKey, cfg.ERPAPISecret)
+	bot, err := newClient(cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret.Reveal())
 	if err != nil {
 		return err
 	}

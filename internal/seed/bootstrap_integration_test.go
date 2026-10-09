@@ -46,7 +46,7 @@ func seederClient(t *testing.T) *frappe.Client {
 	if err != nil {
 		t.Fatalf("config: %v", err)
 	}
-	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey, frappe.Secret(cfg.ERPSeedAPISecret))
+	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey.Reveal(), frappe.Secret(cfg.ERPSeedAPISecret.Reveal()))
 	if err != nil {
 		t.Fatal(err)
 	}
