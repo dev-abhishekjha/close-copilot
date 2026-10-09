@@ -27,6 +27,16 @@ type Inputs struct {
 	Books    BooksReader
 	Evidence EvidenceReader
 	Rules    Rules
+	// BankAccounts are the ERPNext names of the company's bank accounts
+	// (e.g. "HDFC Current 0001 - STPL"). The caller fills it from the
+	// company profile with BankAccountsFor.
+	BankAccounts []string
+}
+
+// BankAccountsFor returns the ERPNext names of the bank accounts named in
+// the company profile (bank.account), for Inputs.BankAccounts.
+func BankAccountsFor(p seed.Profile) []string {
+	return []string{seed.ERPAccount(p.Bank.Account, p.Abbr)}
 }
 
 // FindingsStore is the persistence interface used by Runner to save findings.
@@ -69,15 +79,16 @@ func (r *Runner) Run(ctx context.Context, runID uuid.UUID, in Inputs, checks ...
 		limit = 4
 	}
 
-	g, ctx := errgroup.WithContext(ctx)
+	// Checks run under gctx, which errgroup cancels when Wait returns.
+	// Persistence below must use the caller's ctx, not gctx.
+	g, gctx := errgroup.WithContext(ctx)
 	g.SetLimit(limit)
 
 	results := make([][]Finding, len(checks))
 
 	for i, c := range checks {
-		i, c := i, c
 		g.Go(func() error {
-			findings, err := c.Run(ctx, in)
+			findings, err := c.Run(gctx, in)
 			if err != nil {
 				return fmt.Errorf("check %s: %w", c.Name(), err)
 			}
