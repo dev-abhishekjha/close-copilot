@@ -231,3 +231,171 @@ func TestBootstrapNeedsERPEnv(t *testing.T) {
 		t.Errorf("bootstrap with no env: exit %d, stderr %q", code, errOut)
 	}
 }
+
+// fakeBooks returns a WriteBooks that records the world and options it got
+// and reports created documents and a map.
+func fakeBooks(created int, gotWorld *seed.World, gotOpt *seed.BooksOptions) booksFunc {
+	return func(_ context.Context, c *frappe.Client, rep seed.BootstrapReport, w seed.World, opt seed.BooksOptions) (seed.BooksResult, error) {
+		if c == nil {
+			return seed.BooksResult{}, errors.New("nil client")
+		}
+		*gotWorld, *gotOpt = w, opt
+		return seed.BooksResult{
+			Company: rep.Company,
+			Month:   w.Month,
+			Counts:  map[string]*seed.BookCounts{seed.DocSalesInvoice: {Created: created, AlreadyPresent: 3 - created}},
+			Skipped: map[string]int{seed.EventGatewaySettlement: 1},
+			Map: seed.ERPMap{
+				"EVT-sharma-2026-09-0001": {DocType: seed.DocSalesInvoice, Name: "SINV-26-00001"},
+			},
+		}, nil
+	}
+}
+
+func runBooksCmd(t *testing.T, d deps, args ...string) (code int, stdout, stderr string) {
+	t.Helper()
+	var out, errOut bytes.Buffer
+	code = cli.Run("seed", args, &out, &errOut, erpTestEnv, requiredEnv(args), newRunDeps(&out, d))
+	return code, out.String(), errOut.String()
+}
+
+func TestBooksPrintsResultAndWritesMap(t *testing.T) {
+	var (
+		gotProfile seed.Profile
+		gotWorld   seed.World
+		gotOpt     seed.BooksOptions
+	)
+	out := t.TempDir()
+	d := deps{bootstrap: fakeBootstrap(0, &gotProfile), books: fakeBooks(2, &gotWorld, &gotOpt)}
+	code, stdout, errOut := runBooksCmd(t, d, "books", "--company", "sharma", "--month", "2026-09", "--small",
+		"--config", configDir, "--out", out)
+	if code != 0 {
+		t.Fatalf("exit %d, stderr:\n%s", code, errOut)
+	}
+	p, err := seed.LoadProfile(filepath.Join(configDir, "sharma.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want, err := seed.Generate(p, "2026-09", seed.Options{Small: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(gotWorld, want) {
+		t.Error("books got another world than Generate's --small one")
+	}
+	if !reflect.DeepEqual(gotOpt.Suppliers, p.Suppliers) || gotOpt.StopAfter != 0 {
+		t.Errorf("options %+v", gotOpt)
+	}
+	var res seed.BooksResult
+	if err := json.Unmarshal([]byte(stdout), &res); err != nil {
+		t.Fatalf("stdout is not a result: %v\n%s", err, stdout)
+	}
+	if res.Counts[seed.DocSalesInvoice].Created != 2 || res.Skipped[seed.EventGatewaySettlement] != 1 {
+		t.Errorf("result %+v", res)
+	}
+	m, err := seed.LoadERPMap(filepath.Join(out, "suite-skeleton", "sharma-2026-09", seed.ERPMapFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if m["EVT-sharma-2026-09-0001"].Name != "SINV-26-00001" {
+		t.Errorf("map %v", m)
+	}
+	if strings.Contains(stdout+errOut, "seed-secret") {
+		t.Error("the secret was printed")
+	}
+
+	// --suite picks the directory.
+	code, _, errOut = runBooksCmd(t, d, "books", "--company", "sharma", "--month", "2026-09", "--suite", "suite-v1",
+		"--config", configDir, "--out", out)
+	if code != 0 {
+		t.Fatalf("suite-v1: exit %d, stderr:\n%s", code, errOut)
+	}
+	if _, err := os.Stat(filepath.Join(out, "suite-v1", "sharma-2026-09", seed.ERPMapFile)); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestBooksExpectNoChanges(t *testing.T) {
+	var (
+		gotProfile seed.Profile
+		gotWorld   seed.World
+		gotOpt     seed.BooksOptions
+	)
+	args := []string{"books", "--company", "sharma", "--month", "2026-09", "--config", configDir, "--out", t.TempDir(), "--expect-no-changes"}
+	code, out, errOut := runBooksCmd(t, deps{fakeBootstrap(0, &gotProfile), fakeBooks(0, &gotWorld, &gotOpt)}, args...)
+	if code != 0 || out == "" {
+		t.Fatalf("no changes: exit %d, stderr:\n%s", code, errOut)
+	}
+	code, out, errOut = runBooksCmd(t, deps{fakeBootstrap(0, &gotProfile), fakeBooks(2, &gotWorld, &gotOpt)}, args...)
+	if code != 1 || !strings.Contains(errOut, "2 documents were created or submitted") {
+		t.Fatalf("changes: exit %d, stderr %q", code, errOut)
+	}
+	if out == "" {
+		t.Error("the result should still be printed")
+	}
+}
+
+func TestBooksNeedsBootstrapFirst(t *testing.T) {
+	var (
+		gotProfile seed.Profile
+		gotWorld   seed.World
+		gotOpt     seed.BooksOptions
+	)
+	out := t.TempDir()
+	code, stdout, errOut := runBooksCmd(t, deps{fakeBootstrap(4, &gotProfile), fakeBooks(0, &gotWorld, &gotOpt)},
+		"books", "--company", "sharma", "--month", "2026-09", "--config", configDir, "--out", out)
+	if code != 1 || !strings.Contains(errOut, "run seed bootstrap first") {
+		t.Fatalf("exit %d, stderr %q", code, errOut)
+	}
+	if stdout != "" || gotWorld.Month != "" {
+		t.Error("books ran although bootstrap made changes")
+	}
+}
+
+func TestBooksErrors(t *testing.T) {
+	var (
+		gotProfile seed.Profile
+		gotWorld   seed.World
+		gotOpt     seed.BooksOptions
+	)
+	failing := func(context.Context, *frappe.Client, seed.BootstrapReport, seed.World, seed.BooksOptions) (seed.BooksResult, error) {
+		return seed.BooksResult{Map: seed.ERPMap{"EVT-1": {DocType: seed.DocSalesInvoice, Name: "SINV-1"}}}, errors.New("boom")
+	}
+	ok := deps{fakeBootstrap(0, &gotProfile), fakeBooks(0, &gotWorld, &gotOpt)}
+	out := t.TempDir()
+	base := []string{"--config", configDir, "--out", out}
+	cases := []struct {
+		name string
+		d    deps
+		args []string
+	}{
+		{"no month", ok, []string{"books", "--company", "sharma"}},
+		{"no company", ok, []string{"books", "--month", "2026-09"}},
+		{"bad month", ok, []string{"books", "--company", "sharma", "--month", "2026-13"}},
+		{"unknown company", ok, []string{"books", "--company", "nobody", "--month", "2026-09"}},
+		{"path in suite", ok, []string{"books", "--company", "sharma", "--month", "2026-09", "--suite", "../x"}},
+		{"extra argument", ok, []string{"books", "--company", "sharma", "--month", "2026-09", "extra"}},
+		{"bad flag", ok, []string{"books", "--bogus"}},
+		{"books fails", deps{fakeBootstrap(0, &gotProfile), failing}, []string{"books", "--company", "sharma", "--month", "2026-09"}},
+	}
+	for _, tc := range cases {
+		args := tc.args
+		if tc.name != "bad flag" {
+			args = append(slices.Clone(tc.args[:1]), append(slices.Clone(base), tc.args[1:]...)...)
+		}
+		code, stdout, _ := runBooksCmd(t, tc.d, args...)
+		if code != 1 {
+			t.Errorf("%s: exit %d, want 1", tc.name, code)
+		}
+		if stdout != "" {
+			t.Errorf("%s: printed %q on failure", tc.name, stdout)
+		}
+	}
+	entries, err := os.ReadDir(out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 0 {
+		t.Errorf("a failed run wrote %v", entries)
+	}
+}

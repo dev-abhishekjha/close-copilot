@@ -1,6 +1,6 @@
 // Command seed is the seeder: generates the synthetic world, posts the books to ERPNext, writes bank.csv, gstr2b.json and ground truth.
 //
-// Built in CC-301 to CC-307. Today it has two subcommands:
+// Built in CC-301 to CC-307. Today it has three subcommands:
 //
 //	seed world --company sharma --month 2026-09 [--small] [--config config/companies]
 //
@@ -10,8 +10,17 @@
 //
 // creates the company's master data in ERPNext with the seeder key and
 // prints the report as JSON (CC-303). With --expect-no-changes it exits
-// non-zero if anything was created or updated. Every other subcommand only
-// checks its configuration.
+// non-zero if anything was created or updated.
+//
+//	seed books --company sharma --month 2026-09 [--small] [--suite suite-skeleton]
+//	           [--config config/companies] [--out data/out] [--expect-no-changes]
+//
+// posts the month's book-side events to ERPNext as submitted documents
+// (CC-304). It runs Bootstrap first, which must report zero changes, then
+// generates the world, posts it, prints the result as JSON and writes
+// <out>/<suite>/<company>-<month>/erp_map.json. With --expect-no-changes it
+// exits non-zero if any document was created or submitted. Every other
+// subcommand only checks its configuration.
 package main
 
 import (
@@ -47,6 +56,15 @@ func main() {
 // bootstrapFunc is seed.Bootstrap; tests replace it.
 type bootstrapFunc func(ctx context.Context, c *frappe.Client, p seed.Profile) (seed.BootstrapReport, error)
 
+// booksFunc is seed.WriteBooks; tests replace it.
+type booksFunc func(ctx context.Context, c *frappe.Client, rep seed.BootstrapReport, w seed.World, opt seed.BooksOptions) (seed.BooksResult, error)
+
+// deps are the ERPNext-writing steps the subcommands call.
+type deps struct {
+	bootstrap bootstrapFunc
+	books     booksFunc
+}
+
 // subcommand returns the first argument that isn't a flag.
 func subcommand(args []string) string {
 	for _, a := range args {
@@ -66,19 +84,27 @@ func requiredEnv(args []string) []string {
 	return erpEnv
 }
 
-func newRun(stdout io.Writer) cli.RunFunc { return newRunWith(stdout, seed.Bootstrap) }
+func newRun(stdout io.Writer) cli.RunFunc {
+	return newRunDeps(stdout, deps{bootstrap: seed.Bootstrap, books: seed.WriteBooks})
+}
 
 func newRunWith(stdout io.Writer, bootstrap bootstrapFunc) cli.RunFunc {
+	return newRunDeps(stdout, deps{bootstrap: bootstrap, books: seed.WriteBooks})
+}
+
+func newRunDeps(stdout io.Writer, d deps) cli.RunFunc {
 	return func(ctx context.Context, cfg config.Config, log *slog.Logger, args []string) error {
 		if len(args) > 0 {
 			switch args[0] {
 			case "world":
 				return runWorld(args[1:], stdout)
 			case "bootstrap":
-				return runBootstrap(ctx, cfg, log, args[1:], stdout, bootstrap)
+				return runBootstrap(ctx, cfg, log, args[1:], stdout, d.bootstrap)
+			case "books":
+				return runBooks(ctx, cfg, log, args[1:], stdout, d)
 			}
 		}
-		log.Info("not implemented yet", "tickets", "CC-304 to CC-307", "args", args)
+		log.Info("not implemented yet", "tickets", "CC-305 to CC-307", "args", args)
 		return nil
 	}
 }
@@ -162,6 +188,70 @@ func runWorld(args []string, stdout io.Writer) error {
 	}
 	if _, err := stdout.Write(b); err != nil {
 		return fmt.Errorf("world: write: %w", err)
+	}
+	return nil
+}
+
+func runBooks(ctx context.Context, cfg config.Config, log *slog.Logger, args []string, stdout io.Writer, d deps) error {
+	fs := flag.NewFlagSet("seed books", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	company := fs.String("company", "", "company id, such as sharma")
+	month := fs.String("month", "", "month as YYYY-MM")
+	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
+	suite := fs.String("suite", "suite-skeleton", "eval suite the outputs belong to")
+	dir := fs.String("config", "config/companies", "directory of company profiles")
+	out := fs.String("out", "data/out", "output root")
+	expectNoChanges := fs.Bool("expect-no-changes", false, "exit non-zero if any document was created or submitted")
+	if err := fs.Parse(args); err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	if fs.NArg() > 0 {
+		return fmt.Errorf("books: unexpected arguments %q", fs.Args())
+	}
+	if *company == "" || *month == "" {
+		return errors.New("books: --company and --month are required")
+	}
+	p, err := loadCompany(*dir, *company)
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	mapDir, err := seed.ERPMapDir(*out, *suite, p.ID, *month)
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	w, err := seed.Generate(p, *month, seed.Options{Small: *small})
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	c, err := frappe.New(cfg, cfg.ERPSeedAPIKey, frappe.Secret(cfg.ERPSeedAPISecret))
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	rep, err := d.bootstrap(ctx, c, p)
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	if n := rep.Changes(); n > 0 {
+		return fmt.Errorf("books: bootstrap created or updated %d records; run seed bootstrap first", n)
+	}
+	log.Info("writing books", "company", p.ID, "month", *month, "small", *small, "events", len(w.Events))
+	res, err := d.books(ctx, c, rep, w, seed.BooksOptions{Suppliers: p.Suppliers, Log: log})
+	if err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	if err := seed.WriteERPMap(mapDir, res.Map); err != nil {
+		return fmt.Errorf("books: %w", err)
+	}
+	log.Info("wrote erp map", "path", filepath.Join(mapDir, seed.ERPMapFile), "entries", len(res.Map))
+	b, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return fmt.Errorf("books: encode result: %w", err)
+	}
+	if _, err := stdout.Write(append(b, '\n')); err != nil {
+		return fmt.Errorf("books: write: %w", err)
+	}
+	if n := res.Changes(); *expectNoChanges && n > 0 {
+		return fmt.Errorf("books: --expect-no-changes, but %d documents were created or submitted", n)
 	}
 	return nil
 }
