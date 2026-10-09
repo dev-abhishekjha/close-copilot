@@ -4,16 +4,19 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/abhishekjha/close-copilot/internal/config"
 )
 
 func TestRequestHeaders(t *testing.T) {
 	f := newFake(t)
 	srv := f.start()
-	c, err := newClient(testConfig(srv), testBotKey, testBotSecret)
+	c, err := newClient(testConfig(srv), config.NewSecret(testBotKey), config.NewSecret(testBotSecret))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -48,7 +51,7 @@ func TestRequestHeaders(t *testing.T) {
 
 func TestNewClientNeedsCredentials(t *testing.T) {
 	srv := newFake(t).start()
-	if _, err := newClient(testConfig(srv), testBotKey, ""); err == nil {
+	if _, err := newClient(testConfig(srv), config.NewSecret(testBotKey), config.Secret{}); err == nil {
 		t.Error("want an error for an empty secret")
 	}
 }
@@ -78,7 +81,7 @@ func TestIsRefused(t *testing.T) {
 }
 
 func TestParseError(t *testing.T) {
-	c := &client{secret: testBotSecret}
+	c := &client{secret: config.NewSecret(testBotSecret)}
 	tests := []struct {
 		name, body, wantExc, wantMsg string
 	}{
@@ -129,7 +132,7 @@ func TestErrorsRedactSecret(t *testing.T) {
 	}))
 	defer srv.Close()
 
-	c, err := newClient(testConfig(srv), testBotKey, testBotSecret)
+	c, err := newClient(testConfig(srv), config.NewSecret(testBotKey), config.NewSecret(testBotSecret))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,6 +150,39 @@ func TestErrorsRedactSecret(t *testing.T) {
 	assertNoSecrets(t, c.String())
 	assertNoSecrets(t, fmt.Sprintf("%v %+v", c, c))
 	assertNoSecrets(t, c.LogValue().String())
+}
+
+func TestClientFormattingHidesCredentials(t *testing.T) {
+	c, err := newClient(testConfig(newFake(t).start()), config.NewSecret(testBotKey), config.NewSecret(testBotSecret))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// holder reaches the client and its fields through unexported fields,
+	// where fmt prints by reflection and never calls Format or String.
+	type holder struct {
+		c   *client
+		v   client
+		key config.Secret
+	}
+	h := holder{c: c, v: *c, key: c.secret}
+	var outputs []string
+	for _, verb := range []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%p"} {
+		outputs = append(outputs,
+			fmt.Sprintf(verb, c), fmt.Sprintf(verb, *c), fmt.Sprintf(verb, h), fmt.Sprintf(verb, &h))
+	}
+	var buf strings.Builder
+	slog.New(slog.NewTextHandler(&buf, nil)).Info("m", "c", c, "v", *c, "h", h)
+	slog.New(slog.NewJSONHandler(&buf, nil)).Info("m", "c", c, "h", h)
+	outputs = append(outputs, buf.String())
+	for _, out := range outputs {
+		assertNoSecrets(t, out)
+		if strings.Contains(out, testBotKey) || strings.Contains(out, testBotSecret[:8]) {
+			t.Errorf("output shows a credential: %s", out)
+		}
+	}
+	if got := fmt.Sprintf("%#v", c); got != c.String() {
+		t.Errorf("%%#v = %q, want %q", got, c.String())
+	}
 }
 
 func TestDispatchUsage(t *testing.T) {

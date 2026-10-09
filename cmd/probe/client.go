@@ -22,17 +22,19 @@ const maxBody = 16 << 20
 
 // client is the small private Frappe request helper that CC-202's
 // internal/frappe replaces. It never puts the secret in an error, a log
-// line or its own string form.
+// line or its own string form. The credentials stay config.Secret until do
+// builds the Authorization header, so even reflection-driven printing of a
+// client (%#v, or a client inside another struct) finds no raw value.
 type client struct {
 	http   *http.Client
 	base   string // ERP_BASE_URL without a trailing slash
 	site   string
-	key    string
-	secret string
+	key    config.Secret
+	secret config.Secret
 }
 
-func newClient(cfg config.Config, key, secret string) (*client, error) {
-	if key == "" || secret == "" {
+func newClient(cfg config.Config, key, secret config.Secret) (*client, error) {
+	if key.IsZero() || secret.IsZero() {
 		return nil, errors.New("probe: an ERPNext API key and secret are required")
 	}
 	hc, err := httpx.New(cfg)
@@ -48,8 +50,15 @@ func newClient(cfg config.Config, key, secret string) (*client, error) {
 	}, nil
 }
 
-// String and LogValue keep the secret out of fmt and slog output.
+// String, GoString, Format and LogValue keep the secret out of fmt and slog
+// output.
 func (c *client) String() string { return "erpnext client (credentials redacted)" }
+
+// GoString implements fmt.GoStringer.
+func (c *client) GoString() string { return c.String() }
+
+// Format implements fmt.Formatter: every verb prints String.
+func (c *client) Format(f fmt.State, _ rune) { _, _ = io.WriteString(f, c.String()) }
 
 func (c *client) LogValue() slog.Value { return slog.StringValue(c.String()) }
 
@@ -86,10 +95,10 @@ func isRefused(err error) bool {
 
 // redact removes the secret from s.
 func (c *client) redact(s string) string {
-	if c.secret == "" {
+	if c.secret.IsZero() {
 		return s
 	}
-	return strings.ReplaceAll(s, c.secret, "[redacted]")
+	return strings.ReplaceAll(s, c.secret.Reveal(), "[redacted]")
 }
 
 // do sends one request to path (already escaped, starting with /api/) with
@@ -112,7 +121,7 @@ func (c *client) do(ctx context.Context, method, path string, query url.Values, 
 	if err != nil {
 		return fmt.Errorf("%s %s: %s", method, path, c.redact(err.Error()))
 	}
-	req.Header.Set("Authorization", "token "+c.key+":"+c.secret)
+	req.Header.Set("Authorization", "token "+c.key.Reveal()+":"+c.secret.Reveal())
 	req.Header.Set("Accept", "application/json")
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
