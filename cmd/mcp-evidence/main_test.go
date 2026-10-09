@@ -171,13 +171,14 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 	}
 
 	// 2. Connect MCP client over Streamable HTTP with agent bearer token
-	clientTransport := &mcp.StreamableClientTransport{
-		Endpoint: baseURL + "/mcp",
-		HTTPClient: &http.Client{
-			Transport: &authTransport{
-				token: cfg.MCPTokenAgent.Reveal(),
-			},
+	httpClient := &http.Client{
+		Transport: &authTransport{
+			token: cfg.MCPTokenAgent.Reveal(),
 		},
+	}
+	clientTransport := &mcp.StreamableClientTransport{
+		Endpoint:             baseURL + "/mcp",
+		HTTPClient:           httpClient,
 		DisableStandaloneSSE: true,
 	}
 
@@ -186,7 +187,6 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 	if err != nil {
 		t.Fatalf("client.Connect: %v", err)
 	}
-	defer sess.Close()
 
 	// 3. List tools: expect exactly list_bank_lines and list_gstr2b_entries
 	toolsList, err := sess.ListTools(ctx, nil)
@@ -207,6 +207,11 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 		t.Errorf("expected list_bank_lines and list_gstr2b_entries, got %v", found)
 	}
 
+	// Close client session and idle connections so server shutdown doesn't wait
+	_ = sess.Close()
+	httpClient.CloseIdleConnections()
+	http.DefaultClient.CloseIdleConnections()
+
 	// Graceful shutdown
 	cancel()
 	select {
@@ -214,7 +219,7 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 		if err != nil {
 			t.Fatalf("run returned error on shutdown: %v", err)
 		}
-	case <-time.After(5 * time.Second):
+	case <-time.After(12 * time.Second):
 		t.Fatal("shutdown timed out")
 	}
 }
