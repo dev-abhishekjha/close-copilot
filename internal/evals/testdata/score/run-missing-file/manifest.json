@@ -1,0 +1,50 @@
+{
+  "agent": false,
+  "commit": "dev-abc123",
+  "config": {
+    "llm_daily_budget_usd": "2",
+    "llm_model_fast": "haiku",
+    "llm_model_strong": "sonnet",
+    "llm_provider": "claude-cli",
+    "llm_run_token_cap": 200000
+  },
+  "failed": 0,
+  "finished_at": "2026-10-10T08:30:10Z",
+  "flags": {
+    "config_dir": "config",
+    "model_fast": "",
+    "no_agent": false,
+    "only": [],
+    "results_dir": "results",
+    "scenarios_dir": "evals/scenarios",
+    "suite": "suite-test"
+  },
+  "results": [
+    {
+      "company": "sharma",
+      "control": false,
+      "failed": false,
+      "file": "sharma-2026-09.json",
+      "month": "2026-09",
+      "reason": "",
+      "run_id": "00000000-0000-4000-8000-000000000001",
+      "status": "partial"
+    },
+    {
+      "company": "sharma",
+      "control": true,
+      "failed": false,
+      "file": "sharma-2026-08.json",
+      "month": "2026-08",
+      "reason": "",
+      "run_id": "00000000-0000-4000-8000-000000000003",
+      "status": "partial"
+    }
+  ],
+  "started_at": "2026-10-10T08:30:00Z",
+  "suite": {
+    "name": "suite-test",
+    "path": "evals/scenarios/suite-test.yaml",
+    "sha256": "0123abcd"
+  }
+}

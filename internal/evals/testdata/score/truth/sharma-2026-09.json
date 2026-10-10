@@ -1,0 +1,49 @@
+{
+  "clean": false,
+  "company": "sharma",
+  "expected": [
+    {
+      "keys": {
+        "bank_txn_id": "BT-0950"
+      },
+      "type": "unmatched_bank_line"
+    }
+  ],
+  "investigations": [
+    {
+      "expected_resolution": "gateway settlement net of fees",
+      "id": "X01",
+      "keys": {
+        "bank_txn_id": "BT-0960"
+      }
+    }
+  ],
+  "month": "2026-09",
+  "planted": [
+    {
+      "amount_paise": 11800,
+      "id": "E01",
+      "keys": {
+        "bank_txn_id": "BT-0901"
+      },
+      "type": "unrecorded_bank_charge"
+    },
+    {
+      "amount_paise": 59000,
+      "id": "E02",
+      "keys": {
+        "bank_txn_id": "BT-0902"
+      },
+      "type": "unrecorded_bank_charge"
+    },
+    {
+      "amount_paise": 35400,
+      "id": "E03",
+      "keys": {
+        "bank_txn_id": "BT-0903"
+      },
+      "type": "unrecorded_bank_charge"
+    }
+  ],
+  "scenario": "suite-test"
+}

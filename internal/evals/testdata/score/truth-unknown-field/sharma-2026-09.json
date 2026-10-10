@@ -1,0 +1,19 @@
+{
+  "clean": false,
+  "company": "sharma",
+  "expected": [],
+  "investigations": [],
+  "month": "2026-09",
+  "planted": [
+    {
+      "amount_paise": 11800,
+      "id": "E01",
+      "keys": {
+        "bank_txn_id": "BT-0901"
+      },
+      "note": "x",
+      "type": "unrecorded_bank_charge"
+    }
+  ],
+  "scenario": "suite-test"
+}
