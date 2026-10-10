@@ -21,8 +21,13 @@ import (
 //	(d) PUT /api/resource/System Settings/System Settings with body {}
 //	    a write that changes no field; must be refused.
 //
-// Refused means HTTP 403 or exc_type PermissionError. Any other error, an
-// authentication failure included, fails the check.
+// Refused means HTTP 403 with exc_type PermissionError. Any other error,
+// an authentication failure or a bare 403 included, fails the check.
+//
+// Check (d) runs only when check (c) was refused: a bot that can read
+// System Settings, or whose read failed for some other reason, must not be
+// sent a write to it. (d) is then reported as SKIP, and (c) has already
+// failed the run.
 
 // readDocTypes are the DocTypes the bot must be able to list (check a).
 var readDocTypes = []string{"GL Entry", "Purchase Invoice", "Payment Entry"}
@@ -36,27 +41,30 @@ const adminOnlyDocType = "System Settings"
 
 type permCheck struct {
 	id, name string
-	run      func(ctx context.Context, bot *client) (detail string, err error)
+	// after names a check that must have passed (every check with that id)
+	// before this one runs; empty means always run.
+	after string
+	run   func(ctx context.Context, bot *client) (detail string, err error)
 }
 
 func permChecks() []permCheck {
 	var checks []permCheck
 	for _, dt := range readDocTypes {
-		checks = append(checks, permCheck{"a", "read " + dt, func(ctx context.Context, bot *client) (string, error) {
+		checks = append(checks, permCheck{id: "a", name: "read " + dt, run: func(ctx context.Context, bot *client) (string, error) {
 			return checkRead(ctx, bot, dt)
 		}})
 	}
 	for _, p := range journalPerms {
-		checks = append(checks, permCheck{"b", p + " Journal Entry", func(ctx context.Context, bot *client) (string, error) {
+		checks = append(checks, permCheck{id: "b", name: p + " Journal Entry", run: func(ctx context.Context, bot *client) (string, error) {
 			return checkPermission(ctx, bot, "Journal Entry", p)
 		}})
 	}
 	checks = append(checks,
-		permCheck{"c", "refused read of " + adminOnlyDocType, func(ctx context.Context, bot *client) (string, error) {
+		permCheck{id: "c", name: "refused read of " + adminOnlyDocType, run: func(ctx context.Context, bot *client) (string, error) {
 			path := resourcePath(adminOnlyDocType, adminOnlyDocType)
 			return expectRefused(bot.do(ctx, http.MethodGet, path, nil, nil, nil), "GET "+path)
 		}},
-		permCheck{"d", "refused write to " + adminOnlyDocType, func(ctx context.Context, bot *client) (string, error) {
+		permCheck{id: "d", name: "refused write to " + adminOnlyDocType, after: "c", run: func(ctx context.Context, bot *client) (string, error) {
 			path := resourcePath(adminOnlyDocType, adminOnlyDocType)
 			return expectRefused(bot.do(ctx, http.MethodPut, path, nil, map[string]any{}, nil), "PUT "+path)
 		}},
@@ -80,7 +88,14 @@ func runPerms(ctx context.Context, bot *client, w io.Writer) error {
 	}
 
 	failed := 0
+	passed := map[string]bool{} // id -> every check with that id passed
 	for _, c := range permChecks() {
+		if c.after != "" && !passed[c.after] {
+			if _, werr := fmt.Fprintf(w, "SKIP (%s) %s: not run because check (%s) did not pass\n", c.id, c.name, c.after); werr != nil {
+				return werr
+			}
+			continue
+		}
 		detail, err := c.run(ctx, bot)
 		status := "PASS"
 		if err != nil {
@@ -88,6 +103,8 @@ func runPerms(ctx context.Context, bot *client, w io.Writer) error {
 			detail = err.Error()
 			failed++
 		}
+		prev, seen := passed[c.id]
+		passed[c.id] = err == nil && (prev || !seen)
 		if _, werr := fmt.Fprintf(w, "%s (%s) %s: %s\n", status, c.id, c.name, detail); werr != nil {
 			return werr
 		}

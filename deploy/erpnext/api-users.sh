@@ -1,4 +1,11 @@
 #!/usr/bin/env bash
+# This script handles API secrets; xtrace would print them.
+case "$-" in *x*)
+	echo "refusing to run with xtrace" >&2
+	exit 1
+	;;
+esac
+
 # Creates the ERPNext API credentials for erp.localhost (CC-201):
 #
 #   - user copilot-bot@example.com (enabled, System User, role Accounts User
@@ -7,8 +14,14 @@
 #     only).
 #
 # All four values, plus ERP_BASE_URL and ERP_SITE, go to tmp/erp-keys.env
-# (git-ignored, mode 600). Copy its lines into your .env. No secret is ever
-# printed.
+# (git-ignored, mode 600). Run a command that needs them in a subshell, so
+# the keys are never exported into your own shell:
+#   (set -a; . tmp/erp-keys.env; set +a; <command>)
+# The seeder's ERP_SEED_* pair lives only in that file, never in .env. No
+# secret is ever printed.
+#
+# ERP_BASE_URL (default http://localhost:8080) must be a bare
+# http(s)://host[:port] URL; it is checked before anything is written.
 #
 # Usage: deploy/erpnext/api-users.sh [--rotate]
 #
@@ -32,6 +45,12 @@ bot_role="Accounts User"
 admin="Administrator"
 keys_file="$root/tmp/erp-keys.env"
 base_url="${ERP_BASE_URL:-http://localhost:8080}"
+
+# The URL goes into the keys file, which is sourced as shell, so it must be
+# a plain scheme, host and optional port: no path, quotes, spaces or $.
+base_url_re='^https?://[A-Za-z0-9.-]+(:[0-9]+)?$'
+[[ "$base_url" =~ $base_url_re ]] ||
+	die "ERP_BASE_URL must look like http://host[:port] (letters, digits, dots and hyphens; no path)"
 
 rotate=0
 case "${1:-}" in
@@ -131,7 +150,9 @@ tmp_file="$(mktemp "$root/tmp/erp-keys.env.XXXXXX")"
 trap 'rm -f "$tmp_file"' EXIT
 {
 	printf '# ERPNext API credentials for %s (deploy/erpnext/api-users.sh). Local development only.\n' "$site"
-	printf '# Copy these lines into .env. Never commit or print them.\n'
+	printf '# Use in a subshell only: (set -a; . tmp/erp-keys.env; set +a; <command>)\n'
+	printf '# ERP_SEED_* stay in this file, never in .env.\n'
+	printf '# Never commit or print these values.\n'
 	printf 'ERP_BASE_URL=%s\n' "$base_url"
 	printf 'ERP_SITE=%s\n' "$site"
 	printf 'ERP_API_KEY=%s\n' "$bot_key"
@@ -152,4 +173,5 @@ fi
 chmod 600 "$keys_file"
 
 log "ok: $bot ($bot_role) and $admin have API keys"
-log "next: copy the ERP_* lines from tmp/erp-keys.env into .env (for example: grep '^ERP_' tmp/erp-keys.env >> .env, after removing the empty ERP_* lines there), then run: go run ./cmd/probe auth"
+log "next: (set -a; . tmp/erp-keys.env; set +a; go run ./cmd/probe auth)"
+log "      the subshell keeps the keys out of your shell; the seeder keys stay in tmp/erp-keys.env, never in .env"

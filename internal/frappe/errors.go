@@ -45,14 +45,15 @@ func IsPermission(err error) bool {
 	return ok && ae.ExcType == "PermissionError"
 }
 
-// IsNotFound reports a DoesNotExistError (or PageDoesNotExistError) or any
-// HTTP 404.
+// IsNotFound reports that the document doesn't exist: HTTP 404 with
+// exc_type DoesNotExistError, which is what Frappe sends for a missing
+// document under /api/ (frappe/app.py handle_exception, report_error). A
+// bare 404 (a proxy, a wrong base path, a missing route) or a 404 with
+// another exc_type is not proof that the document is absent, so a caller
+// that would create or skip on "not found" must not treat it as such.
 func IsNotFound(err error) bool {
 	ae, ok := asAPIError(err)
-	if !ok {
-		return false
-	}
-	return ae.Status == http.StatusNotFound || ae.ExcType == "DoesNotExistError" || ae.ExcType == "PageDoesNotExistError"
+	return ok && ae.Status == http.StatusNotFound && ae.ExcType == "DoesNotExistError"
 }
 
 // IsAuth reports an authentication failure: HTTP 401 or exc_type

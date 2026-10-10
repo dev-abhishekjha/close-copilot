@@ -77,7 +77,7 @@ func (f *fakeBooks) client(t *testing.T) *frappe.Client {
 	t.Helper()
 	srv := httptest.NewServer(f)
 	t.Cleanup(srv.Close)
-	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL, ERPSite: "erp.localhost"}, "seed-key", frappe.Secret("seed-secret"))
+	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL, ERPSite: "erp.localhost"}, "seed-key", config.NewSecret("seed-secret"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -190,11 +190,26 @@ func TestAPIError(t *testing.T) {
 			notFound:    true,
 		},
 		{
-			name:        "bare 404",
+			// A proxy's or router's 404 says nothing about the document.
+			name:        "bare 404 is not not-found",
 			status:      http.StatusNotFound,
 			body:        "Not Found",
 			wantMessage: "Not Found",
-			notFound:    true,
+		},
+		{
+			name:        "404 with another exc_type is not not-found",
+			status:      http.StatusNotFound,
+			body:        `{"exc_type":"PageDoesNotExistError","exception":"no such page"}`,
+			wantExcType: "PageDoesNotExistError",
+			wantMessage: "no such page",
+		},
+		{
+			name:        "DoesNotExistError without a 404 is not not-found",
+			status:      http.StatusExpectationFailed,
+			body:        `{"exc_type":"DoesNotExistError","exception":"odd"}`,
+			wantExcType: "DoesNotExistError",
+			wantMessage: "odd",
+			validation:  true, // any 417 with an exc_type
 		},
 		{
 			name:        "authentication error",

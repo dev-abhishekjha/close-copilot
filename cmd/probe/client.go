@@ -20,11 +20,18 @@ import (
 // well under 1 MiB.
 const maxBody = 16 << 20
 
-// client is the small private Frappe request helper that CC-202's
-// internal/frappe replaces. It never puts the secret in an error, a log
-// line or its own string form. The credentials stay config.Secret until do
-// builds the Authorization header, so even reflection-driven printing of a
-// client (%#v, or a client inside another struct) finds no raw value.
+// client is the probe's own small Frappe request helper. It stays separate
+// from internal/frappe because check (b) needs a raw request that client
+// refuses on purpose: GET frappe.client.has_permission (internal/frappe
+// allows GET only on frappe.client's get, get_list, get_count and
+// get_value), and the probe must send no POST at all. It follows the same
+// rules as internal/frappe where they apply (CC-205): every redirect is
+// refused, a refusal is HTTP 403 with exc_type PermissionError, and the
+// secret never appears in an error, a log line or its own string form. The
+// credentials stay config.Secret until do builds the Authorization header,
+// so even reflection-driven printing of a client (%#v, or a client inside
+// another struct) finds no raw value. httpx bounds every request (30 s) and
+// nothing is retried.
 type client struct {
 	http   *http.Client
 	base   string // ERP_BASE_URL without a trailing slash
@@ -41,6 +48,7 @@ func newClient(cfg config.Config, key, secret config.Secret) (*client, error) {
 	if err != nil {
 		return nil, fmt.Errorf("probe: %w", err)
 	}
+	hc.CheckRedirect = checkRedirect
 	return &client{
 		http:   hc,
 		base:   strings.TrimRight(cfg.ERPBaseURL, "/"),
@@ -83,14 +91,35 @@ func (e *apiError) Error() string {
 }
 
 // isRefused reports whether err is Frappe refusing the request for lack of
-// permission: HTTP 403 or exc_type PermissionError. An authentication
-// failure (401) is not a refusal: it means the key itself is wrong.
+// permission: HTTP 403 with exc_type PermissionError. A bare 403 (a proxy or
+// WAF) says nothing about the user's roles, a PermissionError on another
+// status is not what Frappe sends for a refusal, and an authentication
+// failure (401) means the key itself is wrong; none of them counts.
 func isRefused(err error) bool {
 	var ae *apiError
 	if !errors.As(err, &ae) {
 		return false
 	}
-	return ae.Status == http.StatusForbidden || ae.ExcType == "PermissionError"
+	return ae.Status == http.StatusForbidden && ae.ExcType == "PermissionError"
+}
+
+// errRedirectRefused is wrapped by the error for any redirect.
+var errRedirectRefused = errors.New("probe: redirect refused")
+
+// checkRedirect refuses every redirect, as internal/frappe does. The Frappe
+// REST API never needs one, and a followed redirect is risky: net/http
+// keeps the Authorization header on a redirect to the same host on another
+// port, and a same-origin redirect with an absolute Location keeps it while
+// dropping the Host override for ERP_SITE. A redirect to another scheme,
+// host or port is therefore refused, and so is every other one.
+func checkRedirect(req *http.Request, via []*http.Request) error {
+	if len(via) == 0 {
+		return nil
+	}
+	// Escaped paths, quoted, so a hostile Location can't put control
+	// characters into an error message.
+	return fmt.Errorf("%w: %s %q redirected to %q", errRedirectRefused,
+		via[0].Method, via[0].URL.EscapedPath(), req.URL.Scheme+"://"+req.URL.Host+req.URL.EscapedPath())
 }
 
 // redact removes the secret from s.
