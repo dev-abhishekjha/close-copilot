@@ -1,0 +1,185 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Submitted sales invoices of the company posted in a date range, with customer, totals, outstanding amount, lines and tax rows, and collected_via: the account the customer's payment went into (the bank account, or Payment Gateway Clearing for gateway collections), empty while unpaid. Use it to follow sales into bank or gateway receipts. All amounts are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first posting date, YYYY-MM-DD",
+        "type": "string"
+      },
+      "to_date": {
+        "description": "last posting date, YYYY-MM-DD, inclusive",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "list_sales_invoices",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "invoices": {
+        "description": "invoices ordered by posting date, then name",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "collected_via": {
+              "description": "account the customer's payment went into (bank or Payment Gateway Clearing); several are joined with '; '; empty while unpaid",
+              "type": "string"
+            },
+            "customer": {
+              "description": "Customer name (ID)",
+              "type": "string"
+            },
+            "customer_name": {
+              "type": "string"
+            },
+            "debit_to": {
+              "description": "receivable account",
+              "type": "string"
+            },
+            "grand_total": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "lines": {
+              "description": "item rows",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "account": {
+                    "description": "income account",
+                    "type": "string"
+                  },
+                  "amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "item_code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "account",
+                  "amount"
+                ],
+                "type": "object"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "net_total": {
+              "description": "total before tax, paise",
+              "type": "integer"
+            },
+            "outstanding_amount": {
+              "description": "unpaid amount, paise",
+              "type": "integer"
+            },
+            "posting_date": {
+              "description": "YYYY-MM-DD",
+              "type": "string"
+            },
+            "remarks": {
+              "type": "string"
+            },
+            "taxes": {
+              "description": "tax rows",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "account_head": {
+                    "type": "string"
+                  },
+                  "add_deduct_tax": {
+                    "description": "Add or Deduct",
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "charge_type": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "gst_tax_type": {
+                    "description": "igst, cgst, sgst or another India Compliance tax type",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rate": {
+                    "description": "percentage as decimal text, e.g. 9 or 2.5",
+                    "type": "string"
+                  },
+                  "tax_amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "account_head",
+                  "tax_amount"
+                ],
+                "type": "object"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "customer",
+            "posting_date",
+            "net_total",
+            "grand_total",
+            "outstanding_amount",
+            "collected_via",
+            "lines",
+            "taxes"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      }
+    },
+    "required": [
+      "invoices"
+    ],
+    "type": "object"
+  }
+}

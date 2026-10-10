@@ -1,0 +1,221 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Submitted purchase invoices (supplier bills) of the company posted in a date range, optionally for one supplier, with the supplier's GSTIN, bill number and date, taxable value, IGST, CGST and SGST, each expense line (account, description, amount) and each tax row. Use it to check bills against GSTR-2B, find duplicate bills or see what a supplier charged. All amounts are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first posting date, YYYY-MM-DD",
+        "type": "string"
+      },
+      "supplier": {
+        "description": "optional exact Supplier name (ID)",
+        "type": "string"
+      },
+      "to_date": {
+        "description": "last posting date, YYYY-MM-DD, inclusive",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "list_purchase_invoices",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "invoices": {
+        "description": "invoices ordered by posting date, then name",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "bill_date": {
+              "description": "the supplier's invoice date, YYYY-MM-DD",
+              "type": "string"
+            },
+            "bill_no": {
+              "description": "the supplier's invoice number",
+              "type": "string"
+            },
+            "cgst": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "company_gstin": {
+              "type": "string"
+            },
+            "credit_to": {
+              "description": "payable account",
+              "type": "string"
+            },
+            "grand_total": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "igst": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "is_return": {
+              "description": "true for a debit note",
+              "type": "boolean"
+            },
+            "lines": {
+              "description": "item rows",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "account": {
+                    "description": "expense account",
+                    "type": "string"
+                  },
+                  "amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "item_code": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name",
+                  "account",
+                  "amount"
+                ],
+                "type": "object"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "outstanding_amount": {
+              "description": "unpaid amount, paise",
+              "type": "integer"
+            },
+            "place_of_supply": {
+              "type": "string"
+            },
+            "posting_date": {
+              "description": "YYYY-MM-DD",
+              "type": "string"
+            },
+            "remarks": {
+              "type": "string"
+            },
+            "sgst": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "supplier": {
+              "description": "Supplier name (ID)",
+              "type": "string"
+            },
+            "supplier_gstin": {
+              "type": "string"
+            },
+            "supplier_name": {
+              "type": "string"
+            },
+            "taxable": {
+              "description": "net total before tax, paise",
+              "type": "integer"
+            },
+            "taxes": {
+              "description": "tax rows",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "account_head": {
+                    "type": "string"
+                  },
+                  "add_deduct_tax": {
+                    "description": "Add or Deduct",
+                    "type": "string"
+                  },
+                  "category": {
+                    "type": "string"
+                  },
+                  "charge_type": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "gst_tax_type": {
+                    "description": "igst, cgst, sgst or another India Compliance tax type",
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "rate": {
+                    "description": "percentage as decimal text, e.g. 9 or 2.5",
+                    "type": "string"
+                  },
+                  "tax_amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "account_head",
+                  "tax_amount"
+                ],
+                "type": "object"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            }
+          },
+          "required": [
+            "name",
+            "supplier",
+            "posting_date",
+            "is_return",
+            "taxable",
+            "igst",
+            "cgst",
+            "sgst",
+            "grand_total",
+            "outstanding_amount",
+            "lines",
+            "taxes"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      }
+    },
+    "required": [
+      "invoices"
+    ],
+    "type": "object"
+  }
+}

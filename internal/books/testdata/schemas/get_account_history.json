@@ -1,0 +1,84 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Monthly debit, credit and net (debit minus credit) of one leaf account over the last 1 to 12 calendar months ending with through_month (default: the current month), oldest first, with zeros for months without entries. Use it to compare this month with earlier months, for example to spot a missing or unusual charge. Amounts are integers in paise (1 rupee = 100 paise); months are YYYY-MM.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "account": {
+        "description": "exact leaf account name, e.g. Bank Charges - STPL",
+        "type": "string"
+      },
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "months": {
+        "description": "number of months, 1 to 12",
+        "type": "integer"
+      },
+      "through_month": {
+        "description": "last month, YYYY-MM; default the current month",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "account",
+      "months"
+    ],
+    "type": "object"
+  },
+  "name": "get_account_history",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "account": {
+        "type": "string"
+      },
+      "history": {
+        "description": "one row per month, oldest first; amounts in paise",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "credit": {
+              "type": "integer"
+            },
+            "debit": {
+              "type": "integer"
+            },
+            "month": {
+              "type": "string"
+            },
+            "net": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "month",
+            "debit",
+            "credit",
+            "net"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      },
+      "through_month": {
+        "description": "last month, YYYY-MM",
+        "type": "string"
+      }
+    },
+    "required": [
+      "account",
+      "through_month",
+      "history"
+    ],
+    "type": "object"
+  }
+}
