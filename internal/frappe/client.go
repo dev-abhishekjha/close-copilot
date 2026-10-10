@@ -25,13 +25,17 @@ import (
 const (
 	// PageSize is the number of rows List asks for per request.
 	PageSize = 500
-	// MaxPages bounds List: a server that ignores limit_start would
-	// otherwise be paged forever.
+	// MaxPages bounds List together with MaxRows: List fails rather than
+	// page on past it.
 	MaxPages = 10_000
 	// MaxInFlight is how many Get requests GetMany runs at once.
 	MaxInFlight = 4
 	// MaxAttempts is the most times an idempotent (GET) request is sent.
 	MaxAttempts = 4
+	// DefaultDeadline is Options.Deadline when it is zero.
+	DefaultDeadline = 60 * time.Second
+	// DefaultMaxRows is Options.MaxRows when it is zero.
+	DefaultMaxRows = 200_000
 
 	requestTimeout = 15 * time.Second
 	maxBody        = 32 << 20 // 32 MiB; the largest list page is far smaller
@@ -42,40 +46,36 @@ const (
 
 const redacted = "[redacted]"
 
-// Secret is an API secret. Every way of printing or encoding it (fmt verbs,
-// slog, encoding/json) yields "[redacted]"; only the unexported reveal
-// method, used to build the Authorization header, returns the value.
-type Secret string
-
-func (Secret) String() string               { return redacted }
-func (Secret) GoString() string             { return redacted }
-func (Secret) Format(f fmt.State, _ rune)   { _, _ = io.WriteString(f, redacted) }
-func (Secret) LogValue() slog.Value         { return slog.StringValue(redacted) }
-func (Secret) MarshalJSON() ([]byte, error) { return []byte(`"` + redacted + `"`), nil }
-func (Secret) MarshalText() ([]byte, error) { return []byte(redacted), nil }
-
-// reveal is the only way to the raw value. It builds the Authorization
-// header and the redaction filter, nothing else.
-func (s Secret) reveal() string { return string(s) }
+// Options tunes a Client. A zero field takes its default.
+type Options struct {
+	// Deadline bounds one request, with all its retries and Retry-After
+	// waits, when the caller's context has no deadline of its own. Zero
+	// means DefaultDeadline (60 s). A caller's deadline always wins, longer
+	// or shorter.
+	Deadline time.Duration
+	// MaxRows is the most rows one List call may collect; List fails once
+	// a server returns more. Zero means DefaultMaxRows (200,000).
+	MaxRows int
+}
 
 // Client is a Frappe REST client for one site and one API key. It is safe
 // for concurrent use. Its fmt, slog and JSON forms never show the secret.
 //
-// The Secret sits inside a closure. fmt bypasses String and Format on
-// unexported fields and walks them by reflection, and a mismatched verb
-// (%s on a pointer) even dereferences a nested pointer, so a struct that
-// holds a Client in an unexported field would print a plain Secret field.
-// A func value prints only as an address.
+// The secret is a config.Secret, which holds its value behind a pointer:
+// fmt walks a Client held in an unexported field by reflection, without
+// calling String or Format, and finds only an address.
 type Client struct {
 	hc     *http.Client
 	base   string // ERP_BASE_URL without a trailing slash
 	site   string // sent as the Host header when set
 	key    string
-	secret func() Secret
+	secret config.Secret
 
 	pageSize    int
 	maxPages    int
+	maxRows     int
 	maxAttempts int
+	deadline    time.Duration
 	backoffBase time.Duration
 	backoffMax  time.Duration
 	afterCap    time.Duration
@@ -84,14 +84,36 @@ type Client struct {
 
 // New returns a client for cfg.ERPBaseURL and cfg.ERPSite that
 // authenticates with key and secret (the bot pair ERP_API_KEY and
-// ERP_API_SECRET, or the seeder pair in seeding code). Requests go through
-// internal/httpx with a 15 s timeout, and every redirect is refused.
-func New(cfg config.Config, key string, secret Secret) (*Client, error) {
-	if key == "" || secret == "" {
-		return nil, errors.New("frappe: an API key and secret are required")
+// ERP_API_SECRET, or the seeder pair in seeding code), with the default
+// Options. Requests go through internal/httpx with a 15 s timeout per
+// attempt, and every redirect is refused.
+//
+// Deadline: when the caller's context has no deadline, each request (one
+// Get, Insert, Call or List page, with all its retries and Retry-After
+// waits) gets DefaultDeadline, 60 s. A retry wait that would end after the
+// deadline is not taken: the request fails at once with the last error.
+// List and GetMany make many requests, and each has its own deadline; give
+// them a context deadline to bound the whole call.
+func New(cfg config.Config, key string, secret config.Secret) (*Client, error) {
+	return NewWithOptions(cfg, key, secret, Options{})
+}
+
+// NewWithOptions is New with explicit Options.
+func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Options) (*Client, error) {
+	if _, err := authorization(key, secret); err != nil {
+		return nil, err
 	}
-	if strings.ContainsAny(key, ": \t\r\n") || strings.ContainsAny(secret.reveal(), ": \t\r\n") {
-		return nil, errors.New("frappe: the API key or secret contains a colon or whitespace")
+	switch {
+	case opts.Deadline < 0:
+		return nil, fmt.Errorf("frappe: negative Options.Deadline %s", opts.Deadline)
+	case opts.MaxRows < 0:
+		return nil, fmt.Errorf("frappe: negative Options.MaxRows %d", opts.MaxRows)
+	}
+	if opts.Deadline == 0 {
+		opts.Deadline = DefaultDeadline
+	}
+	if opts.MaxRows == 0 {
+		opts.MaxRows = DefaultMaxRows
 	}
 	base, err := url.Parse(cfg.ERPBaseURL)
 	switch {
@@ -114,15 +136,31 @@ func New(cfg config.Config, key string, secret Secret) (*Client, error) {
 		base:        strings.TrimRight(cfg.ERPBaseURL, "/"),
 		site:        cfg.ERPSite,
 		key:         key,
-		secret:      func() Secret { return secret },
+		secret:      secret,
 		pageSize:    PageSize,
 		maxPages:    MaxPages,
+		maxRows:     opts.MaxRows,
 		maxAttempts: MaxAttempts,
+		deadline:    opts.Deadline,
 		backoffBase: backoffBase,
 		backoffMax:  backoffMax,
 		afterCap:    retryAfterCap,
 		sleep:       sleepCtx,
 	}, nil
+}
+
+// authorization is the Authorization header value for key and secret. It
+// is one of the two places that reveal the secret (redact is the other);
+// New calls it once to validate the pair.
+func authorization(key string, secret config.Secret) (string, error) {
+	raw := secret.Reveal()
+	if key == "" || raw == "" {
+		return "", errors.New("frappe: an API key and secret are required")
+	}
+	if strings.ContainsAny(key, ": \t\r\n") || strings.ContainsAny(raw, ": \t\r\n") {
+		return "", errors.New("frappe: the API key or secret contains a colon or whitespace")
+	}
+	return "token " + key + ":" + raw, nil
 }
 
 // String, GoString, Format and LogValue have value receivers, so a Client
@@ -150,10 +188,10 @@ func (c Client) MarshalJSON() ([]byte, error) {
 
 // redact removes the secret (raw and query-escaped) from text.
 func (c *Client) redact(text string) string {
-	if c == nil || c.secret == nil {
+	if c == nil {
 		return text
 	}
-	return redactSecret(text, c.secret().reveal())
+	return redactSecret(text, c.secret.Reveal())
 }
 
 func redactSecret(text, secret string) string {
@@ -229,8 +267,17 @@ type response struct {
 // when body isn't nil, a JSON body. A 2xx response is decoded into out
 // (when not nil) with UseNumber; anything else becomes an *APIError. Only
 // GET is retried: on 429, 502, 503 and 504, and on transport errors before
-// a response arrived.
+// a response arrived. POST, PUT and DELETE are sent exactly once.
+//
+// When ctx has no deadline, do applies c.deadline across every attempt and
+// wait. A wait that would outlast the deadline (a long Retry-After, say) is
+// not taken: do returns the last error at once.
 func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any) error {
+	if _, ok := ctx.Deadline(); !ok && c.deadline > 0 {
+		var cancel context.CancelFunc
+		ctx, cancel = context.WithTimeout(ctx, c.deadline)
+		defer cancel()
+	}
 	var payload []byte
 	if body != nil {
 		b, err := json.Marshal(body)
@@ -251,19 +298,30 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	var resp *response
 	for attempt := 1; ; attempt++ {
 		r, responded, err := c.send(ctx, method, target, payload)
+		retry := attempt < attempts
+		if err != nil {
+			retry = retry && !responded && retryableTransport(ctx, err)
+		} else {
+			retry = retry && retryableStatus(r.status)
+		}
 		var wait time.Duration
-		switch {
-		case err != nil:
-			if responded || attempt >= attempts || !retryableTransport(ctx, err) {
+		if retry {
+			var header http.Header
+			if r != nil {
+				header = r.header
+			}
+			wait = c.backoff(attempt, header)
+			if !fitsDeadline(ctx, wait) {
+				slog.DebugContext(ctx, "frappe: not retrying; the wait would outlast the deadline",
+					"method", method, "path", path, "attempt", attempt, "wait", wait)
+				retry = false
+			}
+		}
+		if !retry {
+			if err != nil {
 				return c.opErr(method, path, "", err)
 			}
-			wait = c.backoff(attempt, nil)
-		case retryableStatus(r.status) && attempt < attempts:
-			wait = c.backoff(attempt, r.header)
-		default:
 			resp = r
-		}
-		if resp != nil {
 			break
 		}
 		status := 0
@@ -289,6 +347,12 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 	return nil
 }
 
+// fitsDeadline reports whether a wait of d ends before ctx's deadline.
+func fitsDeadline(ctx context.Context, d time.Duration) bool {
+	dl, ok := ctx.Deadline()
+	return !ok || time.Until(dl) > d
+}
+
 // send makes one request. responded is true when the server answered, so a
 // later failure (reading the body) must not be retried.
 func (c *Client) send(ctx context.Context, method, target string, payload []byte) (r *response, responded bool, err error) {
@@ -300,7 +364,11 @@ func (c *Client) send(ctx context.Context, method, target string, payload []byte
 	if err != nil {
 		return nil, false, err
 	}
-	req.Header.Set("Authorization", "token "+c.key+":"+c.secret().reveal())
+	auth, err := authorization(c.key, c.secret)
+	if err != nil {
+		return nil, false, err
+	}
+	req.Header.Set("Authorization", auth)
 	req.Header.Set("Accept", "application/json")
 	if payload != nil {
 		req.Header.Set("Content-Type", "application/json")
