@@ -22,10 +22,11 @@ import (
 
 // Test credentials. The secret is distinctive so a leak is easy to spot.
 const (
-	testKey    = "botkey0000000ab"
-	testSecret = Secret("SECRETmustNEVERleak7f3a")
-	testSite   = "erp.localhost"
+	testKey  = "botkey0000000ab"
+	testSite = "erp.localhost"
 )
+
+var testSecret = config.NewSecret("SECRETmustNEVERleak7f3a")
 
 // newTestClient starts an httptest server with h and returns a client for
 // it whose retries don't sleep. edit can add URLs to the config (and so to
@@ -83,13 +84,13 @@ func TestNew(t *testing.T) {
 		name   string
 		cfg    config.Config
 		key    string
-		secret Secret
+		secret config.Secret
 		want   string // substring of the error; empty means success
 	}{
 		{"ok", good, testKey, testSecret, ""},
 		{"no key", good, "", testSecret, "key and secret are required"},
-		{"no secret", good, testKey, "", "key and secret are required"},
-		{"colon in secret", good, testKey, "a:b", "colon or whitespace"},
+		{"no secret", good, testKey, config.Secret{}, "key and secret are required"},
+		{"colon in secret", good, testKey, config.NewSecret("a:b"), "colon or whitespace"},
 		{"no base URL", config.Config{}, testKey, testSecret, config.EnvERPBaseURL},
 		{"not http", config.Config{ERPBaseURL: "ftp://localhost"}, testKey, testSecret, "http or https"},
 		{"user info", config.Config{ERPBaseURL: "http://u:p@localhost:8080"}, testKey, testSecret, "user info"},
@@ -130,7 +131,7 @@ func TestHeaders(t *testing.T) {
 	}
 	mu.Lock()
 	defer mu.Unlock()
-	if want := "token " + testKey + ":" + testSecret.reveal(); got.Get("Authorization") != want {
+	if want := "token " + testKey + ":" + testSecret.Reveal(); got.Get("Authorization") != want {
 		t.Error("Authorization header is not token <key>:<secret>")
 	}
 	if got.Get("Accept") != "application/json" {
@@ -142,7 +143,7 @@ func TestHeaders(t *testing.T) {
 }
 
 func TestSecretRedacted(t *testing.T) {
-	secret := testSecret.reveal()
+	secret := testSecret.Reveal()
 	var sawAuth atomic.Bool
 	c, _ := newTestClient(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		auth := r.Header.Get("Authorization")
@@ -197,11 +198,11 @@ func TestSecretRedacted(t *testing.T) {
 	}
 	type exported struct {
 		C Client
-		S Secret
+		S config.Secret
 	}
 	var outputs []string
 	add := func(s string) { outputs = append(outputs, s) }
-	for _, verb := range []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%d"} {
+	for _, verb := range []string{"%v", "%+v", "%#v", "%s", "%q", "%x", "%d", "%p"} {
 		add(fmt.Sprintf(verb, c))
 		add(fmt.Sprintf(verb, *c))
 		add(fmt.Sprintf(verb, testSecret))
@@ -212,7 +213,7 @@ func TestSecretRedacted(t *testing.T) {
 	add(fmt.Sprint(c))
 	add(fmt.Sprint(testSecret))
 	add(c.String())
-	for _, v := range []any{c, *c, testSecret, exported{C: *c, S: testSecret}, map[string]Secret{"s": testSecret}} {
+	for _, v := range []any{c, *c, testSecret, exported{C: *c, S: testSecret}, map[string]config.Secret{"s": testSecret}} {
 		b, err := json.Marshal(v)
 		if err != nil {
 			t.Fatalf("json.Marshal(%T): %v", v, err)

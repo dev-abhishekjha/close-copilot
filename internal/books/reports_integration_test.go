@@ -58,7 +58,7 @@ func integrationConfig(t *testing.T) config.Config {
 
 func botLedger(t *testing.T, cfg config.Config) FrappeLedger {
 	t.Helper()
-	bot, err := frappe.New(cfg, cfg.ERPAPIKey.Reveal(), frappe.Secret(cfg.ERPAPISecret.Reveal()))
+	bot, err := frappe.New(cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret)
 	if err != nil {
 		t.Fatalf("frappe.New (bot): %v", err)
 	}
@@ -114,7 +114,7 @@ func erpReport(t *testing.T, cfg config.Config, bot *frappe.Client, fiscalYear s
 			t.Fatalf("the bot may not run the Trial Balance report and no seeder key is set: %v", err)
 		}
 		t.Logf("the bot may not run the Trial Balance report; using the seeder key for the report call only")
-		seeder, nerr := frappe.New(cfg, key, frappe.Secret(secret))
+		seeder, nerr := frappe.New(cfg, key, config.NewSecret(secret))
 		if nerr != nil {
 			t.Fatalf("frappe.New (seeder): %v", nerr)
 		}

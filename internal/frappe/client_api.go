@@ -34,20 +34,33 @@ type Query struct {
 // request via limit_start and limit_page_length. List rows never include
 // child tables; use Get or GetMany for those.
 //
+// q is checked first (see ErrUnsafeQuery): Fields and filter fields must be
+// column names, OrderBy a comma-separated list of "<field> asc|desc", and
+// nothing is sent when they aren't.
+//
 // List stops at the first empty page (or once it has q.Limit rows), never
 // at a merely short one, so a server that caps pages below PageSize can't
 // make it drop rows; the cost is one extra request that returns nothing.
-// A server that ignores limit_start would page forever, so List fails when
-// a page repeats the previous one byte for byte, or after MaxPages pages.
-// (Two genuinely identical consecutive pages are only possible when Fields
-// omits "name"; include it when selecting few columns.)
+// So that a misbehaving server can't make it page forever, List fails when
+// a page repeats the previous one byte for byte or starts with the same
+// row name, after MaxPages pages, or once it holds more than
+// Options.MaxRows rows. (Two genuinely identical consecutive pages are only
+// possible when Fields omits "name"; include it when selecting few columns.)
+//
+// Without a caller deadline, the whole call is bounded by
+// Options.ListDeadline and each page request by Options.Deadline (see New).
 func List[T any](ctx context.Context, c *Client, doctype string, q Query) ([]T, error) {
 	path, err := resourcePath(doctype)
 	if err != nil {
 		return nil, err
 	}
+	ctx, cancelWhole := c.wholeCall(ctx)
+	defer cancelWhole()
 	if q.Limit < 0 {
 		return nil, fmt.Errorf("frappe: list %s: negative limit %d", doctype, q.Limit)
+	}
+	if err := validateQuery(q); err != nil {
+		return nil, fmt.Errorf("frappe: list %s: %w", doctype, err)
 	}
 	base := url.Values{}
 	if len(q.Fields) > 0 {
@@ -69,11 +82,11 @@ func List[T any](ctx context.Context, c *Client, doctype string, q Query) ([]T, 
 	}
 
 	out := []T{}
-	var prev json.RawMessage
+	var prev, prevFirst json.RawMessage
 	start := 0
 	for page := 0; ; page++ {
 		if page >= c.maxPages {
-			return nil, fmt.Errorf("frappe: list %s: stopped after %d pages; the server may be ignoring limit_start", doctype, c.maxPages)
+			return nil, fmt.Errorf("frappe: list %s: stopped after %d pages (%d rows) without reaching an empty page", doctype, c.maxPages, len(out))
 		}
 		want := c.pageSize
 		if q.Limit > 0 {
@@ -104,16 +117,35 @@ func List[T any](ctx context.Context, c *Client, doctype string, q Query) ([]T, 
 		if len(rows) == 0 {
 			return out, nil
 		}
-		if bytes.Equal(resp.Data, prev) {
-			return nil, fmt.Errorf("frappe: list %s: page at limit_start %d repeats the previous page; the server may be ignoring limit_start", doctype, start)
+		first := firstRowName(resp.Data)
+		if bytes.Equal(resp.Data, prev) || (first != nil && bytes.Equal(first, prevFirst)) {
+			return nil, fmt.Errorf("frappe: list %s: page at limit_start %d repeats the previous page; refusing to page on", doctype, start)
 		}
-		prev = resp.Data
+		prev, prevFirst = resp.Data, first
 		out = append(out, rows...)
 		if q.Limit > 0 && len(out) >= q.Limit {
 			return out[:q.Limit], nil
 		}
+		if len(out) > c.maxRows {
+			return nil, fmt.Errorf("frappe: list %s: more than %d rows; narrow the filters", doctype, c.maxRows)
+		}
 		start += len(rows)
 	}
+}
+
+// firstRowName is the raw JSON "name" of the first row of a list page, or
+// nil when the page has no rows or the first row has no (or a null) name.
+func firstRowName(data json.RawMessage) json.RawMessage {
+	var rows []struct {
+		Name json.RawMessage `json:"name"`
+	}
+	if err := json.Unmarshal(data, &rows); err != nil || len(rows) == 0 {
+		return nil
+	}
+	if n := rows[0].Name; len(n) > 0 && string(n) != "null" {
+		return n
+	}
+	return nil
 }
 
 // Get returns one document, child tables included.
@@ -138,12 +170,15 @@ func Get[T any](ctx context.Context, c *Client, doctype, name string) (T, error)
 // GetMany fetches each named document with Get (so child tables are
 // included), at most MaxInFlight at a time. Results are in the order of
 // names. The first error cancels the requests still running or waiting and
-// is the error returned.
+// is the error returned. Without a caller deadline, the whole call is
+// bounded by Options.ListDeadline and each Get by Options.Deadline.
 func GetMany[T any](ctx context.Context, c *Client, doctype string, names []string) ([]T, error) {
 	out := make([]T, len(names))
 	if len(names) == 0 {
 		return out, nil
 	}
+	ctx, cancelWhole := c.wholeCall(ctx)
+	defer cancelWhole()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -271,13 +306,27 @@ var dottedPathRE = regexp.MustCompile(`^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z_][A-Za-
 // Call invokes the whitelisted method at /api/method/<dottedPath> and
 // decodes its "message" into T (the zero T when the method returns
 // nothing). httpMethod is GET or POST. GET sends params in the query
-// string (strings as they are, everything else JSON-encoded) and is
-// retried like any GET, so use it only for methods without side effects;
-// POST sends params as a JSON body and is never retried.
+// string (strings as they are, everything else JSON-encoded); POST sends
+// them as a JSON body. Before anything is sent (ErrUnsafeQuery):
+//
+//   - for frappe.client, GET is refused on anything but get, get_list,
+//     get_count and get_value;
+//   - for get_list, get_count and get_value, only their known parameters
+//     are accepted, and fields, fieldname, order_by, filters and or_filters
+//     go through the same checks as a List Query.
+//
+// Only a GET to one of those four frappe.client reads is retried; every
+// other call, GET or POST, is sent exactly once.
 func Call[T any](ctx context.Context, c *Client, httpMethod, dottedPath string, params map[string]any) (T, error) {
 	var zero T
 	if !dottedPathRE.MatchString(dottedPath) {
 		return zero, fmt.Errorf("frappe: call %q: not a dotted method path", dottedPath)
+	}
+	if err := validateCall(httpMethod, dottedPath); err != nil {
+		return zero, fmt.Errorf("frappe: call: %w", err)
+	}
+	if err := validateCallParams(dottedPath, params); err != nil {
+		return zero, fmt.Errorf("frappe: call %s: %w", dottedPath, err)
 	}
 	path := "/api/method/" + dottedPath
 	var (
@@ -302,7 +351,8 @@ func Call[T any](ctx context.Context, c *Client, httpMethod, dottedPath string, 
 	var resp struct {
 		Message T `json:"message"`
 	}
-	if err := c.do(ctx, httpMethod, path, query, body, &resp); err != nil {
+	retryable := httpMethod == http.MethodGet && isClientRead(dottedPath)
+	if err := c.request(ctx, httpMethod, path, query, body, &resp, retryable); err != nil {
 		return zero, fmt.Errorf("frappe: call %s: %w", dottedPath, err)
 	}
 	return resp.Message, nil

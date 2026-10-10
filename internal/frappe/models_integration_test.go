@@ -40,7 +40,7 @@ func TestIntegrationModelsAccounts(t *testing.T) {
 	if err != nil {
 		t.Fatalf("config: %v", err)
 	}
-	bot, err := New(cfg, cfg.ERPAPIKey.Reveal(), Secret(cfg.ERPAPISecret.Reveal()))
+	bot, err := New(cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret)
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}

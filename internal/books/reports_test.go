@@ -607,7 +607,7 @@ func listServer(t *testing.T, body []byte) (FrappeLedger, *[]listRequest) {
 		_, _ = w.Write(body)
 	}))
 	t.Cleanup(srv.Close)
-	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL}, "botkey", frappe.Secret("botsecret"))
+	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL}, "botkey", config.NewSecret("botsecret"))
 	if err != nil {
 		t.Fatal(err)
 	}

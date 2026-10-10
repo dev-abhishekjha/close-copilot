@@ -36,6 +36,8 @@ const (
 	DefaultDeadline = 60 * time.Second
 	// DefaultMaxRows is Options.MaxRows when it is zero.
 	DefaultMaxRows = 200_000
+	// DefaultListDeadline is Options.ListDeadline when it is zero.
+	DefaultListDeadline = 5 * time.Minute
 
 	requestTimeout = 15 * time.Second
 	maxBody        = 32 << 20 // 32 MiB; the largest list page is far smaller
@@ -56,30 +58,38 @@ type Options struct {
 	// MaxRows is the most rows one List call may collect; List fails once
 	// a server returns more. Zero means DefaultMaxRows (200,000).
 	MaxRows int
+	// ListDeadline bounds one whole List or GetMany call, every page or
+	// document request included, when the caller's context has no
+	// deadline. Each request inside still gets Deadline as well. Zero
+	// means DefaultListDeadline (5 min).
+	ListDeadline time.Duration
 }
 
 // Client is a Frappe REST client for one site and one API key. It is safe
 // for concurrent use. Its fmt, slog and JSON forms never show the secret.
 //
-// The secret is a config.Secret, which holds its value behind a pointer:
-// fmt walks a Client held in an unexported field by reflection, without
-// calling String or Format, and finds only an address.
+// The key and secret are config.Secret values, which hold their value
+// behind a pointer: fmt walks a Client held in an unexported field by
+// reflection, without calling String or Format, and finds only addresses.
+// (A mismatched verb such as %s on a nested *Client makes fmt print the
+// struct's fields; even then neither credential appears.)
 type Client struct {
 	hc     *http.Client
 	base   string // ERP_BASE_URL without a trailing slash
 	site   string // sent as the Host header when set
-	key    string
+	key    config.Secret
 	secret config.Secret
 
-	pageSize    int
-	maxPages    int
-	maxRows     int
-	maxAttempts int
-	deadline    time.Duration
-	backoffBase time.Duration
-	backoffMax  time.Duration
-	afterCap    time.Duration
-	sleep       func(context.Context, time.Duration) error
+	pageSize     int
+	maxPages     int
+	maxRows      int
+	maxAttempts  int
+	deadline     time.Duration
+	listDeadline time.Duration
+	backoffBase  time.Duration
+	backoffMax   time.Duration
+	afterCap     time.Duration
+	sleep        func(context.Context, time.Duration) error
 }
 
 // New returns a client for cfg.ERPBaseURL and cfg.ERPSite that
@@ -88,12 +98,13 @@ type Client struct {
 // Options. Requests go through internal/httpx with a 15 s timeout per
 // attempt, and every redirect is refused.
 //
-// Deadline: when the caller's context has no deadline, each request (one
+// Deadlines: when the caller's context has no deadline, each request (one
 // Get, Insert, Call or List page, with all its retries and Retry-After
-// waits) gets DefaultDeadline, 60 s. A retry wait that would end after the
-// deadline is not taken: the request fails at once with the last error.
-// List and GetMany make many requests, and each has its own deadline; give
-// them a context deadline to bound the whole call.
+// waits) gets DefaultDeadline, 60 s, and each whole List or GetMany call
+// gets DefaultListDeadline, 5 min, on top. A retry wait that would end
+// after the deadline is not taken: the request fails at once with the last
+// error. A caller's own context deadline replaces both, longer or shorter.
+// Callers therefore don't need to set a deadline themselves.
 func New(cfg config.Config, key string, secret config.Secret) (*Client, error) {
 	return NewWithOptions(cfg, key, secret, Options{})
 }
@@ -108,6 +119,11 @@ func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Op
 		return nil, fmt.Errorf("frappe: negative Options.Deadline %s", opts.Deadline)
 	case opts.MaxRows < 0:
 		return nil, fmt.Errorf("frappe: negative Options.MaxRows %d", opts.MaxRows)
+	case opts.ListDeadline < 0:
+		return nil, fmt.Errorf("frappe: negative Options.ListDeadline %s", opts.ListDeadline)
+	}
+	if opts.ListDeadline == 0 {
+		opts.ListDeadline = DefaultListDeadline
 	}
 	if opts.Deadline == 0 {
 		opts.Deadline = DefaultDeadline
@@ -132,26 +148,27 @@ func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Op
 	}
 	hc.CheckRedirect = checkRedirect
 	return &Client{
-		hc:          hc,
-		base:        strings.TrimRight(cfg.ERPBaseURL, "/"),
-		site:        cfg.ERPSite,
-		key:         key,
-		secret:      secret,
-		pageSize:    PageSize,
-		maxPages:    MaxPages,
-		maxRows:     opts.MaxRows,
-		maxAttempts: MaxAttempts,
-		deadline:    opts.Deadline,
-		backoffBase: backoffBase,
-		backoffMax:  backoffMax,
-		afterCap:    retryAfterCap,
-		sleep:       sleepCtx,
+		hc:           hc,
+		base:         strings.TrimRight(cfg.ERPBaseURL, "/"),
+		site:         cfg.ERPSite,
+		key:          config.NewSecret(key),
+		secret:       secret,
+		pageSize:     PageSize,
+		maxPages:     MaxPages,
+		maxRows:      opts.MaxRows,
+		maxAttempts:  MaxAttempts,
+		deadline:     opts.Deadline,
+		listDeadline: opts.ListDeadline,
+		backoffBase:  backoffBase,
+		backoffMax:   backoffMax,
+		afterCap:     retryAfterCap,
+		sleep:        sleepCtx,
 	}, nil
 }
 
 // authorization is the Authorization header value for key and secret. It
 // is one of the two places that reveal the secret (redact is the other);
-// New calls it once to validate the pair.
+// New calls it once to validate the pair, and send once per request.
 func authorization(key string, secret config.Secret) (string, error) {
 	raw := secret.Reveal()
 	if key == "" || raw == "" {
@@ -263,17 +280,40 @@ type response struct {
 	body   []byte
 }
 
-// do sends method to path (escaped, starting with /api/) with query and,
-// when body isn't nil, a JSON body. A 2xx response is decoded into out
-// (when not nil) with UseNumber; anything else becomes an *APIError. Only
-// GET is retried: on 429, 502, 503 and 504, and on transport errors before
-// a response arrived. POST, PUT and DELETE are sent exactly once.
-//
-// When ctx has no deadline, do applies c.deadline across every attempt and
-// wait. A wait that would outlast the deadline (a long Retry-After, say) is
-// not taken: do returns the last error at once.
+// wholeCallKey marks a context whose deadline the client set for a whole
+// List or GetMany call, so that do still applies the per-request deadline
+// inside it.
+type wholeCallKey struct{}
+
+// wholeCall gives ctx the whole-call deadline c.listDeadline when the
+// caller set none.
+func (c *Client) wholeCall(ctx context.Context) (context.Context, context.CancelFunc) {
+	if _, ok := ctx.Deadline(); ok || c.listDeadline <= 0 {
+		return ctx, func() {}
+	}
+	ctx, cancel := context.WithTimeout(ctx, c.listDeadline)
+	return context.WithValue(ctx, wholeCallKey{}, true), cancel
+}
+
+// do is request with GET retried and everything else sent once.
 func (c *Client) do(ctx context.Context, method, path string, query url.Values, body, out any) error {
-	if _, ok := ctx.Deadline(); !ok && c.deadline > 0 {
+	return c.request(ctx, method, path, query, body, out, method == http.MethodGet)
+}
+
+// request sends method to path (escaped, starting with /api/) with query
+// and, when body isn't nil, a JSON body. A 2xx response is decoded into out
+// (when not nil) with UseNumber; anything else becomes an *APIError. Only
+// a retryable request (always a GET) is retried: on 429, 502, 503 and 504,
+// and on transport errors before a response arrived. POST, PUT and DELETE
+// are sent exactly once.
+//
+// When ctx has no caller deadline, request applies c.deadline across every
+// attempt and wait (inside a whole-call deadline, whichever ends first). A
+// wait that would outlast the deadline (a long Retry-After, say) is not
+// taken: request returns the last error at once.
+func (c *Client) request(ctx context.Context, method, path string, query url.Values, body, out any, retryable bool) error {
+	_, has := ctx.Deadline()
+	if (!has || ctx.Value(wholeCallKey{}) != nil) && c.deadline > 0 {
 		var cancel context.CancelFunc
 		ctx, cancel = context.WithTimeout(ctx, c.deadline)
 		defer cancel()
@@ -291,7 +331,7 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		target += "?" + query.Encode()
 	}
 	attempts := 1
-	if method == http.MethodGet {
+	if retryable && method == http.MethodGet {
 		attempts = c.maxAttempts
 	}
 
@@ -364,7 +404,7 @@ func (c *Client) send(ctx context.Context, method, target string, payload []byte
 	if err != nil {
 		return nil, false, err
 	}
-	auth, err := authorization(c.key, c.secret)
+	auth, err := authorization(c.key.Reveal(), c.secret)
 	if err != nil {
 		return nil, false, err
 	}

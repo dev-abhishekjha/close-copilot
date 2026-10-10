@@ -109,6 +109,7 @@ func TestPermsFailures(t *testing.T) {
 		{"System Settings readable", func(f *fakeERP) { f.settingsReadable = true }, "FAIL (c) refused read of System Settings"},
 		{"System Settings writable", func(f *fakeERP) { f.settingsWritable = true }, "FAIL (d) refused write to System Settings"},
 		{"401 is not a refusal", func(f *fakeERP) { f.settingsAuthFails = true }, "FAIL (c) refused read of System Settings: GET /api/resource/System%20Settings/System%20Settings failed but was not a permission refusal"},
+		{"bare 403 is not a refusal", func(f *fakeERP) { f.settingsBare403 = true }, "FAIL (c) refused read of System Settings: GET /api/resource/System%20Settings/System%20Settings failed but was not a permission refusal"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -124,6 +125,19 @@ func TestPermsFailures(t *testing.T) {
 			}
 			if got := strings.Count(r.stdout, "\n"); got != 8 {
 				t.Errorf("want all 8 lines even after a failure, got %d", got)
+			}
+			// Check (d), the System Settings write, runs only when (c) was
+			// refused.
+			cFailed := strings.Contains(r.stdout, "FAIL (c)")
+			if skipped := strings.Contains(r.stdout, "SKIP (d) refused write to System Settings: not run because check (c) did not pass"); skipped != cFailed {
+				t.Errorf("(d) skipped = %v, want %v:\n%s", skipped, cFailed, r.stdout)
+			}
+			put := false
+			for _, req := range f.seen() {
+				put = put || req.Method == http.MethodPut
+			}
+			if put == cFailed {
+				t.Errorf("PUT sent = %v with check (c) failed = %v; (d) must run exactly when (c) passed", put, cFailed)
 			}
 		})
 	}

@@ -7,7 +7,9 @@ import (
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
+	"sync/atomic"
 	"testing"
 
 	"github.com/abhishekjha/close-copilot/internal/config"
@@ -62,9 +64,11 @@ func TestIsRefused(t *testing.T) {
 		err  error
 		want bool
 	}{
-		{"403", &apiError{Status: 403}, true},
-		{"PermissionError on 417", &apiError{Status: 417, ExcType: "PermissionError"}, true},
-		{"wrapped 403", fmt.Errorf("probe: %w", &apiError{Status: 403, ExcType: "PermissionError"}), true},
+		{"403 PermissionError", &apiError{Status: 403, ExcType: "PermissionError"}, true},
+		{"wrapped 403 PermissionError", fmt.Errorf("probe: %w", &apiError{Status: 403, ExcType: "PermissionError"}), true},
+		{"bare 403 from a proxy", &apiError{Status: 403}, false},
+		{"403 with another exc_type", &apiError{Status: 403, ExcType: "CSRFTokenError"}, false},
+		{"PermissionError on 417", &apiError{Status: 417, ExcType: "PermissionError"}, false},
 		{"401 is not a refusal", &apiError{Status: 401, ExcType: "AuthenticationError"}, false},
 		{"404", &apiError{Status: 404, ExcType: "DoesNotExistError"}, false},
 		{"500", &apiError{Status: 500}, false},
@@ -192,5 +196,75 @@ func TestDispatchUsage(t *testing.T) {
 		if r := runProbe(t, cfg, args...); r.err == nil {
 			t.Errorf("args %q: want an error", args)
 		}
+	}
+}
+
+func TestRedirectRefused(t *testing.T) {
+	var otherHits atomic.Int32
+	other := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		otherHits.Add(1)
+		_, _ = fmt.Fprint(w, `{"message":"stolen"}`)
+	}))
+	defer other.Close()
+
+	var landed atomic.Int32
+	var mainURL atomic.Pointer[url.URL]
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		u := mainURL.Load()
+		switch r.URL.Path {
+		case "/api/method/port":
+			http.Redirect(w, r, other.URL+"/api/method/landed", http.StatusFound)
+		case "/api/method/host":
+			http.Redirect(w, r, "http://localhost:"+u.Port()+"/api/method/landed", http.StatusFound)
+		case "/api/method/scheme":
+			http.Redirect(w, r, "https://"+u.Host+"/api/method/landed", http.StatusFound)
+		case "/api/method/same-absolute":
+			http.Redirect(w, r, u.String()+"/api/method/landed", http.StatusMovedPermanently)
+		case "/api/method/same-relative":
+			http.Redirect(w, r, "/api/method/landed", http.StatusTemporaryRedirect)
+		case "/api/method/hostile":
+			w.Header().Set("Location", "/api/x%0Alevel=INFO%20msg=approved%1B[2J")
+			w.WriteHeader(http.StatusFound)
+		default:
+			landed.Add(1)
+			_, _ = fmt.Fprint(w, `{"message":"landed"}`)
+		}
+	}))
+	defer srv.Close()
+	u, err := url.Parse(srv.URL)
+	if err != nil {
+		t.Fatal(err)
+	}
+	mainURL.Store(u)
+
+	cfg := testConfig(srv)
+	// Put the targets on the httpx allowlist, so the refusal is the
+	// redirect policy and not the egress guard.
+	cfg.BooksMCPURL = other.URL
+	cfg.DoclingURL = "http://localhost:" + u.Port()
+	c, err := newClient(cfg, config.NewSecret(testBotKey), config.NewSecret(testBotSecret))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"port", "host", "scheme", "same-absolute", "same-relative", "hostile"} {
+		t.Run(name, func(t *testing.T) {
+			var out struct{ Message string }
+			err := c.do(context.Background(), http.MethodGet, "/api/method/"+name, nil, nil, &out)
+			if err == nil || !strings.Contains(err.Error(), "redirect refused") {
+				t.Fatalf("err = %v, want a refused redirect", err)
+			}
+			for _, r := range err.Error() {
+				if r < 0x20 || r == 0x7f {
+					t.Errorf("error has control character %U: %q", r, err.Error())
+				}
+			}
+			assertNoSecrets(t, err.Error())
+		})
+	}
+	if n := otherHits.Load(); n != 0 {
+		t.Errorf("the other port received %d requests (and the Authorization header)", n)
+	}
+	if n := landed.Load(); n != 0 {
+		t.Errorf("a refused redirect still reached its target %d times", n)
 	}
 }
