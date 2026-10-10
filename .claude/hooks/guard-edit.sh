@@ -16,7 +16,6 @@ set -euo pipefail
 set -f # globs from specs are patterns, never pathnames
 
 role="${1:-}"
-root="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 input="$(cat)"
 
 if command -v jq >/dev/null 2>&1; then
@@ -25,6 +24,19 @@ else
   file="$(printf '%s' "$input" | sed -E -n 's/.*"(file_path|notebook_path)"[[:space:]]*:[[:space:]]*"([^"]*)".*/\2/p' | head -n 1)"
 fi
 [ -n "$file" ] || exit 0
+
+# The root is the checkout that holds the file: the main checkout or one of
+# the ticket worktrees under .worktrees/. Each worktree has its own
+# tmp/current-task, so parallel builds each enforce their own spec.
+root=""
+dir="$(dirname "$file")"
+while [ -n "$dir" ] && [ "$dir" != "/" ] && [ ! -d "$dir" ]; do
+  dir="$(dirname "$dir")"
+done
+if [ -d "$dir" ]; then
+  root="$(git -C "$dir" rev-parse --show-toplevel 2>/dev/null || true)"
+fi
+[ -n "$root" ] || root="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 rel="${file#"$root"/}"
 

@@ -2,7 +2,7 @@
 
 A Go agent that runs the month-end close on ERPNext for Indian companies. Deterministic checks find the problems, an LLM explains each one, a verifier traces every number back to the evidence, and nothing reaches the ledger without maker-checker approval. All data is synthetic.
 
-Everything in this repo is built by Claude Code on the owner's machine (ADR 0001). The owner (abhi) reviews and merges; agents never merge.
+Everything in this repo is built by Claude Code on the owner's machine (ADR 0001). The owner (abhi) owns `main`. During the build phase (owner decision, 2026-10-10) the orchestrator merges on the owner's behalf once every gate passes; subagents never merge.
 
 ## Where things are decided
 
@@ -17,7 +17,7 @@ Everything in this repo is built by Claude Code on the owner's machine (ADR 0001
 1. `/next` lists the tickets whose dependencies are merged, in phase order.
 2. `/spec CC-xxx` writes `specs/CC-xxx.md` from the ticket and the graph. A regulated spec waits for the owner's approval.
 3. `/build CC-xxx` creates the branch, delegates to the owner subagent, runs the gates, retries up to three times with a failure report, runs the security review for data-sensitive and regulated tickets, and commits on the branch.
-4. The owner reviews `git diff main...<branch>` and merges with `git merge --no-ff`. A ticket is done when `main` has a commit whose subject starts with `CC-xxx:`.
+4. During the build phase the orchestrator merges with `git merge --no-ff` through the merge queue in `/build`, after the gates (and G5 where required) pass; regulated tickets go on the owner's review list. A ticket is done when `main` has a commit whose subject starts with `CC-xxx:`.
 
 Work in **phase order** (0 → 5), not epic order. Phase 1 is a thin end-to-end slice on `suite-skeleton` (one company, one month, three planted bank charges); nothing widens until Gate B passes. `/gates` runs the ladder on the current branch at any time.
 
@@ -77,7 +77,7 @@ make help        # everything else
 ## Git
 
 - One branch per ticket: `cc-602-bank-rec`. Commit subjects start with the ticket ID: `CC-602: bank reconciliation matcher`. Add the trailer `Agent-Run: <session id>`.
-- Never push, merge, rebase or reset `main`. There is no remote yet.
+- Only the orchestrator merges to `main` and pushes (`--no-ff`, never `--force`); never rebase or reset `main`. Parallel tickets use worktrees under `.worktrees/`.
 - `tmp/` (git-ignored) holds per-build state: `tmp/current-task`, `tmp/erpnext.lock`, `tmp/reports/`.
 
 ## ERPNext lock
