@@ -7,7 +7,7 @@ import (
 
 	"github.com/jackc/pgx/v5"
 
-	"github.com/abhishekjha/close-copilot/internal/seed"
+	"github.com/abhishekjha/close-copilot/internal/company"
 )
 
 // ErrNotFound is returned when a requested record does not exist.
@@ -81,8 +81,9 @@ func (s *Store) ListCompanies(ctx context.Context) ([]Company, error) {
 	return out, nil
 }
 
-// SeedCompaniesFromProfiles seeds the companies table from parsed seed.Profiles.
-func (s *Store) SeedCompaniesFromProfiles(ctx context.Context, profiles []seed.Profile) error {
+// SeedCompaniesFromProfiles seeds the companies table from parsed company
+// profiles (company.Profile, which seed.Profile aliases).
+func (s *Store) SeedCompaniesFromProfiles(ctx context.Context, profiles []company.Profile) error {
 	return s.WithTx(ctx, func(tx pgx.Tx) error {
 		const query = `
 			INSERT INTO companies (id, erp_company, gstin)
@@ -106,7 +107,7 @@ func (s *Store) SeedCompaniesFromProfiles(ctx context.Context, profiles []seed.P
 
 // SeedCompaniesFromDir loads profile YAMLs from a directory and upserts them.
 func (s *Store) SeedCompaniesFromDir(ctx context.Context, dir string) error {
-	profiles, err := seed.LoadProfiles(dir)
+	profiles, err := company.LoadProfiles(dir)
 	if err != nil {
 		return fmt.Errorf("store: load profiles from %s: %w", dir, err)
 	}

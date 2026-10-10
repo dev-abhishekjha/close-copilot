@@ -534,7 +534,7 @@ func TestPayrollOnLastWorkingDay(t *testing.T) {
 		}
 	}
 	// A fixed day on a weekend moves to the Friday before.
-	p.Payroll.Day = Day{N: 3, set: true} // 2026-10-03 is a Saturday
+	p.Payroll.Day = DayOfMonth(3) // 2026-10-03 is a Saturday
 	pay := eventsOf(mustGenerate(t, p, "2026-10", Options{}), EventPayroll)
 	if len(pay) != 1 || pay[0].Date != "2026-10-02" {
 		t.Errorf("payroll %+v, want one on 2026-10-02", pay)

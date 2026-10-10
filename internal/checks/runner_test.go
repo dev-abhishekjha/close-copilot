@@ -10,8 +10,8 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/money"
-	"github.com/abhishekjha/close-copilot/internal/seed"
 )
 
 type fakeCheck struct {
@@ -278,17 +278,17 @@ func TestRunnerCancelledCallerContext(t *testing.T) {
 func TestBankAccountsFor(t *testing.T) {
 	tests := []struct {
 		name string
-		p    seed.Profile
+		p    company.Profile
 		want []string
 	}{
 		{
 			name: "profile bank account with company abbr",
-			p:    seed.Profile{ID: "testco", Abbr: "TC", Bank: seed.Bank{Name: "Test Bank", Account: "Test Current 0001"}},
+			p:    company.Profile{ID: "testco", Abbr: "TC", Bank: company.Bank{Name: "Test Bank", Account: "Test Current 0001"}},
 			want: []string{"Test Current 0001 - TC"},
 		},
 		{
 			name: "other abbr",
-			p:    seed.Profile{ID: "demo", Abbr: "DPL", Bank: seed.Bank{Account: "Demo Bank Current"}},
+			p:    company.Profile{ID: "demo", Abbr: "DPL", Bank: company.Bank{Account: "Demo Bank Current"}},
 			want: []string{"Demo Bank Current - DPL"},
 		},
 	}
