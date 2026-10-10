@@ -33,6 +33,7 @@ The main session is the orchestrator: it reads, plans, delegates and runs gates.
 | llm-engineer | llm, agent (explainer, verifier, investigator, router), prompts, pricing | internal/evals, golden sets, baselines, budget caps |
 | eval-engineer | internal/evals, judge drafts, golden-set drafts | code under test in the same ticket, the baseline |
 | security-reviewer | nothing (reports only) | everything (read-only) |
+| ticket-reviewer | nothing (reports only): Opus review of regulated specs and diffs | everything (read-only) |
 
 No agent grades its own output: the data engineer plants the errors, the implementer writes the detectors, the eval engineer writes the scorer. The guard hook enforces these boundaries.
 
@@ -40,7 +41,7 @@ No agent grades its own output: the data engineer plants the errors, the impleme
 
 Spend tokens where judgment is needed and nowhere else. These rules never loosen a gate.
 
-- **Models:** each subagent's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer and security-reviewer. `/build` raises a worker to Opus for regulated tickets and for a last attempt after the same failure twice. Run the main session on Sonnet (`/model sonnet`) and switch to Opus to build a regulated ticket. Search-only questions go to the Explore agent with `model: "haiku"`; Haiku never writes code.
+- **Models are automatic:** sessions start on Sonnet (`.claude/settings.json`) and `/next`, `/spec`, `/build` and `/gates` run on Sonnet. Each subagent's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer, security-reviewer and ticket-reviewer. For regulated and `human_review` tickets, `ticket-reviewer` does the Opus spec and diff reviews, and `/build` raises the worker to Opus; a worker's last attempt after the same failure twice also runs on Opus. No manual `/model` switch is needed. Search-only questions go to the Explore agent with `model: "haiku"`; Haiku never writes code.
 - **One ticket per session:** `/clear` after a ticket merges, once nothing else is in flight. State lives in git, `specs/`, `tasks/` and `tmp/`; `/next` picks it up.
 - **Specs stand alone:** a spec quotes what the worker needs from `docs/` and has a Code map, so workers don't read the 69-ticket doc or explore the repo.
 - **Logs go to files:** commands write to `tmp/reports/*.log`, and agents read only the failing lines. Retries get the failure report, never a raw log.

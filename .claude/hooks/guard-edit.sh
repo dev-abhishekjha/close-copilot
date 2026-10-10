@@ -283,8 +283,8 @@ case "$role" in
       internal/seed/* | evals/scenarios/* | evals/baseline.json)
         block "implementer never edits the seeder, scenarios or baseline ($rel); the domain-data-engineer owns them." ;;
     esac ;;
-  security-reviewer)
-    block "security-reviewer is read-only; report the finding instead of editing $rel." ;;
+  security-reviewer | ticket-reviewer)
+    block "$role is read-only; report the finding instead of editing $rel." ;;
 esac
 shopt -u nocasematch
 

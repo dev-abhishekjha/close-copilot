@@ -4,6 +4,7 @@ description: "Design mode. Write specs/<ID>.md for one Close Copilot ticket from
 argument-hint: CC-xxx
 arguments: [id]
 disable-model-invocation: true
+model: sonnet
 allowed-tools: Read Grep Glob Write Edit Bash(git log *) Bash(git status*)
 ---
 
@@ -39,7 +40,7 @@ You are the orchestrator in design mode. The spec is the only thing the worker w
 
 ## Finish
 
-- Regulated or `human_review: true`: show the owner a short summary (scope, files, acceptance, risks) and ask for approval. On approval, set `approved_by: abhi <date>`. Don't start the build.
+- Regulated or `human_review: true`: start `ticket-reviewer` (Opus) in mode `spec` with the ID and checkout path, and fix every blocking finding before you finish. During the build phase `/build` records the delegated approval; otherwise show the owner a short summary (scope, files, acceptance, risks, the reviewer's verdict) and ask for approval, and on approval set `approved_by: abhi <date>`. Don't start the build.
 - Otherwise: say the spec is ready and suggest `/build $id`.
 
 Don't commit; `/build` commits the spec as the branch's first commit.
