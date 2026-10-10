@@ -42,6 +42,7 @@ const (
 	EnvLLMModelFast     = "LLM_MODEL_FAST"
 	EnvLLMModelStrong   = "LLM_MODEL_STRONG"
 	EnvLLMDailyBudget   = "LLM_DAILY_BUDGET_USD"
+	EnvLLMRunTokenCap   = "LLM_RUN_TOKEN_CAP"
 	EnvPseudonymKey     = "PSEUDONYM_KEY"
 	EnvTEIEmbedURL      = "TEI_EMBED_URL"
 	EnvTEIRerankURL     = "TEI_RERANK_URL"
@@ -86,7 +87,10 @@ type Config struct {
 	LLMModelFast      string
 	LLMModelStrong    string
 	LLMDailyBudgetUSD float64
-	PseudonymKey      Secret
+	// LLMRunTokenCap caps the model tokens (input plus output) one close
+	// run may use; the workflow checks it before each model call.
+	LLMRunTokenCap int64
+	PseudonymKey   Secret
 
 	TEIEmbedURL  string
 	TEIRerankURL string
@@ -124,6 +128,7 @@ func (c Config) view() []slog.Attr {
 		slog.String("LLMModelFast", c.LLMModelFast),
 		slog.String("LLMModelStrong", c.LLMModelStrong),
 		slog.Float64("LLMDailyBudgetUSD", c.LLMDailyBudgetUSD),
+		slog.Int64("LLMRunTokenCap", c.LLMRunTokenCap),
 		slog.String("PseudonymKey", c.PseudonymKey.masked()),
 		slog.String("TEIEmbedURL", redactURL(c.TEIEmbedURL)),
 		slog.String("TEIRerankURL", redactURL(c.TEIRerankURL)),
@@ -243,6 +248,7 @@ var defaults = map[string]string{
 	EnvAppAddr:        ":8000",
 	EnvDataDir:        "./data/external",
 	EnvLLMDailyBudget: "2.00",
+	EnvLLMRunTokenCap: "200000",
 }
 
 // Lookup reads one variable; os.LookupEnv satisfies it.
@@ -320,7 +326,7 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 	var missing []string
 	for _, key := range required {
 		empty, known := isEmpty(key)
-		if !known && key != EnvLLMDailyBudget {
+		if !known && key != EnvLLMDailyBudget && key != EnvLLMRunTokenCap {
 			errs = append(errs, fmt.Errorf("config: unknown variable %q marked as required", key))
 			continue
 		}
@@ -340,6 +346,16 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 		errs = append(errs, fmt.Errorf("config: %s must not be negative", EnvLLMDailyBudget))
 	default:
 		c.LLMDailyBudgetUSD = budget
+	}
+
+	tokenCap, err := strconv.ParseInt(get(EnvLLMRunTokenCap), 10, 64)
+	switch {
+	case err != nil:
+		errs = append(errs, fmt.Errorf("config: %s must be a whole number: %w", EnvLLMRunTokenCap, err))
+	case tokenCap <= 0:
+		errs = append(errs, fmt.Errorf("config: %s must be greater than zero", EnvLLMRunTokenCap))
+	default:
+		c.LLMRunTokenCap = tokenCap
 	}
 
 	switch c.LLMProvider {
