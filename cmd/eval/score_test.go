@@ -115,9 +115,15 @@ func TestScoreCLI(t *testing.T) {
 		if code != 0 {
 			t.Fatalf("baseline-out: exit %d, %s", code, errText)
 		}
-		var b map[string]any
+		var b struct {
+			Version int `json:"version"`
+			Tiers   map[string]*struct {
+				PricingVersion string `json:"pricing_version"`
+			} `json:"tiers"`
+		}
 		raw, _ := os.ReadFile(base)
-		if err := json.Unmarshal(raw, &b); err != nil || len(b["pricing_version"].(string)) != 64 {
+		if err := json.Unmarshal(raw, &b); err != nil || b.Version != 2 || b.Tiers["replay"] == nil ||
+			len(b.Tiers["replay"].PricingVersion) != 64 || b.Tiers["llm"] != nil {
 			t.Fatalf("candidate %s: %v", raw, err)
 		}
 		code, _, errText = runCLI(t, "score", filepath.Join(scoreData, "run-pass"), "--truth-dir", truth, "--out", t.TempDir(), "--compare", base)

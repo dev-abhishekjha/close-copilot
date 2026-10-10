@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"slices"
@@ -12,19 +13,73 @@ import (
 	"strings"
 )
 
-// BaselineVersion is the baseline file format version.
-const BaselineVersion = 1
+// BaselineVersion is the baseline file format version. Version 2 holds
+// one section per tier; version 1 (a single section) is rejected.
+const BaselineVersion = 2
 
-// Baseline is a candidate evals/baseline.json: every item's outcome, the
-// aggregates, the noise measured over repeated runs, and what produced it.
-// The scorer only writes candidates; the owner commits the real file in
-// its own baseline-update commit.
+// Baseline tiers: Tier 1 replays recorded fixtures without the model
+// (agent false); Tier 2 runs the explainer and verifier (agent true).
+const (
+	TierReplay = "replay"
+	TierLLM    = "llm"
+)
+
+// TierFor is the baseline section a score is judged against.
+func TierFor(agent bool) string {
+	if agent {
+		return TierLLM
+	}
+	return TierReplay
+}
+
+// BaselineFile is evals/baseline.json: one protected file with a section
+// per tier, {"version":2,"tiers":{"replay":...,"llm":...}}. The scorer
+// only writes candidates; the owner commits the real file in its own
+// baseline-update commit.
+type BaselineFile struct {
+	Version int           `json:"version"`
+	Tiers   BaselineTiers `json:"tiers"`
+}
+
+// BaselineTiers are the sections; an absent section is null.
+type BaselineTiers struct {
+	Replay *Baseline `json:"replay"`
+	LLM    *Baseline `json:"llm"`
+}
+
+// ErrBaselineTier is a baseline file with no section for a score's tier.
+var ErrBaselineTier = errors.New("evals: baseline has no section for this tier")
+
+// Section is the section for a score's agent flag; a missing one is
+// ErrBaselineTier (fail closed).
+func (f BaselineFile) Section(agent bool) (Baseline, error) {
+	b := f.Tiers.Replay
+	if agent {
+		b = f.Tiers.LLM
+	}
+	if b == nil {
+		return Baseline{}, fmt.Errorf("%w %q (agent %t)", ErrBaselineTier, TierFor(agent), agent)
+	}
+	return *b, nil
+}
+
+// Set replaces the section for b's agent flag and keeps the other.
+func (f *BaselineFile) Set(b Baseline) {
+	c := b
+	if b.Agent {
+		f.Tiers.LLM = &c
+	} else {
+		f.Tiers.Replay = &c
+	}
+}
+
+// Baseline is one tier's section: every item's outcome, the aggregates,
+// the noise measured over repeated runs, and what produced it.
 type Baseline struct {
-	Version int         `json:"version"`
-	Suite   string      `json:"suite"`
-	Commit  string      `json:"commit"`
-	Agent   bool        `json:"agent"`
-	Models  ScoreModels `json:"models"`
+	Suite  string      `json:"suite"`
+	Commit string      `json:"commit"`
+	Agent  bool        `json:"agent"`
+	Models ScoreModels `json:"models"`
 	// PricingVersion is the sha256 of config/pricing.yaml.
 	PricingVersion string `json:"pricing_version"`
 
@@ -65,7 +120,6 @@ const (
 // NewBaseline builds a candidate baseline from a score. noise may be nil.
 func NewBaseline(s Score, noise *Noise, pricingVersion string) (Baseline, error) {
 	b := Baseline{
-		Version:        BaselineVersion,
 		Suite:          s.Suite,
 		Commit:         s.Commit,
 		Agent:          s.Agent,
@@ -194,31 +248,65 @@ func protectedDir(p string) (string, bool) {
 	return "", false
 }
 
-// WriteBaseline writes a candidate baseline atomically. It refuses any
-// path CheckOutputPath refuses, evals/baseline.json above all.
+// WriteBaseline writes a candidate baseline atomically: it replaces only
+// b's tier section of the file at path and keeps the other (creating the
+// file if absent). It refuses any path CheckOutputPath refuses,
+// evals/baseline.json above all, and an existing file it can't read.
 func WriteBaseline(path string, b Baseline) error {
 	if err := CheckOutputPath("--baseline-out", path); err != nil {
 		return err
 	}
-	return writeJSON(path, b)
+	f := BaselineFile{Version: BaselineVersion}
+	if _, err := os.Stat(path); err == nil {
+		if f, err = LoadBaseline(path); err != nil {
+			return fmt.Errorf("evals: --baseline-out %s exists but can't be updated: %w", path, err)
+		}
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return fmt.Errorf("evals: --baseline-out %s: %w", path, err)
+	}
+	f.Set(b)
+	return writeJSON(path, f)
 }
 
-// LoadBaseline reads a baseline strictly. A missing or malformed file is
-// an error, never an empty baseline.
-func LoadBaseline(path string) (Baseline, error) {
-	var b Baseline
-	if err := readStrict(path, &b); err != nil {
-		return Baseline{}, fmt.Errorf("evals: baseline: %w", err)
+// LoadBaseline reads a baseline file strictly. A missing or malformed
+// file, another version, and a section that isn't a valid baseline of
+// its tier are errors, never an empty baseline. A file may lack a
+// section; Section fails closed on it.
+func LoadBaseline(path string) (BaselineFile, error) {
+	// The version first, leniently, so an old file says so plainly.
+	var v struct {
+		Version int `json:"version"`
 	}
-	switch {
-	case b.Version != BaselineVersion:
-		return Baseline{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, b.Version, BaselineVersion)
-	case !nameRe.MatchString(b.Suite):
-		return Baseline{}, fmt.Errorf("evals: baseline %s: suite %.64q is not a suite name", path, b.Suite)
-	case b.Items == nil:
-		return Baseline{}, fmt.Errorf("evals: baseline %s: items is missing", path)
+	if err := readJSONFile(path, &v); err != nil {
+		return BaselineFile{}, fmt.Errorf("evals: baseline: %w", err)
 	}
-	return b, nil
+	if v.Version != BaselineVersion {
+		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, v.Version, BaselineVersion)
+	}
+	var f BaselineFile
+	if err := readStrict(path, &f); err != nil {
+		return BaselineFile{}, fmt.Errorf("evals: baseline: %w", err)
+	}
+	if f.Version != BaselineVersion {
+		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, f.Version, BaselineVersion)
+	}
+	for _, sec := range []struct {
+		tier  string
+		agent bool
+		b     *Baseline
+	}{{TierReplay, false, f.Tiers.Replay}, {TierLLM, true, f.Tiers.LLM}} {
+		b := sec.b
+		switch {
+		case b == nil:
+		case !nameRe.MatchString(b.Suite):
+			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s: suite %.64q is not a suite name", path, sec.tier, b.Suite)
+		case b.Items == nil:
+			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s: items is missing", path, sec.tier)
+		case b.Agent != sec.agent:
+			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s has agent %t", path, sec.tier, b.Agent)
+		}
+	}
+	return f, nil
 }
 
 // PricingVersion is the sha256 (hex) of the pricing file.
@@ -239,7 +327,17 @@ const (
 	CompareCleanMonthFailed = "clean_month_failed"
 	CompareVerifiedDrop     = "verified_drop" // verified findings fell by more than the noise
 	CompareNew              = "new"           // not in the baseline; listed, not a failure
+
+	CompareTierMissing     = "baseline_tier_missing" // the baseline file has no section for the score's tier
+	CompareEmptyBaseline   = "empty_baseline"        // the section has no items, so nothing could regress
+	CompareAgentMismatch   = "agent_mismatch"        // the section's agent flag differs from the score's
+	CompareModelMismatch   = "model_mismatch"        // Tier 2: the fast or strong model differs
+	CompareLatencyIncrease = "latency_p95_increase"  // Tier 2: p95 close duration rose past the threshold
+	CompareCostIncrease    = "cost_increase"         // Tier 2: total cost rose past the threshold
 )
+
+// compareRepro re-runs a comparison.
+const compareRepro = "go run ./cmd/eval score <results-dir> --compare <baseline.json>"
 
 // CompareEntry is one line of a comparison.
 type CompareEntry struct {
@@ -258,15 +356,33 @@ type Comparison struct {
 	New      []CompareEntry `json:"new"`
 }
 
-// Compare judges a score against a baseline item by item: every item
-// caught in the baseline and not caught now, every baseline item missing
-// from the score, every clean-month false alarm, a failed clean month, and
-// a drop in verified findings larger than the measured noise (floor: one
-// item) are failures. Items new since the baseline are listed, not failed.
-// A baseline for another suite is an error.
+// CompareTier judges a score against its tier's section of a baseline
+// file. A missing section is a failure (fail closed), never a pass.
+func CompareTier(f BaselineFile, s Score) (Comparison, error) {
+	b, err := f.Section(s.Agent)
+	if err != nil {
+		return Comparison{Failures: []CompareEntry{{Kind: CompareTierMissing, Key: TierFor(s.Agent),
+			Detail: err.Error() + "; the owner commits it in a baseline-update commit (evals/fixtures/README.md)",
+			Repro:  compareRepro, Evidence: "baseline tiers/" + TierFor(s.Agent)}}, New: []CompareEntry{}}, nil
+	}
+	return Compare(b, s)
+}
+
+// Compare judges a score against one tier's baseline item by item: every
+// item caught in the baseline and not caught now, every baseline item
+// missing from the score, every clean-month false alarm, a failed clean
+// month, and a drop in verified findings larger than the measured noise
+// (floor: one item) are failures. Items new since the baseline are
+// listed, not failed. An empty baseline, a baseline whose agent flag
+// differs from the score's, and (with the agent on) one whose fast or
+// strong model differs are failures, and nothing else is compared. A
+// baseline for another suite is an error.
 func Compare(b Baseline, s Score) (Comparison, error) {
 	if b.Suite != s.Suite {
 		return Comparison{}, fmt.Errorf("evals: baseline is for suite %s, the score for %s", b.Suite, s.Suite)
+	}
+	if fs := compareConfig(b, s); len(fs) > 0 {
+		return Comparison{Failures: fs, New: []CompareEntry{}}, nil
 	}
 	c := Comparison{Failures: []CompareEntry{}, New: []CompareEntry{}}
 	now := map[string]ItemOutcome{}
@@ -292,7 +408,7 @@ func Compare(b Baseline, s Score) (Comparison, error) {
 	for _, k := range gone {
 		c.Failures = append(c.Failures, CompareEntry{Kind: CompareRemoved, Key: k, Was: b.Items[k], Now: "absent",
 			Detail: "item is in the baseline but not in the ground truth now",
-			Repro:  "go run ./cmd/eval score <results-dir> --compare <baseline>", Evidence: "baseline items/" + k})
+			Repro:  compareRepro, Evidence: "baseline items/" + k})
 	}
 	for _, fa := range s.FalseAlarms {
 		if fa.Reason != ReasonCleanMonth {
@@ -313,9 +429,101 @@ func Compare(b Baseline, s Score) (Comparison, error) {
 		c.Failures = append(c.Failures, CompareEntry{Kind: CompareVerifiedDrop, Key: NoiseVerified,
 			Was: fmt.Sprint(b.Aggregates.VerifiedRate.Num), Now: fmt.Sprint(s.VerifiedRate.Num),
 			Detail: fmt.Sprintf("verified findings fell by %d, more than the noise tolerance %d", drop, tol),
-			Repro:  "go run ./cmd/eval score <results-dir> --compare <baseline>", Evidence: ScoreJSONFile + "#verified_rate"})
+			Repro:  compareRepro, Evidence: ScoreJSONFile + "#verified_rate"})
 	}
 	return c, nil
+}
+
+// compareConfig fails a baseline that can't judge the score: no items, or
+// another agent flag, or (agent on) other models.
+func compareConfig(b Baseline, s Score) []CompareEntry {
+	var out []CompareEntry
+	if len(b.Items) == 0 {
+		out = append(out, CompareEntry{Kind: CompareEmptyBaseline, Key: TierFor(s.Agent),
+			Detail: "the baseline has no items, so no regression could fail; re-measure it", Repro: compareRepro,
+			Evidence: "baseline tiers/" + TierFor(s.Agent) + "/items"})
+	}
+	if b.Agent != s.Agent {
+		out = append(out, CompareEntry{Kind: CompareAgentMismatch, Key: "agent", Was: fmt.Sprint(b.Agent), Now: fmt.Sprint(s.Agent),
+			Detail: "the baseline and the score ran with a different agent setting", Repro: compareRepro,
+			Evidence: ScoreJSONFile + "#agent"})
+		return out
+	}
+	if s.Agent {
+		if b.Models.Fast != s.Models.Fast {
+			out = append(out, CompareEntry{Kind: CompareModelMismatch, Key: "models.fast", Was: b.Models.Fast, Now: s.Models.Fast,
+				Detail: "fast model differs from the baseline's", Repro: compareRepro, Evidence: ScoreJSONFile + "#models"})
+		}
+		if b.Models.Strong != s.Models.Strong {
+			out = append(out, CompareEntry{Kind: CompareModelMismatch, Key: "models.strong", Was: b.Models.Strong, Now: s.Models.Strong,
+				Detail: "strong model differs from the baseline's", Repro: compareRepro, Evidence: ScoreJSONFile + "#models"})
+		}
+	}
+	return out
+}
+
+// CompareLatencyP95 fails when the score's p95 close duration exceeds the
+// baseline's by more than maxPct percent. An increase below minDeltaMS
+// milliseconds is ignored (an absolute floor). Integer math only: the
+// increase fails when delta*100 > baseline*maxPct, so exactly maxPct
+// passes.
+func CompareLatencyP95(b Baseline, s Score, maxPct, minDeltaMS int64) []CompareEntry {
+	was, now := b.Aggregates.Runs.DurationMS.P95, s.Runs.DurationMS.P95
+	delta := now - was
+	if delta <= 0 || delta < minDeltaMS {
+		return nil
+	}
+	lhs := new(big.Int).Mul(big.NewInt(delta), big.NewInt(100))
+	if lhs.Cmp(new(big.Int).Mul(big.NewInt(was), big.NewInt(maxPct))) <= 0 {
+		return nil
+	}
+	return []CompareEntry{{Kind: CompareLatencyIncrease, Key: "runs.duration_ms.p95", Was: fmt.Sprint(was), Now: fmt.Sprint(now),
+		Detail:   fmt.Sprintf("p95 close duration rose by %d ms, more than %d%% of the baseline (floor %d ms)", delta, maxPct, minDeltaMS),
+		Repro:    compareRepro + fmt.Sprintf(" --max-p95-increase-pct %d --min-latency-delta-ms %d", maxPct, minDeltaMS),
+		Evidence: ScoreJSONFile + "#runs.duration_ms.p95"}}
+}
+
+// CompareCost fails when the score's total cost exceeds the baseline's by
+// more than maxPct percent, in exact decimal math. A zero baseline cost
+// passes a zero cost and fails any cost above it.
+func CompareCost(b Baseline, s Score, maxPct int64) ([]CompareEntry, error) {
+	was, err := parseCost(b.Aggregates.Runs.CostUSD.Total)
+	if err != nil {
+		return nil, fmt.Errorf("evals: baseline cost: %w", err)
+	}
+	now, err := parseCost(s.Runs.CostUSD.Total)
+	if err != nil {
+		return nil, fmt.Errorf("evals: score cost: %w", err)
+	}
+	delta := new(big.Rat).Sub(now, was)
+	if delta.Sign() <= 0 {
+		return nil, nil
+	}
+	limit := new(big.Rat).Mul(was, new(big.Rat).SetInt64(maxPct))
+	if was.Sign() != 0 && new(big.Rat).Mul(delta, big.NewRat(100, 1)).Cmp(limit) <= 0 {
+		return nil, nil
+	}
+	return []CompareEntry{{Kind: CompareCostIncrease, Key: "runs.cost_usd.total",
+		Was: b.Aggregates.Runs.CostUSD.Total, Now: s.Runs.CostUSD.Total,
+		Detail:   fmt.Sprintf("total cost rose by more than %d%% of the baseline", maxPct),
+		Repro:    compareRepro + fmt.Sprintf(" --max-cost-increase-pct %d", maxPct),
+		Evidence: ScoreJSONFile + "#runs.cost_usd.total"}}, nil
+}
+
+// parseCost reads exact decimal cost text ("" is zero).
+func parseCost(v string) (*big.Rat, error) {
+	if v == "" {
+		return new(big.Rat), nil
+	}
+	norm, err := sumDecimals([]string{v})
+	if err != nil {
+		return nil, err
+	}
+	r, ok := new(big.Rat).SetString(norm)
+	if !ok {
+		return nil, fmt.Errorf("cost %.40q is not a decimal", v)
+	}
+	return r, nil
 }
 
 // String is one line per entry, failures first.

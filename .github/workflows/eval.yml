@@ -1,0 +1,300 @@
+name: eval
+
+# The eval gate, G4 (CC-905). Tier 1 replays the recorded books and
+# evidence tool responses (evals/fixtures/<suite>) through the real close
+# workflow with no model and no ERPNext, then scores the run against
+# evals/baseline.json item by item. Tier 2 runs the same replay with the
+# explainer and verifier three times, nightly and on dispatch only: it
+# reads the Anthropic key, which pull request code must never see.
+#
+# The scorer is built from the base ref, never from the pull request, so
+# a PR can't loosen the measuring stick that judges it (as CC-004 does for
+# the gates); the PR's code is only the code under test. A change to the
+# scorer's flags therefore lands in two PRs: the flag first, its use here
+# next. The baseline is read from the base tree too.
+#
+# The one job always runs (a skipped required check counts as passing);
+# steps decide the tier. With no eval-relevant change on a PR it passes
+# with a note. A missing baseline or fixtures index fails closed.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  schedule:
+    - cron: "30 21 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eval-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  eval:
+    name: eval (G4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: copilot
+          POSTGRES_PASSWORD: copilot
+          POSTGRES_DB: copilot
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U copilot -d copilot"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    env:
+      SUITE: suite-skeleton
+      # A throwaway service container on the runner, not a secret.
+      DATABASE_URL: postgres://copilot:copilot@localhost:5432/copilot?sslmode=disable
+    steps:
+      - name: check out the base ref (the scorer and the baseline)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.event.repository.default_branch }}
+          path: base
+          persist-credentials: false
+      - name: check out the code under test
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      # No cache: a cache saved by the PR's own jobs could hand the base
+      # build planted objects.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: base/go.mod
+          cache: false
+
+      - name: decide the tier
+        id: tier
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          replay=false
+          llm=false
+          if [ "$EVENT" = "pull_request" ]; then
+            changed="$(git -C pr diff --name-only "$BASE_SHA...$HEAD_SHA")"
+            if printf '%s\n' "$changed" | grep -qE '^(internal/(checks|seed|evidence|books|store|evals)/|cmd/eval/|evals/|go\.mod$|go\.sum$|\.github/workflows/eval\.yml$)'; then
+              replay=true
+            else
+              echo "eval (G4): no eval-relevant paths changed" >>"$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            replay=true
+            llm=true
+          fi
+          echo "replay=$replay" >>"$GITHUB_OUTPUT"
+          echo "llm=$llm" >>"$GITHUB_OUTPUT"
+
+      - name: build the scorer from the base ref
+        if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
+        working-directory: base
+        run: |
+          go mod verify
+          mkdir -p "$RUNNER_TEMP/evalbase"
+          go build -o "$RUNNER_TEMP/evalbase/eval" ./cmd/eval
+
+      - name: fixtures present (fail closed)
+        if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
+        working-directory: pr
+        run: |
+          if [ ! -f "evals/fixtures/$SUITE/index.json" ]; then
+            {
+              echo "## eval (G4): no recorded fixtures for $SUITE"
+              echo
+              echo "evals/fixtures/$SUITE/index.json is missing, so the eval gate can't run. Bootstrap:"
+              echo "1. reset ERPNext, seed and load the suite (Makefile targets erp-reset, seed, load)"
+              echo "2. record the fixtures (Makefile target record-fixtures)"
+              echo "3. commit evals/fixtures/$SUITE"
+              echo "4. the owner scores a replay and commits evals/baseline.json in a baseline-update commit"
+            } | tee -a "$RUNNER_TEMP/notice.md"
+            echo "::error::eval (G4): no fixtures index for $SUITE; see the job summary for the bootstrap steps"
+            exit 1
+          fi
+
+      - name: gitleaks over the fixtures (pinned, checksum verified)
+        if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
+        run: |
+          version=8.30.1
+          sum=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+          file="gitleaks_${version}_linux_x64.tar.gz"
+          mkdir -p "$RUNNER_TEMP/gitleaks"
+          curl -sSfL -o "$RUNNER_TEMP/gitleaks/$file" "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${file}"
+          echo "$sum  $RUNNER_TEMP/gitleaks/$file" | sha256sum --check --strict
+          tar -xzf "$RUNNER_TEMP/gitleaks/$file" -C "$RUNNER_TEMP/gitleaks" gitleaks
+          "$RUNNER_TEMP/gitleaks/gitleaks" dir pr/evals/fixtures --no-banner --redact --exit-code 1
+
+      - name: prepare the code under test (modules, migrations)
+        if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
+        working-directory: pr
+        run: |
+          go mod verify
+          go run github.com/pressly/goose/v3/cmd/goose@v3.28.0 -dir migrations postgres "$DATABASE_URL" up
+          mkdir -p "$RUNNER_TEMP/candidate"
+          if [ -f "$GITHUB_WORKSPACE/base/evals/baseline.json" ]; then
+            cp "$GITHUB_WORKSPACE/base/evals/baseline.json" "$RUNNER_TEMP/candidate/baseline.json"
+          fi
+
+      # Tier 1: no secret, no model. The candidate baseline replaces only
+      # the replay section of the copy of the base baseline.
+      - name: "tier 1: replay without the model and score"
+        id: replay
+        if: steps.tier.outputs.replay == 'true'
+        working-directory: pr
+        run: |
+          set +e
+          go run ./cmd/eval run --replay --no-llm --suite "$SUITE" --results-dir "$RUNNER_TEMP/results-replay" >"$RUNNER_TEMP/replay.out"
+          rc=$?
+          set -e
+          manifest="$(tail -n 1 "$RUNNER_TEMP/replay.out")"
+          if [ ! -f "$manifest" ]; then
+            echo "::error::eval run --replay wrote no manifest (exit $rc)"
+            exit 1
+          fi
+          echo "dir=$(dirname "$manifest")" >>"$GITHUB_OUTPUT"
+          echo "run_rc=$rc" >>"$GITHUB_OUTPUT"
+          "$RUNNER_TEMP/evalbase/eval" score "$(dirname "$manifest")" --out "$RUNNER_TEMP/score-replay" \
+            --baseline-out "$RUNNER_TEMP/candidate/baseline.json" --pricing config/pricing.yaml
+
+      # Tier 2: never on pull_request (PR code would run with the key).
+      - name: "tier 2: replay with the model, three runs, and noise"
+        id: llm
+        if: steps.tier.outputs.llm == 'true' && github.event_name != 'pull_request'
+        working-directory: pr
+        env:
+          LLM_PROVIDER: anthropic
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          LLM_DAILY_BUDGET_USD: ${{ vars.LLM_DAILY_BUDGET_USD }}
+        run: |
+          rc_all=0
+          for i in 1 2 3; do
+            set +e
+            go run ./cmd/eval run --replay --suite "$SUITE" --results-dir "$RUNNER_TEMP/results-llm-$i" >"$RUNNER_TEMP/llm-$i.out"
+            rc=$?
+            set -e
+            [ "$rc" = 0 ] || rc_all=$rc
+            manifest="$(tail -n 1 "$RUNNER_TEMP/llm-$i.out")"
+            if [ ! -f "$manifest" ]; then
+              echo "::error::eval run --replay (run $i) wrote no manifest (exit $rc)"
+              exit 1
+            fi
+            echo "dir$i=$(dirname "$manifest")" >>"$GITHUB_OUTPUT"
+            "$RUNNER_TEMP/evalbase/eval" score "$(dirname "$manifest")" --out "$RUNNER_TEMP/score-llm-$i"
+          done
+          echo "run_rc=$rc_all" >>"$GITHUB_OUTPUT"
+          "$RUNNER_TEMP/evalbase/eval" noise "$RUNNER_TEMP/score-llm-1/score.json" "$RUNNER_TEMP/score-llm-2/score.json" \
+            "$RUNNER_TEMP/score-llm-3/score.json" --out "$RUNNER_TEMP/noise-llm.json"
+          "$RUNNER_TEMP/evalbase/eval" score "$(dirname "$(tail -n 1 "$RUNNER_TEMP/llm-1.out")")" --out "$RUNNER_TEMP/score-llm" \
+            --baseline-out "$RUNNER_TEMP/candidate/baseline.json" --noise "$RUNNER_TEMP/noise-llm.json" --pricing config/pricing.yaml
+
+      - name: upload results and the candidate baseline
+        if: always() && github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            ${{ runner.temp }}/results-*
+            ${{ runner.temp }}/score-*
+            ${{ runner.temp }}/noise-llm.json
+            ${{ runner.temp }}/candidate/baseline.json
+          if-no-files-found: ignore
+
+      - name: baseline present (fail closed)
+        if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
+        env:
+          REPLAY: ${{ steps.tier.outputs.replay }}
+          LLM: ${{ steps.tier.outputs.llm }}
+        run: |
+          baseline="$GITHUB_WORKSPACE/base/evals/baseline.json"
+          missing=""
+          if [ ! -f "$baseline" ]; then
+            missing="evals/baseline.json"
+          else
+            for tier in replay llm; do
+              if [ "$tier" = replay ] && [ "$REPLAY" != true ]; then continue; fi
+              if [ "$tier" = llm ] && [ "$LLM" != true ]; then continue; fi
+              if ! jq -e --arg t "$tier" '.version == 2 and .tiers[$t] != null' "$baseline" >/dev/null; then
+                missing="$missing evals/baseline.json tier $tier"
+              fi
+            done
+          fi
+          if [ -n "$missing" ]; then
+            {
+              echo "## eval (G4): no baseline ($missing)"
+              echo
+              echo "The base branch has no baseline to judge this run by, so the gate fails closed. Bootstrap:"
+              echo "1. reset ERPNext, seed and load the suite (Makefile targets erp-reset, seed, load)"
+              echo "2. record the fixtures (Makefile target record-fixtures) and commit evals/fixtures/$SUITE"
+              echo "3. dispatch this workflow; it uploads a candidate baseline (artifact eval-results)"
+              echo "4. the owner reviews it and commits evals/baseline.json in its own baseline-update commit"
+            } | tee -a "$RUNNER_TEMP/notice.md"
+            echo "::error::eval (G4): no baseline for this tier; see the job summary for the bootstrap steps"
+            exit 1
+          fi
+
+      - name: "tier 1 gate: compare with the baseline"
+        if: steps.tier.outputs.replay == 'true'
+        working-directory: pr
+        env:
+          RESULTS: ${{ steps.replay.outputs.dir }}
+          RUN_RC: ${{ steps.replay.outputs.run_rc }}
+        run: |
+          set +e
+          "$RUNNER_TEMP/evalbase/eval" score "$RESULTS" --out "$RUNNER_TEMP/gate-replay" \
+            --compare "$GITHUB_WORKSPACE/base/evals/baseline.json" \
+            --require 'unrecorded_bank_charge.recall>=3/3' --require 'clean.false_alarms==0'
+          rc=$?
+          set -e
+          if [ "$RUN_RC" != 0 ]; then
+            echo "::error::eval run --replay exited $RUN_RC: a month's run failed (see failed runs in the summary)"
+            exit 1
+          fi
+          exit $rc
+
+      - name: "tier 2 gate: compare with the baseline, latency and cost"
+        if: steps.tier.outputs.llm == 'true' && github.event_name != 'pull_request'
+        working-directory: pr
+        env:
+          RESULTS: ${{ steps.llm.outputs.dir1 }}
+          RUN_RC: ${{ steps.llm.outputs.run_rc }}
+        run: |
+          set +e
+          "$RUNNER_TEMP/evalbase/eval" score "$RESULTS" --out "$RUNNER_TEMP/gate-llm" \
+            --compare "$GITHUB_WORKSPACE/base/evals/baseline.json" \
+            --require 'unrecorded_bank_charge.recall>=3/3' --require 'clean.false_alarms==0' \
+            --max-p95-increase-pct 25 --max-cost-increase-pct 15 --min-latency-delta-ms 1000
+          rc=$?
+          set -e
+          if [ "$RUN_RC" != 0 ]; then
+            echo "::error::eval run --replay with the model exited $RUN_RC: a month's run failed"
+            exit 1
+          fi
+          exit $rc
+
+      - name: job summary
+        if: always()
+        run: |
+          # The notice, then per tier the gate's summary.md (score.md plus
+          # every comparison failure with its repro and evidence), or
+          # score.md alone when the gate never ran.
+          if [ -f "$RUNNER_TEMP/notice.md" ]; then
+            cat "$RUNNER_TEMP/notice.md" >>"$GITHUB_STEP_SUMMARY"
+          fi
+          for tier in replay llm; do
+            if [ -f "$RUNNER_TEMP/gate-$tier/summary.md" ]; then
+              cat "$RUNNER_TEMP/gate-$tier/summary.md" >>"$GITHUB_STEP_SUMMARY"
+            elif [ -f "$RUNNER_TEMP/score-$tier/score.md" ]; then
+              cat "$RUNNER_TEMP/score-$tier/score.md" >>"$GITHUB_STEP_SUMMARY"
+            fi
+          done

@@ -158,7 +158,7 @@ func TestEvalCLI(t *testing.T) {
 
 	t.Run("a failed month exits non-zero after every month ran", func(t *testing.T) {
 		results := t.TempDir()
-		code, stdout, stderr := e.run(t, results, "run", "--suite", "suite-it")
+		code, stdout, stderr := e.run(t, results, "run", "--suite", "suite-it", "--no-llm")
 		if code == 0 {
 			t.Fatalf("eval exited 0 with a failed control month\nstderr: %s", stderr)
 		}

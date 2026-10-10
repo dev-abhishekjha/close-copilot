@@ -1,6 +1,9 @@
 package main
 
 import (
+	"go/ast"
+	"go/parser"
+	"go/token"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -59,4 +62,46 @@ func goTool(t *testing.T) string {
 		t.Fatalf("no go command: %v", err)
 	}
 	return p
+}
+
+// TestDepsNoAdminToken checks that neither cmd/eval nor internal/evals
+// (production files) names the MCP admin token: only internal/approvals
+// may use MCP_TOKEN_ADMIN. It walks the ASTs for the identifiers
+// MCPTokenAdmin and EnvMCPTokenAdmin and for the variable's name in a
+// string literal.
+func TestDepsNoAdminToken(t *testing.T) {
+	var files []string
+	for _, dir := range []string{".", filepath.Join("..", "..", "internal", "evals")} {
+		m, err := filepath.Glob(filepath.Join(dir, "*.go"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, f := range m {
+			if !strings.HasSuffix(f, "_test.go") {
+				files = append(files, f)
+			}
+		}
+	}
+	if len(files) < 10 {
+		t.Fatalf("found only %d files", len(files))
+	}
+	for _, name := range files {
+		f, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			switch x := n.(type) {
+			case *ast.Ident:
+				if x.Name == "MCPTokenAdmin" || x.Name == "EnvMCPTokenAdmin" {
+					t.Errorf("%s names %s", name, x.Name)
+				}
+			case *ast.BasicLit:
+				if strings.Contains(x.Value, "MCP_TOKEN_ADMIN") {
+					t.Errorf("%s names MCP_TOKEN_ADMIN in a literal", name)
+				}
+			}
+			return true
+		})
+	}
 }

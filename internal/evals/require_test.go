@@ -119,10 +119,21 @@ func TestRequireBoundaries(t *testing.T) {
 		"clean.false_alarms==0":                  true,
 		"verified_rate>=0/3":                     true,
 		"verified_rate>=0/4":                     false,
-		"missing_accrual.caught==0":              true,
+		"missing_accrual.caught==0":              false, // no planted item: can't fail, so rejected
+		"missing_accrual.missed==0":              false,
+		"missing_accrual.caught>=0":              false,
+		"missing_accrual.false_alarms==0":        true, // a clean type is a real claim
 		"missing_accrual.recall>=0/1":            false,
+		"renamed_type_x.false_alarms==0":         false, // not a scored type: a parse error
 	} {
-		if err := check(expr, three); (err == nil) != want {
+		r, perr := ParseRequire(expr)
+		if perr != nil {
+			if want {
+				t.Errorf("%s: %v", expr, perr)
+			}
+			continue
+		}
+		if err := r.Check(three); (err == nil) != want {
 			t.Errorf("%s: err %v, want pass=%t", expr, err, want)
 		}
 	}
@@ -134,6 +145,17 @@ func TestRequireBoundaries(t *testing.T) {
 	checked.UnauthorizedWrites = WritesCheck{Checked: true, Count: &zero}
 	if err := check("unauthorized_writes==0", checked); err != nil {
 		t.Errorf("unauthorized_writes checked: %v", err)
+	}
+	// Count requirements need a planted denominator; the error says why.
+	if err := check("missing_accrual.missed==0", three); err == nil || !strings.Contains(err.Error(), "no planted items") {
+		t.Errorf("missed==0 with no planted items = %v", err)
+	}
+	empty := mustScore(t, monthIn("sharma", "2026-09", false, GroundTruth{}))
+	if err := check("overall.caught>=0", empty); err == nil || !strings.Contains(err.Error(), "no planted items") {
+		t.Errorf("overall count with nothing planted = %v", err)
+	}
+	if err := check("overall.false_alarms==0", empty); err != nil {
+		t.Errorf("overall false alarms with nothing planted = %v", err)
 	}
 	noClean := mustScore(t, monthIn("sharma", "2026-09", false, threeCharges()))
 	if err := check("clean.false_alarms==0", noClean); err == nil || !strings.Contains(err.Error(), "no clean control month") {

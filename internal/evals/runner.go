@@ -44,10 +44,11 @@ type Runner struct {
 	ResultsDir string
 	Config     ManifestConfig
 	Flags      Flags
-	// Agent records whether the explainer and verifier ran (false until
-	// the explainer is wired into the eval path).
+	// Agent records whether the explainer and verifier ran.
 	Agent  bool
 	Commit string
+	// FixturesIndexSHA256 is recorded in the manifest of a replay run.
+	FixturesIndexSHA256 string
 
 	Now func() time.Time
 	Log *slog.Logger
@@ -97,6 +98,8 @@ func (r *Runner) Run(ctx context.Context, suite Suite, months []SuiteMonth) (str
 		Commit:    r.Commit,
 		StartedAt: started,
 		Results:   []ManifestEntry{},
+
+		FixturesIndexSHA256: r.FixturesIndexSHA256,
 	}
 	if man.Flags.Only == nil {
 		man.Flags.Only = []string{}
@@ -218,6 +221,7 @@ func (r *Runner) export(ctx context.Context, runID uuid.UUID, res *Result) error
 		if err != nil {
 			return fmt.Errorf("evals: export run %s step %s model calls: %w", runID, st.ID, err)
 		}
+		countVerification(st, res)
 		for _, c := range calls {
 			res.Tokens.Input += c.InputTokens
 			res.Tokens.Output += c.OutputTokens
@@ -238,6 +242,28 @@ func (r *Runner) export(ctx context.Context, runID uuid.UUID, res *Result) error
 	}
 	slices.Sort(res.Models.Called)
 	return nil
+}
+
+// countVerification adds a step's verifier rejects and explain retries to
+// res. A failed verdict before the last explain attempt ends that verify
+// attempt failed and restarts the step on a new attempt, so a verify
+// step's earlier attempts are rejects; on the last explain attempt a
+// failed verdict ends the step done with a reason (a passing one has
+// none). Every explain attempt after the first is a retry.
+func countVerification(st store.Step, res *Result) {
+	switch st.Kind {
+	case store.StepKindExplain:
+		if st.Attempt > 1 {
+			res.Retries += int64(st.Attempt - 1)
+		}
+	case store.StepKindVerify:
+		if st.Attempt > 1 {
+			res.VerifierRejects += int64(st.Attempt - 1)
+		}
+		if st.Status == store.StepDone && st.Error != nil && *st.Error != "" {
+			res.VerifierRejects++
+		}
+	}
 }
 
 // joinText joins two error texts with "; ".

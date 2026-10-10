@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/abhishekjha/close-copilot/internal/evals"
@@ -16,19 +17,36 @@ import (
 const scoreUsage = `usage: eval score <results-dir> [flags]
 
 Scores a suite run (results/<suite>/<timestamp>, written by eval run)
-against the seeder's ground truth and writes score.json and score.md.
-Matching is by the truth item's keys, one finding per item. A month with
-no ground truth file is an error, never clean.
+against the seeder's ground truth and writes score.json, score.md and
+summary.md (the gate verdict, every comparison failure with its repro and
+evidence, then score.md). Matching is by the truth item's keys, one
+finding per item. A month with no ground truth file is an error, never
+clean.
 
 --require <subject>.<metric><op><value> checks a count or ratio, e.g.
   unrecorded_bank_charge.recall>=3/3   (the denominator must be exactly 3)
   clean.false_alarms==0
   unauthorized_writes==0               (fails until writes are checked)
---compare <baseline.json> fails on any item caught in the baseline and not
-now, and on any clean-month false alarm. --baseline-out writes a candidate
-baseline; it refuses evals/baseline.json, which only the owner commits.
-No output (--out, --baseline-out) may resolve to evals/baseline.json or
-under evals/scenarios/, evals/golden/ or gates/.
+A caught or missed count on a type with no planted item fails (a renamed
+or empty type can't pass vacuously); <type>.false_alarms==0 is allowed
+there, since a clean type is a real claim.
+
+--compare <baseline.json> judges the score against the baseline file's
+section for its tier ("replay" for agent false, "llm" for agent true). A
+missing section, an empty one, and one whose agent flag (or, with the
+agent on, fast or strong model) differs all fail. Then any item caught in
+the baseline and not now, and any clean-month false alarm, fails.
+--max-p95-increase-pct N fails a p95 close duration more than N percent
+above the baseline's, ignoring increases under --min-latency-delta-ms;
+--max-cost-increase-pct N does the same for total cost (a zero baseline
+cost fails any cost). A threshold not given is skipped, and summary.md
+says so. Tier 1 (replay, no model) passes no threshold.
+
+--baseline-out writes a candidate baseline: it replaces only the score's
+tier section of that file and keeps the other. It refuses
+evals/baseline.json, which only the owner commits. No output (--out,
+--baseline-out) may resolve to evals/baseline.json or under
+evals/scenarios/, evals/golden/ or gates/.
 
 Needs no environment variables. Exits non-zero, with each failure on
 stderr, when a requirement or the comparison fails.
@@ -56,6 +74,32 @@ type scoreFlags struct {
 	BaselineOut string
 	Noise       string
 	Pricing     string
+
+	MaxP95IncreasePct  optInt
+	MinLatencyDeltaMS  optInt
+	MaxCostIncreasePct optInt
+}
+
+// optInt is a non-negative integer flag that may be absent.
+type optInt struct {
+	set bool
+	v   int64
+}
+
+func (o *optInt) String() string {
+	if o == nil || !o.set {
+		return ""
+	}
+	return strconv.FormatInt(o.v, 10)
+}
+
+func (o *optInt) Set(v string) error {
+	n, err := strconv.ParseInt(v, 10, 64)
+	if err != nil || n < 0 || n > 1_000_000 {
+		return fmt.Errorf("%.20q is not an integer from 0 to 1000000", v)
+	}
+	o.set, o.v = true, n
+	return nil
 }
 
 // noiseFlags are eval noise's arguments.
@@ -108,6 +152,9 @@ func parseScoreArgs(args []string, out io.Writer) (command, error) {
 	fs.StringVar(&c.score.BaselineOut, "baseline-out", "", "write a candidate baseline here (never evals/baseline.json)")
 	fs.StringVar(&c.score.Noise, "noise", "", "noise file (from eval noise) to record in the candidate baseline")
 	fs.StringVar(&c.score.Pricing, "pricing", filepath.Join("config", "pricing.yaml"), "pricing file whose sha256 the candidate baseline records")
+	fs.Var(&c.score.MaxP95IncreasePct, "max-p95-increase-pct", "fail when p95 close duration rises more than N percent over the baseline (Tier 2)")
+	fs.Var(&c.score.MinLatencyDeltaMS, "min-latency-delta-ms", "ignore p95 increases under N ms (needs --max-p95-increase-pct)")
+	fs.Var(&c.score.MaxCostIncreasePct, "max-cost-increase-pct", "fail when total cost rises more than N percent over the baseline (Tier 2)")
 	pos, err := parseInterleaved(fs, args[1:])
 	if err != nil {
 		return command{}, err
@@ -128,6 +175,12 @@ func parseScoreArgs(args []string, out io.Writer) (command, error) {
 	}
 	if c.score.Noise != "" && c.score.BaselineOut == "" {
 		return command{}, errors.New("eval score: --noise is recorded only in a --baseline-out candidate")
+	}
+	if (c.score.MaxP95IncreasePct.set || c.score.MaxCostIncreasePct.set) && c.score.Compare == "" {
+		return command{}, errors.New("eval score: --max-p95-increase-pct and --max-cost-increase-pct need --compare")
+	}
+	if c.score.MinLatencyDeltaMS.set && !c.score.MaxP95IncreasePct.set {
+		return command{}, errors.New("eval score: --min-latency-delta-ms needs --max-p95-increase-pct")
 	}
 	c.score.Require = []string(req)
 	return c, nil
@@ -186,7 +239,7 @@ func runScore(f scoreFlags) error {
 		}
 		noise = &n
 	}
-	var base *evals.Baseline
+	var base *evals.BaselineFile
 	if f.Compare != "" {
 		b, err := evals.LoadBaseline(f.Compare)
 		if err != nil {
@@ -217,24 +270,32 @@ func runScore(f scoreFlags) error {
 		if err := evals.WriteBaseline(f.BaselineOut, b); err != nil {
 			return err
 		}
-		_, _ = fmt.Fprintf(stdout, "candidate baseline %s\n", f.BaselineOut)
+		_, _ = fmt.Fprintf(stdout, "candidate baseline %s (tier %s)\n", f.BaselineOut, evals.TierFor(s.Agent))
 	}
 
-	var failures []string
+	var sm evals.Summary
 	for _, r := range reqs {
 		if err := r.Check(s); err != nil {
-			failures = append(failures, err.Error())
+			sm.Requirements = append(sm.Requirements, err.Error())
 		}
 	}
 	if base != nil {
-		c, err := evals.Compare(*base, s)
+		c, err := compareAll(*base, s, f, &sm)
 		if err != nil {
 			return err
 		}
+		sm.Compare = &c
 		for _, e := range c.New {
 			_, _ = fmt.Fprintf(stdout, "%s\n", e)
 		}
-		for _, e := range c.Failures {
+	}
+	if err := evals.WriteSummary(f.Out, s, sm); err != nil {
+		return err
+	}
+	var failures []string
+	failures = append(failures, sm.Requirements...)
+	if sm.Compare != nil {
+		for _, e := range sm.Compare.Failures {
 			failures = append(failures, "compare: "+e.String())
 		}
 	}
@@ -245,6 +306,36 @@ func runScore(f scoreFlags) error {
 		return fmt.Errorf("%w: %d", errChecksFailed, len(failures))
 	}
 	return nil
+}
+
+// compareAll compares the score with its tier's section of the baseline,
+// then applies the latency and cost thresholds that were passed and notes
+// the ones that weren't.
+func compareAll(base evals.BaselineFile, s evals.Score, f scoreFlags, sm *evals.Summary) (evals.Comparison, error) {
+	c, err := evals.CompareTier(base, s)
+	if err != nil {
+		return evals.Comparison{}, err
+	}
+	sec, serr := base.Section(s.Agent)
+	if f.MaxP95IncreasePct.set {
+		if serr == nil {
+			c.Failures = append(c.Failures, evals.CompareLatencyP95(sec, s, f.MaxP95IncreasePct.v, f.MinLatencyDeltaMS.v)...)
+		}
+	} else {
+		sm.Notes = append(sm.Notes, "p95 latency rule skipped: --max-p95-increase-pct was not passed")
+	}
+	if f.MaxCostIncreasePct.set {
+		if serr == nil {
+			fs, err := evals.CompareCost(sec, s, f.MaxCostIncreasePct.v)
+			if err != nil {
+				return evals.Comparison{}, err
+			}
+			c.Failures = append(c.Failures, fs...)
+		}
+	} else {
+		sm.Notes = append(sm.Notes, "cost rule skipped: --max-cost-increase-pct was not passed")
+	}
+	return c, nil
 }
 
 // runNoise writes the spread of two or more score files.
