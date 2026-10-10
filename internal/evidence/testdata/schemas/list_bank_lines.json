@@ -1,0 +1,80 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "List bank statement lines for a company within a date range, ordered by transaction date and txn_id.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "start of transaction date range (YYYY-MM-DD)",
+        "type": "string"
+      },
+      "min_amount": {
+        "description": "optional minimum absolute amount in paise",
+        "type": [
+          "null",
+          "integer"
+        ]
+      },
+      "to_date": {
+        "description": "end of transaction date range (YYYY-MM-DD)",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "list_bank_lines",
+  "outputSchema": {
+    "items": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "type": "integer"
+        },
+        "balance": {
+          "type": [
+            "null",
+            "integer"
+          ]
+        },
+        "date": {
+          "type": "string"
+        },
+        "narration": {
+          "type": "string"
+        },
+        "ref": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "txn_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "txn_id",
+        "date",
+        "narration",
+        "amount"
+      ],
+      "type": "object"
+    },
+    "type": [
+      "null",
+      "array"
+    ]
+  }
+}

@@ -7,10 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/abhishekjha/close-copilot/internal/books"
-	"github.com/abhishekjha/close-copilot/internal/frappe"
+	"github.com/abhishekjha/close-copilot/internal/company"
+	"github.com/abhishekjha/close-copilot/internal/ledger"
 	"github.com/abhishekjha/close-copilot/internal/money"
-	"github.com/abhishekjha/close-copilot/internal/seed"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -235,30 +234,30 @@ func TestBankRecClassifyLeftovers(t *testing.T) {
 }
 
 type fakeBooksReaderForBankRec struct {
-	glEntries   []frappe.GLEntry
-	payments    []frappe.PaymentEntry
+	glEntries   []ledger.GLEntry
+	payments    []ledger.PaymentEntry
 	paymentsErr error
 }
 
-func (f *fakeBooksReaderForBankRec) TrialBalance(_ context.Context, _ string, _, _ time.Time) (books.TB, error) {
-	return books.TB{}, nil
+func (f *fakeBooksReaderForBankRec) TrialBalance(_ context.Context, _ string, _, _ time.Time) (ledger.TB, error) {
+	return ledger.TB{}, nil
 }
-func (f *fakeBooksReaderForBankRec) GLEntries(_ context.Context, _ string, _, _ time.Time) ([]frappe.GLEntry, error) {
+func (f *fakeBooksReaderForBankRec) GLEntries(_ context.Context, _ string, _, _ time.Time) ([]ledger.GLEntry, error) {
 	return f.glEntries, nil
 }
-func (f *fakeBooksReaderForBankRec) PurchaseInvoices(_ context.Context, _ string, _, _ time.Time) ([]frappe.PurchaseInvoice, error) {
+func (f *fakeBooksReaderForBankRec) PurchaseInvoices(_ context.Context, _ string, _, _ time.Time) ([]ledger.PurchaseInvoice, error) {
 	return nil, nil
 }
-func (f *fakeBooksReaderForBankRec) SalesInvoices(_ context.Context, _ string, _, _ time.Time) ([]frappe.SalesInvoice, error) {
+func (f *fakeBooksReaderForBankRec) SalesInvoices(_ context.Context, _ string, _, _ time.Time) ([]ledger.SalesInvoice, error) {
 	return nil, nil
 }
-func (f *fakeBooksReaderForBankRec) PaymentEntries(_ context.Context, _ string, _, _ time.Time) ([]frappe.PaymentEntry, error) {
+func (f *fakeBooksReaderForBankRec) PaymentEntries(_ context.Context, _ string, _, _ time.Time) ([]ledger.PaymentEntry, error) {
 	if f.paymentsErr != nil {
 		return nil, f.paymentsErr
 	}
 	return f.payments, nil
 }
-func (f *fakeBooksReaderForBankRec) AccountHistory(_ context.Context, _, _ string, _ string, _ int) ([]books.MonthTotal, error) {
+func (f *fakeBooksReaderForBankRec) AccountHistory(_ context.Context, _, _ string, _ string, _ int) ([]ledger.MonthTotal, error) {
 	return nil, nil
 }
 func (f *fakeBooksReaderForBankRec) RecurringSuppliers(_ context.Context, _ string, _ string, _, _, _ int) ([]RecurringSupplier, error) {
@@ -281,7 +280,7 @@ func TestBankRecCheckEndToEnd(t *testing.T) {
 	date := time.Date(2026, 9, 15, 0, 0, 0, 0, time.UTC)
 
 	bReader := &fakeBooksReaderForBankRec{
-		glEntries: []frappe.GLEntry{
+		glEntries: []ledger.GLEntry{
 			// Legitimate payment matched via reference
 			{
 				Name:        "GLE-1",
@@ -293,7 +292,7 @@ func TestBankRecCheckEndToEnd(t *testing.T) {
 				VoucherNo:   "PAY-001",
 			},
 		},
-		payments: []frappe.PaymentEntry{
+		payments: []ledger.PaymentEntry{
 			{
 				Name:        "PAY-001",
 				ReferenceNo: "CHQ-888",
@@ -326,12 +325,12 @@ func TestBankRecCheckEndToEnd(t *testing.T) {
 		Month:    "2026-09",
 		Books:    bReader,
 		Evidence: eReader,
-		Rules: seed.Rules{
-			BankMatch: seed.BankMatchRules{DateWindowDays: 3},
+		Rules: company.Rules{
+			BankMatch: company.BankMatchRules{DateWindowDays: 3},
 		},
-		BankAccounts: BankAccountsFor(seed.Profile{
+		BankAccounts: BankAccountsFor(company.Profile{
 			Abbr: "STPL",
-			Bank: seed.Bank{Account: "HDFC Current 0001"},
+			Bank: company.Bank{Account: "HDFC Current 0001"},
 		}),
 	}
 
@@ -405,8 +404,8 @@ func day(d int) time.Time { return time.Date(2026, 9, d, 0, 0, 0, 0, time.UTC) }
 
 // recordedChargeJE is a Journal Entry for a bank charge: Dr Bank Charges
 // 1000.00, Dr Input Tax IGST 180.00, Cr HDFC Current 1180.00.
-func recordedChargeJE() []frappe.GLEntry {
-	return []frappe.GLEntry{
+func recordedChargeJE() []ledger.GLEntry {
+	return []ledger.GLEntry{
 		{Name: "GLE-JV-1", Account: stplBankCharges, Debit: 100000, PostingDate: day(30), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00012"},
 		{Name: "GLE-JV-2", Account: stplInputIGST, Debit: 18000, PostingDate: day(30), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00012"},
 		{Name: "GLE-JV-3", Account: stplBank, Credit: 118000, PostingDate: day(30), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00012"},
@@ -426,8 +425,8 @@ func TestBankRecSharmaBooks(t *testing.T) {
 	}
 	tests := []struct {
 		name     string
-		gl       []frappe.GLEntry
-		payments []frappe.PaymentEntry
+		gl       []ledger.GLEntry
+		payments []ledger.PaymentEntry
 		lines    []store.BankLine
 		want     []want
 	}{
@@ -445,11 +444,11 @@ func TestBankRecSharmaBooks(t *testing.T) {
 		{
 			// Dates are 6 days apart, outside the window: only pass 1 can match.
 			name: "vendor payment entry matches by reference_no",
-			gl: []frappe.GLEntry{
+			gl: []ledger.GLEntry{
 				{Name: "GLE-PE-1", Account: stplCreditors, Debit: 4500000, PostingDate: day(5), VoucherType: "Payment Entry", VoucherNo: "ACC-PAY-2026-00007", PartyType: "Supplier", Party: "Omkar Estates"},
 				{Name: "GLE-PE-2", Account: stplBank, Credit: 4500000, PostingDate: day(5), VoucherType: "Payment Entry", VoucherNo: "ACC-PAY-2026-00007"},
 			},
-			payments: []frappe.PaymentEntry{{Name: "ACC-PAY-2026-00007", PaymentType: "Pay", Party: "Omkar Estates", ReferenceNo: "UTR20260905001", PaidFrom: stplBank}},
+			payments: []ledger.PaymentEntry{{Name: "ACC-PAY-2026-00007", PaymentType: "Pay", Party: "Omkar Estates", ReferenceNo: "UTR20260905001", PaidFrom: stplBank}},
 			lines: []store.BankLine{
 				{CompanyID: "sharma", TxnID: "HDFC-0911-01", TxnDate: day(11), AmountPaise: -4500000, Narration: "NEFT DR OMKAR ESTATES", Ref: strPtr("UTR20260905001")},
 			},
@@ -464,7 +463,7 @@ func TestBankRecSharmaBooks(t *testing.T) {
 		},
 		{
 			name: "voucher on non-bank accounts only is ignored",
-			gl: []frappe.GLEntry{
+			gl: []ledger.GLEntry{
 				{Name: "GLE-JV-9", Account: stplRent, Debit: 4500000, PostingDate: day(1), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00001"},
 				{Name: "GLE-JV-10", Account: stplCreditors, Credit: 4500000, PostingDate: day(1), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00001", PartyType: "Supplier", Party: "Omkar Estates"},
 				{Name: "GLE-JV-11", Account: stplGatewayClear, Debit: 9800000, PostingDate: day(15), VoucherType: "Journal Entry", VoucherNo: "ACC-JV-2026-00002"},
@@ -474,7 +473,7 @@ func TestBankRecSharmaBooks(t *testing.T) {
 		},
 		{
 			name: "receipt in books without bank line is unmatched_ledger_entry",
-			gl: []frappe.GLEntry{
+			gl: []ledger.GLEntry{
 				{Name: "GLE-PE-5", Account: stplBank, Debit: 2360000, PostingDate: day(20), VoucherType: "Payment Entry", VoucherNo: "ACC-PAY-2026-00010"},
 				{Name: "GLE-PE-6", Account: stplDebtors, Credit: 2360000, PostingDate: day(20), VoucherType: "Payment Entry", VoucherNo: "ACC-PAY-2026-00010"},
 			},
@@ -489,7 +488,7 @@ func TestBankRecSharmaBooks(t *testing.T) {
 				Month:        "2026-09",
 				Books:        &fakeBooksReaderForBankRec{glEntries: tc.gl, payments: tc.payments},
 				Evidence:     &fakeEvidenceReaderForBankRec{bankLines: tc.lines},
-				Rules:        seed.Rules{BankMatch: seed.BankMatchRules{DateWindowDays: 3}},
+				Rules:        company.Rules{BankMatch: company.BankMatchRules{DateWindowDays: 3}},
 				BankAccounts: []string{stplBank},
 			}
 			got, err := (&BankRecCheck{}).Run(context.Background(), in)
@@ -658,7 +657,7 @@ func TestBankRecRunReturnsPaymentEntriesError(t *testing.T) {
 	errPayments := errors.New("payment entries unavailable")
 	tests := []struct {
 		name string
-		gl   []frappe.GLEntry
+		gl   []ledger.GLEntry
 	}{
 		{name: "with bank GL entries", gl: recordedChargeJE()},
 		{name: "without GL entries", gl: nil},

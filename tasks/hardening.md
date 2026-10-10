@@ -139,3 +139,8 @@ These are requirements on tickets that already exist. When you spec one of them,
 - **CC-502:** the books tools validate `fields` and `order_by` against identifier and `asc|desc` allowlists at the tool boundary. CC-205's client check is the second line of defence, not the only one.
 - **CC-1201:** the dev site has `delete_linked_ledger_entries=1`, a CC-102 follow-up the owner approved. That is a compliance-relevant setting. The deploy must set it to 0 and check that it is 0 on every non-dev site.
 - **Any ticket that calls `internal/frappe` before CC-205 lands:** set a context deadline yourself.
+- **CC-506 (from the CC-502 review):** bind `company` and every date and month argument of all seven books tools server-side, including `before_month` and `through_month`.
+- **CC-710 (from the CC-502 review):** the books tools return raw GSTINs (`supplier_gstin`, `company_gstin`), party and customer names, and GL `party` and `against`. Pseudonymise them before any model call.
+- **CC-706 and CC-1103 (from the CC-502 review):**
+  - Books tool results carry untrusted ERPNext free text. These fields are capped at 500 runes, but not fenced: `remarks`, `description`, `against`, `bill_no`, `reference_no`, `supplier_name`, `customer_name` and `party_name`.
+  - The investigator's tool-result projection must fence or drop these fields. Tool-error text is fixed per error class, so it isn't free text.

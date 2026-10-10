@@ -1,0 +1,124 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Trial balance of the company for a date range, computed from submitted GL Entries: one row per leaf account with a non-zero value, giving the opening balance, the period's debit and credit totals and the closing balance, plus column totals. Balances are signed, debit positive and credit negative; profit-and-loss accounts open at zero on 1 April (Indian fiscal year). Use it to see account balances at month end or to find which accounts moved. All amounts are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first day of the period, YYYY-MM-DD",
+        "type": "string"
+      },
+      "to_date": {
+        "description": "last day of the period, YYYY-MM-DD, inclusive",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "get_trial_balance",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first day of the period, YYYY-MM-DD",
+        "type": "string"
+      },
+      "rows": {
+        "description": "one row per leaf account with a non-zero value; amounts in paise, balances debit positive",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "account": {
+              "type": "string"
+            },
+            "account_name": {
+              "type": "string"
+            },
+            "closing": {
+              "type": "integer"
+            },
+            "credit": {
+              "type": "integer"
+            },
+            "debit": {
+              "type": "integer"
+            },
+            "opening": {
+              "type": "integer"
+            },
+            "root_type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "account",
+            "account_name",
+            "root_type",
+            "opening",
+            "debit",
+            "credit",
+            "closing"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      },
+      "to_date": {
+        "description": "last day of the period, YYYY-MM-DD",
+        "type": "string"
+      },
+      "totals": {
+        "additionalProperties": false,
+        "description": "column totals in paise; a balanced ledger has debit equal to credit and zero opening and closing",
+        "properties": {
+          "closing": {
+            "type": "integer"
+          },
+          "credit": {
+            "type": "integer"
+          },
+          "debit": {
+            "type": "integer"
+          },
+          "opening": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "opening",
+          "debit",
+          "credit",
+          "closing"
+        ],
+        "type": "object"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date",
+      "rows",
+      "totals"
+    ],
+    "type": "object"
+  }
+}

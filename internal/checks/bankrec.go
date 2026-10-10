@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/abhishekjha/close-copilot/internal/frappe"
+	"github.com/abhishekjha/close-copilot/internal/ledger"
 	"github.com/abhishekjha/close-copilot/internal/money"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
@@ -459,12 +459,12 @@ func classifyFindings(res BankRecResult, company string) []Finding {
 
 // filterBankGLEntries returns the entries posted to one of the named bank
 // accounts (exact ERPNext account names).
-func filterBankGLEntries(entries []frappe.GLEntry, bankAccounts []string) []frappe.GLEntry {
+func filterBankGLEntries(entries []ledger.GLEntry, bankAccounts []string) []ledger.GLEntry {
 	accounts := make(map[string]struct{}, len(bankAccounts))
 	for _, a := range bankAccounts {
 		accounts[a] = struct{}{}
 	}
-	var bankEntries []frappe.GLEntry
+	var bankEntries []ledger.GLEntry
 	for _, e := range entries {
 		if _, ok := accounts[e.Account]; ok {
 			bankEntries = append(bankEntries, e)
