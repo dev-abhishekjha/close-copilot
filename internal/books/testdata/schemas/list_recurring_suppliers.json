@@ -1,0 +1,93 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Suppliers that billed regularly in the lookback_months calendar months before before_month: billed in at least min_occurrences distinct months with every bill within amount_band_pct percent (default 20) of their median. Returns each supplier's median bill, typical billing day and the months seen. Use it to expect this month's recurring bills (rent, utilities, subscriptions) and spot one that is missing. Amounts are integers in paise (1 rupee = 100 paise); months are YYYY-MM.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "amount_band_pct": {
+        "description": "largest allowed difference of any bill from the median, percent, 0 to 100; default 20",
+        "type": [
+          "null",
+          "integer"
+        ]
+      },
+      "before_month": {
+        "description": "month being closed, YYYY-MM; only earlier months are read",
+        "type": "string"
+      },
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "lookback_months": {
+        "description": "months before before_month to read, 1 to 12",
+        "type": "integer"
+      },
+      "min_occurrences": {
+        "description": "fewest distinct months a supplier must have billed in, 1 to 12",
+        "type": "integer"
+      }
+    },
+    "required": [
+      "company",
+      "before_month",
+      "lookback_months",
+      "min_occurrences"
+    ],
+    "type": "object"
+  },
+  "name": "list_recurring_suppliers",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "suppliers": {
+        "description": "recurring suppliers ordered by name",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "median_amount": {
+              "description": "median invoice grand total, in paise (1 rupee = 100 paise)",
+              "type": "integer"
+            },
+            "months_seen": {
+              "description": "months the supplier billed in, YYYY-MM, oldest first",
+              "items": {
+                "type": "string"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            },
+            "supplier": {
+              "description": "ERPNext Supplier name (ID)",
+              "type": "string"
+            },
+            "typical_day": {
+              "description": "typical day of the month the supplier bills on, 1 to 31",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "supplier",
+            "median_amount",
+            "typical_day",
+            "months_seen"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      }
+    },
+    "required": [
+      "suppliers"
+    ],
+    "type": "object"
+  }
+}

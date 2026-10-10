@@ -1,0 +1,89 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "List GSTR-2B inward supply entries for a company and return period (YYYY-MM), optionally filtered by supplier GSTIN.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "period": {
+        "description": "return period in YYYY-MM format",
+        "type": "string"
+      },
+      "supplier_gstin": {
+        "description": "optional supplier GSTIN to filter entries",
+        "type": [
+          "null",
+          "string"
+        ]
+      }
+    },
+    "required": [
+      "company",
+      "period"
+    ],
+    "type": "object"
+  },
+  "name": "list_gstr2b_entries",
+  "outputSchema": {
+    "items": {
+      "additionalProperties": false,
+      "properties": {
+        "cgst": {
+          "type": "integer"
+        },
+        "igst": {
+          "type": "integer"
+        },
+        "invoice_date": {
+          "type": "string"
+        },
+        "invoice_no": {
+          "type": "string"
+        },
+        "invoice_no_norm": {
+          "type": "string"
+        },
+        "itc_available": {
+          "type": "boolean"
+        },
+        "sgst": {
+          "type": "integer"
+        },
+        "supplier_gstin": {
+          "type": "string"
+        },
+        "supplier_name": {
+          "type": [
+            "null",
+            "string"
+          ]
+        },
+        "taxable": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "supplier_gstin",
+        "invoice_no",
+        "invoice_no_norm",
+        "invoice_date",
+        "taxable",
+        "igst",
+        "cgst",
+        "sgst",
+        "itc_available"
+      ],
+      "type": "object"
+    },
+    "type": [
+      "null",
+      "array"
+    ]
+  }
+}

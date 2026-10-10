@@ -1,0 +1,165 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Submitted payment entries (payments to suppliers, receipts from customers, internal transfers) of the company posted in a date range, optionally for one party (exact party name), with amount, bank reference number, accounts and the invoices each payment settles. Use it to match bank lines to payments or to see how an invoice was paid. All amounts are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first posting date, YYYY-MM-DD",
+        "type": "string"
+      },
+      "party": {
+        "description": "optional exact party name (a Supplier or Customer ID)",
+        "type": "string"
+      },
+      "to_date": {
+        "description": "last posting date, YYYY-MM-DD, inclusive",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "list_payments",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "payments": {
+        "description": "payment entries ordered by posting date, then name",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "amount": {
+              "description": "received amount for Receive, paid amount otherwise; paise",
+              "type": "integer"
+            },
+            "invoices": {
+              "description": "invoices this payment settles",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "allocated_amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "outstanding_amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  },
+                  "reference_doctype": {
+                    "description": "e.g. Purchase Invoice or Sales Invoice",
+                    "type": "string"
+                  },
+                  "reference_name": {
+                    "type": "string"
+                  },
+                  "total_amount": {
+                    "description": "paise",
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "name",
+                  "reference_doctype",
+                  "reference_name",
+                  "allocated_amount",
+                  "total_amount",
+                  "outstanding_amount"
+                ],
+                "type": "object"
+              },
+              "type": [
+                "null",
+                "array"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "paid_amount": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "paid_from": {
+              "description": "account the money left",
+              "type": "string"
+            },
+            "paid_to": {
+              "description": "account the money went into",
+              "type": "string"
+            },
+            "party": {
+              "type": "string"
+            },
+            "party_name": {
+              "type": "string"
+            },
+            "party_type": {
+              "type": "string"
+            },
+            "payment_type": {
+              "description": "Pay, Receive or Internal Transfer",
+              "type": "string"
+            },
+            "posting_date": {
+              "description": "YYYY-MM-DD",
+              "type": "string"
+            },
+            "received_amount": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "reference_date": {
+              "description": "YYYY-MM-DD",
+              "type": "string"
+            },
+            "reference_no": {
+              "description": "bank reference (UTR, cheque number)",
+              "type": "string"
+            },
+            "remarks": {
+              "type": "string"
+            },
+            "unallocated_amount": {
+              "description": "amount not allocated to any invoice (an advance), paise",
+              "type": "integer"
+            }
+          },
+          "required": [
+            "name",
+            "payment_type",
+            "amount",
+            "paid_amount",
+            "received_amount",
+            "posting_date",
+            "unallocated_amount",
+            "invoices"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      }
+    },
+    "required": [
+      "payments"
+    ],
+    "type": "object"
+  }
+}

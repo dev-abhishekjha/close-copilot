@@ -1,0 +1,123 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "General-ledger entries (submitted, not cancelled) of the company posted in a date range, ordered by entry name, 500 a page. Optionally filter by exact account name (e.g. \"HDFC Current 0001 - STPL\") or exact party name. If next_cursor is non-empty, call again with the same arguments and cursor set to it for the next page; an empty next_cursor means the last page. Use it to trace the postings behind a balance or a voucher. Debit and credit are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "account": {
+        "description": "optional exact account name, e.g. HDFC Current 0001 - STPL",
+        "type": "string"
+      },
+      "company": {
+        "description": "company ID, e.g. sharma",
+        "type": "string"
+      },
+      "cursor": {
+        "description": "next_cursor from the previous page; omit for the first page",
+        "type": "string"
+      },
+      "from_date": {
+        "description": "first posting date, YYYY-MM-DD",
+        "type": "string"
+      },
+      "party": {
+        "description": "optional exact party name (a Supplier or Customer ID)",
+        "type": "string"
+      },
+      "to_date": {
+        "description": "last posting date, YYYY-MM-DD, inclusive",
+        "type": "string"
+      }
+    },
+    "required": [
+      "company",
+      "from_date",
+      "to_date"
+    ],
+    "type": "object"
+  },
+  "name": "list_gl_entries",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "entries": {
+        "description": "GL Entries ordered by name",
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "account": {
+              "type": "string"
+            },
+            "against": {
+              "description": "the other accounts or parties of the voucher",
+              "type": "string"
+            },
+            "credit": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "debit": {
+              "description": "paise",
+              "type": "integer"
+            },
+            "is_opening": {
+              "description": "true for an opening entry",
+              "type": "boolean"
+            },
+            "name": {
+              "description": "GL Entry name",
+              "type": "string"
+            },
+            "party": {
+              "type": "string"
+            },
+            "party_type": {
+              "type": "string"
+            },
+            "posting_date": {
+              "description": "YYYY-MM-DD",
+              "type": "string"
+            },
+            "remarks": {
+              "type": "string"
+            },
+            "voucher_no": {
+              "type": "string"
+            },
+            "voucher_type": {
+              "description": "e.g. Journal Entry, Purchase Invoice, Payment Entry",
+              "type": "string"
+            }
+          },
+          "required": [
+            "name",
+            "account",
+            "debit",
+            "credit",
+            "posting_date",
+            "voucher_type",
+            "voucher_no",
+            "is_opening"
+          ],
+          "type": "object"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      },
+      "next_cursor": {
+        "description": "pass as cursor to get the next page; empty on the last page",
+        "type": "string"
+      }
+    },
+    "required": [
+      "entries",
+      "next_cursor"
+    ],
+    "type": "object"
+  }
+}
