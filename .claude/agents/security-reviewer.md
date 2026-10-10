@@ -3,7 +3,7 @@ name: security-reviewer
 description: "Read-only security and compliance review (gate G5) of a ticket's diff - secrets, injection paths, tenant isolation, write-path controls and the plan's guardrail invariants. Use only for data-sensitive and regulated tickets, after the gates pass."
 tools: Read, Grep, Glob, Bash
 disallowedTools: Edit, Write, MultiEdit, NotebookEdit
-model: inherit
+model: opus
 color: red
 hooks:
   PreToolUse:
