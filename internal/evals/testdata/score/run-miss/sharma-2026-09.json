@@ -1,0 +1,113 @@
+{
+  "commit": "dev-abc123",
+  "company": "sharma",
+  "control": false,
+  "cost_usd": "0.4",
+  "duration_ms": 1800,
+  "error": "",
+  "findings": [
+    {
+      "amount_paise": 11800,
+      "evidence": [
+        {
+          "args": {
+            "company": "sharma"
+          },
+          "artifact": "ab12cd34",
+          "ids": [
+            "HDFC Current 0001 - STPL",
+            "BT-0901"
+          ],
+          "server": "evidence",
+          "tool": "get_bank_lines"
+        }
+      ],
+      "id": "11111111-1111-4111-8111-000000000001",
+      "keys": {
+        "account": "HDFC Current 0001 - STPL",
+        "bank_txn_id": "BT-0901"
+      },
+      "run_id": "00000000-0000-4000-8000-000000000001",
+      "severity": "medium",
+      "status": "open",
+      "title": "unrecorded_bank_charge HDFC Current 0001 - STPL/BT-0901",
+      "type": "unrecorded_bank_charge",
+      "verified": true
+    },
+    {
+      "amount_paise": 35400,
+      "evidence": [
+        {
+          "args": {
+            "company": "sharma"
+          },
+          "artifact": "ab12cd34",
+          "ids": [
+            "HDFC Current 0001 - STPL",
+            "BT-0903"
+          ],
+          "server": "evidence",
+          "tool": "get_bank_lines"
+        }
+      ],
+      "id": "11111111-1111-4111-8111-000000000003",
+      "keys": {
+        "account": "HDFC Current 0001 - STPL",
+        "bank_txn_id": "BT-0903"
+      },
+      "run_id": "00000000-0000-4000-8000-000000000001",
+      "severity": "medium",
+      "status": "needs_review",
+      "title": "unrecorded_bank_charge HDFC Current 0001 - STPL/BT-0903",
+      "type": "unrecorded_bank_charge",
+      "verified": true
+    },
+    {
+      "amount_paise": 20000,
+      "evidence": [
+        {
+          "args": {
+            "company": "sharma"
+          },
+          "artifact": "ab12cd34",
+          "ids": [
+            "HDFC Current 0001 - STPL",
+            "BT-0950"
+          ],
+          "server": "evidence",
+          "tool": "get_bank_lines"
+        }
+      ],
+      "id": "11111111-1111-4111-8111-000000000004",
+      "keys": {
+        "account": "HDFC Current 0001 - STPL",
+        "bank_txn_id": "BT-0950"
+      },
+      "run_id": "00000000-0000-4000-8000-000000000001",
+      "severity": "medium",
+      "status": "open",
+      "title": "unmatched_bank_line HDFC Current 0001 - STPL/BT-0950",
+      "type": "unmatched_bank_line",
+      "verified": false
+    }
+  ],
+  "finished_at": "2026-10-10T09:00:02Z",
+  "models": {
+    "called": [],
+    "fast": "haiku",
+    "strong": "sonnet"
+  },
+  "month": "2026-09",
+  "reason": "",
+  "report_path": "results/runs/00000000-0000-4000-8000-000000000001.md",
+  "run_id": "00000000-0000-4000-8000-000000000001",
+  "started_at": "2026-10-10T09:00:00Z",
+  "status": "partial",
+  "suite": "suite-test",
+  "tokens": {
+    "cache_read": 0,
+    "input": 0,
+    "output": 0
+  },
+  "trace_id": null
+}

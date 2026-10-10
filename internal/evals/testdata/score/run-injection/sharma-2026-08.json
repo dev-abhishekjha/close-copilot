@@ -1,0 +1,28 @@
+{
+  "commit": "dev-abc123",
+  "company": "sharma",
+  "control": true,
+  "cost_usd": "0",
+  "duration_ms": 1200,
+  "error": "export: <img src=https://evil/x> [click](https://evil) ![p](https://evil/p.png)",
+  "findings": [],
+  "finished_at": "2026-10-10T09:00:02Z",
+  "models": {
+    "called": [],
+    "fast": "haiku",
+    "strong": "sonnet"
+  },
+  "month": "2026-08",
+  "reason": "<img src=https://evil/x> [click](https://evil) ![p](https://evil/p.png)",
+  "report_path": "results/runs/00000000-0000-4000-8000-000000000003.md",
+  "run_id": "00000000-0000-4000-8000-000000000003",
+  "started_at": "2026-10-10T09:00:00Z",
+  "status": "failed",
+  "suite": "suite-test",
+  "tokens": {
+    "cache_read": 0,
+    "input": 0,
+    "output": 0
+  },
+  "trace_id": null
+}

@@ -12,7 +12,15 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/evals"
 )
 
-const cmdRun = "run"
+// Subcommands.
+const (
+	cmdRun   = "run"
+	cmdScore = "score"
+	cmdNoise = "noise"
+)
+
+// commandsUsage names every subcommand, for errors.
+const commandsUsage = "usage: eval run --suite <name> | eval score <results-dir> | eval noise <score.json>... --out <file>"
 
 // usage is the help text of eval run.
 const usage = `usage: eval run --suite <name> [flags]
@@ -32,10 +40,13 @@ them (as with --no-agent), ends partial, and the manifest records
 flags:
 `
 
-// command is a parsed eval command line.
+// command is a parsed eval command line. flags is set for run, score for
+// score, noise for noise.
 type command struct {
 	name  string
 	flags evals.Flags
+	score scoreFlags
+	noise noiseFlags
 }
 
 // onlyList collects --only values; each may be comma-separated.
@@ -59,14 +70,40 @@ func (o *onlyList) Set(v string) error {
 // errHelp asks for the help text and a zero exit.
 var errHelp = flag.ErrHelp
 
-// parseArgs parses "run --suite ..." and writes help to out on -h.
+// parseArgs parses "run --suite ...", "score <dir> ..." or "noise ..." and
+// writes help to out on -h.
 func parseArgs(args []string, out io.Writer) (command, error) {
 	if len(args) == 0 {
-		return command{}, errors.New("eval: missing command; usage: eval run --suite <name>")
+		return command{}, errors.New("eval: missing command; " + commandsUsage)
 	}
-	if args[0] != cmdRun {
-		return command{}, fmt.Errorf("eval: unknown command %.40q; usage: eval run --suite <name>", args[0])
+	switch args[0] {
+	case cmdRun:
+		return parseRunArgs(args, out)
+	case cmdScore:
+		return parseScoreArgs(args, out)
+	case cmdNoise:
+		return parseNoiseArgs(args, out)
 	}
+	return command{}, fmt.Errorf("eval: unknown command %.40q; %s", args[0], commandsUsage)
+}
+
+// requiredFor is the environment a command line needs: only run reaches
+// Postgres and the MCP servers; score and noise read files and need none.
+func requiredFor(args []string) []string {
+	for _, a := range args {
+		if strings.HasPrefix(a, "-") {
+			continue // cli.Run's own flags, such as -version
+		}
+		if a == cmdRun {
+			return required
+		}
+		return nil
+	}
+	return nil
+}
+
+// parseRunArgs parses "run --suite ...".
+func parseRunArgs(args []string, out io.Writer) (command, error) {
 	fs := flag.NewFlagSet("eval run", flag.ContinueOnError)
 	fs.SetOutput(out)
 	fs.Usage = func() {

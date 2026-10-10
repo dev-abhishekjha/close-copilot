@@ -1,10 +1,16 @@
 // Command eval is the eval harness: runs closes on a seeded suite and scores them against ground truth.
 //
-// Built in CC-901 (runner); scoring comes in CC-902 and the CI gate in
+// Built in CC-901 (runner) and CC-902 (scoring); the CI gate comes in
 // CC-905. Usage:
 //
 //	eval run --suite suite-v1 [--only sharma:2026-09] [--model-fast X] [--no-agent]
 //	         [--results-dir results] [--scenarios-dir evals/scenarios] [--config-dir config]
+//	eval score <results-dir> [--truth-dir D] [--out D] [--require EXPR]... [--compare FILE]
+//	         [--baseline-out FILE] [--noise FILE] [--pricing config/pricing.yaml]
+//	eval noise <score.json> <score.json>... --out FILE
+//
+// score and noise read files only and need no environment variables; run
+// needs DATABASE_URL and the MCP settings.
 //
 // run closes every evaluated company-month of the suite and its clean
 // control month, one after another, through the same agent.Workflow as
@@ -41,7 +47,8 @@ var (
 	stderr io.Writer = os.Stderr
 )
 
-// required are the variables eval run can't start without.
+// required are the variables eval run can't start without; score and
+// noise need none (requiredFor).
 var required = []string{
 	config.EnvDatabaseURL,
 	config.EnvBooksMCPURL,
@@ -50,7 +57,7 @@ var required = []string{
 }
 
 func main() {
-	cli.Main("eval", required, run)
+	cli.Main("eval", requiredFor(os.Args[1:]), run)
 }
 
 func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string) error {
@@ -60,6 +67,12 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	}
 	if err != nil {
 		return err
+	}
+	switch cmd.name {
+	case cmdScore:
+		return runScore(cmd.score)
+	case cmdNoise:
+		return runNoise(cmd.noise)
 	}
 	if cmd.flags.ModelFast != "" {
 		cfg.LLMModelFast = cmd.flags.ModelFast // this run only
