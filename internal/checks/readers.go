@@ -4,12 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"slices"
 	"time"
 
 	"github.com/abhishekjha/close-copilot/internal/books"
 	"github.com/abhishekjha/close-copilot/internal/frappe"
-	"github.com/abhishekjha/close-copilot/internal/money"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -32,13 +30,10 @@ type EvidenceReader interface {
 	GSTR2BEntries(ctx context.Context, company string, period string) ([]store.GSTR2BEntry, error)
 }
 
-// RecurringSupplier summarizes a supplier with regular, recurring monthly billing.
-type RecurringSupplier struct {
-	Supplier     string      `json:"supplier"`
-	MedianAmount money.Paise `json:"median_amount"`
-	TypicalDay   int         `json:"typical_day"`
-	MonthsSeen   []string    `json:"months_seen"`
-}
+// RecurringSupplier summarizes a supplier with regular, recurring monthly
+// billing. It is books.RecurringSupplier, which the books MCP tool
+// list_recurring_suppliers returns too (CC-502).
+type RecurringSupplier = books.RecurringSupplier
 
 // CompanyDirectory resolves a company ID ("sharma") to its stored record,
 // whose ERPCompany is the name ERPNext knows the company by.
@@ -219,101 +214,11 @@ func (d *DirectBooks) RecurringSuppliers(ctx context.Context, company string, be
 	return computeRecurringSuppliers(invoices, minOccurrences, amountBandPct), nil
 }
 
-// computeRecurringSuppliers processes purchase invoices and determines recurring suppliers.
+// computeRecurringSuppliers processes purchase invoices and determines
+// recurring suppliers. The rule lives in books.RecurringSuppliers, shared
+// with the list_recurring_suppliers MCP tool.
 func computeRecurringSuppliers(invoices []frappe.PurchaseInvoice, minOccurrences, amountBandPct int) []RecurringSupplier {
-	type supplierData struct {
-		months  map[string]bool
-		amounts []money.Paise
-		days    []int
-	}
-
-	bySupplier := make(map[string]*supplierData)
-	for _, inv := range invoices {
-		if inv.Supplier == "" {
-			continue
-		}
-		data := bySupplier[inv.Supplier]
-		if data == nil {
-			data = &supplierData{
-				months: make(map[string]bool),
-			}
-			bySupplier[inv.Supplier] = data
-		}
-		monthStr := inv.PostingDate.Format("2006-01")
-		data.months[monthStr] = true
-		data.amounts = append(data.amounts, inv.GrandTotal)
-		day := inv.PostingDate.Day()
-		if !inv.BillDate.IsZero() {
-			day = inv.BillDate.Day()
-		}
-		data.days = append(data.days, day)
-	}
-
-	var out []RecurringSupplier
-	for supplier, data := range bySupplier {
-		if len(data.months) < minOccurrences || len(data.amounts) == 0 {
-			continue
-		}
-
-		// Sort amounts to compute median
-		slices.Sort(data.amounts)
-		mid := len(data.amounts) / 2
-		median := data.amounts[mid]
-
-		// Check amount band tolerance
-		tolerance := (int64(median) * int64(amountBandPct)) / 100
-		allWithin := true
-		for _, a := range data.amounts {
-			diff := int64(a - median)
-			if diff < 0 {
-				diff = -diff
-			}
-			if diff > tolerance {
-				allWithin = false
-				break
-			}
-		}
-		if !allWithin {
-			continue
-		}
-
-		// Calculate typical day of month
-		sumDays := 0
-		for _, d := range data.days {
-			sumDays += d
-		}
-		typicalDay := sumDays / len(data.days)
-		if typicalDay < 1 {
-			typicalDay = 1
-		} else if typicalDay > 31 {
-			typicalDay = 31
-		}
-
-		monthsSeen := make([]string, 0, len(data.months))
-		for m := range data.months {
-			monthsSeen = append(monthsSeen, m)
-		}
-		slices.Sort(monthsSeen)
-
-		out = append(out, RecurringSupplier{
-			Supplier:     supplier,
-			MedianAmount: median,
-			TypicalDay:   typicalDay,
-			MonthsSeen:   monthsSeen,
-		})
-	}
-
-	slices.SortFunc(out, func(a, b RecurringSupplier) int {
-		if a.Supplier < b.Supplier {
-			return -1
-		}
-		if a.Supplier > b.Supplier {
-			return 1
-		}
-		return 0
-	})
-
-	return out
+	return books.RecurringSuppliers(invoices, minOccurrences, amountBandPct)
 }
 
 // EvidenceStore defines the database methods needed by DirectEvidence.
