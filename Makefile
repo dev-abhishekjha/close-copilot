@@ -109,7 +109,7 @@ ingest: ## Ingest the document corpus (CC-803)
 
 .PHONY: eval
 eval: ## Run and score the eval suite (CC-901, CC-902)
-	$(GO) run ./cmd/eval run --suite $(SUITE)
+	$(GO) run ./cmd/eval run --no-llm --suite $(SUITE)
 
 # Records the books and evidence tool responses of SUITE from the seeded
 # ERPNext into evals/fixtures/SUITE (CC-905). Needs erp-reset, seed and
