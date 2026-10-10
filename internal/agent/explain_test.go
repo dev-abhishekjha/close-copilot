@@ -55,6 +55,8 @@ func (s *explainStore) SetFindingExplanation(_ context.Context, id uuid.UUID, ex
 		if s.findings[i].ID == id {
 			s.findings[i].Explanation = &explanation
 			s.findings[i].Action = &action
+			s.findings[i].Citations = citations
+			s.findings[i].Proposal = proposal
 		}
 	}
 	return nil
@@ -584,5 +586,116 @@ func TestExplainInWorkflow(t *testing.T) {
 	if !strings.Contains(string(md), "| Average cost per explained finding | USD 0 (run cost over 4 explained) |") ||
 		!strings.Contains(string(md), "- Action: book_entry") || !strings.Contains(string(md), "the books have no matching entry") {
 		t.Errorf("report:\n%s", md)
+	}
+}
+
+// TestExplainRecordsAccountsSnapshot checks that the explanation names a
+// stored snapshot of exactly the accounts in the model's ACCOUNTS, scoped
+// to the run's company and month, and an empty DOCUMENTS list.
+func TestExplainRecordsAccountsSnapshot(t *testing.T) {
+	fx, model := newExplainFixture(t, answer(validArgs))
+	fx.accounts.list = []string{"Creditors - STPL", bankAccount, chargeAccount}
+	res, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil || res.Status != store.StepDone {
+		t.Fatalf("Explain %+v: %v", res, err)
+	}
+	a, err := fx.st.GetArtifact(t.Context(), res.OutputRefs[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	var art ExplanationArtifact
+	if err := json.Unmarshal(a.Content, &art); err != nil {
+		t.Fatal(err)
+	}
+	if art.AccountsRef == "" || art.DocumentRefs == nil || len(art.DocumentRefs) != 0 || art.FaultInjected {
+		t.Fatalf("artifact refs %q %v fault %v", art.AccountsRef, art.DocumentRefs, art.FaultInjected)
+	}
+
+	// What the model saw in ACCOUNTS.
+	system := model.Calls()[0].System[0].Text
+	_, list, ok := strings.Cut(system, "ACCOUNTS (the only accounts a proposal may use), as JSON:\n")
+	if !ok {
+		t.Fatal("no ACCOUNTS in the system block")
+	}
+	var shown []string
+	if err := json.Unmarshal([]byte(strings.TrimSpace(list)), &shown); err != nil {
+		t.Fatal(err)
+	}
+
+	// What the verifier rebuilds from the snapshot.
+	snapArt, err := fx.st.GetArtifact(t.Context(), art.AccountsRef)
+	if err != nil || snapArt.Kind != store.ArtifactToolResult {
+		t.Fatalf("accounts snapshot: %v %s", err, snapArt.Kind)
+	}
+	snap, err := decodeSnapshot(snapArt.Content)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if snap.Server != ServerBooks || snap.Tool != toolGetTrialBalance || snap.Args["company"] != explainCompany ||
+		snap.Args["from_date"] != "2026-09-01" || snap.Args["to_date"] != "2026-09-30" {
+		t.Errorf("snapshot header %s/%s %v", snap.Server, snap.Tool, snap.Args)
+	}
+	set := snapshotAccountSet(snap)
+	if len(set) != len(shown) {
+		t.Errorf("snapshot has %d accounts, the model saw %d", len(set), len(shown))
+	}
+	for _, name := range shown {
+		if !set[name] {
+			t.Errorf("account %q shown to the model is not in the snapshot", name)
+		}
+	}
+	// The order is the model's too.
+	var rows accountsSnapshot
+	raw, _ := json.Marshal(snap.Result)
+	if err := json.Unmarshal(raw, &rows); err != nil {
+		t.Fatal(err)
+	}
+	for i, r := range rows.Rows {
+		if r.Account != shown[i] {
+			t.Errorf("row %d %q, model saw %q", i, r.Account, shown[i])
+		}
+	}
+
+	// The verifier passes this grounded answer.
+	v := &CodeVerifier{Store: fx.st}
+	vres, err := v.Verify(t.Context(), VerifyRequest{
+		RunID: fx.req.RunID, StepID: uuid.New(), Company: explainCompany, Month: explainMonth,
+		Finding: fx.req.Finding, EvidenceRefs: fx.req.EvidenceRefs, ExplanationRefs: res.OutputRefs, ExplainAttempt: 1,
+	})
+	if err != nil || len(vres.Violations) != 0 {
+		t.Errorf("verify: %v, violations %s", err, vres.Violations)
+	}
+}
+
+func TestExplainFaultCorruptsTheStoredExplanation(t *testing.T) {
+	fx, _ := newExplainFixture(t, answer(validArgs), answer(validArgs))
+	fault, err := NewFault("corrupt_explanation")
+	if err != nil {
+		t.Fatal(err)
+	}
+	fx.ex.Fault = fault
+	res, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a, _ := fx.st.GetArtifact(t.Context(), res.OutputRefs[0])
+	var art ExplanationArtifact
+	if err := json.Unmarshal(a.Content, &art); err != nil {
+		t.Fatal(err)
+	}
+	if !art.FaultInjected || !strings.HasSuffix(art.Explanation, FaultSentence) || fx.st.set[fx.req.Finding.ID].explanation != art.Explanation {
+		t.Errorf("artifact %+v", art)
+	}
+	if art.Proposal == nil || art.Proposal.Lines[0].DebitPaise != 590 || len(art.CitedAmountsPaise) != 1 {
+		t.Errorf("the fault touched more than the explanation: %+v", art)
+	}
+	// Once per process: the next explanation is clean.
+	res2, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	a2, _ := fx.st.GetArtifact(t.Context(), res2.OutputRefs[0])
+	if strings.Contains(string(a2.Content), "fault_injected") {
+		t.Error("the fault fired twice")
 	}
 }

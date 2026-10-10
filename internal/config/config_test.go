@@ -132,6 +132,22 @@ func TestLoadDefaultsToClaudeCLIWithModelAliases(t *testing.T) {
 	}
 }
 
+func TestLoadReadsFault(t *testing.T) {
+	c, err := Load(env(nil))
+	if err != nil || c.Fault != "" {
+		t.Fatalf("default fault %q, %v; want off", c.Fault, err)
+	}
+	c, err = Load(env(map[string]string{EnvCopilotFault: " corrupt_explanation "}))
+	if err != nil || c.Fault != FaultCorruptExplanation {
+		t.Fatalf("fault %q, %v", c.Fault, err)
+	}
+	for _, v := range []string{"corrupt", "CORRUPT_EXPLANATION", "corrupt_explanation,x", "pass_everything"} {
+		if _, err := Load(env(map[string]string{EnvCopilotFault: v})); err == nil || !strings.Contains(err.Error(), EnvCopilotFault) {
+			t.Errorf("fault %q: err %v, want a config error", v, err)
+		}
+	}
+}
+
 func TestLoadRejectsUnknownProvider(t *testing.T) {
 	if _, err := Load(env(map[string]string{EnvLLMProvider: "openai"})); err == nil {
 		t.Fatal("want an error for an unknown provider")
@@ -302,6 +318,7 @@ var plainValues = map[string]string{
 	EnvOTLPEndpoint:   "http://otlp.visible.test:4318",
 	EnvAppAddr:        ":9777",
 	EnvDataDir:        "/visible/data",
+	EnvCopilotFault:   FaultCorruptExplanation,
 }
 
 func allValues() map[string]string {

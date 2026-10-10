@@ -22,13 +22,38 @@ package agent
 //
 // Phase 1 runs preflight, the bank reconciliation check, explaining,
 // verifying and synthesizing; retrieving (CC-806) and investigating
-// (CC-706) are recorded as skipped steps. With no Explainer configured
-// (until CC-704), the explain and verify steps are skipped and the run ends
-// partial: findings saved, explanations missing.
+// (CC-706) are recorded as skipped steps. With no Explainer configured,
+// the explain and verify steps are skipped and the run ends partial:
+// findings saved, explanations missing.
+//
+// Explaining and verifying run per finding, Parallel findings at a time,
+// as a loop (CC-705): explain, then verify. A failed verdict reopens the
+// explain step with the violations as feedback (store.ReopenStep) and ends
+// the verify attempt failed with the verdict in its output refs, so both
+// steps run again: the next explain attempt gets VERIFIER_FEEDBACK
+// (attempt 3 uses the strong model), and the verify step restarts on a
+// fresh attempt. After the third failed verification the finding is
+// marked needs_review and the verify step ends done with the failing
+// verdict and a reason naming the violation codes. A verify step that is
+// done without a reason passed. The order of the writes (clear the
+// finding's explanation, end the verify attempt failed with its verdict,
+// then reopen the explain step) makes a crash anywhere in the loop resume
+// correctly: before the reopen, the explain step is still done and the
+// verification is simply re-run (it is deterministic); after it, the
+// failed verdict is already in the verify step's output_refs.
+//
+// No attempt's output is lost: ReopenStep and every restart by Begin move
+// a step's output refs to the end of its input refs, so a step's
+// input_refs also holds, in order, the outputs of its earlier attempts:
+// the rejected explanations on the explain step and the failed verdicts on
+// the verify step. cmd/audit rebuilds a finding whose last explain retry
+// ended without an explanation from the last of those verdicts.
 
 import (
+	"bytes"
 	"cmp"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -81,6 +106,10 @@ const (
 	reasonInvestigate   = "investigation arrives with CC-706"
 )
 
+// MaxExplainAttempts is how many explain attempts a finding gets before a
+// failing verification marks it needs_review: the first and two retries.
+const MaxExplainAttempts = 3
+
 var (
 	// ErrRunDone is returned by ResumeClose for a run that is already done.
 	ErrRunDone = errors.New("agent: run is already done")
@@ -119,10 +148,14 @@ type StepResult struct {
 	// Reason explains a failed or skipped step. It must not carry prompt,
 	// response or evidence text.
 	Reason string
-	// NeedsReview is the verifier's hook: the explanation still fails
-	// verification after the explainer's retries, so the finding is
-	// marked needs_review.
+	// NeedsReview is the verifier's hook: the explanation passed, but the
+	// model itself flagged it for review, so the finding is marked
+	// needs_review.
 	NeedsReview bool
+	// Violations is a failed verdict's VerifierFeedback JSON; non-empty
+	// means the explanation failed verification. The workflow decides
+	// whether to retry and stores it as the explain step's feedback.
+	Violations json.RawMessage
 }
 
 // ExplainRequest is one finding to explain (CC-704).
@@ -161,7 +194,11 @@ type VerifyRequest struct {
 	EvidenceRefs []string
 	// ExplanationRefs are the explain step's output artifacts.
 	ExplanationRefs []string
-	Model           llm.Provider
+	// ExplainAttempt is the attempt of the explain step that produced the
+	// explanation; it is recorded in the verdict.
+	ExplainAttempt int
+	// Model is the step's provider. The CodeVerifier never uses it.
+	Model llm.Provider
 }
 
 // Verifier traces an explanation's numbers back to the evidence and stores
@@ -187,6 +224,9 @@ type RunStore interface {
 	RunTokensUsed(ctx context.Context, runID uuid.UUID) (int64, error)
 	LLMBudgetExhausted(ctx context.Context, cfg config.Config, now time.Time) (bool, error)
 	SetFindingStatus(ctx context.Context, findingID uuid.UUID, status string) error
+	SetFindingVerified(ctx context.Context, runID, findingID uuid.UUID, verified bool) error
+	ClearFindingExplanation(ctx context.Context, runID, findingID uuid.UUID) error
+	ReopenStep(ctx context.Context, step store.Step, feedback json.RawMessage) error
 }
 
 var _ RunStore = (*store.Store)(nil)
@@ -463,15 +503,7 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 		return outcome{}, err
 	}
 
-	explained, err := w.explainAll(ctx, run, findings)
-	if err != nil {
-		return outcome{}, err
-	}
-	if err := w.progress(ctx, run.ID); err != nil {
-		return outcome{}, err
-	}
-
-	verified, err := w.verifyAll(ctx, run, findings, explained)
+	explained, verified, err := w.explainAndVerifyAll(ctx, run, findings)
 	if err != nil {
 		return outcome{}, err
 	}
@@ -485,11 +517,11 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 
 	out := outcome{status: store.RunDone, findings: len(findings)}
 	var notes []string
-	if n := len(findings) - len(explained); n > 0 {
+	if n := len(findings) - explained; n > 0 {
 		notes = append(notes, fmt.Sprintf("explanations missing for %d of %d findings", n, len(findings)))
 	}
-	if n := len(explained) - verified; n > 0 {
-		notes = append(notes, fmt.Sprintf("%d of %d explanations not verified", n, len(explained)))
+	if n := explained - verified; n > 0 {
+		notes = append(notes, fmt.Sprintf("%d of %d explanations not verified", n, explained))
 	}
 	if len(notes) > 0 {
 		out.status, out.reason = store.RunPartial, strings.Join(notes, "; ")
@@ -706,49 +738,88 @@ func (w *Workflow) finishWorker(ctx context.Context, step store.Step, res StepRe
 	return status == store.StepDone, nil
 }
 
-// explainAll runs one explain step per finding, Parallel at a time. It
-// returns the output refs of each finding whose explain step is done.
-func (w *Workflow) explainAll(ctx context.Context, run store.CloseRun, findings []store.Finding) (map[uuid.UUID][]string, error) {
+// explainAndVerifyAll runs each finding's explain and verify loop,
+// Parallel findings at a time. It returns how many findings have an
+// explanation and how many of those passed verification.
+func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding) (int, int, error) {
 	var mu sync.Mutex
-	explained := map[uuid.UUID][]string{}
+	explained, verified := 0, 0
 	g, gctx := errgroup.WithContext(ctx)
 	g.SetLimit(w.parallel())
 	for _, f := range findings {
 		g.Go(func() error {
-			refs, ok, err := w.explainOne(gctx, run, f)
+			hasExplanation, passed, err := w.explainAndVerify(gctx, run, f)
 			if err != nil {
 				return err
 			}
-			if ok {
-				mu.Lock()
-				explained[f.ID] = refs
-				mu.Unlock()
+			mu.Lock()
+			defer mu.Unlock()
+			if hasExplanation {
+				explained++
+			}
+			if passed {
+				verified++
 			}
 			return nil
 		})
 	}
 	if err := g.Wait(); err != nil {
-		return nil, err
+		return 0, 0, err
 	}
-	return explained, nil
+	return explained, verified, nil
 }
 
-func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.Finding) ([]string, bool, error) {
+// explainAndVerify is one finding's loop: explain, verify, and on a failed
+// verdict reopen both steps and go again, up to MaxExplainAttempts explain
+// attempts. It reports whether the finding has an explanation and whether
+// it passed verification.
+func (w *Workflow) explainAndVerify(ctx context.Context, run store.CloseRun, f store.Finding) (bool, bool, error) {
+	for {
+		explainStep, refs, ok, err := w.explainOne(ctx, run, f)
+		if err != nil {
+			return false, false, err
+		}
+		if !ok {
+			// No explanation: the verify step has nothing to check. When an
+			// earlier attempt failed verification (the step carries
+			// feedback), the finding needs review; its rejected explanation
+			// was cleared before the reopen. Marked before the verify step
+			// is skipped, so a crash in between marks it on resume. The
+			// skip restarts the verify step (Begin), which keeps the last
+			// failed verdict in its input_refs for cmd/audit.
+			if len(bytes.TrimSpace(explainStep.Feedback)) > 0 {
+				if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+					return false, false, err
+				}
+				w.log().WarnContext(ctx, "explanation retry ended without an explanation; finding needs review", "run_id", run.ID, "finding_id", f.ID, "explain_attempt", explainStep.Attempt)
+			}
+			return false, false, w.skipVerify(ctx, run, f, reasonNoExplanation)
+		}
+		again, passed, err := w.verifyOne(ctx, run, f, explainStep, refs)
+		if err != nil || !again {
+			return true, passed, err
+		}
+	}
+}
+
+// explainOne runs the finding's explain step unless it is done. It returns
+// the step (for its attempt) and its output refs when it ends done.
+func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.Finding) (store.Step, []string, bool, error) {
 	step, done, err := w.begin(ctx, run.ID, store.StepKindExplain, f.ID.String())
 	if err != nil {
-		return nil, false, err
+		return store.Step{}, nil, false, err
 	}
 	if done {
-		return step.OutputRefs, true, nil
+		return step, step.OutputRefs, true, nil
 	}
 	if w.Explainer == nil {
-		return nil, false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoExplainer)
+		return step, nil, false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoExplainer)
 	}
 	if reason, err := w.overTokenCap(ctx, run.ID); err != nil || reason != "" {
 		if err != nil {
-			return nil, false, w.failStep(ctx, step, err)
+			return step, nil, false, w.failStep(ctx, step, err)
 		}
-		return nil, false, w.finish(ctx, step, store.StepSkipped, nil, reason)
+		return step, nil, false, w.finish(ctx, step, store.StepSkipped, nil, reason)
 	}
 	res, err := w.Explainer.Explain(ctx, ExplainRequest{
 		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
@@ -757,13 +828,13 @@ func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.F
 		Model: w.stepModel(run.ID, step.ID),
 	})
 	if err != nil {
-		return nil, false, w.workerError(ctx, step, err)
+		return step, nil, false, w.workerError(ctx, step, err)
 	}
 	ok, err := w.finishWorker(ctx, step, res)
 	if err != nil || !ok {
-		return nil, false, err
+		return step, nil, false, err
 	}
-	return res.OutputRefs, true, nil
+	return step, res.OutputRefs, true, nil
 }
 
 // workerError ends a worker's step after an error: skipped at the token
@@ -783,65 +854,98 @@ func (w *Workflow) workerError(ctx context.Context, step store.Step, err error) 
 	return nil
 }
 
-// verifyAll runs one verify step per finding, Parallel at a time, and
-// returns how many verify steps are done.
-func (w *Workflow) verifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding, explained map[uuid.UUID][]string) (int, error) {
-	var mu sync.Mutex
-	verified := 0
-	g, gctx := errgroup.WithContext(ctx)
-	g.SetLimit(w.parallel())
-	for _, f := range findings {
-		refs, hasExplanation := explained[f.ID]
-		g.Go(func() error {
-			ok, err := w.verifyOne(gctx, run, f, refs, hasExplanation)
-			if err != nil {
-				return err
-			}
-			if ok {
-				mu.Lock()
-				verified++
-				mu.Unlock()
-			}
-			return nil
-		})
-	}
-	if err := g.Wait(); err != nil {
-		return 0, err
-	}
-	return verified, nil
+// skipVerify records the finding's verify step as skipped, unless it is
+// done.
+func (w *Workflow) skipVerify(ctx context.Context, run store.CloseRun, f store.Finding, reason string) error {
+	return w.skipStep(ctx, run.ID, store.StepKindVerify, f.ID.String(), reason)
 }
 
-func (w *Workflow) verifyOne(ctx context.Context, run store.CloseRun, f store.Finding, explanation []string, hasExplanation bool) (bool, error) {
+// verifyOne runs the finding's verify step against the explain step's
+// output. It returns again=true when the verdict failed and the explain
+// step was reopened for another attempt, and passed=true when the verdict
+// passed. A verify step that is already done is not re-run: done without
+// a reason passed, done with one is a final failure.
+func (w *Workflow) verifyOne(ctx context.Context, run store.CloseRun, f store.Finding, explainStep store.Step, explanation []string) (again, passed bool, err error) {
 	step, done, err := w.begin(ctx, run.ID, store.StepKindVerify, f.ID.String())
 	if err != nil {
-		return false, err
+		return false, false, err
 	}
 	if done {
-		return true, nil
+		return false, step.Error == nil, nil
 	}
-	switch {
-	case !hasExplanation:
-		return false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoExplanation)
-	case w.Verifier == nil:
-		return false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoVerifier)
+	if w.Verifier == nil {
+		return false, false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoVerifier)
 	}
 	res, err := w.Verifier.Verify(ctx, VerifyRequest{
 		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
 		Company: run.CompanyID, Month: run.Month,
 		Finding: f, EvidenceRefs: evidenceRefs(f), ExplanationRefs: explanation,
-		Model: w.stepModel(run.ID, step.ID),
+		ExplainAttempt: explainStep.Attempt,
+		Model:          w.stepModel(run.ID, step.ID),
 	})
 	if err != nil {
-		return false, w.workerError(ctx, step, err)
+		return false, false, w.workerError(ctx, step, err)
 	}
-	if res.NeedsReview {
-		// Marked before the step is done, so a crash in between re-runs
-		// the (idempotent) verification rather than losing the mark.
-		if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
-			return false, w.failStep(ctx, step, err)
+	if res.StepID != uuid.Nil && res.StepID != step.ID {
+		return false, false, w.failStep(ctx, step, fmt.Errorf("agent: %s worker answered for another step", step.Kind))
+	}
+	if res.Status != "" && res.Status != store.StepDone {
+		_, err := w.finishWorker(ctx, step, res)
+		return false, false, err
+	}
+
+	if len(bytes.TrimSpace(res.Violations)) == 0 {
+		// Passed. Marked before the step is done, so a crash in between
+		// re-runs the (idempotent) verification rather than losing a mark.
+		if err := w.Store.SetFindingVerified(ctx, run.ID, f.ID, true); err != nil {
+			return false, false, w.failStep(ctx, step, err)
 		}
+		if res.NeedsReview {
+			if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+				return false, false, w.failStep(ctx, step, err)
+			}
+		}
+		res.Reason = ""
+		ok, err := w.finishWorker(ctx, step, res)
+		return false, ok, err
 	}
-	return w.finishWorker(ctx, step, res)
+
+	reason := cmp.Or(res.Reason, "verification failed")
+	if explainStep.Attempt < MaxExplainAttempts {
+		// Retry: clear the rejected explanation and proposal from the
+		// finding, end this verify attempt failed (restartable) with its
+		// verdict in output_refs, then reopen the explain step with the
+		// violations. A crash after the clear or after the finish re-runs
+		// this verification (the explain step is still done), which fails
+		// the same way and goes on from the clear; a crash after the
+		// reopen re-explains with the feedback, and the failed verdict is
+		// already on the verify step, so the next Begin or skip keeps it in
+		// input_refs for cmd/audit. Either way the finding never shows a
+		// rejected explanation.
+		if err := w.Store.ClearFindingExplanation(ctx, run.ID, f.ID); err != nil {
+			return false, false, w.failStep(ctx, step, err)
+		}
+		if err := w.finish(ctx, step, store.StepFailed, res.OutputRefs, fmt.Sprintf("%s (explain attempt %d); retrying", reason, explainStep.Attempt)); err != nil {
+			return false, false, err
+		}
+		if err := w.Store.ReopenStep(ctx, explainStep, res.Violations); err != nil {
+			// The verify step already ended failed with its verdict, so
+			// it is not failed again: a resume re-runs it.
+			return false, false, err
+		}
+		w.log().InfoContext(ctx, "explanation failed verification; retrying", "run_id", run.ID, "finding_id", f.ID, "explain_attempt", explainStep.Attempt)
+		return true, false, nil
+	}
+
+	// The last attempt failed: needs_review, then the step ends done with
+	// the failing verdict.
+	if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+		return false, false, w.failStep(ctx, step, err)
+	}
+	w.log().WarnContext(ctx, "explanation failed verification on its last attempt; finding needs review", "run_id", run.ID, "finding_id", f.ID, "explain_attempt", explainStep.Attempt)
+	res.Reason = fmt.Sprintf("%s after %d explain attempts", reason, explainStep.Attempt)
+	_, err = w.finishWorker(ctx, step, res)
+	return false, false, err
 }
 
 // ---- model budget ----
@@ -938,10 +1042,14 @@ func (w *Workflow) synthesize(ctx context.Context, run store.CloseRun, out outco
 	if err != nil {
 		return "", w.failStep(ctx, step, err)
 	}
+	fault, err := storedFault(ctx, w.Store, steps)
+	if err != nil {
+		return "", w.failStep(ctx, step, err)
+	}
 	md := RenderReport(ReportData{
 		RunID: run.ID, Company: run.CompanyID, Month: run.Month,
 		Outcome: out.status, Reason: out.reason, Usage: usage,
-		Findings: findings, Steps: steps,
+		Findings: findings, Steps: steps, Fault: fault,
 	})
 	sha, err := w.Store.PutArtifact(ctx, store.ArtifactReport, run.ID, step.ID, ReportArtifact{RunID: run.ID.String(), Markdown: md})
 	if err != nil {
@@ -955,4 +1063,36 @@ func (w *Workflow) synthesize(ctx context.Context, run store.CloseRun, out outco
 		return "", err
 	}
 	return path, nil
+}
+
+// storedFault returns the COPILOT_FAULT mode the run's stored explanations
+// show ("" for none): config.FaultCorruptExplanation when any explanation
+// artifact the run's explain steps point to (output refs, and the input
+// refs a reopen keeps from earlier attempts) is marked fault_injected. It
+// reads stored data only, never this process's setting.
+func storedFault(ctx context.Context, st ArtifactGetter, steps []store.Step) (string, error) {
+	for _, s := range steps {
+		if s.Kind != store.StepKindExplain {
+			continue
+		}
+		for _, ref := range slices.Concat(s.InputRefs, s.OutputRefs) {
+			a, err := st.GetArtifact(ctx, ref)
+			if err != nil {
+				return "", fmt.Errorf("agent: report fault: %w", err)
+			}
+			if a.Kind != store.ArtifactExplanation {
+				continue
+			}
+			var art struct {
+				FaultInjected bool `json:"fault_injected"`
+			}
+			if err := json.Unmarshal(a.Content, &art); err != nil {
+				return "", fmt.Errorf("agent: report fault: decode explanation %s: %w", shortSHA(ref), err)
+			}
+			if art.FaultInjected {
+				return config.FaultCorruptExplanation, nil
+			}
+		}
+	}
+	return "", nil
 }

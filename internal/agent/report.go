@@ -4,8 +4,10 @@ package agent
 // model call. It renders one run as Markdown: the run, its outcome, its
 // steps, and each finding with its amount in rupees, its evidence IDs and
 // snapshots, its suggested action, explanation, citations, proposed entry
-// and verification when present, and the average model cost per explained
-// finding (CC-704). The same
+// and verification when present, the average model cost per explained
+// finding (CC-704), and the verification pass rate with the retries and
+// the findings left for review (CC-705), plus a line when COPILOT_FAULT is
+// on. The same
 // Markdown is stored as a report artifact and written to
 // <results dir>/runs/<run_id>.md.
 //
@@ -42,6 +44,10 @@ type ReportData struct {
 	Usage    store.RunUsage
 	Findings []store.Finding // in report order
 	Steps    []store.Step
+	// Fault is the COPILOT_FAULT mode the run's stored explanations show
+	// ("" for none): the workflow reads it from the explanation artifacts'
+	// fault_injected mark, never from the process environment.
+	Fault string
 }
 
 // ReportArtifact is the content of a report artifact.
@@ -138,6 +144,10 @@ func RenderReport(d ReportData) string {
 	} else {
 		p("| Average cost per explained finding | USD %s (run cost over %d explained) |\n", cell(averageUSD(cost, explained)), explained)
 	}
+	p("| Verification | %s |\n", cell(verificationSummary(d.Findings, explain, verify)))
+	if d.Fault != "" {
+		p("| Fault injection | COPILOT_FAULT=%s: one explanation was corrupted on purpose on its first attempt |\n", cell(d.Fault))
+	}
 	rows = append(rows, perFinding(store.StepKindExplain, explain, d.Findings), perFinding(store.StepKindVerify, verify, d.Findings))
 	rows = append(rows, plainSteps(d.Steps, store.StepKindInvestigate)...)
 
@@ -188,6 +198,36 @@ func RenderReport(d ReportData) string {
 		p("- Verification: %s\n", verificationLine(f, verify[f.ID.String()]))
 	}
 	return b.String()
+}
+
+// verificationSummary is "verified N of M explanations (pass rate P%), R
+// retried, K needs_review": M findings have an explanation, N of them a
+// verify step done without a reason (passed), R an explain step that got
+// verifier feedback, and K are marked needs_review.
+func verificationSummary(findings []store.Finding, explain, verify map[string]store.Step) string {
+	explained, passed, retried, review := 0, 0, 0, 0
+	for _, f := range findings {
+		id := f.ID.String()
+		e := explain[id]
+		if len(e.Feedback) > 0 {
+			retried++
+		}
+		if f.Status == "needs_review" {
+			review++
+		}
+		if e.Status != store.StepDone {
+			continue
+		}
+		explained++
+		if v, ok := verify[id]; ok && v.Status == store.StepDone && v.Error == nil {
+			passed++
+		}
+	}
+	rate := "n/a"
+	if explained > 0 {
+		rate = strconv.Itoa(passed*100/explained) + "%"
+	}
+	return fmt.Sprintf("verified %d of %d explanations (pass rate %s), %d retried, %d needs_review", passed, explained, rate, retried, review)
 }
 
 // proposalLine renders a proposed journal entry on one line.

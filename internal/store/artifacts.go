@@ -26,6 +26,10 @@ const (
 	ArtifactResponse    = "response"
 	ArtifactExplanation = "explanation"
 	ArtifactReport      = "report"
+	// ArtifactVerdict is the verifier's verdict on one explanation
+	// (CC-705). It extends the shared spec's six kinds; the column has no
+	// CHECK constraint, so no migration is needed.
+	ArtifactVerdict = "verdict"
 )
 
 // ErrArtifactMismatch reports a stored artifact whose content no longer
@@ -66,10 +70,10 @@ type LLMCall struct {
 }
 
 // ValidateArtifactKind reports whether kind is one of the shared spec's
-// artifact kinds.
+// artifact kinds or a verdict.
 func ValidateArtifactKind(kind string) error {
 	switch kind {
-	case ArtifactToolResult, ArtifactRetrieval, ArtifactPrompt, ArtifactResponse, ArtifactExplanation, ArtifactReport:
+	case ArtifactToolResult, ArtifactRetrieval, ArtifactPrompt, ArtifactResponse, ArtifactExplanation, ArtifactReport, ArtifactVerdict:
 		return nil
 	}
 	return fmt.Errorf("store: invalid artifact kind %.40q", kind)

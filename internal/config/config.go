@@ -52,7 +52,13 @@ const (
 	EnvAppAddr          = "APP_ADDR"
 	EnvAppSessionKey    = "APP_SESSION_KEY"
 	EnvDataDir          = "DATA_DIR"
+	EnvCopilotFault     = "COPILOT_FAULT"
 )
+
+// FaultCorruptExplanation is the only COPILOT_FAULT value (CC-705): it
+// corrupts one explanation on its first attempt so the verifier's retry
+// loop can be seen working. It can only make verification fail.
+const FaultCorruptExplanation = "corrupt_explanation"
 
 // LLM providers (CC-701). claude-cli runs model calls through the local
 // `claude -p` for development (ADR 0001); anthropic uses the API key and is
@@ -103,6 +109,10 @@ type Config struct {
 	AppSessionKey Secret
 
 	DataDir string
+
+	// Fault is COPILOT_FAULT: "" (off) or FaultCorruptExplanation. Only
+	// cmd/agent reads it; library defaults are off.
+	Fault string
 }
 
 // view is the one printable form of a Config, shared by LogValue, Format and
@@ -138,6 +148,7 @@ func (c Config) view() []slog.Attr {
 		slog.String("AppAddr", c.AppAddr),
 		slog.String("AppSessionKey", c.AppSessionKey.masked()),
 		slog.String("DataDir", c.DataDir),
+		slog.String("Fault", c.Fault),
 	}
 }
 
@@ -278,6 +289,7 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 		EnvOTLPEndpoint:   &c.OTLPEndpoint,
 		EnvAppAddr:        &c.AppAddr,
 		EnvDataDir:        &c.DataDir,
+		EnvCopilotFault:   &c.Fault,
 	}
 	secrets := map[string]*Secret{
 		EnvERPAPIKey:        &c.ERPAPIKey,
@@ -356,6 +368,13 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 		errs = append(errs, fmt.Errorf("config: %s must be greater than zero", EnvLLMRunTokenCap))
 	default:
 		c.LLMRunTokenCap = tokenCap
+	}
+
+	switch c.Fault {
+	case "", FaultCorruptExplanation:
+	default:
+		errs = append(errs, fmt.Errorf("config: %s must be empty or %q, got %.40q",
+			EnvCopilotFault, FaultCorruptExplanation, c.Fault))
 	}
 
 	switch c.LLMProvider {

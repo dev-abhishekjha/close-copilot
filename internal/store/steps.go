@@ -117,6 +117,12 @@ func scanStep(row pgx.Row) (Step, error) {
 // incremented if it exists and is not done. When the step is already done
 // it returns the stored step and done=true, and the caller skips it.
 //
+// A restart moves the step's output refs to the end of its input refs and
+// clears output_refs, as ReopenStep does: what an earlier attempt produced
+// (such as a failed verify attempt's verdict) stays reachable from
+// run_steps. So input_refs holds the step's inputs and then, in order, the
+// outputs of its earlier attempts.
+//
 // Two concurrent Begin calls on the same key leave exactly one row, in
 // status running; the later call sees the higher attempt.
 func (s *Store) Begin(ctx context.Context, runID uuid.UUID, kind, subject string) (Step, bool, error) {
@@ -134,6 +140,7 @@ func (s *Store) Begin(ctx context.Context, runID uuid.UUID, kind, subject string
 		VALUES ($1, $2, $3, $4, 'running', 1, now())
 		ON CONFLICT (run_id, kind, subject) DO UPDATE
 		  SET status = 'running', attempt = run_steps.attempt + 1, started_at = now(),
+		      input_refs = run_steps.input_refs || run_steps.output_refs, output_refs = '{}',
 		      finished_at = NULL, error = NULL
 		  WHERE run_steps.status <> 'done'
 		RETURNING ` + stepColumns + `;`
@@ -298,6 +305,48 @@ func checkArtifactsTx(ctx context.Context, tx pgx.Tx, shas []string) error {
 		return fmt.Errorf("%w: %d of %d refs name no stored artifact", ErrMissingArtifact, len(distinct)-n, len(distinct))
 	}
 	return nil
+}
+
+// MaxFeedbackBytes caps the feedback ReopenStep stores.
+const MaxFeedbackBytes = 16 << 10
+
+// ReopenStep sets a done step back to pending, so the next Begin restarts
+// it with attempt incremented, and stores feedback (a JSON value, such as
+// the verifier's violations) in run_steps.feedback for that attempt. It
+// moves the step's output refs to the end of its input refs (what the
+// reopened attempt produced, and the feedback is about, stays reachable
+// from run_steps; input_refs therefore also holds earlier attempts'
+// outputs) and clears output_refs, finished_at and error.
+//
+// Only the attempt that finished the step may reopen it: the row must be
+// done with step.Attempt, else the error wraps ErrStaleAttempt (or
+// ErrNotFound when the step is missing). Feedback must be a JSON value of
+// at most 16 KiB.
+func (s *Store) ReopenStep(ctx context.Context, step Step, feedback json.RawMessage) error {
+	if len(feedback) == 0 || !json.Valid(feedback) {
+		return errors.New("store: reopen step: feedback must be a JSON value")
+	}
+	if len(feedback) > MaxFeedbackBytes {
+		return fmt.Errorf("store: reopen step: feedback of %d bytes exceeds %d", len(feedback), MaxFeedbackBytes)
+	}
+	const query = `
+		UPDATE run_steps
+		SET status = 'pending', feedback = $2::jsonb, input_refs = input_refs || output_refs,
+		    output_refs = '{}', finished_at = NULL, error = NULL
+		WHERE id = $1 AND attempt = $3 AND status = 'done';
+	`
+	tag, err := s.pool.Exec(ctx, query, step.ID, string(feedback), step.Attempt)
+	if err != nil {
+		return fmt.Errorf("store: reopen step %s: %w", step.ID, err)
+	}
+	if tag.RowsAffected() == 1 {
+		return nil
+	}
+	st, err := s.GetStep(ctx, step.ID)
+	if err != nil {
+		return err
+	}
+	return fmt.Errorf("%w: reopen step %s attempt %d (current attempt %d, %s)", ErrStaleAttempt, step.ID, step.Attempt, st.Attempt, st.Status)
 }
 
 // errNoRowMarked is the internal signal that the step row was not updated.

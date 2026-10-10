@@ -177,3 +177,40 @@ func TestArtifacts(t *testing.T) {
 		}
 	})
 }
+
+func TestArtifactVerdictRoundTrip(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	run := newRun(t, st)
+	step, _, err := st.Begin(ctx, run, store.StepKindVerify, uuid.NewString())
+	if err != nil {
+		t.Fatal(err)
+	}
+	verdict := map[string]any{
+		"run_id": run.String(), "finding_id": uuid.NewString(), "explanation_ref": "ab", "explain_attempt": 2,
+		"pass": false, "violations": []map[string]any{{"code": "amount_not_in_evidence", "field": "explanation", "value_paise": int64(98765432), "detail": "fixed text"}},
+		"checked": map[string]int{"amounts": 3, "citations": 0, "proposal_lines": 2}, "verifier_version": "cc-705.1",
+	}
+	sha, err := st.PutArtifact(ctx, store.ArtifactVerdict, run, step.ID, verdict)
+	if err != nil {
+		t.Fatalf("PutArtifact verdict: %v", err)
+	}
+	a, err := st.GetArtifact(ctx, sha)
+	if err != nil || a.Kind != store.ArtifactVerdict {
+		t.Fatalf("GetArtifact: %v %s", err, a.Kind)
+	}
+	want, _, _ := store.CanonicalHash(verdict)
+	if string(a.Content) != string(want) {
+		t.Errorf("content %s, want %s", a.Content, want)
+	}
+	if err := st.Finish(ctx, step, store.StepDone, []string{sha}, ""); err != nil {
+		t.Fatalf("Finish with a verdict ref: %v", err)
+	}
+	// Tampering with the row is detected.
+	if _, err := st.Pool().Exec(ctx, `UPDATE artifacts SET content = jsonb_set(content, '{pass}', 'true') WHERE sha256 = $1`, sha); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := st.GetArtifact(ctx, sha); !errors.Is(err, store.ErrArtifactMismatch) {
+		t.Errorf("tampered verdict: %v, want ErrArtifactMismatch", err)
+	}
+}
