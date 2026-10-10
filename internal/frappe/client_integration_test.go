@@ -55,9 +55,9 @@ type itJournal struct {
 	} `json:"accounts"`
 }
 
-func itClient(t *testing.T, cfg config.Config, key, secret string) *Client {
+func itClient(t *testing.T, cfg config.Config, key string, secret config.Secret) *Client {
 	t.Helper()
-	c, err := New(cfg, key, Secret(secret))
+	c, err := New(cfg, key, secret)
 	if err != nil {
 		t.Fatalf("New: %v", err)
 	}
@@ -66,7 +66,7 @@ func itClient(t *testing.T, cfg config.Config, key, secret string) *Client {
 
 func TestIntegrationListAccounts(t *testing.T) {
 	cfg := integrationConfig(t, os.LookupEnv)
-	bot := itClient(t, cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret.Reveal())
+	bot := itClient(t, cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret)
 	accounts, err := itLeafAccounts(t.Context(), bot)
 	if err != nil {
 		t.Fatalf("list accounts with the bot key: %v", err)
@@ -79,7 +79,7 @@ func TestIntegrationListAccounts(t *testing.T) {
 
 func TestIntegrationJournalEntryRoundTrip(t *testing.T) {
 	cfg := integrationConfig(t, os.LookupEnv)
-	bot := itClient(t, cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret.Reveal())
+	bot := itClient(t, cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret)
 	ctx := t.Context()
 
 	// The bot's user id scopes the cleanup to entries this test's key made.
@@ -91,7 +91,7 @@ func TestIntegrationJournalEntryRoundTrip(t *testing.T) {
 	// The seeder (Administrator) client is built lazily and used only to
 	// delete the entry this run inserted, and only if Frappe refuses the bot
 	// (see itRemove).
-	seeder := func() *Client { return itClient(t, cfg, cfg.ERPSeedAPIKey.Reveal(), cfg.ERPSeedAPISecret.Reveal()) }
+	seeder := func() *Client { return itClient(t, cfg, cfg.ERPSeedAPIKey.Reveal(), cfg.ERPSeedAPISecret) }
 	var inserted string // the name this run created, once known
 
 	// Clean up leftovers from an earlier failed run, and register the same

@@ -6,7 +6,7 @@ One JSON file per DocType that Close Copilot reads or writes. Later tickets code
 
 ```sh
 deploy/erpnext/api-users.sh        # creates the bot user and both key pairs in tmp/erp-keys.env
-env $(grep -v '^#' tmp/erp-keys.env | xargs) go run ./cmd/probe schema --out docs/erpnext-schema
+(set -a; . tmp/erp-keys.env; set +a; go run ./cmd/probe schema --out docs/erpnext-schema)
 ```
 
 The site was `erp.localhost` from CC-102, running frappe 15.122.0, erpnext 15.122.0 and india_compliance 15.32.0 (`bench version`).
@@ -28,7 +28,7 @@ Caveats:
 
 ## Credentials (tmp/erp-keys.env)
 
-`deploy/erpnext/api-users.sh` writes `tmp/erp-keys.env` with mode 600. It holds `ERP_BASE_URL`, `ERP_SITE`, `ERP_API_KEY`/`ERP_API_SECRET` (the bot) and `ERP_SEED_API_KEY`/`ERP_SEED_API_SECRET` (Administrator, local development only). Copy those lines into your `.env` over the empty `ERP_*` lines there. Never commit or print them. `deploy/erpnext/api-users.sh --rotate` issues new pairs and rewrites the file; copy them again afterwards.
+`deploy/erpnext/api-users.sh` writes `tmp/erp-keys.env` with mode 600. It holds `ERP_BASE_URL`, `ERP_SITE`, `ERP_API_KEY`/`ERP_API_SECRET` (the bot) and `ERP_SEED_API_KEY`/`ERP_SEED_API_SECRET` (Administrator, local development only). Copy only the bot lines (`ERP_BASE_URL`, `ERP_SITE`, `ERP_API_KEY`, `ERP_API_SECRET`) into your `.env`; the seed keys stay in `tmp/erp-keys.env`, and commands that need them load it in a subshell (`(set -a; . tmp/erp-keys.env; set +a; <command>)`). Never commit or print them. `deploy/erpnext/api-users.sh --rotate` issues new pairs and rewrites the file; copy the bot lines again afterwards.
 
 ## Fields the project relies on
 

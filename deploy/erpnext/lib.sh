@@ -1,6 +1,13 @@
 # Shared helpers for the ERPNext scripts in deploy/erpnext (CC-102).
 # Source it; don't run it.
 
+# The scripts handle passwords and API secrets; xtrace would print them.
+case "$-" in *x*)
+	echo "refusing to run with xtrace" >&2
+	exit 1
+	;;
+esac
+
 root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 compose_file="$root/deploy/erpnext/docker-compose.yaml"
 site="erp.localhost"

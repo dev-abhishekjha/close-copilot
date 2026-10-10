@@ -44,6 +44,7 @@ type fakeERP struct {
 	settingsReadable   bool
 	settingsWritable   bool
 	settingsAuthFails  bool // System Settings answers 401, which is not a refusal
+	settingsBare403    bool // System Settings answers a proxy's bare 403, which is not a refusal
 	echoAuthInErrors   bool // error bodies quote the Authorization header
 	journalCustomCount int  // custom fields on Journal Entry, to test paging
 
@@ -109,6 +110,9 @@ func (f *fakeERP) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		switch {
 		case f.settingsAuthFails:
 			f.fail(w, http.StatusUnauthorized, "AuthenticationError", "session expired", auth)
+		case f.settingsBare403:
+			w.WriteHeader(http.StatusForbidden)
+			_, _ = w.Write([]byte("<html><body>403 Forbidden</body></html>"))
 		case admin, r.Method == http.MethodGet && f.settingsReadable, r.Method == http.MethodPut && f.settingsWritable:
 			f.reply(w, map[string]any{"data": map[string]any{"name": "System Settings"}})
 		default:

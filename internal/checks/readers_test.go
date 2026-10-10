@@ -340,7 +340,7 @@ func newFakeERP(t *testing.T) (*fakeERP, *frappe.Client) {
 	}
 	srv := httptest.NewServer(f)
 	t.Cleanup(srv.Close)
-	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL}, "testkey", frappe.Secret("testsecret"))
+	c, err := frappe.New(config.Config{ERPBaseURL: srv.URL}, "testkey", config.NewSecret("testsecret"))
 	if err != nil {
 		t.Fatal(err)
 	}
