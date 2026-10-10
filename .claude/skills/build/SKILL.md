@@ -48,6 +48,14 @@ Start the subagent named by `owner_role` with a pointer-only brief:
 
 On a retry, add only: `Previous attempt failed; fix exactly what tmp/reports/<file> lists.`
 
+**Model and effort** (token budget, owner decision 2026-10-10). Each worker's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer and security-reviewer. Override only by risk, never down:
+
+- `risk: regulated`: pass `model: "opus"` and `effort: "high"` to the worker.
+- Otherwise: pass neither; the frontmatter model at default effort.
+- A worker that failed twice on the same blocking check gets `model: "opus"` on its last attempt (see step 4).
+
+Don't paste the spec, code or logs into the brief; the worker reads them itself.
+
 ## 4. Gates
 
 Run the `/gates` procedure yourself in the worktree. Judge only from command output.
@@ -56,6 +64,8 @@ Run the `/gates` procedure yourself in the worktree. Judge only from command out
 - **Data-sensitive and regulated:** the full ladder every time.
 - Pass: go to step 5.
 - Fail: write the failure report, then retry step 3 (max `budget.max_attempts`, default 3).
+- **Same failure twice:** if the new report's blocking `check`s match the previous attempt's, the worker isn't converging. Before the last attempt, reread the spec section behind that check: if the spec is ambiguous or wrong, fix the spec (back through G0) instead of retrying; if it is clear, make the last attempt with `model: "opus"`.
+- Read gate output from log files (`> tmp/reports/<id>-<gate>.log 2>&1`), only the failing part. The worker's summary plus the gate results are all you need; don't re-read the worker's code for standard and data-sensitive tickets (G5 reads the diff).
 - Escalate to the owner immediately, without retrying, if the fix needs a new dependency the spec doesn't mention, a threshold or budget change, or a weaker security control. A file outside `files` sends the spec back through G0.
 
 ## 5. Security review (G5)
@@ -91,3 +101,4 @@ git push && git worktree remove .worktrees/<branch> && git branch -d <branch>
 
 - `rm -f tmp/erpnext.lock` in the main checkout if this ticket took it.
 - Report: summary, files, gate table, attempts used, anything deferred. Regulated tickets go in the end-of-day list for the owner.
+- When no other build or background review is in flight in this session, end the report with: `Run /clear before the next ticket.` All state lives in git, specs/, tasks/ and tmp/, so a fresh session picks up from `/next`.

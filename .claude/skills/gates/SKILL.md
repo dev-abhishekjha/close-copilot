@@ -15,6 +15,8 @@ Branch and changes:
 
 Run each gate in order and stop at the first failure. Judge from command output, never from a worker's report.
 
+Send each command's output to `tmp/reports/<ID>-<gate>.log` and print only `exit=<code>`. On a non-zero exit, read just the failing lines (`grep -nE 'FAIL|panic|error|---' <log> | head -60`, or `tail -40`). Never read a passing log in full.
+
 | Gate | Run | Fails when |
 | --- | --- | --- |
 | G1 self-check | `go mod tidy -diff`; `make check`; changed files (`git diff --name-only main...HEAD` plus uncommitted) against the spec's `files` globs; protected paths touched | any non-zero exit; a file outside `files` (except `go.mod`, `go.sum`, the spec); a protected path changed without the owner's OK in this session |
@@ -37,4 +39,4 @@ Once CC-001 lands, prefer its programs: `go run ./gates/cmd/ready`, `./gates/cmd
                "evidence": "internal/checks/bankrec_test.go:88"}]}
 ```
 
-Every blocking entry needs a `repro` command and an `evidence` pointer; a report without them is a gate bug.
+Every blocking entry needs a `repro` command and an `evidence` pointer; a report without them is a gate bug. Keep each `message` to the failing assertion or error (at most 20 lines); point at the log file for the rest.

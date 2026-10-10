@@ -25,6 +25,8 @@ You are the orchestrator in design mode. The spec is the only thing the worker w
 - `gates`: always G1, G2, G3. Add `G4-tier1` if the ticket touches checks, seed, evidence, books, store or evals and the eval harness exists (CC-905 merged); `G4-tier2` if it touches agent, llm, prompts, retrieval or corpus; G5 for data-sensitive and regulated; G6 for regulated or `human_review: true`.
 - Phase scope: for `phase_2_pass: true` tickets in Phase 1, write the `suite-skeleton` scope in Subtasks and the rest under "Phase 2 pass".
 - `owner: human` tickets: write the spec as a checklist for the owner; no worker will run it.
+- **Context:** quote the exact rows, fields and rules the worker needs from the shared specs (Finding fields, table columns, tool signatures, env vars), not just section names. A worker reads `docs/` only for something the spec doesn't quote, so a missing quote costs a whole doc read.
+- **Code map:** find the existing code the ticket calls or implements (`grep -rn` for the types and functions) and list each as `path:line` with its signature, plus one existing test or fixture to copy the style from. Keep it to what the worker needs, usually 3 to 8 entries. Note anything it should *not* open.
 
 ## G0 readiness check (report each line as pass or fail)
 
@@ -32,6 +34,7 @@ You are the orchestrator in design mode. The spec is the only thing the worker w
 - Every `depends_on` ticket is done (`git log main --format=%s | grep -E '^CC-xxx:'`).
 - No declared file overlaps a ticket that is in progress (`tmp/current-task` and open `cc-*` branches).
 - Every acceptance line is a runnable command.
+- Context quotes what the worker needs and the Code map points at real `path:line` entries (spot-check two).
 - Regulated: `approved_by` is set.
 
 ## Finish

@@ -31,6 +31,14 @@ One sentence from the ticket.
 - Ticket: docs/implementation-tickets.md, section `CC-000`.
 - Shared specs it relies on: name the sections (Finding, schema, MCP tool catalog...).
 - Plan row: phase, owner, gate-run acceptance from tasks/graph.yaml.
+- Quoted from the shared specs: the exact fields, columns, signatures and rules this ticket needs, so the worker doesn't open `docs/`.
+
+## Code map
+
+Existing code to call or implement, with signatures. Read these and nothing else unless they point further.
+
+- `internal/example/types.go:12`: `func Example(ctx context.Context, in Input) (Output, error)`
+- Style to copy: `internal/other/other_test.go` (table-driven test with fakes).
 
 ## Subtasks
 

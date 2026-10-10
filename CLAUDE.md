@@ -36,6 +36,16 @@ The main session is the orchestrator: it reads, plans, delegates and runs gates.
 
 No agent grades its own output: the data engineer plants the errors, the implementer writes the detectors, the eval engineer writes the scorer. The guard hook enforces these boundaries.
 
+## Token budget (owner decision, 2026-10-10)
+
+Spend tokens where judgment is needed and nowhere else. These rules never loosen a gate.
+
+- **Models:** each subagent's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer and security-reviewer. `/build` raises a worker to Opus for regulated tickets and for a last attempt after the same failure twice. Run the main session on Sonnet (`/model sonnet`) and switch to Opus to build a regulated ticket. Search-only questions go to the Explore agent with `model: "haiku"`; Haiku never writes code.
+- **One ticket per session:** `/clear` after a ticket merges, once nothing else is in flight. State lives in git, `specs/`, `tasks/` and `tmp/`; `/next` picks it up.
+- **Specs stand alone:** a spec quotes what the worker needs from `docs/` and has a Code map, so workers don't read the 69-ticket doc or explore the repo.
+- **Logs go to files:** commands write to `tmp/reports/*.log`, and agents read only the failing lines. Retries get the failure report, never a raw log.
+- **Model calls in the product:** with `LLM_PROVIDER=claude-cli`, Close Copilot's own runtime calls use this same plan. While building, run evals without the model (`--no-agent` today; `--replay --no-llm` once CC-905 lands). Use the model only where a spec lists G4-tier2, or to set a baseline.
+
 ## Commands
 
 ```sh
