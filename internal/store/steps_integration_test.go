@@ -4,7 +4,10 @@ package store_test
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"reflect"
+	"strings"
 	"sync"
 	"testing"
 
@@ -350,4 +353,124 @@ func TestSteps(t *testing.T) {
 			t.Errorf("GetStep of a missing step: %v", err)
 		}
 	})
+}
+
+func TestReopenStep(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	run := newRun(t, st)
+	subject := uuid.NewString()
+	feedback := []byte(`{"violations":[{"code":"amount_not_in_evidence","field":"explanation","value_paise":98765432,"detail":"fixed"}]}`)
+
+	step, _, err := st.Begin(ctx, run, store.StepKindExplain, subject)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A running step can't be reopened.
+	if err := st.ReopenStep(ctx, step, feedback); !errors.Is(err, store.ErrStaleAttempt) {
+		t.Errorf("reopen of a running step: %v, want ErrStaleAttempt", err)
+	}
+	sha := putSnapshot(t, st, run, "TXN-REOPEN")
+	if err := st.Finish(ctx, step, store.StepDone, []string{sha}, ""); err != nil {
+		t.Fatal(err)
+	}
+	if err := st.ReopenStep(ctx, step, []byte(`not json`)); err == nil {
+		t.Error("reopen with feedback that is not JSON")
+	}
+	if err := st.ReopenStep(ctx, step, feedback); err != nil {
+		t.Fatalf("ReopenStep: %v", err)
+	}
+	got, err := st.GetStep(ctx, step.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Status != store.StepPending || got.Attempt != 1 || len(got.OutputRefs) != 0 || got.FinishedAt != nil || got.Error != nil {
+		t.Errorf("reopened step %+v", got)
+	}
+	// The reopened attempt's outputs stay reachable as the step's inputs.
+	if !reflect.DeepEqual(got.InputRefs, []string{sha}) {
+		t.Errorf("input refs %v, want [%s]", got.InputRefs, sha)
+	}
+	var fb, want any
+	_ = json.Unmarshal(got.Feedback, &fb)
+	_ = json.Unmarshal(feedback, &want)
+	if !reflect.DeepEqual(fb, want) {
+		t.Errorf("feedback %s, want %s", got.Feedback, feedback)
+	}
+	// A second reopen of the same attempt is stale.
+	if err := st.ReopenStep(ctx, step, feedback); !errors.Is(err, store.ErrStaleAttempt) {
+		t.Errorf("second reopen: %v, want ErrStaleAttempt", err)
+	}
+
+	// Begin restarts it with attempt 2 and keeps the feedback.
+	step2, done, err := st.Begin(ctx, run, store.StepKindExplain, subject)
+	if err != nil || done || step2.Attempt != 2 || step2.Status != store.StepRunning || len(step2.Feedback) == 0 {
+		t.Fatalf("Begin after reopen: %+v done %v err %v", step2, done, err)
+	}
+	if err := st.Finish(ctx, step2, store.StepDone, []string{sha}, ""); err != nil {
+		t.Fatal(err)
+	}
+	// The old attempt can no longer reopen the step.
+	if err := st.ReopenStep(ctx, step, feedback); !errors.Is(err, store.ErrStaleAttempt) {
+		t.Errorf("reopen from attempt 1 after attempt 2: %v, want ErrStaleAttempt", err)
+	}
+	if err := st.ReopenStep(ctx, store.Step{ID: uuid.New(), Attempt: 1}, feedback); !errors.Is(err, store.ErrNotFound) {
+		t.Errorf("reopen of a missing step: %v, want ErrNotFound", err)
+	}
+	// Feedback over MaxFeedbackBytes is refused.
+	big := []byte(`"` + strings.Repeat("x", store.MaxFeedbackBytes) + `"`)
+	if err := st.ReopenStep(ctx, step2, big); err == nil {
+		t.Error("reopen with oversized feedback")
+	}
+	// A second reopen appends to the inputs.
+	if err := st.ReopenStep(ctx, step2, feedback); err != nil {
+		t.Fatal(err)
+	}
+	if got, _ := st.GetStep(ctx, step.ID); !reflect.DeepEqual(got.InputRefs, []string{sha, sha}) {
+		t.Errorf("input refs after two reopens %v", got.InputRefs)
+	}
+}
+
+// TestReopenStepBeginKeepsFailedOutputs: restarting a failed step moves
+// its output refs (a failed verify attempt's verdict) to its input refs,
+// so they stay reachable after the next attempt finishes.
+func TestReopenStepBeginKeepsFailedOutputs(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	run := newRun(t, st)
+	subject := uuid.NewString()
+	first := putSnapshot(t, st, run, "TXN-VERDICT-1")
+	second := putSnapshot(t, st, run, "TXN-VERDICT-2")
+
+	step, _, err := st.Begin(ctx, run, store.StepKindVerify, subject)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := st.Finish(ctx, step, store.StepFailed, []string{first}, "verification failed; retrying"); err != nil {
+		t.Fatal(err)
+	}
+	step2, done, err := st.Begin(ctx, run, store.StepKindVerify, subject)
+	if err != nil || done {
+		t.Fatalf("restart: %v done %v", err, done)
+	}
+	if !reflect.DeepEqual(step2.InputRefs, []string{first}) || len(step2.OutputRefs) != 0 {
+		t.Errorf("restarted step inputs %v outputs %v, want [%s] []", step2.InputRefs, step2.OutputRefs, first)
+	}
+	if err := st.Finish(ctx, step2, store.StepFailed, []string{second}, "verification failed; retrying"); err != nil {
+		t.Fatal(err)
+	}
+	step3, _, err := st.Begin(ctx, run, store.StepKindVerify, subject)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := st.Finish(ctx, step3, store.StepSkipped, nil, "no explanation to verify"); err != nil {
+		t.Fatal(err)
+	}
+	got, err := st.GetStep(ctx, step.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(got.InputRefs, []string{first, second}) || len(got.OutputRefs) != 0 || got.Attempt != 3 {
+		t.Errorf("step %+v, want inputs [%s %s]", got, first, second)
+	}
 }

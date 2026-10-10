@@ -45,6 +45,13 @@ type memStore struct {
 	exhausted bool
 	// finishHook may fail a Finish before it is applied.
 	finishHook func(store.Step, string) error
+	// beginHook may fail a Begin before it is applied.
+	beginHook func(kind, subject string) error
+	// afterReopen runs after a ReopenStep is applied; an error simulates
+	// a crash right after the reopen committed.
+	afterReopen func(store.Step) error
+	// cleared counts ClearFindingExplanation calls.
+	cleared int
 }
 
 var _ RunStore = (*memStore)(nil)
@@ -86,6 +93,11 @@ func (m *memStore) Begin(ctx context.Context, runID uuid.UUID, kind, subject str
 	if err := store.ValidateStepKind(kind); err != nil {
 		return store.Step{}, false, err
 	}
+	if m.beginHook != nil {
+		if err := m.beginHook(kind, subject); err != nil {
+			return store.Step{}, false, err
+		}
+	}
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	k := stepKey{runID, kind, subject}
@@ -100,6 +112,10 @@ func (m *memStore) Begin(ctx context.Context, runID uuid.UUID, kind, subject str
 	s.Attempt++
 	s.Status = store.StepRunning
 	s.Error = nil
+	// As store.Begin: a restart keeps earlier attempts' outputs in
+	// input_refs.
+	s.InputRefs = append(slices.Clone(s.InputRefs), s.OutputRefs...)
+	s.OutputRefs = nil
 	return *s, false, nil
 }
 
@@ -222,12 +238,89 @@ func (m *memStore) ListFindingsByRun(_ context.Context, runID uuid.UUID) ([]stor
 	return out, nil
 }
 
+// GetArtifact re-hashes the content, as the store does, so a test can
+// tamper with it.
 func (m *memStore) GetArtifact(_ context.Context, sha string) (store.Artifact, error) {
 	b, kind, ok := m.getAny(sha)
 	if !ok {
-		return store.Artifact{}, store.ErrNotFound
+		return store.Artifact{}, fmt.Errorf("%w: artifact %s", store.ErrNotFound, sha)
 	}
-	return store.Artifact{SHA256: sha, Kind: kind, Content: b}, nil
+	canon, got, err := store.CanonicalHash(json.RawMessage(b))
+	if err != nil {
+		return store.Artifact{}, err
+	}
+	if got != sha {
+		return store.Artifact{}, fmt.Errorf("%w: %s", store.ErrArtifactMismatch, sha)
+	}
+	return store.Artifact{SHA256: sha, Kind: kind, Content: canon}, nil
+}
+
+// tamper replaces an artifact's stored content.
+func (m *memStore) tamper(sha string, content []byte) {
+	m.fakeArtifactStore.mu.Lock()
+	defer m.fakeArtifactStore.mu.Unlock()
+	m.content[sha] = content
+}
+
+// ReopenStep has the store's semantics: only the done attempt that
+// finished the step may reopen it.
+func (m *memStore) ReopenStep(ctx context.Context, step store.Step, feedback json.RawMessage) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if len(feedback) == 0 || !json.Valid(feedback) {
+		return errors.New("mem: feedback must be JSON")
+	}
+	m.mu.Lock()
+	var target *store.Step
+	for _, s := range m.steps {
+		if s.ID == step.ID {
+			target = s
+		}
+	}
+	switch {
+	case target == nil:
+		m.mu.Unlock()
+		return store.ErrNotFound
+	case target.Status != store.StepDone || target.Attempt != step.Attempt:
+		m.mu.Unlock()
+		return store.ErrStaleAttempt
+	}
+	target.InputRefs = append(slices.Clone(target.InputRefs), target.OutputRefs...)
+	target.Status, target.Feedback, target.OutputRefs, target.Error = store.StepPending, slices.Clone(feedback), nil, nil
+	m.mu.Unlock()
+	if m.afterReopen != nil {
+		return m.afterReopen(step)
+	}
+	return nil
+}
+
+func (m *memStore) SetFindingVerified(_ context.Context, runID, id uuid.UUID, verified bool) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for i := range m.findings {
+		if m.findings[i].ID == id && m.findings[i].RunID == runID {
+			m.findings[i].Verified = verified
+			return nil
+		}
+	}
+	return store.ErrNotFound
+}
+
+// ClearFindingExplanation has the store's semantics: it clears the
+// explanation columns and the verified flag of a finding of the run.
+func (m *memStore) ClearFindingExplanation(_ context.Context, runID, id uuid.UUID) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	for i := range m.findings {
+		if m.findings[i].ID == id && m.findings[i].RunID == runID {
+			f := &m.findings[i]
+			f.Explanation, f.Action, f.Citations, f.Proposal, f.Verified = nil, nil, nil, nil, false
+			m.cleared++
+			return nil
+		}
+	}
+	return store.ErrNotFound
 }
 
 func (m *memStore) SetRunState(ctx context.Context, runID uuid.UUID, status, errText string) error {
@@ -380,7 +473,7 @@ func (v *fakeVerifier) Verify(ctx context.Context, req VerifyRequest) (StepResul
 	if req.Finding.Type == v.reviewType {
 		verdict = "needs_review"
 	}
-	sha, err := v.st.PutArtifact(ctx, store.ArtifactExplanation, req.RunID, req.StepID,
+	sha, err := v.st.PutArtifact(ctx, store.ArtifactVerdict, req.RunID, req.StepID,
 		map[string]any{"verdict": verdict, "explanation": req.ExplanationRefs[0]})
 	if err != nil {
 		return StepResult{}, err

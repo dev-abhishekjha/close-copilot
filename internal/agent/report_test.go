@@ -68,10 +68,20 @@ func goldenReport(outcome string) ReportData {
 			Lines: []store.JournalLine{{Account: "Bank Charges - STPL", DebitPaise: 590}, {Account: "HDFC Current 0001 - STPL", CreditPaise: 590}},
 		}}
 		d.Findings[1].Status = "needs_review"
+		d.Fault = "corrupt_explanation"
 		for i, f := range findings {
-			steps = append(steps,
-				store.Step{RunID: run, Kind: "explain", Subject: f.ID.String(), Status: "done", OutputRefs: []string{strings.Repeat("c", 63) + string(rune('0'+i))}},
-				store.Step{RunID: run, Kind: "verify", Subject: f.ID.String(), Status: "done", OutputRefs: []string{strings.Repeat("d", 63) + string(rune('0'+i))}})
+			explain := store.Step{RunID: run, Kind: "explain", Subject: f.ID.String(), Status: "done", Attempt: 1, OutputRefs: []string{strings.Repeat("c", 63) + string(rune('0'+i))}}
+			verify := store.Step{RunID: run, Kind: "verify", Subject: f.ID.String(), Status: "done", OutputRefs: []string{strings.Repeat("d", 63) + string(rune('0'+i))}}
+			switch i {
+			case 1: // failed verification three times: needs review
+				explain.Attempt = 3
+				explain.Feedback = json.RawMessage(`{"violations":[{"code":"amount_not_in_evidence"}]}`)
+				verify.Error = strp("verification failed: amount_not_in_evidence after 3 explain attempts")
+			case 2: // passed on the second attempt
+				explain.Attempt = 2
+				explain.Feedback = json.RawMessage(`{"violations":[{"code":"amount_not_in_evidence"}]}`)
+			}
+			steps = append(steps, explain, verify)
 		}
 	}
 	d.Steps = steps

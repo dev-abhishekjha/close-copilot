@@ -7,9 +7,16 @@
 //
 // Each finding is explained by the LLM explainer (CC-704) through
 // LLM_PROVIDER: claude-cli (the default, the local claude -p, no API key)
-// or anthropic. Model prices come from <config-dir>/pricing.yaml.
-// --no-explain calls no model: the explain and verify steps are skipped and
-// the run ends partial.
+// or anthropic, and each explanation is checked by the code verifier
+// (CC-705), which traces every number, citation and journal line back to
+// the stored evidence; a failed check is retried with the violations, at
+// most twice, and then left for review. Model prices come from
+// <config-dir>/pricing.yaml. --no-explain calls no model: the explain and
+// verify steps are skipped and the run ends partial.
+//
+// COPILOT_FAULT=corrupt_explanation (testing only) corrupts one
+// explanation on its first attempt so the verifier's retry can be seen;
+// the run report says when it is on.
 //
 // close runs one month-end close and resume finishes a run that stopped
 // (a crash or kill -9 leaves it running). Ctrl-C (SIGINT or SIGTERM)
@@ -101,13 +108,11 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 
 	books := &agent.MCPBooks{Registry: reg, Companies: st}
 	wf := &agent.Workflow{
-		Store:    st,
-		Books:    books,
-		Evidence: &agent.MCPEvidence{Registry: reg},
-		Profiles: byID,
-		Rules:    rules,
-		// No verifier until CC-705: verify steps are skipped and a run
-		// ends partial.
+		Store:      st,
+		Books:      books,
+		Evidence:   &agent.MCPEvidence{Registry: reg},
+		Profiles:   byID,
+		Rules:      rules,
 		Config:     cfg,
 		ResultsDir: cmd.resultsDir,
 		Timeout:    cmd.timeout,
@@ -120,14 +125,23 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		if err != nil {
 			return err
 		}
+		fault, err := agent.NewFault(cfg.Fault)
+		if err != nil {
+			return err
+		}
+		if fault != nil {
+			log.Warn("COPILOT_FAULT is on: one explanation will be corrupted on its first attempt", "fault", fault.Mode())
+		}
 		wf.Model = model
 		wf.Explainer = &agent.LLMExplainer{
 			Store:       st,
 			Accounts:    agent.BooksAccounts{Books: books},
 			FastModel:   cfg.LLMModelFast,
 			StrongModel: cfg.LLMModelStrong,
+			Fault:       fault,
 			Log:         log,
 		}
+		wf.Verifier = &agent.CodeVerifier{Store: st, Citations: st}
 	}
 
 	var res agent.Result

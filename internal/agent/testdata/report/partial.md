@@ -10,6 +10,7 @@
 | Findings | 3 |
 | Model usage | 0 input tokens, 0 output tokens, 0 cache-read tokens, USD 0 |
 | Average cost per explained finding | none explained |
+| Verification | verified 0 of 0 explanations (pass rate n/a), 0 retried, 0 needs_review |
 
 ## Steps
 

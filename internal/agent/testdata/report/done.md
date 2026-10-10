@@ -9,6 +9,8 @@
 | Findings | 3 |
 | Model usage | 2400 input tokens, 300 output tokens, 1200 cache-read tokens, USD 0.0042 |
 | Average cost per explained finding | USD 0.0014 (run cost over 3 explained) |
+| Verification | verified 2 of 3 explanations (pass rate 66%), 2 retried, 1 needs_review |
+| Fault injection | COPILOT_FAULT=corrupt_explanation: one explanation was corrupted on purpose on its first attempt |
 
 ## Steps
 
@@ -18,7 +20,7 @@
 | check.bankrec | bankrec | done |  |
 | retrieve | close | skipped | retrieval arrives with CC-806 |
 | explain | 3 findings | 3 done |  |
-| verify | 3 findings | 3 done |  |
+| verify | 3 findings | 3 done | verification failed: amount_not_in_evidence after 3 explain attempts |
 | investigate | close | skipped | investigation arrives with CC-706 |
 
 ## Findings

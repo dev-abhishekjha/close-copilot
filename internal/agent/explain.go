@@ -16,6 +16,11 @@ package agent
 // malformed answer is retried once with a corrective turn that names the
 // field; a second one fails the step with a fixed reason. A valid answer
 // is stored as an explanation artifact and copied to the findings row.
+// Answers that are well formed but not grounded in the evidence are the
+// verifier's job (CC-705): the explanation artifact names the account
+// list the model saw (AccountsRef, a tool_result snapshot stored by the
+// explain step) and the DOCUMENTS it was given (DocumentRefs), so the
+// verifier can check the answer offline.
 //
 // Nothing here logs prompt, evidence or response text: RecordingProvider
 // (req.Model) stores prompts and responses as artifacts.
@@ -156,7 +161,9 @@ type LLMExplainer struct {
 	// Pseudonymiser masks the user message; nil means identity, which
 	// logs once that identifiers go unmasked.
 	Pseudonymiser Pseudonymiser
-	Log           *slog.Logger
+	// Fault is the COPILOT_FAULT injector (fault.go); nil is off.
+	Fault *Fault
+	Log   *slog.Logger
 
 	warnOnce sync.Once
 	mu       sync.Mutex
@@ -225,6 +232,42 @@ type ExplanationArtifact struct {
 	Proposal          *store.JournalPayload `json:"proposal,omitempty"`
 	// Retried is true when the first answer was malformed.
 	Retried bool `json:"retried"`
+	// AccountsRef is the tool_result snapshot of the account list in the
+	// model's ACCOUNTS (books/get_trial_balance, args company, from_date
+	// and to_date), so the verifier checks a proposal's accounts offline.
+	AccountsRef string `json:"accounts_ref,omitempty"`
+	// DocumentRefs are the retrieval artifacts whose passages were in
+	// DOCUMENTS (empty until CC-806). A citation must name one of them.
+	DocumentRefs []string `json:"document_refs"`
+	// FaultInjected marks an explanation corrupted by COPILOT_FAULT.
+	FaultInjected bool `json:"fault_injected,omitempty"`
+}
+
+// accountsSnapshot is the result stored under AccountsRef: the account
+// names of the month's trial balance exactly as listed in ACCOUNTS.
+type accountsSnapshot struct {
+	Rows []accountRow `json:"rows"`
+}
+
+type accountRow struct {
+	Account string `json:"account"`
+}
+
+// putAccounts stores the account list the model saw as a tool_result
+// snapshot of the explain step and returns its address.
+func (e *LLMExplainer) putAccounts(ctx context.Context, req ExplainRequest, accounts []string, from, to time.Time) (string, error) {
+	rows := make([]accountRow, len(accounts))
+	for i, a := range accounts {
+		rows[i] = accountRow{Account: a}
+	}
+	sha, err := e.Store.PutArtifact(ctx, store.ArtifactToolResult, req.RunID, req.StepID, toolSnapshot{
+		Server: ServerBooks, Tool: toolGetTrialBalance, Args: rangeArgMap(req.Company, from, to),
+		Result: accountsSnapshot{Rows: rows},
+	})
+	if err != nil {
+		return "", fmt.Errorf("agent: snapshot accounts: %w", err)
+	}
+	return sha, nil
 }
 
 // Explain explains one finding. A nil req.Model skips the step. A model
@@ -307,6 +350,13 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 	}
 	if art.Proposal != nil {
 		art.Proposal.Remark = string(unmask([]byte(art.Proposal.Remark)))
+	}
+	if art.AccountsRef, err = e.putAccounts(ctx, req, accounts, from, to); err != nil {
+		return StepResult{}, err
+	}
+	art.DocumentRefs = []string{}
+	if e.Fault.corruptExplanation(req.Attempt, &art) {
+		e.log().WarnContext(ctx, "COPILOT_FAULT: explanation corrupted on purpose", "run_id", req.RunID, "step_id", req.StepID, "fault", e.Fault.Mode())
 	}
 	sha, err := e.Store.PutArtifact(ctx, store.ArtifactExplanation, req.RunID, req.StepID, art)
 	if err != nil {
@@ -469,19 +519,44 @@ type snapshotContent struct {
 // evidence loads one snapshot (GetArtifact verifies its hash) and projects
 // it to the records the finding's evidence names.
 func (e *LLMExplainer) evidence(ctx context.Context, sha string, refs []store.EvidenceRef) (evidenceView, error) {
-	a, err := e.Store.GetArtifact(ctx, sha)
+	view, _, err := loadEvidence(ctx, e.Store, sha, refs)
+	return view, err
+}
+
+// loadEvidence reads one tool_result snapshot (GetArtifact verifies its
+// hash) and projects it as the explainer sends it in EVIDENCE. The
+// verifier and cmd/audit use the same projection, so they see exactly
+// what the model saw.
+func loadEvidence(ctx context.Context, st artifactReader, sha string, refs []store.EvidenceRef) (evidenceView, snapshotContent, error) {
+	a, err := st.GetArtifact(ctx, sha)
 	if err != nil {
-		return evidenceView{}, fmt.Errorf("agent: explain evidence: %w", err)
+		return evidenceView{}, snapshotContent{}, fmt.Errorf("agent: evidence: %w", err)
 	}
 	if a.Kind != store.ArtifactToolResult {
-		return evidenceView{}, fmt.Errorf("agent: explain evidence %s is a %s artifact, not a tool result", shortSHA(sha), a.Kind)
+		return evidenceView{}, snapshotContent{}, fmt.Errorf("agent: evidence %s is a %s artifact, not a tool result", shortSHA(sha), a.Kind)
 	}
+	s, err := decodeSnapshot(a.Content)
+	if err != nil {
+		return evidenceView{}, snapshotContent{}, fmt.Errorf("agent: decode evidence %s: %w", shortSHA(sha), err)
+	}
+	return projectEvidence(s, sha, refs), s, nil
+}
+
+// decodeSnapshot decodes a tool_result artifact's content with exact
+// numbers.
+func decodeSnapshot(content []byte) (snapshotContent, error) {
 	var s snapshotContent
-	dec := json.NewDecoder(bytes.NewReader(a.Content))
+	dec := json.NewDecoder(bytes.NewReader(content))
 	dec.UseNumber()
 	if err := dec.Decode(&s); err != nil {
-		return evidenceView{}, fmt.Errorf("agent: decode evidence %s: %w", shortSHA(sha), err)
+		return snapshotContent{}, err
 	}
+	return s, nil
+}
+
+// projectEvidence is the EVIDENCE view of one snapshot: the records the
+// refs to sha name (at most maxRecordsPerRef), with every string capped.
+func projectEvidence(s snapshotContent, sha string, refs []store.EvidenceRef) evidenceView {
 	var ids []string
 	for _, r := range refs {
 		if r.Artifact != sha {
@@ -505,7 +580,7 @@ func (e *LLMExplainer) evidence(ctx context.Context, sha string, refs []store.Ev
 		}
 		view.Records = append(view.Records, capStrings(r))
 	}
-	return view, nil
+	return view
 }
 
 // selectRecords returns the records of a tool result that the ids name:

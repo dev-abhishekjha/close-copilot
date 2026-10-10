@@ -300,6 +300,13 @@ func TestWorkflowGateB(t *testing.T) {
 			t.Fatalf("resume %+v: %v", res2, err)
 		}
 		after, _ := g.st.ListFindingsByRun(ctx, res.RunID)
+		// The resume verified every finding (CC-705); nothing else changed.
+		for i := range after {
+			if !after[i].Verified {
+				t.Errorf("finding %s not verified after the resume", after[i].ID)
+			}
+			after[i].Verified = false
+		}
 		if normalized(t, before) != normalized(t, after) || len(after) != 3 {
 			t.Error("findings changed across the resume")
 		}
@@ -357,4 +364,85 @@ func TestWorkflowGateB(t *testing.T) {
 			t.Error("refused run explained findings")
 		}
 	})
+}
+
+// TestWorkflowGateBVerifyFault is the Gate B evidence of CC-705 against
+// Postgres and the MCP servers: with COPILOT_FAULT=corrupt_explanation the
+// skeleton month ends done with three verified explanations, one of them
+// retried after the verifier rejected the corrupted first attempt.
+func TestWorkflowGateBVerifyFault(t *testing.T) {
+	g := setupGateB(t)
+	ctx := t.Context()
+	model := newAnsweringModel(nil)
+	fault, err := NewFault(config.FaultCorruptExplanation)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wf, _ := g.workflow(t)
+	wf.Parallel = 1
+	wf.Model = model
+	wf.Explainer = &LLMExplainer{
+		Store: g.st, Accounts: BooksAccounts{Books: wf.Books},
+		FastModel: explainFast, StrongModel: explainStrong, Fault: fault, Log: discardLog(),
+	}
+	wf.Verifier = &CodeVerifier{Store: g.st, Citations: g.st}
+	res, err := wf.RunClose(ctx, skeletonCompany, skeletonMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	if res.Status != store.RunDone || res.Findings != 3 {
+		t.Fatalf("result %+v, want done with 3 findings", res)
+	}
+	if n := model.count(); n != 4 {
+		t.Errorf("%d model calls, want 4 (3 findings, one retry)", n)
+	}
+	steps, err := g.st.ListSteps(ctx, res.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	retried := 0
+	for _, s := range steps {
+		switch s.Kind {
+		case store.StepKindExplain:
+			if len(s.Feedback) > 0 {
+				retried++
+				if s.Attempt != 2 || !strings.Contains(string(s.Feedback), ViolationAmountNotInEvidence) {
+					t.Errorf("retried explain step %+v feedback %s", s, s.Feedback)
+				}
+			}
+		case store.StepKindVerify:
+			if s.Status != store.StepDone || s.Error != nil || len(s.OutputRefs) != 1 {
+				t.Errorf("verify step %+v", s)
+				continue
+			}
+			a, err := g.st.GetArtifact(ctx, s.OutputRefs[0])
+			if err != nil || a.Kind != store.ArtifactVerdict {
+				t.Errorf("verdict of %s: %v %s", s.Subject, err, a.Kind)
+			}
+		}
+	}
+	if retried != 1 {
+		t.Errorf("%d retried explanations, want 1", retried)
+	}
+	fs, err := g.st.ListFindingsByRun(ctx, res.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range fs {
+		if !f.Verified || f.Status != "open" {
+			t.Errorf("finding %s verified %v status %s", f.ID, f.Verified, f.Status)
+		}
+	}
+	md, err := os.ReadFile(res.ReportPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		"| Verification | verified 3 of 3 explanations (pass rate 100%), 1 retried, 0 needs_review |",
+		"| Fault injection | COPILOT_FAULT=corrupt_explanation",
+	} {
+		if !strings.Contains(string(md), want) {
+			t.Errorf("report lacks %q:\n%s", want, md)
+		}
+	}
 }
