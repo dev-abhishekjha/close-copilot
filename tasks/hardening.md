@@ -190,3 +190,11 @@ These are requirements on tickets that already exist. When you spec one of them,
 - **CC-806 (from the CC-704 G5):** `validator.documents` is never filled, so every citation is rejected today. Fill it from the same DOCUMENTS slice sent to the model and check `section` as well as `doc_id`.
 - **Ticket that promotes `findings.proposal` to `journal_proposals` or `/mcp-admin` (from the CC-704 G5):** don't trust the embedded status, company, maker or accounts. Re-validate (balance, accounts, date, company from the run) inside `internal/approvals` and set maker and status server-side.
 - **Web or long-lived explainer (from the CC-704 G5):** the ACCOUNTS cache is keyed by company and month only. Key it by run ID, or make a new explainer per run.
+- **CC-905 (from the CC-902 G5):**
+  - Run error text (`Result.Error`/`Reason`) is republished in `score.json` and `score.md`. Cap its length and redact URLs and DSNs, or print only the status plus a pointer to the result file.
+  - `--compare` passes an empty but well-formed baseline (`items: {}`), and doesn't check that the baseline's agent and model IDs match the score. Make both fail.
+  - Count requirements (`X.missed==0`, `X.false_alarms==0`) have no denominator guard and pass when type X has no planted items. Have the CI gate use `recall>=N/M`, or make `caught`/`missed` fail when `planted==0`.
+  - `ScoreMonths` is exported but skips the control/clean and result-control checks, which live only in `LoadMonths`. Repeat them there.
+  - The scorer shares `internal/evals` with the runner, so its independence from checks/agent/seed is enforced per file, not by the compiler. Consider moving it to `internal/evals/score` with a `go list -deps` test.
+  - Wire the explainer into `eval run` (deferred from CC-901 and CC-902), using recorded fixtures.
+- **Seeder and Phase 2 suites (from the CC-902 G5):** the scorer rejects ground truth where two items of the same mapped type have equal or subset keys (`internal/evals/truth.go` `overlappingTruth`). Example: a planted `gstr2b_wrong_period` on the same invoice as the "late" expected entry (`internal/seed/truth.go:128-150`) stops scoring with a load error. The domain data engineer must keep truth items distinct.
