@@ -14,18 +14,16 @@ import (
 	"path/filepath"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
-	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
 	"github.com/abhishekjha/close-copilot/internal/checks"
-	"github.com/abhishekjha/close-copilot/internal/evidence"
 	"github.com/abhishekjha/close-copilot/internal/money"
 	"github.com/abhishekjha/close-copilot/internal/store"
+	"github.com/abhishekjha/close-copilot/internal/testsupport/fakeerp"
 )
 
 func parityStore(t *testing.T) *store.Store {
@@ -72,42 +70,6 @@ func rupees(t *testing.T, s string) money.Paise {
 	return p
 }
 
-// plantedCharges are the three bank charges on the statement that the
-// books never recorded.
-var plantedCharges = []struct{ txn, date, narration, amount string }{
-	{"HDFC-20260915-C1", "2026-09-15", "NEFT CHARGES INCL GST", "-5.90"},
-	{"HDFC-20260920-C2", "2026-09-20", "DEBIT CARD ANNUAL FEE", "-590.00"},
-	{"HDFC-20260930-C3", "2026-09-30", "SMS CHGS JUL-SEP 2026", "-17.70"},
-}
-
-// parityBankLines is September's statement: the rent payment (by UTR),
-// the gateway receipt, all but the last ten cash sales, the three planted
-// charges and one unexplained deposit.
-func parityBankLines(t *testing.T) []store.BankLine {
-	t.Helper()
-	line := func(txn, date, narration, amount string, ref *string) store.BankLine {
-		d, err := time.Parse(time.DateOnly, date)
-		if err != nil {
-			t.Fatal(err)
-		}
-		return store.BankLine{CompanyID: parityCompanyID, TxnID: txn, TxnDate: d, Narration: narration, Ref: ref,
-			AmountPaise: rupees(t, amount), SourceFile: "parity-hdfc-2026-09.csv"}
-	}
-	utr := "UTR2026091000123"
-	out := []store.BankLine{
-		line("HDFC-20260910-R1", "2026-09-10", "NEFT VARDHAN ESTATES RENT", "-59000.00", &utr),
-		line("HDFC-20260913-P1", "2026-09-13", "PG SETTL TATVA RETAIL", "1180.00", nil),
-		line("HDFC-20260918-X1", "2026-09-18", "IMPS UNKNOWN REMITTER", "2500.00", nil),
-	}
-	for i := range parityCashSales - 10 {
-		out = append(out, line("HDFC-CASH-"+cashSaleDate(i)+"-"+cashSale(i), cashSaleDate(i), "CASH DEPOSIT BRANCH", cashSale(i), nil))
-	}
-	for _, c := range plantedCharges {
-		out = append(out, line(c.txn, c.date, c.narration, c.amount, nil))
-	}
-	return out
-}
-
 func clearIDs(fs []checks.Finding) []checks.Finding {
 	out := make([]checks.Finding, len(fs))
 	for i, f := range fs {
@@ -120,17 +82,16 @@ func clearIDs(fs []checks.Finding) []checks.Finding {
 func TestParityFindings(t *testing.T) {
 	ctx := t.Context()
 	st := parityStore(t)
-	if err := st.UpsertCompany(ctx, store.Company{ID: parityCompanyID, ERPCompany: parityERP, GSTIN: parityGSTIN}); err != nil {
+	lines, err := fakeerp.ParityStatement()
+	if err != nil {
 		t.Fatal(err)
 	}
-	if err := st.UpsertBankLines(ctx, parityBankLines(t)); err != nil {
+	if err := fakeerp.Seed(ctx, st, lines); err != nil {
 		t.Fatal(err)
 	}
 
 	_, client := newParityERP(t)
-	es := mcp.NewServer(&mcp.Implementation{Name: "close-copilot-evidence", Version: "parity"}, nil)
-	evidence.RegisterTools(es, st)
-	reg := registry(t, booksMCP(t, client), serveMCP(t, es))
+	reg := registry(t, booksMCP(t, client), serveMCP(t, fakeerp.EvidenceMCPServer(st)))
 
 	in := checks.Inputs{
 		Company:      parityCompanyID,
@@ -166,12 +127,12 @@ func TestParityFindings(t *testing.T) {
 			charges[f.Keys["bank_txn_id"]] = *f.AmountPaise
 		}
 	}
-	if len(charges) != len(plantedCharges) {
-		t.Errorf("unrecorded bank charges = %v, want the %d planted ones", charges, len(plantedCharges))
+	if len(charges) != len(fakeerp.PlantedCharges) {
+		t.Errorf("unrecorded bank charges = %v, want the %d planted ones", charges, len(fakeerp.PlantedCharges))
 	}
-	for _, c := range plantedCharges {
-		if got, want := charges[c.txn], -rupees(t, c.amount); got != want {
-			t.Errorf("charge %s = %d paise, want %d", c.txn, got, want)
+	for _, c := range fakeerp.PlantedCharges {
+		if got, want := charges[c.TxnID], -rupees(t, c.Amount); got != want {
+			t.Errorf("charge %s = %d paise, want %d", c.TxnID, got, want)
 		}
 	}
 	if counts[checks.TypeUnmatchedBankLine] != 1 || counts[checks.TypeUnmatchedLedgerEntry] != 10 {

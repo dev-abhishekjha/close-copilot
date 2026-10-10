@@ -55,6 +55,33 @@ func TestLoadAppliesDefaults(t *testing.T) {
 	if c.AppAddr != ":8000" || c.DataDir != "./data/external" || c.LLMDailyBudgetUSD != 2 {
 		t.Errorf("defaults not applied: %+v", c)
 	}
+	if c.LLMRunTokenCap != 200000 {
+		t.Errorf("LLMRunTokenCap default = %d, want 200000", c.LLMRunTokenCap)
+	}
+}
+
+func TestLoadReadsRunTokenCap(t *testing.T) {
+	c, err := Load(env(map[string]string{EnvLLMRunTokenCap: " 5000 "}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if c.LLMRunTokenCap != 5000 {
+		t.Errorf("LLMRunTokenCap = %d, want 5000", c.LLMRunTokenCap)
+	}
+	// It may be marked required like any other setting; its default
+	// satisfies the requirement.
+	if _, err := Load(env(nil), EnvLLMRunTokenCap); err != nil {
+		t.Errorf("required %s with its default: %v", EnvLLMRunTokenCap, err)
+	}
+}
+
+func TestLoadRejectsBadRunTokenCap(t *testing.T) {
+	for _, v := range []string{"0", "-1", "lots", "1.5", "200k", "99999999999999999999"} {
+		_, err := Load(env(map[string]string{EnvLLMRunTokenCap: v}))
+		if err == nil || !strings.Contains(err.Error(), EnvLLMRunTokenCap) {
+			t.Errorf("token cap %q: got %v, want an error naming %s", v, err, EnvLLMRunTokenCap)
+		}
+	}
 }
 
 func TestLoadReadsValues(t *testing.T) {
@@ -268,6 +295,7 @@ var plainValues = map[string]string{
 	EnvLLMModelFast:   "visible-fast-model",
 	EnvLLMModelStrong: "visible-strong-model",
 	EnvLLMDailyBudget: "7.25",
+	EnvLLMRunTokenCap: "123457",
 	EnvTEIEmbedURL:    "http://tei-embed.visible.test",
 	EnvTEIRerankURL:   "http://tei-rerank.visible.test",
 	EnvDoclingURL:     "http://docling.visible.test",
