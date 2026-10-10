@@ -411,6 +411,13 @@ CC-302 to CC-307, CC-502, CC-503 and CC-602 get a second pass to full scope (bot
 
 ## Parallelism: real and apparent
 
+> **Build-phase operating mode (owner decision, 2026-10-10).** While the project is being built, the orchestrator approves specs, merges to `main` and pushes on the owner's behalf. The quality bar is unchanged:
+> - G1–G3 pass on every ticket, and G5 on every data-sensitive and regulated ticket;
+> - role separation and the invariants hold;
+> - the orchestrator's own full-diff review stands in for G6 until the owner reviews the day's regulated list.
+>
+> Up to three lanes run in separate git worktrees (`.worktrees/<branch>`): one ERPNext writer, and two code lanes whose files don't overlap. The guard hook resolves each file's own checkout. The owner still decides budgets, allowlists, baselines, golden sets, weaker controls and destructive actions on shared ERPNext. The `/build` skill has the procedure.
+
 Three workers at a time is the useful ceiling for this project: one holding the ERPNext lock, one on the LLM lane, one on pure Go against fixtures. A fourth mostly waits. The limits come from the research's own constraints: one ERPNext instance needing 3–4 GB on a 16 GB laptop, one daily LLM budget, and one human reviewer.
 
 The 69 tasks split into 33 standard, 21 data-sensitive and 15 regulated. All 15 regulated tasks wait for your review, so your weekly hours set the pace of Phases 1, 3 and 4 more than agent count does.

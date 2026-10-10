@@ -23,3 +23,6 @@ CLAUDE.local.md
 
 # Files the Claude desktop app saves into this folder
 Claude outputs/
+
+# Per-ticket git worktrees for parallel builds (Go tooling skips dot-dirs).
+.worktrees/
