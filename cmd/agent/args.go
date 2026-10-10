@@ -21,8 +21,8 @@ const (
 )
 
 const usage = `usage:
-  agent close --company <id> --month YYYY-MM [--results-dir results] [--timeout 10m] [--config-dir config]
-  agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config]`
+  agent close --company <id> --month YYYY-MM [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
+  agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]`
 
 // errUsage is wrapped by every argument error.
 var errUsage = errors.New("agent: bad arguments")
@@ -36,6 +36,9 @@ type command struct {
 	resultsDir string
 	timeout    time.Duration
 	configDir  string
+	// noExplain skips the explain (and verify) steps: no model is called
+	// and the run ends partial.
+	noExplain bool
 }
 
 func usageErr(format string, a ...any) error {
@@ -54,7 +57,8 @@ func parseArgs(args []string) (command, error) {
 	fs.SetOutput(io.Discard)
 	fs.StringVar(&c.resultsDir, "results-dir", agent.DefaultResultsDir, "directory for runs/<run_id>.md")
 	fs.DurationVar(&c.timeout, "timeout", agent.DefaultRunTimeout, "run deadline, at most 10m")
-	fs.StringVar(&c.configDir, "config-dir", "config", "directory holding companies/ and rules.yaml")
+	fs.StringVar(&c.configDir, "config-dir", "config", "directory holding companies/, rules.yaml and pricing.yaml")
+	fs.BoolVar(&c.noExplain, "no-explain", false, "skip explaining: no model calls, the run ends partial")
 
 	rest := args[1:]
 	switch c.name {
