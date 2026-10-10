@@ -10,6 +10,7 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-005 Close the static analyzer gaps | 0 | implementer | regulated | |
 | CC-104 Redact secrets in config | 1 | implementer | data-sensitive | CC-701, CC-904 |
 | CC-205 Harden the Frappe client, probe and API-user script | 1 | integration-engineer | data-sensitive | CC-502 |
+| CC-006 Guard hook self-protection and path-expansion parity | 0 | implementer | regulated | |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -128,6 +129,30 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 - `make check`
 
 **Files.** `internal/frappe/**`, `cmd/probe/**`, `deploy/erpnext/api-users.sh`, `deploy/erpnext/lib.sh`, `.env.example`, `docs/erpnext-schema/README.md`. That last one is protected, so `human_review` is true.
+
+---
+
+### CC-006 · Guard hook self-protection and path-expansion parity
+
+**Goal.** No worker can edit the files that enforce its own limits, and the hook judges exactly the path Claude Code writes to.
+
+**Findings** (CC-004 G5, attempt 3; `tmp/reports/CC-004-attempt-3.json` in the CC-004 worktree)
+1. **Self-protection.** A worker whose cwd is a worktree can edit the main checkout's `.claude/hooks/guard-edit.sh`, `.claude/settings*.json`, `.claude/agents/*`, `gates/`, `.github/` or `CLAUDE.md` by absolute path. During a worktree build the main checkout has no `tmp/current-task`, and no role pattern covers these paths. Hooks are re-read on every call, so such an edit takes effect at once and never appears in a PR diff. The gap predates CC-004.
+2. **Path-expansion parity.** The hook neither trims whitespace nor expands `~`, as Claude Code's own path expansion does. When the tool input isn't rewritten before hooks run, `<wt>/tmp/current-task ` (trailing space) passes the `tmp/*` exemption, and `<main>/evals/baseline.json ` slips past the implementer rule.
+3. **Flaky timing test.** `TestGuardHookFailsClosed` has 3 s and 5 s wall-clock limits. It failed once under `-race` while `make check` ran at the same time.
+
+**Subtasks**
+- When a role is given, block every `gates.ProtectedPaths` match unless the root's active spec declares it. Block `.claude/hooks/*` and `.claude/settings*.json` for every role, with no exception.
+- Refuse a path with leading or trailing whitespace or a leading `~`, or expand them exactly as Claude Code does.
+- Raise the timing limits to about 8 s, or skip the timing assertion under the race detector.
+- `TestGuardHook` cases: from a worktree cwd against the main checkout's copies, and both whitespace and `~` forms.
+
+**Acceptance**
+- `go test ./gates/... -race -count=1`
+- `bash -n .claude/hooks/guard-edit.sh`
+- `make check`
+
+**Files.** `.claude/hooks/guard-edit.sh`, `gates/hook_test.go` (both protected). Phase 0, implementer, regulated.
 
 ---
 
