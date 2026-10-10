@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/abhishekjha/close-copilot/internal/seed"
+	"github.com/abhishekjha/close-copilot/internal/company"
 )
 
 // Check is the interface implemented by each deterministic check worker.
@@ -17,8 +17,8 @@ type Check interface {
 	Run(ctx context.Context, in Inputs) ([]Finding, error)
 }
 
-// Rules aliases seed.Rules for check inputs.
-type Rules = seed.Rules
+// Rules aliases company.Rules (config/rules.yaml) for check inputs.
+type Rules = company.Rules
 
 // Inputs holds the company, period and readers passed to each Check.
 type Inputs struct {
@@ -35,8 +35,8 @@ type Inputs struct {
 
 // BankAccountsFor returns the ERPNext names of the bank accounts named in
 // the company profile (bank.account), for Inputs.BankAccounts.
-func BankAccountsFor(p seed.Profile) []string {
-	return []string{seed.ERPAccount(p.Bank.Account, p.Abbr)}
+func BankAccountsFor(p company.Profile) []string {
+	return []string{company.ERPAccount(p.Bank.Account, p.Abbr)}
 }
 
 // FindingsStore is the persistence interface used by Runner to save findings.
