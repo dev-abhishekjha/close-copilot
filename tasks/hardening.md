@@ -169,3 +169,10 @@ These are requirements on tickets that already exist. When you spec one of them,
 - **CC-706 and CC-1103 (from the CC-502 review):**
   - Books tool results carry untrusted ERPNext free text. These fields are capped at 500 runes, but not fenced: `remarks`, `description`, `against`, `bill_no`, `reference_no`, `supplier_name`, `customer_name` and `party_name`.
   - The investigator's tool-result projection must fence or drop these fields. Tool-error text is fixed per error class, so it isn't free text.
+- **CC-703 (from CC-709 scoping and the CC-702 review):**
+  - CC-709 builds the data plane and a test-workflow resume. CC-703 owns `cmd/agent resume <run_id>` and the real `kill -9` mid-run check for Gate B.
+  - Put a run-level deadline on the workflow's ctx. `MCPBooks.GLEntries` can page up to 1000 times at 10 s per call.
+- **CC-706 (from the CC-702 review):**
+  - The registry turns every MCP tool error into fixed text (`MsgToolError`). This drops the books server's field-named input errors that would let the model correct its arguments. Decide whether to pass the server's fixed per-class text through.
+  - Tool `Description`s from the servers go to the model unchanged. They are server-controlled text, which is acceptable only while the servers are first-party.
+- **MCP SDK (from the CC-702 review):** the SDK's server-side output validation decodes generically, so amounts above 2^53 paise are rounded before they leave the books or evidence server. The client decode is exact. This is a theoretical limit (about ₹90 lakh crore); revisit if the servers ever stop validating output through the SDK.
