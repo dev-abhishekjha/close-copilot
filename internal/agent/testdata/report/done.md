@@ -8,6 +8,7 @@
 | Outcome | done |
 | Findings | 3 |
 | Model usage | 2400 input tokens, 300 output tokens, 1200 cache-read tokens, USD 0.0042 |
+| Average cost per explained finding | USD 0.0014 (run cost over 3 explained) |
 
 ## Steps
 
@@ -33,6 +34,8 @@
   - evidence/list_bank_lines: HDFC-20260915-C1 (snapshot `abababababab`)
 - Action: book_entry
 - Explanation: The bank debited ₹5.90 of NEFT charges on 15 Sep; the books have no matching entry.
+- Citations: [POL-BANK §2.1]
+- Proposed entry: 2026-09-15; Dr Bank Charges - STPL ₹5.90; Cr HDFC Current 0001 - STPL ₹5.90; NEFT charges per statement
 - Verification: verified
 
 ### 2. Unrecorded bank charge: DEBIT CARD | ANNUAL 'FEE' # not a heading

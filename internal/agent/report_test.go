@@ -62,6 +62,11 @@ func goldenReport(outcome string) ReportData {
 		d.Usage = store.RunUsage{InputTokens: 2400, OutputTokens: 300, CacheReadTokens: 1200, CostUSD: "0.0042"}
 		d.Findings[0].Explanation = strp("The bank debited ₹5.90 of NEFT charges on 15 Sep;\nthe books have no matching entry.")
 		d.Findings[0].Verified = true
+		d.Findings[0].Citations = []store.Citation{{DocID: "POL-BANK", Section: "2.1"}}
+		d.Findings[0].Proposal = &store.JournalProposal{Status: "proposed", CompanyID: "sharma", Payload: store.JournalPayload{
+			PostingDate: "2026-09-15", Remark: "NEFT charges\nper statement",
+			Lines: []store.JournalLine{{Account: "Bank Charges - STPL", DebitPaise: 590}, {Account: "HDFC Current 0001 - STPL", CreditPaise: 590}},
+		}}
 		d.Findings[1].Status = "needs_review"
 		for i, f := range findings {
 			steps = append(steps,
@@ -147,5 +152,30 @@ func TestReportPathAndRestore(t *testing.T) {
 	snap, _ := st.PutArtifact(context.Background(), store.ArtifactToolResult, run, uuid.Nil, map[string]string{"a": "b"})
 	if _, err := restoreReport(t.Context(), mem, dir, uuid.New(), []string{snap}); err == nil {
 		t.Error("restored a tool result as a report")
+	}
+}
+
+func TestAverageUSD(t *testing.T) {
+	for _, tt := range []struct {
+		total string
+		n     int
+		want  string
+	}{
+		{"0.0042", 3, "0.0014"},
+		{"0.0042", 1, "0.0042"},
+		{"0", 3, "0"},
+		{"1", 3, "0.333333"},
+		{"2", 3, "0.666667"},
+		{"12.5", 2, "6.25"},
+		{"0.0000005", 1, "0"},
+		{"0.000001", 2, "0.000001"},
+		{"-1", 1, "unknown"},
+		{"1e3", 1, "unknown"},
+		{"", 1, "unknown"},
+		{"1", 0, "unknown"},
+	} {
+		if got := averageUSD(tt.total, tt.n); got != tt.want {
+			t.Errorf("averageUSD(%q, %d) = %q, want %q", tt.total, tt.n, got, tt.want)
+		}
 	}
 }

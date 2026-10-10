@@ -2,8 +2,14 @@
 //
 // Built in CC-703 (workflow) and CC-1001 (web app). Usage:
 //
-//	agent close --company sharma --month 2026-09 [--results-dir results] [--timeout 10m] [--config-dir config]
-//	agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config]
+//	agent close --company sharma --month 2026-09 [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
+//	agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
+//
+// Each finding is explained by the LLM explainer (CC-704) through
+// LLM_PROVIDER: claude-cli (the default, the local claude -p, no API key)
+// or anthropic. Model prices come from <config-dir>/pricing.yaml.
+// --no-explain calls no model: the explain and verify steps are skipped and
+// the run ends partial.
 //
 // close runs one month-end close and resume finishes a run that stopped
 // (a crash or kill -9 leaves it running). Ctrl-C (SIGINT or SIGTERM)
@@ -31,6 +37,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/cli"
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -60,8 +67,10 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if err != nil {
 		return err
 	}
-	if err := cfg.CheckLLM(); err != nil {
-		return err
+	if !cmd.noExplain {
+		if err := cfg.CheckLLM(); err != nil {
+			return err
+		}
 	}
 	log.Info("llm", "provider", cfg.LLMProvider, "fast", cfg.LLMModelFast, "strong", cfg.LLMModelStrong, "run_token_cap", cfg.LLMRunTokenCap)
 
@@ -90,18 +99,35 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	}
 	defer reg.Close()
 
+	books := &agent.MCPBooks{Registry: reg, Companies: st}
 	wf := &agent.Workflow{
 		Store:    st,
-		Books:    &agent.MCPBooks{Registry: reg, Companies: st},
+		Books:    books,
 		Evidence: &agent.MCPEvidence{Registry: reg},
 		Profiles: byID,
 		Rules:    rules,
-		// No explainer or verifier until CC-704 and CC-705: their steps
-		// are skipped and a run ends partial.
+		// No verifier until CC-705: verify steps are skipped and a run
+		// ends partial.
 		Config:     cfg,
 		ResultsDir: cmd.resultsDir,
 		Timeout:    cmd.timeout,
 		Log:        log,
+	}
+	if cmd.noExplain {
+		log.Info("explaining disabled (--no-explain)")
+	} else {
+		model, err := newProvider(cfg, filepath.Join(cmd.configDir, "pricing.yaml"))
+		if err != nil {
+			return err
+		}
+		wf.Model = model
+		wf.Explainer = &agent.LLMExplainer{
+			Store:       st,
+			Accounts:    agent.BooksAccounts{Books: books},
+			FastModel:   cfg.LLMModelFast,
+			StrongModel: cfg.LLMModelStrong,
+			Log:         log,
+		}
 	}
 
 	var res agent.Result
@@ -121,4 +147,21 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		}
 	}
 	return err
+}
+
+// newProvider builds the model provider LLM_PROVIDER names, priced from
+// the pricing table at pricingPath. The workflow wraps it per step in a
+// recording, token-capped provider.
+func newProvider(cfg config.Config, pricingPath string) (llm.Provider, error) {
+	pricing, err := llm.LoadPricing(pricingPath)
+	if err != nil {
+		return nil, err
+	}
+	switch cfg.LLMProvider {
+	case config.ProviderAnthropic:
+		return llm.NewAnthropicProvider(cfg, pricing)
+	case config.ProviderClaudeCLI, "":
+		return llm.NewClaudeCLI("", nil, pricing), nil
+	}
+	return nil, fmt.Errorf("agent: unknown %s %.40q", config.EnvLLMProvider, cfg.LLMProvider)
 }

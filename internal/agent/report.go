@@ -3,7 +3,9 @@ package agent
 // The close report (CC-703): a templated Synthesizer in plain Go, with no
 // model call. It renders one run as Markdown: the run, its outcome, its
 // steps, and each finding with its amount in rupees, its evidence IDs and
-// snapshots, and its explanation and verification when present. The same
+// snapshots, its suggested action, explanation, citations, proposed entry
+// and verification when present, and the average model cost per explained
+// finding (CC-704). The same
 // Markdown is stored as a report artifact and written to
 // <results dir>/runs/<run_id>.md.
 //
@@ -19,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/google/uuid"
@@ -124,6 +127,17 @@ func RenderReport(d ReportData) string {
 			verify[s.Subject] = s
 		}
 	}
+	explained := 0
+	for _, f := range d.Findings {
+		if explain[f.ID.String()].Status == store.StepDone {
+			explained++
+		}
+	}
+	if explained == 0 {
+		p("| Average cost per explained finding | none explained |\n")
+	} else {
+		p("| Average cost per explained finding | USD %s (run cost over %d explained) |\n", cell(averageUSD(cost, explained)), explained)
+	}
 	rows = append(rows, perFinding(store.StepKindExplain, explain, d.Findings), perFinding(store.StepKindVerify, verify, d.Findings))
 	rows = append(rows, plainSteps(d.Steps, store.StepKindInvestigate)...)
 
@@ -161,9 +175,72 @@ func RenderReport(d ReportData) string {
 			p("- Action: %s\n", oneLine(*f.Action))
 		}
 		p("- Explanation: %s\n", explanationLine(f, explain[f.ID.String()]))
+		if len(f.Citations) > 0 {
+			cs := make([]string, len(f.Citations))
+			for j, c := range f.Citations {
+				cs[j] = fmt.Sprintf("[%s §%s]", oneLine(c.DocID), oneLine(c.Section))
+			}
+			p("- Citations: %s\n", strings.Join(cs, " "))
+		}
+		if f.Proposal != nil {
+			p("- Proposed entry: %s\n", proposalLine(f.Proposal.Payload))
+		}
 		p("- Verification: %s\n", verificationLine(f, verify[f.ID.String()]))
 	}
 	return b.String()
+}
+
+// proposalLine renders a proposed journal entry on one line.
+func proposalLine(pl store.JournalPayload) string {
+	parts := []string{oneLine(pl.PostingDate)}
+	for _, l := range pl.Lines {
+		switch {
+		case l.DebitPaise > 0:
+			parts = append(parts, fmt.Sprintf("Dr %s %s", oneLine(l.Account), l.DebitPaise.Format()))
+		case l.CreditPaise > 0:
+			parts = append(parts, fmt.Sprintf("Cr %s %s", oneLine(l.Account), l.CreditPaise.Format()))
+		}
+	}
+	if r := oneLine(pl.Remark); r != "" {
+		parts = append(parts, r)
+	}
+	return strings.Join(parts, "; ")
+}
+
+// averageUSD divides a decimal USD amount (such as "0.0042") by n, exactly
+// to the micro-dollar with halves rounded up, and returns decimal text.
+// Digits beyond the sixth decimal are dropped. Text that is not a plain
+// non-negative decimal gives "unknown". No floating point is involved.
+func averageUSD(total string, n int) string {
+	whole, frac, _ := strings.Cut(total, ".")
+	if whole == "" || n <= 0 || !allDigits(whole) || !allDigits(frac) || len(whole) > 12 {
+		return "unknown"
+	}
+	if len(frac) > 6 {
+		frac = frac[:6]
+	}
+	frac += strings.Repeat("0", 6-len(frac))
+	w, err1 := strconv.ParseInt(whole, 10, 64)
+	f, err2 := strconv.ParseInt(frac, 10, 64)
+	if err1 != nil || err2 != nil {
+		return "unknown"
+	}
+	micro := w*1_000_000 + f
+	avg := (2*micro + int64(n)) / (2 * int64(n))
+	out := strconv.FormatInt(avg/1_000_000, 10)
+	if rest := strings.TrimRight(fmt.Sprintf("%06d", avg%1_000_000), "0"); rest != "" {
+		out += "." + rest
+	}
+	return out
+}
+
+func allDigits(s string) bool {
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 // plainSteps are the steps of one kind ("check." for every check), in

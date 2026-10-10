@@ -5,9 +5,10 @@ package main
 // Gate B (CC-703) end to end: the agent binary, built here, runs a close
 // against Postgres (testcontainers) and the real books and evidence MCP
 // servers over the fake ERPNext's skeleton month, served in this test
-// process. The binary has no explainer until CC-704, so a run ends
-// partial with its explain and verify steps skipped; that is the expected
-// end state of these tests.
+// process. No test here may call a real model, so every command runs with
+// --no-explain (CC-704): a run ends partial with its explain and verify
+// steps skipped, which is the expected end state of these tests. The
+// explainer itself is covered with a fake provider in internal/agent.
 //
 // To stop a run at a known point, a test installs a trigger that makes the
 // insert of the retrieve step sleep in Postgres: by then preflight and the
@@ -102,7 +103,7 @@ func (e *cliEnv) command(t *testing.T, args ...string) (*exec.Cmd, *bytes.Buffer
 	if err != nil {
 		t.Fatal(err)
 	}
-	args = append(args, "--results-dir", e.results, "--config-dir", configDir)
+	args = append(args, "--results-dir", e.results, "--config-dir", configDir, "--no-explain")
 	cmd := exec.Command(e.bin, args...)
 	cmd.Dir = t.TempDir()
 	cmd.Env = []string{

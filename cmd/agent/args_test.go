@@ -25,6 +25,10 @@ func TestParseArgs(t *testing.T) {
 			command{name: cmdResume, runID: id, resultsDir: "out", timeout: 10 * time.Minute, configDir: "config"}},
 		{"resume with flags before the ID", []string{"resume", "--timeout", "5m", id.String()},
 			command{name: cmdResume, runID: id, resultsDir: "results", timeout: 5 * time.Minute, configDir: "config"}},
+		{"close without explaining", []string{"close", "--company", "sharma", "--month", "2026-09", "--no-explain"},
+			command{name: cmdClose, company: "sharma", month: "2026-09", resultsDir: "results", timeout: 10 * time.Minute, configDir: "config", noExplain: true}},
+		{"resume without explaining", []string{"resume", id.String(), "--no-explain"},
+			command{name: cmdResume, runID: id, resultsDir: "results", timeout: 10 * time.Minute, configDir: "config", noExplain: true}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -55,6 +59,7 @@ func TestParseArgsRejects(t *testing.T) {
 		{"close", "--company", "sharma", "--month", "2026-09", "--timeout", "-1m"},
 		{"close", "--company", "sharma", "--month", "2026-09", "--results-dir", ""},
 		{"close", "--company", "sharma", "--month", "2026-09", "--unknown"},
+		{"close", "--company", "sharma", "--month", "2026-09", "--no-explain=maybe"},
 		{"resume"},
 		{"resume", "not-a-uuid"},
 		{"resume", "00000000-0000-0000-0000-000000000000"},
