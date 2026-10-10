@@ -27,6 +27,8 @@ func TestUsageAndIOErrorsExit2(t *testing.T) {
 		{"declared with a missing spec", RunDeclared, []string{"--spec", "specs/CC-999.md"}},
 		{"declared with an unknown base", RunDeclared, []string{"--spec", "specs/CC-500.md", "--base", "nope"}},
 		{"protected with a positional argument", RunProtected, []string{"x"}},
+		{"protected with a short approved SHA", RunProtected, []string{"--approved-sha", "abc123"}},
+		{"protected with an upper-case approved SHA", RunProtected, []string{"--approved-sha", strings.Repeat("A", 40)}},
 		{"graph without a subcommand", RunGraph, nil},
 		{"graph with an unknown subcommand", RunGraph, []string{"list"}},
 		{"graph check without a path", RunGraph, []string{"check"}},
@@ -60,6 +62,7 @@ func TestProtectedBadEventPayloadExits2(t *testing.T) {
 func TestReportFlagWritesReport(t *testing.T) {
 	r := onTicketBranch(t)
 	r.write("evals/baseline.json", "{}\n")
+	r.commit("CC-500: baseline")
 	path := filepath.Join(t.TempDir(), "out", "G1.json")
 
 	res := r.runCmd(RunProtected, nil, "--report", path, "--task", "CC-500", "--attempt", "2")
@@ -79,7 +82,7 @@ func TestReportFlagWritesReport(t *testing.T) {
 	}
 
 	// A later pass overwrites the failure.
-	res = r.runCmd(RunProtected, nil, "--report", path, "--labels", "approved")
+	res = r.runCmd(RunProtected, nil, "--report", path, "--labels", "approved", "--approved-sha", strings.TrimSpace(r.git("rev-parse", "HEAD")))
 	if res.code != ExitPass {
 		t.Fatalf("exit %d, want %d", res.code, ExitPass)
 	}

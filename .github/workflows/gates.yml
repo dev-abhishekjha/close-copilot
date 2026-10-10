@@ -1,0 +1,85 @@
+name: gates
+
+# G1's declared-files, task-graph and analyzer gates, built from the base
+# ref (CC-004). They rerun on `edited`, which is how GitHub reports a
+# changed base branch, so a retargeted PR is judged against its new base;
+# that is why they live apart from ci.yml, whose check and integration
+# jobs must never be cancelled by an edit. Every run judges the current
+# head; no job is skipped (a skipped required check counts as passing).
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gates-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  # The gate code comes from the base ref, never from the pull request: a PR
+  # that edits gates/ is still judged by the gates on main (CC-004). The PR
+  # tree is only data to those binaries. gates/ci_test.go asserts this shape.
+  gates:
+    name: gates (G1 declared files, task graph, analyzers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: ${{ github.event.pull_request.base.sha }}
+    steps:
+      - name: check out the base ref (the gate code)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: check out the pull request head (the tree under test)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      # No cache: a cache saved by the PR's own jobs could hand the base
+      # build planted objects.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: base/go.mod
+          cache: false
+      - name: build the gates from the base ref
+        working-directory: base
+        run: |
+          go mod verify
+          mkdir -p "$RUNNER_TEMP/gates"
+          go build -o "$RUNNER_TEMP/gates/" ./gates/cmd/...
+      - name: ticket ID from branch name
+        id: ticket
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          # cc-602-bank-rec -> CC-602
+          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p')"
+          if [ -z "$id" ]; then
+            echo "::error::branch '$HEAD_REF' is not named cc-<n>-<slug>"
+            exit 1
+          fi
+          echo "id=$id" >>"$GITHUB_OUTPUT"
+      - name: task graph
+        working-directory: pr
+        run: '"$RUNNER_TEMP/gates/graph" check tasks/graph.yaml'
+      # Also checks the spec's id, that no front-matter field changed since
+      # the spec was pinned, and that every commit subject in base..HEAD
+      # starts with "$TASK:" (the branch comes from $GITHUB_HEAD_REF).
+      - name: declared files, spec pin and commit subjects (G1)
+        if: ${{ !cancelled() }}
+        working-directory: pr
+        env:
+          TASK: ${{ steps.ticket.outputs.id }}
+        run: '"$RUNNER_TEMP/gates/declared" --spec "specs/$TASK.md" --base "$BASE"'
+      - name: custom analyzers (CC-002)
+        if: ${{ !cancelled() }}
+        working-directory: pr
+        env:
+          GOFLAGS: -tags=integration
+        run: '"$RUNNER_TEMP/gates/lint" ./...'
