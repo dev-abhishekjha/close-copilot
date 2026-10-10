@@ -4,6 +4,7 @@ description: "Orchestrate one Close Copilot ticket end to end - G0 readiness, wo
 argument-hint: CC-xxx
 arguments: [id]
 disable-model-invocation: true
+model: sonnet
 allowed-tools: Read Grep Glob Write Agent Bash(rm -f tmp/current-task*) Bash(rm -f tmp/erpnext.lock*) Bash(make *) Bash(go *) Bash(git status*) Bash(git diff *) Bash(git log *) Bash(git switch *) Bash(git checkout -b *) Bash(git add *) Bash(git commit *) Bash(git rev-parse *) Bash(git worktree *) Bash(git merge *) Bash(git push*) Bash(git branch *) Bash(git fetch*) Bash(mkdir -p tmp*)
 ---
 
@@ -30,7 +31,7 @@ The guard hook finds the checkout that holds each edited file, so each worktree'
 ## 1. G0 readiness
 
 - `specs/$id.md` exists (else stop: run `/spec $id`). Re-run the G0 checklist from `/spec`.
-- Regulated or `human_review: true` without `approved_by`: the owner delegated approval during the build phase (2026-10-10). Review the spec yourself against the ticket and its invariants, then set `approved_by: orchestrator (owner-delegated) <date>`.
+- Regulated or `human_review: true` without `approved_by`: the owner delegated approval during the build phase (2026-10-10). Start `ticket-reviewer` (Opus) in mode `spec` with `$id` and the checkout path. Fix every blocking finding in the spec and re-run it until `VERDICT: pass`, then set `approved_by: orchestrator (owner-delegated, ticket-reviewer pass) <date>`.
 - `needs_erpnext: true` and the main checkout's `tmp/erpnext.lock` names another ticket: wait. Otherwise write `$id` into it.
 - `owner_role: human`: don't delegate. Tell the owner exactly what to do and how to record it (commit subject `$id: ...`).
 
@@ -48,9 +49,9 @@ Start the subagent named by `owner_role` with a pointer-only brief:
 
 On a retry, add only: `Previous attempt failed; fix exactly what tmp/reports/<file> lists.`
 
-**Model and effort** (token budget, owner decision 2026-10-10). Each worker's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer and security-reviewer. Override only by risk, never down:
+**Model and effort** (token budget, owner decision 2026-10-10). This skill runs on Sonnet; the Opus judgment for regulated tickets comes from `ticket-reviewer`, so the session never needs a manual `/model` switch. Each worker's frontmatter sets its model: Sonnet for implementer, integration-engineer, domain-data-engineer and eval-engineer; Opus for llm-engineer and security-reviewer. Override only by risk, never down:
 
-- `risk: regulated`: pass `model: "opus"` and `effort: "high"` to the worker.
+- `risk: regulated` or `human_review: true`: pass `model: "opus"` and `effort: "high"` to the worker.
 - Otherwise: pass neither; the frontmatter model at default effort.
 - A worker that failed twice on the same blocking check gets `model: "opus"` on its last attempt (see step 4).
 
@@ -72,7 +73,7 @@ Run the `/gates` procedure yourself in the worktree. Judge only from command out
 
 For `risk: data-sensitive` or `regulated`: start `security-reviewer` in the background with `$id`, the worktree path and the range `main...HEAD` plus uncommitted changes, and start the next ticket in another lane meanwhile. A blocking finding goes back to the worker as a failure report (counts as an attempt). Nothing data-sensitive or regulated merges without a G5 pass.
 
-**Regulated tickets:** in place of the owner's G6 during the build phase, read the whole diff yourself against the spec's acceptance and the CLAUDE.md invariants, and list the ticket in the end-of-day report for the owner's later review.
+**Regulated and `human_review: true` tickets:** in place of the owner's G6 during the build phase, start `ticket-reviewer` (Opus) in mode `diff` with `$id`, the worktree path and the range, alongside G5. Treat its blocking findings like G5's. Nothing merges without a pass from both. List the ticket in the end-of-day report for the owner's later review.
 
 ## 6. Commit
 

@@ -2,6 +2,7 @@
 name: next
 description: "List the Close Copilot tickets that are ready to start now, in phase order, with owner, risk and whether they need the ERPNext lock. Use when deciding what to build next."
 argument-hint: "[phase]"
+model: sonnet
 allowed-tools: Read Grep Bash(git log *) Bash(git branch *)
 ---
 

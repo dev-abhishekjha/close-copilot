@@ -2,6 +2,7 @@
 name: gates
 description: "Run the Close Copilot gate ladder (G1-G4) locally on the current branch against its spec and print a pass/fail table plus a machine-readable failure report. Use before committing ticket work or when the owner asks whether a branch is ready."
 argument-hint: "[CC-xxx]"
+model: sonnet
 allowed-tools: Read Grep Glob Bash(make *) Bash(go *) Bash(git diff *) Bash(git status*) Bash(git log *) Bash(git rev-parse *) Bash(mkdir -p tmp*)
 ---
 
