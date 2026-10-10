@@ -136,7 +136,7 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 **Goal.** No worker can edit the files that enforce its own limits, and the hook judges exactly the path Claude Code writes to.
 
-**Findings** (CC-004 G5, attempt 3; `tmp/reports/CC-004-attempt-3.json` in the CC-004 worktree)
+**Findings** (CC-004 G5, attempt 3; `tmp/reports/CC-004-attempt-3.json`)
 1. **Self-protection.** A worker whose cwd is a worktree can edit the main checkout's `.claude/hooks/guard-edit.sh`, `.claude/settings*.json`, `.claude/agents/*`, `gates/`, `.github/` or `CLAUDE.md` by absolute path. During a worktree build the main checkout has no `tmp/current-task`, and no role pattern covers these paths. Hooks are re-read on every call, so such an edit takes effect at once and never appears in a PR diff. The gap predates CC-004.
 2. **Path-expansion parity.** The hook neither trims whitespace nor expands `~`, as Claude Code's own path expansion does. When the tool input isn't rewritten before hooks run, `<wt>/tmp/current-task ` (trailing space) passes the `tmp/*` exemption, and `<main>/evals/baseline.json ` slips past the implementer rule.
 3. **Flaky timing test.** `TestGuardHookFailsClosed` has 3 s and 5 s wall-clock limits. It failed once under `-race` while `make check` ran at the same time.
