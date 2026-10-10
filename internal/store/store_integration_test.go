@@ -16,8 +16,8 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 
+	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/money"
-	"github.com/abhishekjha/close-copilot/internal/seed"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -98,7 +98,7 @@ func TestStoreIntegration_MigrationsAndRoundTrip(t *testing.T) {
 
 		// Seed from profiles in config/companies
 		companiesDir := filepath.Join("..", "..", "config", "companies")
-		profiles, err := seed.LoadProfiles(companiesDir)
+		profiles, err := company.LoadProfiles(companiesDir)
 		if err != nil {
 			t.Fatalf("LoadProfiles: %v", err)
 		}

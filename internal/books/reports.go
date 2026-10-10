@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"github.com/abhishekjha/close-copilot/internal/frappe"
+	"github.com/abhishekjha/close-copilot/internal/ledger"
 	"github.com/abhishekjha/close-copilot/internal/money"
 )
 
@@ -142,38 +143,14 @@ func FiscalYearStart(d time.Time) time.Time {
 	return time.Date(y, time.April, 1, 0, 0, 0, 0, time.UTC)
 }
 
-// TB is a trial balance for one company and period. Rows hold leaf
-// accounts with any non-zero value, ordered by root type (Asset,
-// Liability, Equity, Income, Expense) and then account name.
-type TB struct {
-	Company string    `json:"company"`
-	From    time.Time `json:"from_date"`
-	To      time.Time `json:"to_date"`
-	Rows    []TBRow   `json:"rows"`
-	Totals  TBTotals  `json:"totals"`
-}
-
-// TBRow is one account's line. Opening and Closing are signed balances
-// (debit positive); Debit and Credit are the period's totals (never
-// negative); Closing = Opening + Debit - Credit.
-type TBRow struct {
-	Account     string      `json:"account"`
-	AccountName string      `json:"account_name"`
-	RootType    string      `json:"root_type"`
-	Opening     money.Paise `json:"opening"`
-	Debit       money.Paise `json:"debit"`
-	Credit      money.Paise `json:"credit"`
-	Closing     money.Paise `json:"closing"`
-}
-
-// TBTotals sums the rows' columns. In a balanced ledger Debit equals Credit
-// and Opening and Closing are zero.
-type TBTotals struct {
-	Opening money.Paise `json:"opening"`
-	Debit   money.Paise `json:"debit"`
-	Credit  money.Paise `json:"credit"`
-	Closing money.Paise `json:"closing"`
-}
+// TB, TBRow and TBTotals are the trial balance types, defined in
+// internal/ledger (CC-601a) so readers that don't use this package can
+// share them.
+type (
+	TB       = ledger.TB
+	TBRow    = ledger.TBRow
+	TBTotals = ledger.TBTotals
+)
 
 // rootOrder is the row order of the root types; it also lists the valid ones.
 var rootOrder = map[string]int{
@@ -312,14 +289,9 @@ func checkBalanced(t TBTotals, earlierPL money.Paise) error {
 	return fmt.Errorf("%w: %s", ErrUnbalanced, strings.Join(gaps, "; "))
 }
 
-// MonthTotal is one calendar month of an account's entries. Net = Debit -
-// Credit (debit positive).
-type MonthTotal struct {
-	Month  string      `json:"month"` // YYYY-MM
-	Debit  money.Paise `json:"debit"`
-	Credit money.Paise `json:"credit"`
-	Net    money.Paise `json:"net"`
-}
+// MonthTotal is one calendar month of an account's entries. It is
+// ledger.MonthTotal (CC-601a).
+type MonthTotal = ledger.MonthTotal
 
 // AccountHistory returns the debit, credit and net of one account for each
 // of the months calendar months ending with through (YYYY-MM), oldest

@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"reflect"
 	"strings"
-	"time"
 
-	"github.com/abhishekjha/close-copilot/internal/money"
+	"github.com/abhishekjha/close-copilot/internal/ledger"
 )
 
 // DocType models (CC-203).
@@ -17,6 +16,9 @@ import (
 // strings and Check fields are 0 or 1. The X struct is the domain form:
 // amounts in money.Paise, dates as time.Time at UTC midnight, Checks as
 // bool. XRaw.Domain (convert.go) turns one into the other.
+//
+// The domain structs live in internal/ledger (CC-601a), which has no
+// dependency on this client; X here is a type alias for ledger.X.
 //
 // Fetch raw structs with List or Get, asking for Fields[XRaw]() so every
 // field the converter needs is present. List never returns child tables;
@@ -34,13 +36,13 @@ const (
 	DocTypeJournalEntry    = "Journal Entry"
 )
 
-// Account root types (Account.root_type).
+// Account root types (Account.root_type), as defined in internal/ledger.
 const (
-	RootTypeAsset     = "Asset"
-	RootTypeLiability = "Liability"
-	RootTypeEquity    = "Equity"
-	RootTypeIncome    = "Income"
-	RootTypeExpense   = "Expense"
+	RootTypeAsset     = ledger.RootTypeAsset
+	RootTypeLiability = ledger.RootTypeLiability
+	RootTypeEquity    = ledger.RootTypeEquity
+	RootTypeIncome    = ledger.RootTypeIncome
+	RootTypeExpense   = ledger.RootTypeExpense
 )
 
 // Fields returns the JSON field names of T's scalar fields, in declaration
@@ -77,17 +79,8 @@ type AccountRaw struct {
 	AccountCurrency string `json:"account_currency"`
 }
 
-type Account struct {
-	Name            string
-	Docstatus       int
-	AccountName     string
-	Company         string
-	ParentAccount   string // empty for a root account
-	IsGroup         bool
-	RootType        string // one of the RootType constants
-	AccountType     string
-	AccountCurrency string
-}
+// Account is ledger.Account, the domain form of AccountRaw.
+type Account = ledger.Account
 
 // ---- GL Entry ----
 
@@ -110,24 +103,8 @@ type GLEntryRaw struct {
 	Remarks     string      `json:"remarks"`
 }
 
-type GLEntry struct {
-	Name        string
-	Docstatus   int
-	Company     string
-	Account     string
-	Debit       money.Paise
-	Credit      money.Paise
-	PostingDate time.Time
-	VoucherType string
-	VoucherNo   string
-	PartyType   string
-	Party       string
-	IsCancelled bool
-	IsOpening   bool
-	FiscalYear  string
-	Against     string
-	Remarks     string
-}
+// GLEntry is ledger.GLEntry, the domain form of GLEntryRaw.
+type GLEntry = ledger.GLEntry
 
 // ---- Supplier ----
 
@@ -142,16 +119,8 @@ type SupplierRaw struct {
 	PAN           string `json:"pan"`
 }
 
-type Supplier struct {
-	Name          string
-	Docstatus     int
-	SupplierName  string
-	SupplierGroup string
-	SupplierType  string
-	GSTIN         string
-	GSTCategory   string
-	PAN           string
-}
+// Supplier is ledger.Supplier, the domain form of SupplierRaw.
+type Supplier = ledger.Supplier
 
 // ---- Customer ----
 
@@ -166,16 +135,8 @@ type CustomerRaw struct {
 	GSTCategory   string `json:"gst_category"`
 }
 
-type Customer struct {
-	Name          string
-	Docstatus     int
-	CustomerName  string
-	CustomerGroup string
-	CustomerType  string
-	Territory     string
-	GSTIN         string
-	GSTCategory   string
-}
+// Customer is ledger.Customer, the domain form of CustomerRaw.
+type Customer = ledger.Customer
 
 // ---- Purchase Invoice ----
 
@@ -201,27 +162,8 @@ type PurchaseInvoiceRaw struct {
 	Taxes             []PurchaseTaxesAndChargesRaw `json:"taxes"`
 }
 
-type PurchaseInvoice struct {
-	Name              string
-	Docstatus         int
-	Company           string
-	Supplier          string
-	SupplierName      string
-	BillNo            string
-	BillDate          time.Time // zero when not set
-	PostingDate       time.Time
-	Remarks           string
-	CreditTo          string
-	NetTotal          money.Paise
-	GrandTotal        money.Paise
-	OutstandingAmount money.Paise
-	IsReturn          bool
-	SupplierGSTIN     string
-	CompanyGSTIN      string
-	PlaceOfSupply     string
-	Items             []PurchaseInvoiceItem
-	Taxes             []PurchaseTaxesAndCharges
-}
+// PurchaseInvoice is ledger.PurchaseInvoice, the domain form of PurchaseInvoiceRaw.
+type PurchaseInvoice = ledger.PurchaseInvoice
 
 // PurchaseInvoiceItemRaw is a Purchase Invoice Item row. That DocType is
 // not in docs/erpnext-schema; these fields were checked live (CC-201).
@@ -233,13 +175,8 @@ type PurchaseInvoiceItemRaw struct {
 	Amount         json.Number `json:"amount"`
 }
 
-type PurchaseInvoiceItem struct {
-	Name           string
-	ItemCode       string
-	Description    string
-	ExpenseAccount string
-	Amount         money.Paise
-}
+// PurchaseInvoiceItem is ledger.PurchaseInvoiceItem, the domain form of PurchaseInvoiceItemRaw.
+type PurchaseInvoiceItem = ledger.PurchaseInvoiceItem
 
 type PurchaseTaxesAndChargesRaw struct {
 	Name         string      `json:"name"`
@@ -253,19 +190,8 @@ type PurchaseTaxesAndChargesRaw struct {
 	GSTTaxType   string      `json:"gst_tax_type"`
 }
 
-type PurchaseTaxesAndCharges struct {
-	Name        string
-	AccountHead string
-	TaxAmount   money.Paise
-	ChargeType  string
-	// Rate is the percentage as ERPNext sends it (a Float field), such as
-	// "9" or "2.5". It is not money, so it stays as exact decimal text.
-	Rate         json.Number
-	AddDeductTax string
-	Category     string
-	Description  string
-	GSTTaxType   string
-}
+// PurchaseTaxesAndCharges is ledger.PurchaseTaxesAndCharges, the domain form of PurchaseTaxesAndChargesRaw.
+type PurchaseTaxesAndCharges = ledger.PurchaseTaxesAndCharges
 
 // ---- Sales Invoice ----
 
@@ -285,21 +211,8 @@ type SalesInvoiceRaw struct {
 	Taxes             []SalesTaxesAndChargesRaw `json:"taxes"`
 }
 
-type SalesInvoice struct {
-	Name              string
-	Docstatus         int
-	Company           string
-	Customer          string
-	CustomerName      string
-	PostingDate       time.Time
-	NetTotal          money.Paise
-	GrandTotal        money.Paise
-	OutstandingAmount money.Paise
-	DebitTo           string
-	Remarks           string
-	Items             []SalesInvoiceItem
-	Taxes             []SalesTaxesAndCharges
-}
+// SalesInvoice is ledger.SalesInvoice, the domain form of SalesInvoiceRaw.
+type SalesInvoice = ledger.SalesInvoice
 
 // SalesInvoiceItemRaw is a Sales Invoice Item row. That DocType is not in
 // docs/erpnext-schema; the fields are ERPNext's standard ones, the sales
@@ -312,13 +225,8 @@ type SalesInvoiceItemRaw struct {
 	Amount        json.Number `json:"amount"`
 }
 
-type SalesInvoiceItem struct {
-	Name          string
-	ItemCode      string
-	Description   string
-	IncomeAccount string
-	Amount        money.Paise
-}
+// SalesInvoiceItem is ledger.SalesInvoiceItem, the domain form of SalesInvoiceItemRaw.
+type SalesInvoiceItem = ledger.SalesInvoiceItem
 
 // SalesTaxesAndChargesRaw is a Sales Taxes and Charges row. That DocType is
 // not in docs/erpnext-schema; it has the fields of Purchase Taxes and
@@ -333,15 +241,8 @@ type SalesTaxesAndChargesRaw struct {
 	GSTTaxType  string      `json:"gst_tax_type"`
 }
 
-type SalesTaxesAndCharges struct {
-	Name        string
-	AccountHead string
-	TaxAmount   money.Paise
-	ChargeType  string
-	Rate        json.Number // see PurchaseTaxesAndCharges.Rate
-	Description string
-	GSTTaxType  string
-}
+// SalesTaxesAndCharges is ledger.SalesTaxesAndCharges, the domain form of SalesTaxesAndChargesRaw.
+type SalesTaxesAndCharges = ledger.SalesTaxesAndCharges
 
 // ---- Payment Entry ----
 
@@ -365,25 +266,8 @@ type PaymentEntryRaw struct {
 	References        []PaymentEntryReferenceRaw `json:"references"`
 }
 
-type PaymentEntry struct {
-	Name              string
-	Docstatus         int
-	Company           string
-	PaymentType       string
-	PartyType         string
-	Party             string
-	PartyName         string
-	PaidAmount        money.Paise
-	ReceivedAmount    money.Paise
-	PaidFrom          string
-	PaidTo            string
-	ReferenceNo       string
-	ReferenceDate     time.Time // zero when not set
-	PostingDate       time.Time
-	Remarks           string
-	UnallocatedAmount money.Paise
-	References        []PaymentEntryReference
-}
+// PaymentEntry is ledger.PaymentEntry, the domain form of PaymentEntryRaw.
+type PaymentEntry = ledger.PaymentEntry
 
 type PaymentEntryReferenceRaw struct {
 	Name              string      `json:"name"`
@@ -394,14 +278,8 @@ type PaymentEntryReferenceRaw struct {
 	OutstandingAmount json.Number `json:"outstanding_amount"`
 }
 
-type PaymentEntryReference struct {
-	Name              string
-	ReferenceDoctype  string
-	ReferenceName     string
-	AllocatedAmount   money.Paise
-	TotalAmount       money.Paise
-	OutstandingAmount money.Paise
-}
+// PaymentEntryReference is ledger.PaymentEntryReference, the domain form of PaymentEntryReferenceRaw.
+type PaymentEntryReference = ledger.PaymentEntryReference
 
 // ---- Journal Entry ----
 
@@ -419,19 +297,8 @@ type JournalEntryRaw struct {
 	Accounts    []JournalEntryAccountRaw `json:"accounts"`
 }
 
-type JournalEntry struct {
-	Name        string
-	Docstatus   int
-	Company     string
-	VoucherType string
-	PostingDate time.Time
-	UserRemark  string
-	ChequeNo    string
-	ChequeDate  time.Time // zero when not set
-	TotalDebit  money.Paise
-	TotalCredit money.Paise
-	Accounts    []JournalEntryAccount
-}
+// JournalEntry is ledger.JournalEntry, the domain form of JournalEntryRaw.
+type JournalEntry = ledger.JournalEntry
 
 type JournalEntryAccountRaw struct {
 	Name                    string      `json:"name"`
@@ -448,17 +315,5 @@ type JournalEntryAccountRaw struct {
 	UserRemark              string      `json:"user_remark"`
 }
 
-type JournalEntryAccount struct {
-	Name                    string
-	Account                 string
-	DebitInAccountCurrency  money.Paise
-	CreditInAccountCurrency money.Paise
-	Debit                   money.Paise // company currency, computed by ERPNext on save
-	Credit                  money.Paise // company currency, computed by ERPNext on save
-	PartyType               string
-	Party                   string
-	ReferenceType           string
-	ReferenceName           string
-	CostCenter              string
-	UserRemark              string
-}
+// JournalEntryAccount is ledger.JournalEntryAccount, the domain form of JournalEntryAccountRaw.
+type JournalEntryAccount = ledger.JournalEntryAccount
