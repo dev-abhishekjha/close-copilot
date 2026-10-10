@@ -176,3 +176,8 @@ These are requirements on tickets that already exist. When you spec one of them,
   - The registry turns every MCP tool error into fixed text (`MsgToolError`). This drops the books server's field-named input errors that would let the model correct its arguments. Decide whether to pass the server's fixed per-class text through.
   - Tool `Description`s from the servers go to the model unchanged. They are server-controlled text, which is acceptable only while the servers are first-party.
 - **MCP SDK (from the CC-702 review):** the SDK's server-side output validation decodes generically, so amounts above 2^53 paise are rounded before they leave the books or evidence server. The client decode is exact. This is a theoretical limit (about ₹90 lakh crore); revisit if the servers ever stop validating output through the SDK.
+- **CC-703 (from the CC-709 G5):**
+  - Use the fenced signatures `Finish(ctx, step, ...)` and `FinishWithFindings(ctx, step, ...)`, and treat `ErrStaleAttempt` as "another attempt owns this step".
+  - A genuine NUL or U+FFFD in ERPNext, bank or document text stops a snapshot with `ErrUnstorableContent`. Decide the reader-boundary policy (sanitise, or reject the row with a typed error) and test it.
+  - `llm_calls.cost_usd` is `numeric(10,6)`: rounded to 1e-6 USD, and a cost of 10000 USD or more overflows. Reject negative or out-of-range costs in Go before the insert, and fix the "exact" wording on `store.LLMCall`. Optionally require `kind = 'tool_result'` for the evidence artifacts that `FinishWithFindings` checks.
+- **CC-703 and CC-705 (from the CC-709 G5):** `artifacts.run_id` and `produced_by` keep the first writer, because artifacts are content-addressed. Never use them for tenancy or provenance; use `run_steps.output_refs`.
