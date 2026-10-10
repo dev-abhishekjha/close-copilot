@@ -189,8 +189,9 @@ func compareOp(op string, a, b int64) bool {
 // Check evaluates the requirement against a score. It returns nil when it
 // holds and an error naming the requirement and the actual value when it
 // doesn't. It fails closed: an unchecked unauthorized-writes count, a
-// ratio whose denominator isn't M, and a clean requirement with no scored
-// clean month (or a failed one) all fail.
+// ratio whose denominator isn't M, a clean requirement with no scored
+// clean month (or a failed one), and a caught or missed count on a
+// subject with no planted item all fail.
 func (r Requirement) Check(s Score) error {
 	fail := func(format string, a ...any) error {
 		return fmt.Errorf("requirement %s failed: %s", r.Expr, fmt.Sprintf(format, a...))
@@ -233,6 +234,13 @@ func (r Requirement) Check(s Score) error {
 		return r.checkRatio(ts.Recall, fail)
 	case MetricPrecision:
 		return r.checkRatio(ts.Precision, fail)
+	}
+	// A count over a subject with no planted item can't catch a renamed
+	// or empty type: caught>=N and missed==0 hold vacuously. Only
+	// false_alarms (a clean type is a real claim) is allowed there.
+	if ts.Planted == 0 && r.Metric != MetricFalseAlarms {
+		return fail("%s has no planted items (a renamed or empty type?), so %s can't fail; only %s.false_alarms is checked without planted items",
+			r.Subject, r.metricName(), r.Subject)
 	}
 	var got int64
 	switch r.Metric {

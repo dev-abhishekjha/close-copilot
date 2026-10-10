@@ -264,6 +264,10 @@ type Score struct {
 	UnauthorizedWrites    WritesCheck `json:"unauthorized_writes"`
 
 	Runs RunStats `json:"runs"`
+	// VerifierRejects and Retries sum the runs' failed verdicts and explain
+	// retries (0 without the agent).
+	VerifierRejects int64 `json:"verifier_rejects"`
+	Retries         int64 `json:"retries"`
 
 	Items          []ItemOutcome          `json:"items"`
 	Investigations []InvestigationOutcome `json:"investigations"`
@@ -600,8 +604,15 @@ func reproRun(suite, company, month string) string {
 	return fmt.Sprintf("go run ./cmd/eval run --suite %s --only %s:%s", suite, company, month)
 }
 
-// ScoreMonths scores months already loaded. It does no I/O.
+// ScoreMonths scores months already loaded. It does no I/O. It repeats
+// LoadMonths's checks, so a direct caller can't skip them: a month listed
+// twice, a truth or result for another month, a control flag that
+// differs between the manifest, the truth's clean flag and the result,
+// and a month with no result that isn't marked failed are errors.
 func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
+	if err := checkMonths(months); err != nil {
+		return Score{}, err
+	}
 	s := Score{
 		Suite:                 man.Suite.Name,
 		Commit:                man.Commit,
@@ -641,6 +652,8 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 			s.Runs.Tokens.Input += m.Result.Tokens.Input
 			s.Runs.Tokens.Output += m.Result.Tokens.Output
 			s.Runs.Tokens.CacheRead += m.Result.Tokens.CacheRead
+			s.VerifierRejects += m.Result.VerifierRejects
+			s.Retries += m.Result.Retries
 		}
 		if e.Control {
 			s.Clean.Months++
@@ -648,13 +661,14 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 
 		if m.failed() {
 			status, reason := e.Status, e.Reason
-			if m.Result != nil {
-				status, reason = m.Result.Status, joinText(m.Result.Reason, m.Result.Error)
-			}
 			evidence := m.ResultPath
 			if evidence == "" {
 				evidence = ManifestFile + "#" + monthKey
 			}
+			if m.Result != nil {
+				status, reason = m.Result.Status, joinText(m.Result.Reason, m.Result.Error)
+			}
+			reason = RunErrorText(reason, evidence)
 			s.FailedRuns = append(s.FailedRuns, RunRef{Company: e.Company, Month: e.Month, Control: e.Control,
 				Status: status, Reason: reason, Repro: repro, Evidence: evidence})
 			if e.Control {
@@ -789,6 +803,70 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 
 	sortOutcomes(&s)
 	return s, nil
+}
+
+// checkMonths is LoadMonths's consistency checks on loaded months.
+func checkMonths(months []MonthInput) error {
+	var errs []error
+	seen := map[string]bool{}
+	for i, m := range months {
+		e := m.Entry
+		field := fmt.Sprintf("months[%d] %s %s", i, e.Company, e.Month)
+		key := e.Company + "-" + e.Month
+		switch {
+		case seen[key]:
+			errs = append(errs, fmt.Errorf("%s: listed twice", field))
+			continue
+		case m.Truth.Company != e.Company || m.Truth.Month != e.Month:
+			errs = append(errs, fmt.Errorf("%s: truth %s holds %s %s", field, m.TruthPath, m.Truth.Company, m.Truth.Month))
+		case e.Control != m.Truth.Clean:
+			errs = append(errs, fmt.Errorf("%s: control %t in the manifest but clean %t in its truth %s", field, e.Control, m.Truth.Clean, m.TruthPath))
+		}
+		seen[key] = true
+		switch r := m.Result; {
+		case r == nil && !e.Failed:
+			errs = append(errs, fmt.Errorf("%s: no result and not marked failed", field))
+		case r == nil:
+		case r.Company != e.Company || r.Month != e.Month:
+			errs = append(errs, fmt.Errorf("%s: result %s holds %s %s", field, m.ResultPath, r.Company, r.Month))
+		case r.Control != e.Control:
+			errs = append(errs, fmt.Errorf("%s: result %s has control %t but the manifest has %t", field, m.ResultPath, r.Control, e.Control))
+		}
+	}
+	if err := errors.Join(errs...); err != nil {
+		return fmt.Errorf("evals: score: %w", err)
+	}
+	return nil
+}
+
+// maxReasonRunes caps a run's error text in score.json and score.md.
+const maxReasonRunes = 200
+
+var (
+	urlTextRe   = regexp.MustCompile(`[A-Za-z][A-Za-z0-9+.-]*://[^\s<>()\[\]"'\x60]+`)
+	credTextRe  = regexp.MustCompile(`[^\s:@/'"]+:[^\s@/'"]+@[^\s/'"]+`)
+	passwordKV  = regexp.MustCompile(`(?i)(password|passwd|pwd)=\S+`)
+	redactedURL = "[redacted-url]"
+)
+
+// RunErrorText makes a run's error text safe for a report: anything
+// URL-like or DSN-like (scheme://..., user:pass@host, password=...)
+// becomes [redacted-url], the text is capped at 200 runes, and it ends
+// with a pointer to the file that holds the run's full result.
+func RunErrorText(text, pointer string) string {
+	if text == "" {
+		return ""
+	}
+	t := urlTextRe.ReplaceAllString(text, redactedURL)
+	t = credTextRe.ReplaceAllString(t, redactedURL)
+	t = passwordKV.ReplaceAllString(t, redactedURL)
+	if r := []rune(t); len(r) > maxReasonRunes {
+		t = string(r[:maxReasonRunes]) + "..."
+	}
+	if pointer != "" {
+		t += " (full text: " + pointer + ")"
+	}
+	return t
 }
 
 func falseAlarm(e ManifestEntry, f store.Finding, reason, repro, resultPath string) FalseAlarm {

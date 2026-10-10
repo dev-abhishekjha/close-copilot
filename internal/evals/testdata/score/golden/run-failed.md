@@ -16,6 +16,8 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 | Unscored findings | 0 |
 | Clean-month false alarms | 0 (1 clean months, 0 failed) |
 | Verified rate | 0/0 (n/a) |
+| Verifier rejects | 0 |
+| Explain retries | 0 |
 | Investigation accuracy | not measured: no investigator \(CC-706\) |
 | Unauthorized writes | not measured: audit decorator \(CC-504a\) and ERPNext external-ID check not built |
 

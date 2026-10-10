@@ -724,3 +724,55 @@ func TestScoreUnfinishedStatusIsFailed(t *testing.T) {
 		t.Fatalf("failed %+v", s.FailedRuns)
 	}
 }
+
+// TestScoreMonthsDirectCallChecks: ScoreMonths repeats LoadMonths's
+// consistency checks, so a direct caller can't skip them.
+func TestScoreMonthsDirectCallChecks(t *testing.T) {
+	ok := func() (MonthInput, MonthInput) {
+		return monthIn("sharma", "2026-09", false, threeCharges()), monthIn("sharma", "2026-08", true, GroundTruth{Clean: true})
+	}
+	for name, tt := range map[string]struct {
+		edit func(m, c *MonthInput) []MonthInput
+		want string
+	}{
+		"control month with unclean truth":  {func(m, c *MonthInput) []MonthInput { c.Truth.Clean = false; return []MonthInput{*m, *c} }, "control true in the manifest but clean false"},
+		"clean truth on an evaluated month": {func(m, c *MonthInput) []MonthInput { m.Truth.Clean = true; return []MonthInput{*m, *c} }, "control false in the manifest but clean true"},
+		"result control differs":            {func(m, c *MonthInput) []MonthInput { c.Result.Control = false; return []MonthInput{*m, *c} }, "has control false but the manifest has true"},
+		"result for another month":          {func(m, c *MonthInput) []MonthInput { m.Result.Month = "2026-07"; return []MonthInput{*m, *c} }, "holds sharma 2026-07"},
+		"truth for another month":           {func(m, c *MonthInput) []MonthInput { m.Truth.Month = "2026-07"; return []MonthInput{*m, *c} }, "truth t/sharma-2026-09.json holds sharma 2026-07"},
+		"month listed twice":                {func(m, c *MonthInput) []MonthInput { return []MonthInput{*m, *m, *c} }, "listed twice"},
+		"no result, not failed":             {func(m, c *MonthInput) []MonthInput { m.Result = nil; return []MonthInput{*m, *c} }, "no result and not marked failed"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			m, c := ok()
+			_, err := ScoreMonths(testManifest(), tt.edit(&m, &c))
+			if err == nil || !strings.Contains(err.Error(), tt.want) {
+				t.Errorf("ScoreMonths = %v, want %q", err, tt.want)
+			}
+		})
+	}
+	m, c := ok()
+	m.Result, m.Entry.Failed = nil, true // a failed month with no result is fine
+	if _, err := ScoreMonths(testManifest(), []MonthInput{m, c}); err != nil {
+		t.Errorf("failed month without a result: %v", err)
+	}
+}
+
+func TestScoreMonthsVerifierSums(t *testing.T) {
+	m := monthIn("sharma", "2026-09", false, threeCharges())
+	m.Result.VerifierRejects, m.Result.Retries = 3, 2
+	c := monthIn("sharma", "2026-08", true, GroundTruth{Clean: true})
+	c.Result.VerifierRejects, c.Result.Retries = 1, 1
+	s := mustScore(t, m, c)
+	if s.VerifierRejects != 4 || s.Retries != 3 {
+		t.Errorf("verifier rejects %d retries %d", s.VerifierRejects, s.Retries)
+	}
+	md := RenderReport(s)
+	if !strings.Contains(md, "| Verifier rejects | 4 |") || !strings.Contains(md, "| Explain retries | 3 |") {
+		t.Errorf("score.md lacks the verifier counts:\n%s", md)
+	}
+	b, _ := marshalSorted(s)
+	if !strings.Contains(string(b), `"verifier_rejects": 4`) || !strings.Contains(string(b), `"retries": 3`) {
+		t.Errorf("score.json lacks the verifier counts")
+	}
+}

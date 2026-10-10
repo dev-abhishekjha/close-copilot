@@ -4,6 +4,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -65,9 +66,16 @@ func TestBaselineWriteAndLoad(t *testing.T) {
 	if err := WriteBaseline(path, b); err != nil {
 		t.Fatal(err)
 	}
-	got, err := LoadBaseline(path)
+	f, err := LoadBaseline(path)
 	if err != nil {
 		t.Fatal(err)
+	}
+	got, err := f.Section(false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.Section(true); !errors.Is(err, ErrBaselineTier) {
+		t.Errorf("llm section of a replay-only file = %v", err)
 	}
 	if got.Items["sharma-2026-09/E01"] != OutcomeCaught || got.Aggregates.Types[bc].Caught != 3 {
 		t.Errorf("loaded %+v", got)
@@ -98,12 +106,15 @@ func TestBaselinePricingVersion(t *testing.T) {
 func TestBaselineLoadErrors(t *testing.T) {
 	dir := t.TempDir()
 	for name, body := range map[string]string{
-		"malformed.json": `{"version":1,`,
-		"unknown.json":   `{"version":1,"suite":"suite-test","items":{},"bogus":1}`,
-		"version.json":   `{"version":2,"suite":"suite-test","items":{}}`,
-		"noitems.json":   `{"version":1,"suite":"suite-test"}`,
-		"nosuite.json":   `{"version":1,"items":{}}`,
-		"trailing.json":  `{"version":1,"suite":"suite-test","items":{}} {}`,
+		"malformed.json":   `{"version":2,`,
+		"unknown.json":     `{"version":2,"tiers":{"replay":{"suite":"suite-test","items":{},"bogus":1}}}`,
+		"unknowntier.json": `{"version":2,"tiers":{"tier3":{"suite":"suite-test","items":{}}}}`,
+		"version1.json":    `{"version":1,"suite":"suite-test","items":{}}`,
+		"noitems.json":     `{"version":2,"tiers":{"replay":{"suite":"suite-test"}}}`,
+		"nosuite.json":     `{"version":2,"tiers":{"replay":{"items":{}}}}`,
+		"agentflag.json":   `{"version":2,"tiers":{"replay":{"suite":"suite-test","agent":true,"items":{}}}}`,
+		"llmflag.json":     `{"version":2,"tiers":{"llm":{"suite":"suite-test","agent":false,"items":{}}}}`,
+		"trailing.json":    `{"version":2,"tiers":{}} {}`,
 	} {
 		p := filepath.Join(dir, name)
 		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
@@ -336,5 +347,196 @@ func TestBaselineOutputGuard(t *testing.T) {
 	}
 	if err := WriteScore("tmp/score", s); err != nil {
 		t.Errorf("WriteScore tmp/score: %v", err)
+	}
+}
+
+// TestBaselineTiers round-trips a replay section, then an llm section, in
+// one file, and checks both survive and that version 1 is rejected.
+func TestBaselineTiers(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "candidate.json")
+	replay, err := NewBaseline(scoreDir(t, "run-pass"), nil, "p1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteBaseline(path, replay); err != nil {
+		t.Fatal(err)
+	}
+	llmScore := scoreDir(t, "run-miss")
+	llmScore.Agent = true
+	llmScore.Models = ScoreModels{Fast: "haiku-x", Strong: "sonnet-x"}
+	llm, err := NewBaseline(llmScore, nil, "p2")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := WriteBaseline(path, llm); err != nil {
+		t.Fatal(err)
+	}
+	f, err := LoadBaseline(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := f.Section(false)
+	if err != nil || r.Agent || r.PricingVersion != "p1" || r.Items["sharma-2026-09/E02"] != OutcomeCaught {
+		t.Errorf("replay section %+v, %v", r, err)
+	}
+	l, err := f.Section(true)
+	if err != nil || !l.Agent || l.PricingVersion != "p2" || l.Items["sharma-2026-09/E02"] != OutcomeMissed || l.Models.Fast != "haiku-x" {
+		t.Errorf("llm section %+v, %v", l, err)
+	}
+	if f.Version != BaselineVersion || BaselineVersion != 2 {
+		t.Errorf("version %d", f.Version)
+	}
+
+	// Replacing the replay section again keeps the llm one.
+	replay.PricingVersion = "p3"
+	if err := WriteBaseline(path, replay); err != nil {
+		t.Fatal(err)
+	}
+	f, _ = LoadBaseline(path)
+	if r, _ := f.Section(false); r.PricingVersion != "p3" {
+		t.Errorf("replay not replaced: %+v", r)
+	}
+	if l, err := f.Section(true); err != nil || l.PricingVersion != "p2" {
+		t.Errorf("llm section lost: %+v, %v", l, err)
+	}
+
+	// A version 1 file is neither read nor overwritten.
+	v1 := filepath.Join(t.TempDir(), "v1.json")
+	if err := os.WriteFile(v1, []byte(`{"version":1,"suite":"suite-test","items":{"sharma-2026-09/E01":"caught"}}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := LoadBaseline(v1); err == nil || !strings.Contains(err.Error(), "version 1") {
+		t.Errorf("version 1 = %v", err)
+	}
+	if err := WriteBaseline(v1, replay); err == nil {
+		t.Error("a version 1 file was overwritten")
+	}
+}
+
+func TestCompareTierMissing(t *testing.T) {
+	pass := scoreDir(t, "run-pass")
+	b, _ := NewBaseline(pass, nil, "")
+	f := BaselineFile{Version: BaselineVersion}
+	f.Set(b)
+	c, err := CompareTier(f, pass)
+	if err != nil || len(c.Failures) != 0 {
+		t.Errorf("replay tier = %+v, %v", c, err)
+	}
+	llm := pass
+	llm.Agent = true
+	c, err = CompareTier(f, llm)
+	if err != nil || len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing || c.Failures[0].Key != TierLLM ||
+		c.Failures[0].Repro == "" || c.Failures[0].Evidence == "" {
+		t.Errorf("missing llm tier = %+v, %v", c, err)
+	}
+	if c, _ := CompareTier(BaselineFile{Version: BaselineVersion}, pass); len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing {
+		t.Errorf("missing replay tier = %+v", c)
+	}
+}
+
+// TestCompareConfig: an empty baseline and an agent or model mismatch
+// fail, for each tier, with repro and evidence.
+func TestCompareConfig(t *testing.T) {
+	for _, agentOn := range []bool{false, true} {
+		t.Run(TierFor(agentOn), func(t *testing.T) {
+			s := scoreDir(t, "run-pass")
+			s.Agent = agentOn
+			b, _ := NewBaseline(s, nil, "")
+			if c, _ := Compare(b, s); len(c.Failures) != 0 {
+				t.Fatalf("same = %+v", c.Failures)
+			}
+			kinds := func(c Comparison) []string {
+				var k []string
+				for _, f := range c.Failures {
+					if f.Repro == "" || f.Evidence == "" {
+						t.Errorf("%s has no repro or evidence", f.Kind)
+					}
+					k = append(k, f.Kind)
+				}
+				return k
+			}
+			empty := b
+			empty.Items = map[string]string{}
+			if c, _ := Compare(empty, s); !slices.Equal(kinds(c), []string{CompareEmptyBaseline}) {
+				t.Errorf("empty = %v", kinds(c))
+			}
+			other := b
+			other.Agent = !agentOn
+			if c, _ := Compare(other, s); !slices.Equal(kinds(c), []string{CompareAgentMismatch}) {
+				t.Errorf("agent mismatch = %v", kinds(c))
+			}
+			models := b
+			models.Models = ScoreModels{Fast: "other-fast", Strong: "other-strong"}
+			c, _ := Compare(models, s)
+			if agentOn && !slices.Equal(kinds(c), []string{CompareModelMismatch, CompareModelMismatch}) {
+				t.Errorf("tier 2 model mismatch = %v", kinds(c))
+			}
+			if !agentOn && len(c.Failures) != 0 {
+				t.Errorf("tier 1 compares models: %v", kinds(c))
+			}
+		})
+	}
+}
+
+func TestCompareLatencyP95(t *testing.T) {
+	b, s := Baseline{}, Score{}
+	at := func(was, now, pct, floor int64) []CompareEntry {
+		b.Aggregates.Runs.DurationMS.P95, s.Runs.DurationMS.P95 = was, now
+		return CompareLatencyP95(b, s, pct, floor)
+	}
+	for _, tt := range []struct {
+		name                 string
+		was, now, pct, floor int64
+		fail                 bool
+	}{
+		{"exactly 25% passes", 8000, 10000, 25, 1000, false},
+		{"25% + 1 ms fails", 8000, 10001, 25, 1000, true},
+		{"under the floor passes", 2000, 2999, 25, 1000, false},
+		{"at the floor, above 25%, fails", 2000, 3000, 25, 1000, true},
+		{"a decrease passes", 8000, 5000, 25, 1000, false},
+		{"no floor", 100, 126, 25, 0, true},
+		{"zero baseline, above the floor", 0, 1000, 25, 1000, true},
+		{"zero baseline, under the floor", 0, 999, 25, 1000, false},
+	} {
+		got := at(tt.was, tt.now, tt.pct, tt.floor)
+		if (len(got) > 0) != tt.fail {
+			t.Errorf("%s: %+v", tt.name, got)
+		}
+		if len(got) > 0 && (got[0].Kind != CompareLatencyIncrease || got[0].Repro == "" || got[0].Evidence == "") {
+			t.Errorf("%s: entry %+v", tt.name, got[0])
+		}
+	}
+}
+
+func TestCompareCost(t *testing.T) {
+	for _, tt := range []struct {
+		name, was, now string
+		fail           bool
+	}{
+		{"exactly 15% passes", "1.00", "1.15", false},
+		{"15% + a hundredth of a cent fails", "1.00", "1.1501", true},
+		{"a decrease passes", "1.00", "0.5", false},
+		{"zero baseline, zero cost passes", "0", "0", false},
+		{"zero baseline, any cost fails", "0", "0.000001", true},
+		{"empty is zero", "", "0", false},
+	} {
+		var b Baseline
+		var s Score
+		b.Aggregates.Runs.CostUSD.Total, s.Runs.CostUSD.Total = tt.was, tt.now
+		got, err := CompareCost(b, s, 15)
+		if err != nil {
+			t.Fatalf("%s: %v", tt.name, err)
+		}
+		if (len(got) > 0) != tt.fail {
+			t.Errorf("%s: %+v", tt.name, got)
+		}
+		if len(got) > 0 && (got[0].Kind != CompareCostIncrease || got[0].Repro == "" || got[0].Evidence == "") {
+			t.Errorf("%s: entry %+v", tt.name, got[0])
+		}
+	}
+	var b Baseline
+	b.Aggregates.Runs.CostUSD.Total = "1e3"
+	if _, err := CompareCost(b, Score{}, 15); err == nil {
+		t.Error("a float cost was accepted")
 	}
 }

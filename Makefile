@@ -111,6 +111,25 @@ ingest: ## Ingest the document corpus (CC-803)
 eval: ## Run and score the eval suite (CC-901, CC-902)
 	$(GO) run ./cmd/eval run --suite $(SUITE)
 
+# Records the books and evidence tool responses of SUITE from the seeded
+# ERPNext into evals/fixtures/SUITE (CC-905). Needs erp-reset, seed and
+# load first, and tmp/erpnext.lock; never run in CI.
+.PHONY: record-fixtures
+record-fixtures: ## Record SUITE's tool responses into evals/fixtures (needs the seeded ERPNext)
+	$(GO) run ./cmd/eval run --record --no-llm --suite $(SUITE)
+
+# Replays SUITE's fixtures without ERPNext or a model (Postgres only, after
+# make up migrate), then scores the run, against evals/baseline.json when
+# it exists.
+.PHONY: eval-replay
+eval-replay: ## Replay SUITE's fixtures without a model (Tier 1) and score the run
+	@out="$$($(GO) run ./cmd/eval run --replay --no-llm --suite $(SUITE))"; rc=$$?; \
+	manifest="$$(printf '%s\n' "$$out" | tail -n 1)"; \
+	if [ ! -f "$$manifest" ]; then echo "eval-replay: no manifest written" >&2; exit 1; fi; \
+	cmp=""; if [ -f evals/baseline.json ]; then cmp="--compare evals/baseline.json"; fi; \
+	$(GO) run ./cmd/eval score "$$(dirname "$$manifest")" $$cmp || exit 1; \
+	exit $$rc
+
 .PHONY: run-agent
 run-agent: ## Run the agent service (CC-703, CC-1001)
 	$(GO) run ./cmd/agent

@@ -47,6 +47,12 @@ type Result struct {
 
 	Commit  string  `json:"commit"`
 	TraceID *string `json:"trace_id"`
+
+	// VerifierRejects counts the verifier's failed verdicts in the run;
+	// Retries counts the explain attempts after a finding's first (each one
+	// follows a reject). Both are 0, and omitted, when the agent was off.
+	VerifierRejects int64 `json:"verifier_rejects,omitempty"`
+	Retries         int64 `json:"retries,omitempty"`
 }
 
 // Tokens are a run's model token totals.
@@ -83,6 +89,11 @@ type Flags struct {
 	ResultsDir   string   `json:"results_dir"`
 	ScenariosDir string   `json:"scenarios_dir"`
 	ConfigDir    string   `json:"config_dir"`
+	// Replay and Record are eval run --replay and --record; FixturesDir is
+	// their --fixtures-dir. Omitted for a live run.
+	Replay      bool   `json:"replay,omitempty"`
+	Record      bool   `json:"record,omitempty"`
+	FixturesDir string `json:"fixtures_dir,omitempty"`
 }
 
 // ManifestSuite identifies the suite file a run used.
@@ -115,6 +126,10 @@ type Manifest struct {
 	FinishedAt time.Time       `json:"finished_at"`
 	Results    []ManifestEntry `json:"results"`
 	Failed     int             `json:"failed"`
+	// FixturesIndexSHA256 is the sha256 of the fixtures index a replay
+	// served; omitted for a live or recording run. The scorer never reads
+	// the fixtures themselves.
+	FixturesIndexSHA256 string `json:"fixtures_index_sha256,omitempty"`
 }
 
 // marshalSorted encodes v as JSON with every object's keys sorted and a

@@ -2,6 +2,7 @@ package evals
 
 import (
 	"fmt"
+	"path/filepath"
 	"slices"
 	"strings"
 )
@@ -26,6 +27,7 @@ func RenderReport(s Score) string {
 		s.Overall.Findings, s.Overall.FalseAlarms, s.Overall.Unscored)
 	w("| Clean-month false alarms | %d (%d clean months, %d failed) |\n", s.Clean.FalseAlarms, s.Clean.Months, s.Clean.FailedMonths)
 	w("| Verified rate | %s |\n", s.VerifiedRate)
+	w("| Verifier rejects | %d |\n| Explain retries | %d |\n", s.VerifierRejects, s.Retries)
 	w("| Investigation accuracy | %s |\n", unmeasured(s.InvestigationAccuracy.Measured, s.InvestigationAccuracy.Reason, ""))
 	writes := ""
 	if s.UnauthorizedWrites.Count != nil {
@@ -120,6 +122,91 @@ func RenderReport(s Score) string {
 			mdCell(orDash(r.Reason)), mdCode(r.Evidence), mdCode(r.Repro))
 	}
 	return b.String()
+}
+
+// SummaryFile is the gate summary eval score writes next to score.md, for
+// $GITHUB_STEP_SUMMARY.
+const SummaryFile = "summary.md"
+
+// Summary is what eval score checked beyond the score itself.
+type Summary struct {
+	// Requirements are the failed --require checks.
+	Requirements []string
+	// Compare is the comparison; nil when no --compare was given.
+	Compare *Comparison
+	// Notes say which rules were skipped and why.
+	Notes []string
+}
+
+// Failed reports whether any requirement or comparison failed.
+func (sm Summary) Failed() bool {
+	return len(sm.Requirements) > 0 || (sm.Compare != nil && len(sm.Compare.Failures) > 0)
+}
+
+// RenderSummary renders summary.md: the gate's verdict, every comparison
+// failure with its item, outcome, repro and evidence, the failed
+// requirements, the skipped rules, then score.md.
+func RenderSummary(s Score, sm Summary) string {
+	var b strings.Builder
+	w := func(format string, a ...any) { fmt.Fprintf(&b, format, a...) }
+	verdict := "PASS"
+	if sm.Failed() {
+		verdict = "FAIL"
+	}
+	w("# Eval gate (G4): %s\n\n", verdict)
+	w("Suite %s, agent %t (baseline tier %s).\n\n", mdCell(s.Suite), s.Agent, TierFor(s.Agent))
+
+	w("## Comparison with the baseline\n\n")
+	switch {
+	case sm.Compare == nil:
+		w("Not compared (no --compare).\n\n")
+	case len(sm.Compare.Failures) == 0:
+		w("No regressions.\n\n")
+	default:
+		w("| Item | Failure | Was | Now | Detail | Repro | Evidence |\n| --- | --- | --- | --- | --- | --- | --- |\n")
+		for _, e := range sm.Compare.Failures {
+			w("| %s | %s | %s | %s | %s | `%s` | `%s` |\n", mdCell(e.Key), mdCell(e.Kind), mdCell(orDash(e.Was)), mdCell(orDash(e.Now)),
+				mdCell(strings.TrimSpace(e.Detail)), mdCode(e.Repro), mdCode(e.Evidence))
+		}
+		w("\n")
+	}
+	if sm.Compare != nil && len(sm.Compare.New) > 0 {
+		w("New since the baseline (not failures):\n\n")
+		for _, e := range sm.Compare.New {
+			w("- %s: %s\n", mdCell(e.Key), mdCell(e.Now))
+		}
+		w("\n")
+	}
+
+	w("## Requirements\n\n")
+	if len(sm.Requirements) == 0 {
+		w("None failed.\n\n")
+	}
+	for _, r := range sm.Requirements {
+		w("- %s\n", mdCell(r))
+	}
+	if len(sm.Requirements) > 0 {
+		w("\n")
+	}
+	if len(sm.Notes) > 0 {
+		w("## Skipped rules\n\n")
+		for _, n := range sm.Notes {
+			w("- %s\n", mdCell(n))
+		}
+		w("\n")
+	}
+	w("---\n\n")
+	b.WriteString(RenderReport(s))
+	return b.String()
+}
+
+// WriteSummary writes summary.md into dir, atomically. It refuses a dir
+// CheckOutputPath refuses.
+func WriteSummary(dir string, s Score, sm Summary) error {
+	if err := CheckOutputPath("score --out", dir); err != nil {
+		return err
+	}
+	return writeFileAtomic(filepath.Join(dir, SummaryFile), []byte(RenderSummary(s, sm)))
 }
 
 func unmeasured(ok bool, reason, value string) string {

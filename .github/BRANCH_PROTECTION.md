@@ -19,9 +19,20 @@ to date before merging:
 | `gates (G1 declared files, task graph, analyzers)` | `gates.yml` | `gates` |
 | `build, vet, lint, test` | `ci.yml` | `check` |
 | `integration tests` | `ci.yml` | `integration` |
+| `eval (G4)` | `eval.yml` | `eval` |
 
 No job in these workflows has an `if:` and none is skipped on any event, so
 a required check is never satisfied by a skipped run.
+
+`eval (G4)` (CC-905) becomes a required check in GitHub only after the
+owner's first `baseline-update` commit adds `evals/baseline.json`; until
+then it fails closed on every eval-relevant pull request, by design. Its
+steps pick the tier: Tier 1 (replay, no model, no secret) on pull
+requests that touch eval-relevant paths, a passing note otherwise, and
+Tier 2 (the model, `ANTHROPIC_API_KEY`) only on the nightly schedule and
+on `workflow_dispatch`, never on `pull_request`. Its scorer is built from
+the base ref, so a change to `eval score`'s flags lands in two pull
+requests, as with the gate binaries below.
 
 ## Reviews
 

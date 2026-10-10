@@ -555,3 +555,31 @@ func TestWriteFileAtomic(t *testing.T) {
 		t.Error("write into a missing folder succeeded")
 	}
 }
+
+// TestRunnerVerifierCounts: a verify step's earlier attempts are rejects,
+// a done step with a reason is a last-attempt reject, and every explain
+// attempt after the first is a retry.
+func TestRunnerVerifierCounts(t *testing.T) {
+	reason := "V_AMOUNT after 3 explain attempts"
+	empty := ""
+	steps := []store.Step{
+		{Kind: store.StepKindExplain, Status: store.StepDone, Attempt: 1},                // passed first time
+		{Kind: store.StepKindVerify, Status: store.StepDone, Attempt: 1},                 // passed
+		{Kind: store.StepKindExplain, Status: store.StepDone, Attempt: 2},                // one retry
+		{Kind: store.StepKindVerify, Status: store.StepDone, Attempt: 2, Error: &empty},  // one reject, then passed
+		{Kind: store.StepKindExplain, Status: store.StepDone, Attempt: 3},                // two retries
+		{Kind: store.StepKindVerify, Status: store.StepDone, Attempt: 3, Error: &reason}, // three rejects
+		{Kind: "check.bank_rec", Status: store.StepDone, Attempt: 4},                     // not counted
+	}
+	var res Result
+	for _, st := range steps {
+		countVerification(st, &res)
+	}
+	if res.VerifierRejects != 4 || res.Retries != 3 {
+		t.Errorf("rejects %d retries %d, want 4 and 3", res.VerifierRejects, res.Retries)
+	}
+	b, _ := json.Marshal(Result{})
+	if strings.Contains(string(b), "verifier_rejects") {
+		t.Errorf("a result without the agent carries verifier counts: %s", b)
+	}
+}

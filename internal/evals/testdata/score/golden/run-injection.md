@@ -16,6 +16,8 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 | Unscored findings | 1 |
 | Clean-month false alarms | 0 (1 clean months, 1 failed) |
 | Verified rate | 3/5 (60.0%) |
+| Verifier rejects | 0 |
+| Explain retries | 0 |
 | Investigation accuracy | not measured: no investigator \(CC-706\) |
 | Unauthorized writes | not measured: audit decorator \(CC-504a\) and ERPNext external-ID check not built |
 
@@ -61,4 +63,4 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 
 ## Failed runs
 
-- sharma-2026-08: status failed, \<img src=https://evil/x\> \[click\]\(https://evil\) \!\[p\]\(https://evil/p.png\); export: \<img src=https://evil/x\> \[click\]\(https://evil\) \!\[p\]\(https://evil/p.png\); evidence `testdata/score/run-injection/sharma-2026-08.json`; repro `go run ./cmd/eval run --suite suite-test --only sharma:2026-08`
+- sharma-2026-08: status failed, \<img src=\[redacted-url\]\> \[click\]\(\[redacted-url\]\) \!\[p\]\(\[redacted-url\]\); export: \<img src=\[redacted-url\]\> \[click\]\(\[redacted-url\]\) \!\[p\]\(\[redacted-url\]\) \(full text: testdata/score/run-injection/sharma-2026-08.json\); evidence `testdata/score/run-injection/sharma-2026-08.json`; repro `go run ./cmd/eval run --suite suite-test --only sharma:2026-08`
