@@ -181,9 +181,9 @@ func (r Repo) ChangedFiles(ctx context.Context, base string) ([]string, error) {
 	if err != nil {
 		return nil, fmt.Errorf("diff against %s: %w", base, err)
 	}
-	status, err := r.git(ctx, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--no-renames")
+	uncommitted, err := r.UncommittedFiles(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("git status: %w", err)
+		return nil, err
 	}
 	set := make(map[string]bool)
 	for f := range strings.SplitSeq(string(diff), "\x00") {
@@ -191,6 +191,25 @@ func (r Repo) ChangedFiles(ctx context.Context, base string) ([]string, error) {
 			set[f] = true
 		}
 	}
+	for _, f := range uncommitted {
+		set[f] = true
+	}
+	files := make([]string, 0, len(set))
+	for f := range set {
+		files = append(files, f)
+	}
+	slices.Sort(files)
+	return files, nil
+}
+
+// UncommittedFiles returns the staged, unstaged and untracked files, sorted,
+// skipping untracked files under tmp/ as ChangedFiles does.
+func (r Repo) UncommittedFiles(ctx context.Context) ([]string, error) {
+	status, err := r.git(ctx, "status", "--porcelain=v1", "-z", "--untracked-files=all", "--no-renames")
+	if err != nil {
+		return nil, fmt.Errorf("git status: %w", err)
+	}
+	var files []string
 	// Each status entry is "XY path".
 	for entry := range strings.SplitSeq(string(status), "\x00") {
 		if len(entry) <= 3 {
@@ -200,11 +219,9 @@ func (r Repo) ChangedFiles(ctx context.Context, base string) ([]string, error) {
 		if strings.HasPrefix(entry, "??") && (f == "tmp" || strings.HasPrefix(f, "tmp/")) {
 			continue
 		}
-		set[f] = true
-	}
-	files := make([]string, 0, len(set))
-	for f := range set {
-		files = append(files, f)
+		if !slices.Contains(files, f) {
+			files = append(files, f)
+		}
 	}
 	slices.Sort(files)
 	return files, nil
@@ -217,6 +234,15 @@ func (r Repo) ShortCommit(ctx context.Context) string {
 		return ""
 	}
 	return strings.TrimSpace(string(out))
+}
+
+// Head returns HEAD's full commit hash.
+func (r Repo) Head(ctx context.Context) (string, error) {
+	out, err := r.git(ctx, "rev-parse", "--verify", "HEAD^{commit}")
+	if err != nil {
+		return "", fmt.Errorf("resolve HEAD: %w", err)
+	}
+	return strings.TrimSpace(string(out)), nil
 }
 
 // Commit is one commit on a ticket branch.
@@ -275,9 +301,10 @@ func (r Repo) FileAt(ctx context.Context, rev, path string) ([]byte, bool, error
 }
 
 // PinnedSpec returns the version of specs/<id>.md that a ticket branch may
-// not loosen: the one on base when it exists there, otherwise the one in the
-// branch's first commit whose subject is "<id>: spec". from names the
-// version for messages; found is false when there is neither.
+// not change: the one on base when it exists there, otherwise the one in the
+// branch's first commit whose subject is "<id>: spec" (commits come oldest
+// first, as BranchCommits returns them), never the branch tip. from names
+// the version for messages; found is false when there is neither.
 func (r Repo) PinnedSpec(ctx context.Context, base, id string, commits []Commit) (data []byte, from string, found bool, err error) {
 	path := "specs/" + id + ".md"
 	data, found, err = r.FileAt(ctx, base, path)

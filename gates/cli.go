@@ -208,9 +208,9 @@ func RunReady(ctx context.Context, env Env, args []string) int {
 // `declared --spec <spec> [--base main] [--report path]`. Besides the files
 // themselves it checks that the spec's id matches its file name, that the
 // branch is named for the spec's ticket, that every commit subject on the
-// branch starts with "<ID>:", and that the branch has not changed the
-// spec's files, risk or approved_by against its pinned version (see
-// Repo.PinnedSpec). The branch name comes from $GITHUB_HEAD_REF in CI and
+// branch starts with "<ID>:", and that the branch has not changed any
+// front-matter field of the spec against its pinned version (see
+// Repo.PinnedSpec and SpecPinProblems). The branch name comes from $GITHUB_HEAD_REF in CI and
 // from HEAD locally.
 func RunDeclared(ctx context.Context, env Env, args []string) int {
 	c := newCommand(env, "declared", args)
@@ -276,7 +276,7 @@ func RunDeclared(ctx context.Context, env Env, args []string) int {
 	case !found:
 		problems = append(problems, Problem{
 			Check: "spec_pin",
-			Message: fmt.Sprintf("specs/%s.md is not on %s and no commit on the branch has the subject %q, so its files, risk and approved_by are not pinned; commit the spec first as %q",
+			Message: fmt.Sprintf("specs/%s.md is not on %s and no commit on the branch has the subject %q, so its front matter is not pinned; commit the spec first as %q",
 				s.ID, *c.base, s.ID+": spec", s.ID+": spec"),
 			Evidence: fmt.Sprintf("git log %s..HEAD --format=%%s", *c.base),
 		})
@@ -289,18 +289,25 @@ func RunDeclared(ctx context.Context, env Env, args []string) int {
 }
 
 // RunProtected is G1's protected-path check:
-// `protected [--base main] [--labels a,b] [--task CC-xxx] [--report path]`.
-// Labels come from --labels and, in CI, from $GITHUB_EVENT_PATH.
+// `protected [--base main] [--labels a,b] [--approved-sha <sha>] [--task CC-xxx] [--report path]`.
+// Labels come from --labels and, in CI, from $GITHUB_EVENT_PATH. A
+// protected change passes only with the approved label and an approved SHA
+// equal to HEAD: the approval covers exactly the commit the owner reviewed.
+// A changed path that is not printable ASCII always fails.
 func RunProtected(ctx context.Context, env Env, args []string) int {
 	c := newCommand(env, "protected", args)
 	labelsFlag := c.fs.String("labels", "", "comma-separated pull request labels")
+	approvedSHA := c.fs.String("approved-sha", "", "full hash of the head commit the owner approved; empty means not approved")
 	task := c.fs.String("task", "", "ticket ID, recorded in the report")
 	pos, err := c.parse(args)
 	if err != nil {
 		return c.usage(err)
 	}
 	if len(pos) != 0 {
-		return c.usage(errors.New("usage: protected [--base main] [--labels approved]"))
+		return c.usage(errors.New("usage: protected [--base main] [--labels approved] [--approved-sha <sha>]"))
+	}
+	if err := ValidApprovedSHA(*approvedSHA); err != nil {
+		return c.usage(err)
 	}
 	// In CI the owner's approval is a pull request label; a flag on the
 	// command line would let the workflow approve itself.
@@ -321,21 +328,29 @@ func RunProtected(ctx context.Context, env Env, args []string) int {
 	r.Commit = repo.ShortCommit(ctx)
 	r.Attempt = *c.attempt
 
+	head, err := repo.Head(ctx)
+	if err != nil {
+		return c.fail("head commit", err)
+	}
 	changed, err := repo.ChangedFiles(ctx, *c.base)
 	if err != nil {
 		return c.fail("changed files", err)
+	}
+	uncommitted, err := repo.UncommittedFiles(ctx)
+	if err != nil {
+		return c.fail("uncommitted files", err)
 	}
 	hits, err := ProtectedChanges(changed)
 	if err != nil {
 		return c.fail("protected paths", err)
 	}
-	problems, err := ProtectedProblems(changed, labels)
+	problems, err := ProtectedProblems(changed, Approval{Labels: labels, SHA: *approvedSHA, Head: head, Uncommitted: uncommitted})
 	if err != nil {
 		return c.fail("protected paths", err)
 	}
 	detail := "no protected path changed"
 	if len(hits) > 0 {
-		detail = fmt.Sprintf("%d protected files changed, %q label present", len(hits), ApprovedLabel)
+		detail = fmt.Sprintf("%d protected files changed, %q label present and approved at %s", len(hits), ApprovedLabel, shortHash(head))
 	}
 	return c.finish(r, problems, detail)
 }

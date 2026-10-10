@@ -1,9 +1,9 @@
 // Command declared is gate G1's declared-files check: every changed file
 // matches a files glob of the spec, no other ticket's spec changes, the
 // spec's id matches its file name and the branch name, every commit subject
-// on the branch starts with "<ID>:", and the spec's files, risk and
-// approved_by are unchanged since they were pinned (on --base, or in the
-// branch's "<ID>: spec" commit).
+// on the branch starts with "<ID>:", and every front-matter field of the
+// spec is unchanged since it was pinned (on --base, or in the branch's first
+// "<ID>: spec" commit).
 //
 //	go run ./gates/cmd/declared --spec specs/CC-xxx.md [--base main] [--report path]
 //

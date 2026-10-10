@@ -328,7 +328,7 @@ func TestSpecPinProblems(t *testing.T) {
 	}{
 		{"same", func(*Spec) {}, nil},
 		{"reordered", func(s *Spec) { s.Files = []string{"b.go", "a/**"} }, nil},
-		{"title is free", func(s *Spec) { s.Title = "x" }, nil},
+		{"title is pinned too", func(s *Spec) { s.Title = "x" }, []string{"x#title"}},
 		{"added file", func(s *Spec) { s.Files = append(s.Files, "c.go") }, []string{"x#files"}},
 		{"removed file", func(s *Spec) { s.Files = s.Files[:1] }, []string{"x#files"}},
 		{"risk", func(s *Spec) { s.Risk = RiskRegulated }, []string{"x#risk"}},
@@ -386,16 +386,20 @@ func TestRunProtected(t *testing.T) {
 		change   func(r *testRepo)
 		env      func(t *testing.T) map[string]string
 		args     []string
+		atHead   bool // pass --approved-sha with HEAD's hash
 		wantCode int
 		want     []string
 	}{
 		{name: "baseline without the label fails", change: editBaseline, wantCode: ExitFail, want: []string{"evals/baseline.json"}},
-		{name: "baseline with --labels approved passes", change: editBaseline, args: []string{"--labels", "approved"}, wantCode: ExitPass},
+		{name: "baseline with --labels approved at the head passes", change: editBaseline, args: []string{"--labels", "approved"}, atHead: true, wantCode: ExitPass},
+		{name: "baseline with --labels approved but no approved SHA fails", change: editBaseline, args: []string{"--labels", "approved"}, wantCode: ExitFail, want: []string{"evals/baseline.json"}},
 		{name: "another label is not approval", change: editBaseline, args: []string{"--labels", "ready, approved-ish"}, wantCode: ExitFail, want: []string{"evals/baseline.json"}},
-		{name: "label in a list", change: editBaseline, args: []string{"--labels", "wip,approved"}, wantCode: ExitPass},
+		{name: "label in a list", change: editBaseline, args: []string{"--labels", "wip,approved"}, atHead: true, wantCode: ExitPass},
+		{name: "approved SHA without the label fails", change: editBaseline, atHead: true, wantCode: ExitFail, want: []string{"evals/baseline.json"}},
 		{
 			name: "label from the GitHub event payload", change: editBaseline,
 			env:      func(t *testing.T) map[string]string { return eventWith(t, `{"name":"bug"},{"name":"approved"}`) },
+			atHead:   true,
 			wantCode: ExitPass,
 		},
 		{
@@ -428,6 +432,7 @@ func TestRunProtected(t *testing.T) {
 				env["GITHUB_ACTIONS"] = "true"
 				return env
 			},
+			atHead:   true,
 			wantCode: ExitPass,
 		},
 		{
@@ -438,9 +443,10 @@ func TestRunProtected(t *testing.T) {
 				r.write("internal/mcpkit/auth_token.go", "package mcpkit\n")
 				r.write("internal/mcpkit/server.go", "package mcpkit\n")
 				r.write("CLAUDE.md", "x\n")
+				r.write(".golangci.yml", "version: \"2\"\n")
 			},
 			wantCode: ExitFail,
-			want:     []string{".github/CODEOWNERS", "CLAUDE.md", "gates/x.go", "internal/mcpkit/auth_token.go"},
+			want:     []string{".github/CODEOWNERS", ".golangci.yml", "CLAUDE.md", "gates/x.go", "internal/mcpkit/auth_token.go"},
 		},
 	}
 	for _, tt := range tests {
@@ -452,6 +458,9 @@ func TestRunProtected(t *testing.T) {
 				env = tt.env(t)
 			}
 			args := append([]string{"--base", "main"}, tt.args...)
+			if tt.atHead {
+				args = append(args, "--approved-sha", strings.TrimSpace(r.git("rev-parse", "HEAD")))
+			}
 			res := r.runCmd(RunProtected, env, args...)
 			if res.code != tt.wantCode {
 				t.Fatalf("exit %d, want %d\nstdout: %s\nstderr: %s", res.code, tt.wantCode, res.stdout, res.stderr)

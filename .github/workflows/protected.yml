@@ -1,0 +1,84 @@
+name: protected
+
+# G1's protected-path gate. It runs on label events as well as pushes, and
+# on `edited` (how GitHub reports a changed base branch), so it lives apart
+# from ci.yml: its runs cancel only each other, never check or
+# integration. It is never skipped; every run judges the current head.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled, edited]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: protected-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  protected:
+    name: protected paths (G1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE: ${{ github.event.pull_request.base.sha }}
+    steps:
+      # The gate code comes from the base ref, never from the pull request
+      # (CC-004); gates/ci_test.go asserts this shape.
+      - name: check out the base ref (the gate code)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: base
+          persist-credentials: false
+      - name: check out the pull request head (the tree under test)
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+          fetch-depth: 0
+          persist-credentials: false
+      # No cache: a cache saved by the PR's own jobs could hand the base
+      # build planted objects.
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: base/go.mod
+          cache: false
+      - name: build the gates from the base ref
+        working-directory: base
+        run: |
+          go mod verify
+          mkdir -p "$RUNNER_TEMP/gates"
+          go build -o "$RUNNER_TEMP/gates/" ./gates/cmd/...
+      # The approval covers exactly the head the owner reviewed: only the
+      # event that applies the approved label approves, and only at the head
+      # SHA in that event's payload. Any later push (synchronize), other
+      # label event or edit (including a base change) runs with no approved
+      # SHA, so a protected change fails until the owner applies the label
+      # again.
+      - name: head SHA the owner approved
+        id: approval
+        env:
+          ACTION: ${{ github.event.action }}
+          LABEL: ${{ github.event.label.name }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          sha=""
+          if [ "$ACTION" = "labeled" ] && [ "$LABEL" = "approved" ]; then
+            sha="$HEAD_SHA"
+          fi
+          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+      - name: ticket ID from branch name
+        id: ticket
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+        run: |
+          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p')"
+          echo "id=$id" >>"$GITHUB_OUTPUT"
+      # Labels are read from the event payload at $GITHUB_EVENT_PATH.
+      - name: protected paths (G1)
+        working-directory: pr
+        env:
+          TASK: ${{ steps.ticket.outputs.id }}
+          APPROVED_SHA: ${{ steps.approval.outputs.sha }}
+        run: '"$RUNNER_TEMP/gates/protected" --base "$BASE" --task "$TASK" --approved-sha "$APPROVED_SHA"'

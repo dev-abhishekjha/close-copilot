@@ -1,6 +1,7 @@
 # Protected paths (CLAUDE.md, gates.ProtectedPaths). A change to any of them
-# needs the owner's review and the `approved` label; gates/cmd/protected
-# enforces the label and gates/spec_test.go keeps this list in step.
+# needs the owner's review and the `approved` label applied at the head
+# commit; gates/cmd/protected (run by .github/workflows/protected.yml)
+# enforces it and gates/spec_test.go keeps this list in step.
 /evals/golden/                @dev-abhishekjha
 /evals/scenarios/             @dev-abhishekjha
 /evals/baseline.json          @dev-abhishekjha
@@ -9,6 +10,7 @@
 /.claude/                     @dev-abhishekjha
 /docs/                        @dev-abhishekjha
 /CLAUDE.md                    @dev-abhishekjha
+/.golangci.yml                @dev-abhishekjha
 /internal/books/admin.go      @dev-abhishekjha
 /internal/approvals/          @dev-abhishekjha
 /internal/mcpkit/auth*.go     @dev-abhishekjha

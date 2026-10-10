@@ -1,9 +1,12 @@
 // Command protected is gate G1's protected-path check: a protected path
-// changes only with the owner's "approved" label. Paths match ignoring
-// case. In GitHub Actions labels come only from $GITHUB_EVENT_PATH and
-// --labels is refused.
+// changes only with the owner's "approved" label and an approved SHA equal
+// to HEAD, so an approval covers exactly the commit the owner reviewed.
+// Paths match ignoring case, and a changed path that is not printable ASCII
+// always fails. In GitHub Actions labels come only from $GITHUB_EVENT_PATH
+// and --labels is refused; .github/workflows/protected.yml passes the head
+// SHA of the event that applied the label as --approved-sha.
 //
-//	go run ./gates/cmd/protected [--base main] [--labels approved] [--report path]
+//	go run ./gates/cmd/protected [--base main] [--labels approved] [--approved-sha <sha>] [--report path]
 //
 // Exit codes: 0 pass, 1 gate failure (the report JSON is on stdout), 2 bad
 // usage or an I/O error.
