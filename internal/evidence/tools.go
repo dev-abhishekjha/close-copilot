@@ -13,6 +13,7 @@ import (
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/money"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
@@ -60,7 +61,7 @@ type GSTR2BEntryOutput struct {
 
 // RegisterTools registers the evidence MCP tools on the provided MCP server.
 func RegisterTools(server *mcp.Server, st *store.Store) {
-	mcp.AddTool(server, &mcp.Tool{
+	mcpkit.AddTool(server, &mcp.Tool{
 		Name:        "list_bank_lines",
 		Description: "List bank statement lines for a company within a date range, ordered by transaction date and txn_id.",
 		Annotations: &mcp.ToolAnnotations{
@@ -116,7 +117,7 @@ func RegisterTools(server *mcp.Server, st *store.Store) {
 		return nil, out, nil
 	})
 
-	mcp.AddTool(server, &mcp.Tool{
+	mcpkit.AddTool(server, &mcp.Tool{
 		Name:        "list_gstr2b_entries",
 		Description: "List GSTR-2B inward supply entries for a company and return period (YYYY-MM), optionally filtered by supplier GSTIN.",
 		Annotations: &mcp.ToolAnnotations{

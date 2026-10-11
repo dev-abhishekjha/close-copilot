@@ -51,6 +51,7 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 
 	version := buildinfo.Version
 	evidenceServer := mcpkit.NewServer("close-copilot-evidence", version)
+	mcpkit.EnableAudit(evidenceServer, "evidence", st)
 	evidence.RegisterTools(evidenceServer, st)
 
 	switch *transport {
@@ -61,7 +62,7 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		routes := map[string]mcpkit.Route{
 			"/mcp": mcpkit.NewAgentRoute(evidenceServer, cfg),
 		}
-		return mcpkit.ServeHTTP(ctx, *addr, routes, log)
+		return mcpkit.ServeHTTP(ctx, *addr, routes, log, mcpkit.WithActors(map[string]string{"/mcp": "agent"}))
 	default:
 		return fmt.Errorf("mcp-evidence: unknown transport %q (want http or stdio)", *transport)
 	}
