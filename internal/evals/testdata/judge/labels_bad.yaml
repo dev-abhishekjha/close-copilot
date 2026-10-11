@@ -1,0 +1,3 @@
+labels:
+  - item: "bank_charge|txn=T1"
+    verdict: great

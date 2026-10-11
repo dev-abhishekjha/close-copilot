@@ -1,0 +1,11 @@
+labels:
+  - item: "bank_charge|txn=T1"
+    verdict: supported
+  - item: "bank_charge|txn=T2"
+    verdict: partially
+    note: minor unsupported detail
+  - item: "duplicate|inv=I1"
+    verdict: unsupported
+    note: deliberately broken
+  - item: "duplicate|inv=I2"
+    verdict: supported
