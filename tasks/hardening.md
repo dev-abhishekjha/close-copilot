@@ -258,3 +258,13 @@ These are requirements on tickets that already exist. When you spec one of them,
 - **Next ticket that touches `internal/books/testdata/schemas` (from CC-506):** `get_account_history`'s description still says an empty `through_month` defaults to the current month; a scoped call defaults to the run's month.
 - **Owner, before relying on `make test-int` (found in CC-506):** `TestKillResume` (fails at `check.gstr2b` ending failed) and `TestCloseCLI/SIGINT_fails_the_run_as_cancelled` in `cmd/agent` fail the same way on `main` at f3cecc1 without CC-506. The GSTR-2B check likely has a bug on the integration path; no ticket owns it yet.
 - **Next ticket that adds a spec with shell acceptance lines:** quote any acceptance line containing `: ` (such as `grep -e '--- PASS: X'`), or the front matter does not parse and `gates/cmd/declared` fails. `/spec` and `ticket-reviewer` did not catch this in CC-506; add a parse check to G0.
+
+- **CC-706 wiring ticket (from the CC-706 G5 and build):** `cmd/agent/main.go` never sets `Workflow.Investigator` or `Workflow.NewRedactor`, so production runs skip investigation (fails closed). Wire `agent.LLMInvestigator` and a `Redactor` with the fail-closed `PSEUDONYM_KEY` check, then measure the gateway success rate (G4-tier2). `suite-skeleton` as seeded has no `PG SETTL` line, so the baseline needs a month with one. `cmd/eval run` doesn't wire the investigator either.
+- **Next ticket that touches `internal/agent/investigate.go` (from the CC-706 G5):**
+  - Should-fix: add `trdnm` to `droppedFields`; cap `party`, `supplier`, `customer`, `invoice_no`, `inum` and `reference_name` at 140 runes and strip control characters (or fence them); extend `TestInvestigateProjection`.
+  - The 30,000-token limit is checked after each response, so one call can overshoot by its input plus 1,024 output tokens. Pre-check or accept.
+  - `noteIDs` accepts any top-level string up to 140 runes as an evidence ID; limit to ID keys.
+  - `workflow_test.go:1594` holds a well-formed synthetic GSTIN; build it at runtime so GSTIN scans don't trip.
+- **CC-709, `report.go`, `internal/evals` (from CC-706):** the investigator's tool results are appended to `finding.evidence`, so `cmd/audit` re-verification sees more evidence than the explainer did. `report.go` doesn't show `verify/investigate/<id>` rows. `countVerification` counts investigation rejects as `VerifierRejects`.
+- **Verifier (from CC-706):** a proposal's total debit must equal one evidence amount, so a settlement covering several receipts fails verification and ends `needs_review`. The prompt books fee plus GST as one line because the verifier needs each amount in evidence.
+- **`SetFindingStatus` (from the CC-706 G5):** no run or company predicate; add a scoped variant.
