@@ -421,8 +421,14 @@ func (w *Workflow) drive(parent context.Context, run store.CloseRun) (Result, er
 		attribute.String("close_run.id", run.ID.String()), attribute.String("close_run.month", run.Month))
 	defer span.End()
 	if tid := telemetry.TraceID(ctx); tid != "" {
-		run.TraceID = &tid
-		if err := w.Store.UpdateCloseRun(ctx, run); err != nil {
+		// Re-read the row and change only the trace ID: the run snapshot
+		// may be stale, and UpdateCloseRun writes every column.
+		cur, err := w.Store.GetCloseRun(ctx, run.ID)
+		if err == nil {
+			cur.TraceID = &tid
+			err = w.Store.UpdateCloseRun(ctx, cur)
+		}
+		if err != nil {
 			w.log().WarnContext(ctx, "close run trace id not stored", "run_id", run.ID, "err", err)
 		}
 	}
@@ -1141,6 +1147,9 @@ func (w *Workflow) synthesize(ctx context.Context, run store.CloseRun, out outco
 	if err != nil {
 		return "", w.failStep(ctx, step, err)
 	}
+	// The trace ID goes into the stored report artifact as well as the file:
+	// it differs per run (empty with tracing off), so a report is not
+	// byte-identical across two traced runs of the same month.
 	md := RenderReport(ReportData{
 		RunID: run.ID, Company: run.CompanyID, Month: run.Month,
 		Outcome: out.status, Reason: out.reason, Usage: usage,

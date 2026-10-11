@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"runtime/debug"
 	"sync"
 	"time"
@@ -211,6 +212,8 @@ func (w *statusWriter) Flush() {
 // middleware, so building a handler twice never doubles the spans.
 var traced sync.Map
 
+var toolNameRE = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
+
 // traceToolCalls makes every tools/call on s record an
 // "mcp.tools/call <tool>" span under the caller's trace. The span holds the
 // tool name and method only, never the arguments or the result.
@@ -227,7 +230,9 @@ func traceToolCalls(s *mcp.Server) {
 				return next(ctx, method, req)
 			}
 			tool := "unknown"
-			if call, ok := req.(*mcp.CallToolRequest); ok && call.Params != nil && call.Params.Name != "" {
+			// The name is client-supplied: use it only when it looks like a
+			// tool name, so identifiers never reach a span name.
+			if call, ok := req.(*mcp.CallToolRequest); ok && call.Params != nil && toolNameRE.MatchString(call.Params.Name) {
 				tool = call.Params.Name
 			}
 			ctx, span := telemetry.StartTool(ctx, tool)

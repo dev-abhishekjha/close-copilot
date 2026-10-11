@@ -286,3 +286,39 @@ func TestGuardStillRefusesWithTracingOn(t *testing.T) {
 		t.Error("no traceparent header on an allowed request")
 	}
 }
+
+func TestTracedClientDoesNotExportURLQuery(t *testing.T) {
+	rec := telemetrytest.Install(t)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	defer srv.Close()
+	c, err := New(config.Config{ERPBaseURL: srv.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, span := telemetry.Start(context.Background(), "root")
+	u := srv.URL + "/api/resource/GL%20Entry/29AAAAA0000A1Z5?filters=" +
+		url.QueryEscape(`[["party","=","Ramesh Kumar"]]`)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	resp, err := c.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = resp.Body.Close()
+	// A failing call must not leak the URL through error text either.
+	srv.Close()
+	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if resp, err := c.Do(req); err == nil {
+		_ = resp.Body.Close()
+	}
+	span.End()
+
+	all := strings.Join(append(telemetrytest.Strings(rec), telemetrytest.EventStrings(rec)...), "\n")
+	for _, bad := range []string{"Ramesh", "Kumar", "29AAAAA0000A1Z5", "GL%20Entry", "GL Entry", "filters"} {
+		if strings.Contains(all, bad) {
+			t.Errorf("span data holds %q:\n%s", bad, all)
+		}
+	}
+	if !strings.Contains(all, "http.request.method=GET") && !strings.Contains(all, "server.address=") {
+		t.Errorf("client span lost its safe attributes:\n%s", all)
+	}
+}

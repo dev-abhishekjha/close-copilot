@@ -87,7 +87,7 @@ func (m *memStore) UpdateCloseRun(_ context.Context, r store.CloseRun) error {
 	if _, ok := m.runs[r.ID]; !ok {
 		return fmt.Errorf("%w: close run %s", store.ErrNotFound, r.ID)
 	}
-	m.runs[r.ID].TraceID = r.TraceID
+	*m.runs[r.ID] = r
 	return nil
 }
 
@@ -1268,5 +1268,27 @@ func TestRunCloseWithoutTracingHasNoTraceID(t *testing.T) {
 	md, _ := os.ReadFile(res.ReportPath)
 	if strings.Contains(string(md), "| Trace |") {
 		t.Error("report shows a trace row with tracing off")
+	}
+}
+
+func TestResumeStoresNewTraceID(t *testing.T) {
+	telemetrytest.Install(t)
+	r := newRig(t)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first := *r.st.runs[res.RunID].TraceID
+	// Reopen the run as failed, with usage that a stale write would clobber.
+	r.st.mu.Lock()
+	r.st.runs[res.RunID].Status = store.RunFailed
+	r.st.runs[res.RunID].InputTokens = 777
+	r.st.mu.Unlock()
+	if _, err := r.wf.ResumeClose(t.Context(), res.RunID); err != nil {
+		t.Fatal(err)
+	}
+	run := r.st.runs[res.RunID]
+	if run.TraceID == nil || *run.TraceID == first {
+		t.Errorf("resumed run trace ID %v, want a new one (first %s)", run.TraceID, first)
 	}
 }

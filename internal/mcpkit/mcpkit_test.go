@@ -317,3 +317,36 @@ func TestToolCallSpanSharesClientTrace(t *testing.T) {
 		t.Error("tool arguments reached a span attribute")
 	}
 }
+
+func TestToolSpanNameIgnoresUnsafeToolName(t *testing.T) {
+	rec := telemetrytest.Install(t)
+	token := "valid-agent-token"
+	routes := map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(mcpkit.NewServer("test-books", "1.0.0"), token)}
+	ts := httptest.NewServer(mcpkit.BuildHandler(routes, testLogger()))
+	defer ts.Close()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	client := mcp.NewClient(&mcp.Implementation{Name: "c", Version: "1"}, nil)
+	session, err := client.Connect(ctx, &mcp.StreamableClientTransport{
+		Endpoint:             ts.URL + "/mcp",
+		HTTPClient:           &http.Client{Transport: &headerTransport{base: ts.Client().Transport, token: token}},
+		DisableStandaloneSSE: true,
+	}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer session.Close()
+	_, _ = session.CallTool(ctx, &mcp.CallToolParams{Name: "29AAAAA0000A1Z5 Ramesh"})
+	var found bool
+	for _, s := range rec.Ended() {
+		if s.Name() == "mcp.tools/call unknown" {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("no span named for an unknown tool")
+	}
+	if all := strings.Join(telemetrytest.Strings(rec), "\n"); strings.Contains(all, "29AAAAA") || strings.Contains(all, "Ramesh") {
+		t.Errorf("client-supplied tool name reached a span:\n%s", all)
+	}
+}

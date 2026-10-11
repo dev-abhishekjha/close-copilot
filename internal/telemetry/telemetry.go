@@ -20,6 +20,7 @@ import (
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/embedded"
 	"go.opentelemetry.io/otel/trace/noop"
 
 	"github.com/abhishekjha/close-copilot/internal/config"
@@ -106,6 +107,10 @@ func Setup(ctx context.Context, serviceName string, cfg config.Config) (func(con
 		}
 		opts = append(opts, otlptracehttp.WithHeaders(headers))
 	}
+	// The exporter uses its own HTTP client, not httpx: the egress guard does
+	// not cover it, but the endpoint is operator-set (OTEL_EXPORTER_OTLP_ENDPOINT,
+	// already on the allowlist) and the client is not traced, so exporting
+	// spans never creates spans of its own.
 	exp, err := otlptracehttp.New(ctx, opts...)
 	if err != nil {
 		return nil, fmt.Errorf("telemetry: otlp exporter: %w", err)
@@ -156,15 +161,69 @@ func parseHeaders(s string) (map[string]string, error) {
 }
 
 // WrapTransport traces the requests rt sends and carries the trace on in
-// traceparent. Put it inside the egress guard.
-func WrapTransport(rt http.RoundTripper) http.RoundTripper { return otelhttp.NewTransport(rt) }
-
-// WrapHandler continues the caller's trace for each request h serves.
-func WrapHandler(h http.Handler) http.Handler {
-	return otelhttp.NewHandler(h, "mcp.http", otelhttp.WithFilter(func(r *http.Request) bool {
-		return r.URL.Path != "/healthz"
-	}))
+// traceparent. Put it inside the egress guard. Client spans keep only the
+// method, host, scheme and status: the URL path and query can hold party and
+// company names or GSTINs (ERPNext filters), so they never reach a span.
+func WrapTransport(rt http.RoundTripper) http.RoundTripper {
+	return otelhttp.NewTransport(rt, otelhttp.WithTracerProvider(scrubProvider{}))
 }
+
+// WrapHandler continues the caller's trace for each request h serves. Server
+// spans are scrubbed like client spans.
+func WrapHandler(h http.Handler) http.Handler {
+	return otelhttp.NewHandler(h, "mcp.http", otelhttp.WithTracerProvider(scrubProvider{}),
+		otelhttp.WithFilter(func(r *http.Request) bool {
+			return r.URL.Path != "/healthz"
+		}))
+}
+
+// safeHTTPAttrs are the only attributes an HTTP span may carry.
+var safeHTTPAttrs = map[attribute.Key]bool{
+	"http.request.method": true, "http.method": true, "http.response.status_code": true,
+	"http.status_code": true, "server.address": true, "server.port": true,
+	"url.scheme": true, "http.scheme": true, "net.peer.name": true, "net.peer.port": true,
+	"network.protocol.name": true, "network.protocol.version": true, "error.type": true,
+}
+
+func scrub(in []attribute.KeyValue) []attribute.KeyValue {
+	out := make([]attribute.KeyValue, 0, len(in))
+	for _, kv := range in {
+		if safeHTTPAttrs[kv.Key] {
+			out = append(out, kv)
+		}
+	}
+	return out
+}
+
+// scrubProvider hands otelhttp a tracer that drops every attribute outside
+// safeHTTPAttrs, exception events and status text (error text embeds the
+// URL). It looks up the global provider on each span, so it works whether
+// Setup ran before or after the wrapper was built.
+type scrubProvider struct{ embedded.TracerProvider }
+
+func (scrubProvider) Tracer(string, ...trace.TracerOption) trace.Tracer { return scrubTracer{} }
+
+type scrubTracer struct{ embedded.Tracer }
+
+func (scrubTracer) Start(ctx context.Context, name string, opts ...trace.SpanStartOption) (context.Context, trace.Span) {
+	cfg := trace.NewSpanStartConfig(opts...)
+	clean := []trace.SpanStartOption{trace.WithSpanKind(cfg.SpanKind()), trace.WithAttributes(scrub(cfg.Attributes())...)}
+	if cfg.NewRoot() {
+		clean = append(clean, trace.WithNewRoot())
+	}
+	if !cfg.Timestamp().IsZero() {
+		clean = append(clean, trace.WithTimestamp(cfg.Timestamp()))
+	}
+	ctx, span := tracer().Start(ctx, name, clean...)
+	return ctx, scrubSpan{span}
+}
+
+type scrubSpan struct{ trace.Span }
+
+func (s scrubSpan) SetAttributes(kv ...attribute.KeyValue)  { s.Span.SetAttributes(scrub(kv)...) }
+func (s scrubSpan) RecordError(error, ...trace.EventOption) {}
+func (s scrubSpan) SetStatus(c codes.Code, _ string)        { s.Span.SetStatus(c, "") }
+func (s scrubSpan) AddEvent(string, ...trace.EventOption)   {}
 
 // Init is Setup for a command's main: it returns a stop func that flushes
 // pending spans for up to five seconds, on a context that outlives ctx.
