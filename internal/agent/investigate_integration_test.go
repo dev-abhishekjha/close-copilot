@@ -94,8 +94,10 @@ func TestInvestigateIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Investigate: %v", err)
 	}
-	if res.Status != store.StepDone || res.Reason != "" || len(res.OutputRefs) != 1 {
-		t.Fatalf("result %+v", res)
+	// One refused call (search_documents) leaves the answer needs_review
+	// without its proposal (CC-1103 investigator guard).
+	if res.Status != store.StepDone || res.Reason != "" || len(res.OutputRefs) != 1 || !res.NeedsReview {
+		t.Fatalf("result %+v, want done and needs_review", res)
 	}
 	if err := g.st.Finish(ctx, step, res.Status, res.OutputRefs, res.Reason); err != nil {
 		t.Fatal(err)
@@ -137,8 +139,12 @@ func TestInvestigateIntegration(t *testing.T) {
 	}
 	var art InvestigationArtifact
 	ea, err := g.st.GetArtifact(ctx, res.OutputRefs[0])
-	if err != nil || json.Unmarshal(ea.Content, &art) != nil || art.Resolution != ResolutionUnrecordedCharge || art.ToolCalls != 2 {
-		t.Errorf("artifact %+v, %v", art, err)
+	if err != nil || json.Unmarshal(ea.Content, &art) != nil || art.Resolution != ResolutionUnrecordedCharge || art.ToolCalls != 2 ||
+		art.Proposal != nil || !art.NeedsReview || art.SuggestedAction != checks.ActionInvestigate {
+		t.Errorf("artifact %+v, %v; want no proposal after a refused call", art, err)
+	}
+	if got.Proposal != nil {
+		t.Errorf("finding has a proposal")
 	}
 
 	// Both model calls were recorded against the step.

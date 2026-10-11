@@ -37,6 +37,15 @@ package agent
 // the explain and verify steps are skipped and the run ends partial:
 // findings saved, explanations missing.
 //
+// Prompt injection (CC-1103): after the checks, every finding that shares
+// an invoice or bank_txn_id key, or an evidence record ID, with a
+// suspicious_instruction_text finding (and that finding itself) is tainted
+// (taintedFindings). A tainted finding
+// is marked needs_review and its explain, verify and investigate steps are
+// recorded as skipped with a fixed reason, so the record's text never
+// reaches a model and no proposal is stored for it. It does not make the
+// run partial. The set is rebuilt from the stored findings on every pass.
+//
 // Explaining and verifying run per finding, Parallel findings at a time,
 // as a loop (CC-705): explain, then verify. A failed verdict reopens the
 // explain step with the violations as feedback (store.ReopenStep) and ends
@@ -126,6 +135,9 @@ const (
 	reasonNothingToInvestigate = "no unmatched bank lines to investigate"
 	reasonNoRedactor           = "no pseudonymiser configured; investigation refused"
 	reasonNoResolution         = "no resolution to verify"
+	// reasonTainted is the reason of every explain, verify and investigate
+	// step skipped for a tainted finding (CC-1103).
+	reasonTainted = "record contains instruction-like text; review by hand"
 )
 
 // investigateVerifyPrefix starts the subject of an investigation's verify
@@ -357,6 +369,7 @@ func DefaultChecks() []checks.Check {
 		&checks.GSTR2BCheck{},
 		&checks.MissingAccrualCheck{},
 		&checks.PolicyRulesCheck{},
+		&checks.SuspiciousTextCheck{},
 		&checks.VarianceCheck{},
 	}
 }
@@ -607,7 +620,8 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 		return outcome{}, err
 	}
 
-	explained, verified, err := w.explainAndVerifyAll(ctx, run, findings)
+	tainted := taintedFindings(findings)
+	explained, verified, err := w.explainAndVerifyAll(ctx, run, findings, tainted)
 	if err != nil {
 		return outcome{}, err
 	}
@@ -615,7 +629,7 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 		return outcome{}, err
 	}
 
-	if err := w.investigateAll(ctx, run, findings); err != nil {
+	if err := w.investigateAll(ctx, run, findings, tainted); err != nil {
 		return outcome{}, err
 	}
 	if err := w.progress(ctx, run.ID); err != nil {
@@ -624,7 +638,9 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 
 	out := outcome{status: store.RunDone, findings: len(findings)}
 	var notes []string
-	if n := len(findings) - explained; n > 0 {
+	// A tainted finding is left unexplained on purpose (needs_review), so
+	// it doesn't make the run partial.
+	if n := len(findings) - len(tainted) - explained; n > 0 {
 		notes = append(notes, fmt.Sprintf("explanations missing for %d of %d findings", n, len(findings)))
 	}
 	if n := explained - verified; n > 0 {
@@ -672,6 +688,80 @@ func unlinkedKey(f store.Finding) string {
 
 // relatedKey is the finding key checks.LinkVariances fills.
 const relatedKey = "related"
+
+// taintKeys are the record keys a suspicious_instruction_text finding
+// carries (checks.SuspiciousTextCheck).
+var taintKeys = []string{"invoice", "bank_txn_id"}
+
+// taintedFindings is the detection layer's hand-off (CC-1103): every
+// suspicious_instruction_text finding is tainted, and so is every other
+// finding that names the same record, either by its invoice or
+// bank_txn_id key or by an evidence ref of the same server and tool that
+// shares a record ID with the suspicious finding's evidence (a variance or
+// unmatched ledger entry citing an injected journal entry's GL lines). A
+// tainted finding is never explained, verified or investigated, so the
+// record's free text never reaches a model that could propose an entry;
+// it is marked needs_review and keeps no proposal. The set is rebuilt from
+// the run's stored findings on every pass, so a resumed run taints the
+// same findings (CC-709).
+func taintedFindings(fs []store.Finding) map[uuid.UUID]bool {
+	type mark struct{ key, value string }
+	type record struct{ server, tool, id string }
+	marks := map[mark]bool{}
+	records := map[record]bool{}
+	out := map[uuid.UUID]bool{}
+	for _, f := range fs {
+		if f.Type != checks.TypeSuspiciousInstruction {
+			continue
+		}
+		out[f.ID] = true
+		for _, k := range taintKeys {
+			if v := f.Keys[k]; v != "" {
+				marks[mark{k, v}] = true
+			}
+		}
+		for _, e := range f.Evidence {
+			for _, id := range e.IDs {
+				if id != "" {
+					records[record{e.Server, e.Tool, id}] = true
+				}
+			}
+		}
+	}
+	if len(out) == 0 {
+		return out
+	}
+	for _, f := range fs {
+		for _, k := range taintKeys {
+			if v := f.Keys[k]; v != "" && marks[mark{k, v}] {
+				out[f.ID] = true
+			}
+		}
+		for _, e := range f.Evidence {
+			for _, id := range e.IDs {
+				if records[record{e.Server, e.Tool, id}] {
+					out[f.ID] = true
+				}
+			}
+		}
+	}
+	return out
+}
+
+// holdTainted handles a tainted finding in place of its explain and
+// verify loop: it marks the finding needs_review, then records both steps
+// as skipped with reasonTainted. Marked first, so a crash in between marks
+// it again on resume; every write is idempotent.
+func (w *Workflow) holdTainted(ctx context.Context, run store.CloseRun, f store.Finding) error {
+	if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+		return err
+	}
+	w.log().WarnContext(ctx, "finding's record holds instruction-like text; not sent to a model", "run_id", run.ID, "finding_id", f.ID)
+	if err := w.skipStep(ctx, run.ID, store.StepKindExplain, f.ID.String(), reasonTainted); err != nil {
+		return err
+	}
+	return w.skipVerify(ctx, run, f, reasonTainted)
+}
 
 // progress writes the run's token and cost rollup after a state.
 func (w *Workflow) progress(ctx context.Context, runID uuid.UUID) error {
@@ -897,15 +987,19 @@ func (w *Workflow) finishWorker(ctx context.Context, step store.Step, res StepRe
 }
 
 // explainAndVerifyAll runs each finding's explain and verify loop,
-// Parallel findings at a time. It returns how many findings have an
-// explanation and how many of those passed verification.
-func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding) (int, int, error) {
+// Parallel findings at a time; a tainted finding is held instead
+// (holdTainted). It returns how many findings have an explanation and how
+// many of those passed verification.
+func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding, tainted map[uuid.UUID]bool) (int, int, error) {
 	var mu sync.Mutex
 	explained, verified := 0, 0
 	g, gctx := errgroup.WithContext(ctx)
 	g.SetLimit(w.parallel())
 	for _, f := range findings {
 		g.Go(func() error {
+			if tainted[f.ID] {
+				return w.holdTainted(gctx, run, f)
+			}
 			hasExplanation, passed, err := w.explainAndVerify(gctx, run, f)
 			if err != nil {
 				return err
@@ -1119,18 +1213,31 @@ func (w *Workflow) verifyOne(ctx context.Context, run store.CloseRun, f store.Fi
 // ---- investigating ----
 
 // investigateAll investigates each unmatched_bank_line finding, Parallel at
-// a time: an investigate step, then a verify step. With nothing to
-// investigate, or no investigator, model or redactor, it records one
-// skipped investigate/close step instead.
-func (w *Workflow) investigateAll(ctx context.Context, run store.CloseRun, findings []store.Finding) error {
+// a time: an investigate step, then a verify step. A tainted one is never
+// investigated: its investigate step is recorded as skipped with
+// reasonTainted (holdTainted already marked it needs_review). With nothing
+// else to investigate, or no investigator, model or redactor, it records
+// one skipped investigate/close step instead.
+func (w *Workflow) investigateAll(ctx context.Context, run store.CloseRun, findings []store.Finding, tainted map[uuid.UUID]bool) error {
 	var targets []store.Finding
+	held := 0
 	for _, f := range findings {
-		if f.Type == checks.TypeUnmatchedBankLine {
-			targets = append(targets, f)
+		if f.Type != checks.TypeUnmatchedBankLine {
+			continue
 		}
+		if tainted[f.ID] {
+			held++
+			if err := w.skipStep(ctx, run.ID, store.StepKindInvestigate, f.ID.String(), reasonTainted); err != nil {
+				return err
+			}
+			continue
+		}
+		targets = append(targets, f)
 	}
 	reason := ""
 	switch {
+	case len(targets) == 0 && held > 0:
+		return nil
 	case len(targets) == 0:
 		reason = reasonNothingToInvestigate
 	case w.Investigator == nil:
