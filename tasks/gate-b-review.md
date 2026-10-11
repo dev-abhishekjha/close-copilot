@@ -24,7 +24,8 @@ Drafted 2026-10-11 from the specs, merge commits and reviewer reports. Each entr
 - **Does:** `make erp-reset` plus `cmd/seed all --suite suite-skeleton` rebuilds ERPNext, the bank CSVs and the ground truth. `suite-skeleton` is one company (sharma), September, 3 charges, August as the clean control, `small: true`.
 - **Evidence it works:** the 2026-10-11 reset and seed succeeded end to end; ERPNext, Postgres and the CSVs lined up.
 - **Check:** the scenario file (`evals/scenarios/suite-skeleton.yaml`) says what you intend the skeleton to be.
-- **Not proven:** the spec requires two reset-and-seed runs to give byte-identical files. I ran the seed once and did not diff two runs. The merge commit does not record G5 or G6.
+- **Determinism (checked 2026-10-11, without ERPNext):** two `seed evidence` runs for sharma 2026-08 and 2026-09 gave byte-identical bank CSVs and GSTR-2B files, and two `seed plant` runs gave byte-identical ground truth that also equals the committed `evals/scenarios/suite-skeleton/ground_truth/*.json`. Not checked: a full `erp-reset` plus `seed all` twice against ERPNext (it wipes the dev site).
+- **Not proven:** the merge commit does not record G5 or G6.
 
 ## CC-709 · Runtime data plane
 
@@ -60,3 +61,7 @@ Drafted 2026-10-11 from the specs, merge commits and reviewer reports. Each entr
 - **Evidence it works:** re-scoring the Gate B run moved precision from 5/8 to 8/8 and clean-month false alarms from 3 to 0. The live run and the replay both agree. The security review and the Opus diff review both passed.
 - **Check:** "the clean month raises nothing" now means "raises nothing outside its truth file". Investigation items match on `bank_txn_id` alone, so keep clean-month truth keys specific.
 - **Deferred:** `checkMonths` does not reject planted items in a clean month (only the truth loader does).
+
+## Decisions recorded
+
+- **Router wording (2026-10-11):** accepted. The Router makes one read-only `list_bank_lines` call to find that a month's evidence is not loaded, then refuses with a reason. "Makes no tool call" in the Gate B checklist is read as "makes no check, books or model call". Recorded on the owner's "yes go on" to the recommendation; change it here if that was not meant. The checklist in `docs/**` is unchanged.
