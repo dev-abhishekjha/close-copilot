@@ -17,6 +17,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/evidence"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
 
 func main() {
@@ -42,6 +43,12 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if *transport != "http" && *transport != "stdio" {
 		return fmt.Errorf("mcp-evidence: unknown transport %q (want http or stdio)", *transport)
 	}
+
+	stopTrace, err := telemetry.Init(ctx, "mcp-evidence", cfg, log)
+	if err != nil {
+		return err
+	}
+	defer stopTrace()
 
 	st, err := store.Open(ctx, cfg.DatabaseURL.Reveal())
 	if err != nil {

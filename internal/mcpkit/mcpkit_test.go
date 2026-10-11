@@ -14,6 +14,8 @@ import (
 
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
+	"github.com/abhishekjha/close-copilot/internal/telemetry/telemetrytest"
 )
 
 func testLogger() *slog.Logger {
@@ -247,5 +249,71 @@ func TestClientServerHandshakeOverStreamableHTTP(t *testing.T) {
 	}
 	if len(tools.Tools) != 0 {
 		t.Errorf("expected 0 tools, got %d", len(tools.Tools))
+	}
+}
+
+func TestToolCallSpanSharesClientTrace(t *testing.T) {
+	rec := telemetrytest.Install(t)
+	token := "valid-agent-token"
+	server := mcpkit.NewServer("test-books", "1.0.0")
+	type in struct {
+		Q string `json:"q"`
+	}
+	type out struct {
+		A string `json:"a"`
+	}
+	mcpkit.AddTool(server, &mcp.Tool{Name: "echo", Description: "echo"},
+		func(context.Context, *mcp.CallToolRequest, in) (*mcp.CallToolResult, out, error) {
+			return nil, out{A: "ok"}, nil
+		})
+	routes := map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(server, token)}
+	// Building twice must not double the spans.
+	_ = mcpkit.BuildHandler(routes, testLogger())
+	ts := httptest.NewServer(mcpkit.BuildHandler(routes, testLogger()))
+	defer ts.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	ctx, root := telemetry.Start(ctx, telemetry.SpanCloseRun)
+
+	client := mcp.NewClient(&mcp.Implementation{Name: "test-client", Version: "1.0.0"}, nil)
+	session, err := client.Connect(ctx, &mcp.StreamableClientTransport{
+		Endpoint: ts.URL + "/mcp",
+		HTTPClient: &http.Client{Transport: telemetry.WrapTransport(
+			&headerTransport{base: ts.Client().Transport, token: token})},
+		DisableStandaloneSSE: true,
+	}, nil)
+	if err != nil {
+		t.Fatalf("Connect: %v", err)
+	}
+	defer session.Close()
+	if _, err := session.CallTool(ctx, &mcp.CallToolParams{Name: "echo", Arguments: map[string]any{"q": "SECRET-ARG"}}); err != nil {
+		t.Fatalf("CallTool: %v", err)
+	}
+	root.End()
+
+	want := root.SpanContext().TraceID()
+	var tools int
+	for _, s := range rec.Ended() {
+		if s.Name() != "mcp.tools/call echo" {
+			continue
+		}
+		tools++
+		if s.SpanContext().TraceID() != want {
+			t.Errorf("tool span trace %s, want %s", s.SpanContext().TraceID(), want)
+		}
+		got := map[string]string{}
+		for _, kv := range s.Attributes() {
+			got[string(kv.Key)] = kv.Value.String()
+		}
+		if got["gen_ai.tool.name"] != "echo" || got["mcp.method.name"] != "tools/call" {
+			t.Errorf("tool span attributes %v", got)
+		}
+	}
+	if tools != 1 {
+		t.Errorf("%d tool spans, want 1", tools)
+	}
+	if all := strings.Join(telemetrytest.Strings(rec), "\n"); strings.Contains(all, "SECRET-ARG") {
+		t.Error("tool arguments reached a span attribute")
 	}
 }

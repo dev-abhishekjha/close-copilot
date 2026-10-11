@@ -63,6 +63,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"go.opentelemetry.io/otel/attribute"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/abhishekjha/close-copilot/internal/checks"
@@ -70,6 +71,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/store"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
 
 // Budgets and limits of one run.
@@ -212,6 +214,7 @@ type Verifier interface {
 type RunStore interface {
 	LLMCallRecorder
 	CreateCloseRun(ctx context.Context, r store.CloseRun) error
+	UpdateCloseRun(ctx context.Context, r store.CloseRun) error
 	GetCloseRun(ctx context.Context, id uuid.UUID) (store.CloseRun, error)
 	Begin(ctx context.Context, runID uuid.UUID, kind, subject string) (store.Step, bool, error)
 	Finish(ctx context.Context, step store.Step, status string, outputRefs []string, errText string) error
@@ -412,12 +415,29 @@ func (w *Workflow) drive(parent context.Context, run store.CloseRun) (Result, er
 	ctx, cancel := context.WithTimeout(parent, w.runTimeout())
 	defer cancel()
 
+	// A resumed run is a new trace; its ID replaces the stored one. The
+	// span holds the run ID and month only, never names or amounts.
+	ctx, span := telemetry.Start(ctx, telemetry.SpanCloseRun,
+		attribute.String("close_run.id", run.ID.String()), attribute.String("close_run.month", run.Month))
+	defer span.End()
+	if tid := telemetry.TraceID(ctx); tid != "" {
+		run.TraceID = &tid
+		if err := w.Store.UpdateCloseRun(ctx, run); err != nil {
+			w.log().WarnContext(ctx, "close run trace id not stored", "run_id", run.ID, "err", err)
+		}
+	}
+
 	var out outcome
 	err := w.Store.SetRunState(ctx, run.ID, store.RunRunning, "")
 	if err == nil {
 		out, err = w.stages(ctx, run)
 	}
-	return w.end(parent, ctx, run, out, err)
+	res, err := w.end(parent, ctx, run, out, err)
+	span.SetAttributes(attribute.String("close_run.status", res.Status))
+	if res.Status == store.RunFailed {
+		telemetry.Fail(span, "close run failed")
+	}
+	return res, err
 }
 
 // end records the run's final state on a fresh context, so a cancelled or
@@ -711,6 +731,8 @@ func (w *Workflow) runCheck(ctx context.Context, run store.CloseRun, profile com
 	if err != nil || done {
 		return err
 	}
+	ctx, span := telemetry.Start(ctx, telemetry.SpanCheckPrefix+name)
+	defer span.End()
 	snap := NewSnapshots(w.Store, run.ID, step.ID)
 	in := checks.Inputs{
 		Company:      run.CompanyID,
@@ -884,12 +906,17 @@ func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.F
 		}
 		return step, nil, false, w.finish(ctx, step, store.StepSkipped, nil, reason)
 	}
-	res, err := w.Explainer.Explain(ctx, ExplainRequest{
+	ectx, span := telemetry.Start(ctx, telemetry.SpanExplain)
+	res, err := w.Explainer.Explain(ectx, ExplainRequest{
 		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
 		Company: run.CompanyID, Month: run.Month,
 		Finding: f, EvidenceRefs: evidenceRefs(f), Feedback: step.Feedback,
 		Model: w.stepModel(run.ID, step.ID),
 	})
+	if err != nil {
+		telemetry.Fail(span, "explain failed")
+	}
+	span.End()
 	if err != nil {
 		return step, nil, false, w.workerError(ctx, step, err)
 	}
@@ -939,13 +966,18 @@ func (w *Workflow) verifyOne(ctx context.Context, run store.CloseRun, f store.Fi
 	if w.Verifier == nil {
 		return false, false, w.finish(ctx, step, store.StepSkipped, nil, reasonNoVerifier)
 	}
-	res, err := w.Verifier.Verify(ctx, VerifyRequest{
+	vctx, span := telemetry.Start(ctx, telemetry.SpanVerify)
+	res, err := w.Verifier.Verify(vctx, VerifyRequest{
 		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
 		Company: run.CompanyID, Month: run.Month,
 		Finding: f, EvidenceRefs: evidenceRefs(f), ExplanationRefs: explanation,
 		ExplainAttempt: explainStep.Attempt,
 		Model:          w.stepModel(run.ID, step.ID),
 	})
+	if err != nil {
+		telemetry.Fail(span, "verify failed")
+	}
+	span.End()
 	if err != nil {
 		return false, false, w.workerError(ctx, step, err)
 	}
@@ -1112,7 +1144,7 @@ func (w *Workflow) synthesize(ctx context.Context, run store.CloseRun, out outco
 	md := RenderReport(ReportData{
 		RunID: run.ID, Company: run.CompanyID, Month: run.Month,
 		Outcome: out.status, Reason: out.reason, Usage: usage,
-		Findings: findings, Steps: steps, Fault: fault,
+		Findings: findings, Steps: steps, Fault: fault, TraceID: telemetry.TraceID(ctx),
 	})
 	sha, err := w.Store.PutArtifact(ctx, store.ArtifactReport, run.ID, step.ID, ReportArtifact{RunID: run.ID.String(), Markdown: md})
 	if err != nil {
