@@ -4,13 +4,13 @@ Drafted 2026-10-11 from the specs, merge commits and reviewer reports. Each entr
 
 | Ticket | What it is | Read this | Signed off |
 | --- | --- | --- | --- |
-| CC-306 | Planter and ground truth | `internal/seed/plant.go`, `truth.go`, `evals/schema/ground_truth.schema.json` | |
-| CC-307 | Suite CLI and reset | `cmd/seed/main.go`, `evals/scenarios/suite-skeleton.yaml` | |
-| CC-709 | Runtime data plane (steps, artifacts, resume) | `migrations/0004_steps.sql`, `internal/store/steps.go`, `artifacts.go` | |
-| CC-705 | Verifier | `internal/agent/verify.go`, `verify_amounts.go`, `fault.go` | |
-| CC-902 | Scoring | `internal/evals/score.go` | |
-| CC-905 | Fixtures and the CI eval gate | `internal/evals/fixtures.go`, `baseline.go`, `.github/workflows/eval.yml` | |
-| CC-007 | Clean-month scoring fix | `internal/evals/score.go` (control-month branch) | |
+| CC-306 | Planter and ground truth | `internal/seed/plant.go`, `truth.go`, `evals/schema/ground_truth.schema.json` | abhi 2026-10-11 |
+| CC-307 | Suite CLI and reset | `cmd/seed/main.go`, `evals/scenarios/suite-skeleton.yaml` | abhi 2026-10-11 |
+| CC-709 | Runtime data plane (steps, artifacts, resume) | `migrations/0004_steps.sql`, `internal/store/steps.go`, `artifacts.go` | abhi 2026-10-11 |
+| CC-705 | Verifier | `internal/agent/verify.go`, `verify_amounts.go`, `fault.go` | abhi 2026-10-11 |
+| CC-902 | Scoring | `internal/evals/score.go` | abhi 2026-10-11 |
+| CC-905 | Fixtures and the CI eval gate | `internal/evals/fixtures.go`, `baseline.go`, `.github/workflows/eval.yml` | abhi 2026-10-11 |
+| CC-007 | Clean-month scoring fix | `internal/evals/score.go` (control-month branch) | abhi 2026-10-11 |
 
 ## CC-306 · Planter and ground truth
 
@@ -65,3 +65,17 @@ Drafted 2026-10-11 from the specs, merge commits and reviewer reports. Each entr
 ## Decisions recorded
 
 - **Router wording (2026-10-11):** accepted. The Router makes one read-only `list_bank_lines` call to find that a month's evidence is not loaded, then refuses with a reason. "Makes no tool call" in the Gate B checklist is read as "makes no check, books or model call". Recorded on the owner's "yes go on" to the recommendation; change it here if that was not meant. The checklist in `docs/**` is unchanged.
+
+## Gate B result (2026-10-11)
+
+**Passed.** The owner signed off the seven regulated Phase 1 tickets (CC-306, 307, 709, 705, 902, 905, 007) on 2026-10-11, with the gaps below carried as follow-ups, not blockers.
+
+Evidence: the runtime checks (Router refusal, MCP-only access, fault retry, `kill -9` resume with no duplicate steps, audit rebuild of every finding), 3 of 3 planted charges found, the clean month at 0 false alarms (replay and live), the baseline and fixtures committed, the seeded-regression drill (blocked by G4, fixed from the failure report alone), and the measurements in `tasks/pilot.md`.
+
+## Follow-ups carried out of Gate B
+
+- **CC-306 and CC-307:** their merge messages do not record a G5 or G6 result. Re-run G5 on both diffs, and a full `erp-reset` plus `seed all` twice against ERPNext for the byte-identical check (the generator and planter were already shown deterministic without ERPNext).
+- **CC-902:** noise calibration (five explainer runs, then `eval noise`) and a model-tier baseline section, so the LLM-tier gates have a tolerance. Needs a model budget.
+- **CC-905:** open a pull request that breaks `bankrec` and watch the `eval (G4)` check fail on GitHub. Note that it becomes a required check only after the first `baseline-update` commit, which has now landed.
+- **CC-007 and the CC-902 notes in `tasks/hardening.md`:** `checkMonths` should reject planted items in a clean month; keep clean-month truth keys specific; reword the `CompareCleanFalseAlarm` comment.
+- **Measurements:** tokens and owner review minutes per ticket in `tasks/pilot.md`.
