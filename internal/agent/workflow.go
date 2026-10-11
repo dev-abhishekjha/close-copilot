@@ -9,7 +9,9 @@ package agent
 //
 // and each state is one or more run_steps rows (CC-709): router/close,
 // check.<name>/<name>, retrieve/close, explain/<finding id>,
-// verify/<finding id>, investigate/close and synthesize/report. Every step
+// verify/<finding id>, investigate/<finding id> with
+// verify/investigate/<finding id> (or one skipped investigate/close) and
+// synthesize/report. Every step
 // is wrapped in store.Begin, so a resumed run skips the steps that are
 // done and re-runs the rest. Steps after checking take their subjects from
 // the stored findings, never from a re-run of the checks, so finding IDs
@@ -21,8 +23,17 @@ package agent
 // narrations: only run and step identifiers, statuses and counts.
 //
 // Phase 1 runs preflight, the bank reconciliation check, explaining,
-// verifying and synthesizing; retrieving (CC-806) and investigating
-// (CC-706) are recorded as skipped steps. With no Explainer configured,
+// verifying and synthesizing; retrieving (CC-806) is recorded as a skipped
+// step. Investigating (CC-706) runs per unmatched_bank_line finding,
+// Parallel at a time, after every finding is explained and verified: an
+// investigate step, whose model is pseudonymised (WrapRedacting outside
+// the recording wrapper, so stored prompts hold tokens only), then a
+// verify step with subject investigate/<finding id> that runs the same
+// Verifier on the investigation's explanation artifact. A breach, a
+// malformed answer or a failed verification marks the finding
+// needs_review; none of them changes the run's outcome. With no
+// Investigator, model or redactor, or no such finding, one investigate/close
+// step is recorded as skipped. With no Explainer configured,
 // the explain and verify steps are skipped and the run ends partial:
 // findings saved, explanations missing.
 //
@@ -106,8 +117,20 @@ const (
 	reasonNoVerifier    = "no verifier configured"
 	reasonNoExplanation = "no explanation to verify"
 	reasonRetrieve      = "retrieval arrives with CC-806"
-	reasonInvestigate   = "investigation arrives with CC-706"
+	// reasonInvestigate is the reason a pre-CC-706 run recorded on its
+	// investigate/close step; stored runs and report fixtures still hold it.
+	reasonInvestigate    = "investigation arrives with CC-706"
+	reasonNoInvestigator = "no investigator configured"
+	// Reasons of the investigate/close step and of an investigation's
+	// verify step.
+	reasonNothingToInvestigate = "no unmatched bank lines to investigate"
+	reasonNoRedactor           = "no pseudonymiser configured; investigation refused"
+	reasonNoResolution         = "no resolution to verify"
 )
+
+// investigateVerifyPrefix starts the subject of an investigation's verify
+// step, so it never collides with the finding's explanation verify step.
+const investigateVerifyPrefix = "investigate/"
 
 // MaxExplainAttempts is how many explain attempts a finding gets before a
 // failing verification marks it needs_review: the first and two retries.
@@ -255,6 +278,14 @@ type Workflow struct {
 	// the run ends partial.
 	Explainer Explainer
 	Verifier  Verifier
+	// Investigator investigates unmatched_bank_line findings (CC-706); nil
+	// records one skipped investigate/close step.
+	Investigator Investigator
+	// NewRedactor builds the run's Redactor (CC-710) for investigate
+	// steps, whose model is WrapRedacting over the recorded provider. Nil
+	// refuses investigation: identifiers never reach a tool-using model
+	// unmasked.
+	NewRedactor func(runID uuid.UUID) *Redactor
 	// Model is the provider every explain and verify step's calls go
 	// through, wrapped per step in a RecordingProvider.
 	Model llm.Provider
@@ -584,7 +615,10 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 		return outcome{}, err
 	}
 
-	if err := w.skipStep(ctx, run.ID, store.StepKindInvestigate, SubjectClose, reasonInvestigate); err != nil {
+	if err := w.investigateAll(ctx, run, findings); err != nil {
+		return outcome{}, err
+	}
+	if err := w.progress(ctx, run.ID); err != nil {
 		return outcome{}, err
 	}
 
@@ -618,14 +652,17 @@ func sortFindings(fs []store.Finding) {
 }
 
 // unlinkedKey is f's dedupe key without keys.related, which holds a random
-// finding ID (checks.LinkVariances), so report order does not depend on it.
+// finding ID (checks.LinkVariances), and without keys.resolution, which an
+// investigation adds (CC-706), so report order depends on neither.
 func unlinkedKey(f store.Finding) string {
-	if _, ok := f.Keys[relatedKey]; !ok {
+	_, related := f.Keys[relatedKey]
+	_, resolution := f.Keys[store.ResolutionKey]
+	if !related && !resolution {
 		return checks.DedupeKey(f)
 	}
 	keys := make(map[string]string, len(f.Keys))
 	for k, v := range f.Keys {
-		if k != relatedKey {
+		if k != relatedKey && k != store.ResolutionKey {
 			keys[k] = v
 		}
 	}
@@ -1077,6 +1114,183 @@ func (w *Workflow) verifyOne(ctx context.Context, run store.CloseRun, f store.Fi
 	res.Reason = fmt.Sprintf("%s after %d explain attempts", reason, explainStep.Attempt)
 	_, err = w.finishWorker(ctx, step, res)
 	return false, false, err
+}
+
+// ---- investigating ----
+
+// investigateAll investigates each unmatched_bank_line finding, Parallel at
+// a time: an investigate step, then a verify step. With nothing to
+// investigate, or no investigator, model or redactor, it records one
+// skipped investigate/close step instead.
+func (w *Workflow) investigateAll(ctx context.Context, run store.CloseRun, findings []store.Finding) error {
+	var targets []store.Finding
+	for _, f := range findings {
+		if f.Type == checks.TypeUnmatchedBankLine {
+			targets = append(targets, f)
+		}
+	}
+	reason := ""
+	switch {
+	case len(targets) == 0:
+		reason = reasonNothingToInvestigate
+	case w.Investigator == nil:
+		reason = reasonNoInvestigator
+	case w.Model == nil:
+		reason = reasonInvestigateNoModel
+	case w.NewRedactor == nil:
+		reason = reasonNoRedactor
+	}
+	if reason != "" {
+		return w.skipStep(ctx, run.ID, store.StepKindInvestigate, SubjectClose, reason)
+	}
+	g, gctx := errgroup.WithContext(ctx)
+	g.SetLimit(w.parallel())
+	for _, f := range targets {
+		g.Go(func() error { return w.investigateOne(gctx, run, f) })
+	}
+	return g.Wait()
+}
+
+// investigateOne runs the finding's investigate step unless it is done,
+// then verifies its answer. A step that ended done without a reason has
+// one output: the investigation's explanation artifact. One that ended
+// with a reason (a breach) or failed has none to verify, and the finding
+// was marked needs_review before the step ended, so a crash in between
+// marks it on resume.
+func (w *Workflow) investigateOne(ctx context.Context, run store.CloseRun, f store.Finding) error {
+	step, done, err := w.begin(ctx, run.ID, store.StepKindInvestigate, f.ID.String())
+	if err != nil {
+		return err
+	}
+	answered := done && step.Error == nil && len(step.OutputRefs) == 1
+	if !done {
+		if answered, err = w.runInvestigation(ctx, run, f, &step); err != nil {
+			return err
+		}
+	}
+	subject := investigateVerifyPrefix + f.ID.String()
+	if !answered {
+		return w.skipStep(ctx, run.ID, store.StepKindVerify, subject, reasonNoResolution)
+	}
+	return w.verifyInvestigation(ctx, run, f.ID, step, subject)
+}
+
+// runInvestigation runs the investigator for a begun step and ends the
+// step. It reports whether the step ended done with an answer to verify.
+func (w *Workflow) runInvestigation(ctx context.Context, run store.CloseRun, f store.Finding, step *store.Step) (bool, error) {
+	if reason, err := w.overTokenCap(ctx, run.ID); err != nil || reason != "" {
+		if err != nil {
+			return false, w.failStep(ctx, *step, err)
+		}
+		return false, w.finish(ctx, *step, store.StepSkipped, nil, reason)
+	}
+	model, err := w.investigateModel(run.ID, step.ID)
+	if err != nil {
+		return false, w.finish(ctx, *step, store.StepSkipped, nil, reasonNoRedactor)
+	}
+	ictx, span := telemetry.Start(ctx, telemetry.SpanInvestigate)
+	res, err := w.Investigator.Investigate(ictx, InvestigateRequest{
+		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
+		Company: run.CompanyID, Month: run.Month,
+		Finding: f, EvidenceRefs: evidenceRefs(f), Model: model,
+	})
+	if err != nil {
+		telemetry.Fail(span, "investigate failed")
+	}
+	span.End()
+	if err != nil {
+		return false, w.workerError(ctx, *step, err)
+	}
+	if res.NeedsReview {
+		if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+			return false, w.failStep(ctx, *step, err)
+		}
+	}
+	ok, err := w.finishWorker(ctx, *step, res)
+	if err != nil || !ok {
+		return false, err
+	}
+	step.OutputRefs = res.OutputRefs
+	return res.Reason == "" && len(res.OutputRefs) == 1, nil
+}
+
+// verifyInvestigation runs the investigation's verify step: the Verifier
+// on the investigate step's explanation artifact, against the finding's
+// evidence as stored now (the check's snapshots plus the investigation's
+// trail). A failed verdict marks the finding needs_review and ends the
+// step done with the verdict and a reason; investigations are not retried.
+func (w *Workflow) verifyInvestigation(ctx context.Context, run store.CloseRun, findingID uuid.UUID, investigateStep store.Step, subject string) error {
+	step, done, err := w.begin(ctx, run.ID, store.StepKindVerify, subject)
+	if err != nil || done {
+		return err
+	}
+	if w.Verifier == nil {
+		return w.finish(ctx, step, store.StepSkipped, nil, reasonNoVerifier)
+	}
+	fs, err := w.Store.ListFindingsByRun(ctx, run.ID)
+	if err != nil {
+		return w.failStep(ctx, step, err)
+	}
+	i := slices.IndexFunc(fs, func(f store.Finding) bool { return f.ID == findingID })
+	if i < 0 {
+		return w.failStep(ctx, step, fmt.Errorf("agent: verify investigation: %w: finding %s", store.ErrNotFound, findingID))
+	}
+	f := fs[i]
+	vctx, span := telemetry.Start(ctx, telemetry.SpanVerify)
+	res, err := w.Verifier.Verify(vctx, VerifyRequest{
+		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
+		Company: run.CompanyID, Month: run.Month,
+		Finding: f, EvidenceRefs: evidenceRefs(f), ExplanationRefs: investigateStep.OutputRefs,
+		ExplainAttempt: investigateStep.Attempt,
+		Model:          w.stepModel(run.ID, step.ID),
+	})
+	if err != nil {
+		telemetry.Fail(span, "verify failed")
+	}
+	span.End()
+	if err != nil {
+		return w.workerError(ctx, step, err)
+	}
+	if res.StepID != uuid.Nil && res.StepID != step.ID {
+		return w.failStep(ctx, step, fmt.Errorf("agent: %s worker answered for another step", step.Kind))
+	}
+	if res.Status != "" && res.Status != store.StepDone {
+		_, err := w.finishWorker(ctx, step, res)
+		return err
+	}
+	failed := len(bytes.TrimSpace(res.Violations)) > 0
+	if failed || res.NeedsReview {
+		if err := w.Store.SetFindingStatus(ctx, f.ID, checks.StatusNeedsReview); err != nil {
+			return w.failStep(ctx, step, err)
+		}
+	}
+	if failed {
+		res.Reason = cmp.Or(res.Reason, "verification failed")
+		w.log().WarnContext(ctx, "investigation failed verification; finding needs review", "run_id", run.ID, "finding_id", f.ID)
+	} else {
+		res.Reason = ""
+	}
+	_, err = w.finishWorker(ctx, step, res)
+	return err
+}
+
+// investigateModel is an investigate step's provider: the step's recorded,
+// capped provider wrapped by WrapRedacting, so identifiers are masked
+// before the call and before the recording wrapper stores the prompt. It
+// is nil when the workflow has no model, and an error without a redactor.
+func (w *Workflow) investigateModel(runID, stepID uuid.UUID) (llm.Provider, error) {
+	base := w.stepModel(runID, stepID)
+	if base == nil {
+		return nil, nil
+	}
+	if w.NewRedactor == nil {
+		return nil, errors.New("agent: investigation needs a redactor")
+	}
+	r := w.NewRedactor(runID)
+	if r == nil {
+		return nil, errors.New("agent: investigation needs a redactor")
+	}
+	return WrapRedacting(base, r), nil
 }
 
 // ---- model budget ----
