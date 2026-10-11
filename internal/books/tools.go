@@ -89,14 +89,19 @@ func (p profileCompanies) ERPCompany(id string) (string, error) {
 
 // ToolDeps are what the books tools need. Client should hold the bot key
 // (ERP_API_KEY, Accounts User); the tools only read. Now, when nil, is
-// time.Now; get_account_history uses it for its default through_month.
-// Logger receives the full error of every failed call (the model sees
-// only a fixed message); nil means slog.Default().
+// time.Now; get_account_history uses it for its default through_month
+// when the call has no run scope. Logger receives the full error of every
+// failed call (the model sees only a fixed message); nil means
+// slog.Default(). Scope binds every call to its run's company and window
+// (CC-506): a call outside it gets an out_of_scope tool error before any
+// ERPNext request. A nil Scope is unscoped (stdio and tests only); the
+// HTTP server always sets it.
 type ToolDeps struct {
 	Client    *frappe.Client
 	Companies CompanyResolver
 	Now       func() time.Time
 	Logger    *slog.Logger
+	Scope     *mcpkit.Scoper
 }
 
 // Limits on tool input.
@@ -444,6 +449,19 @@ func (h *handlers) company(id string) (string, error) {
 	return erp, nil
 }
 
+// scopeCompany refuses a company outside the call's run scope. Handlers
+// call it first, before h.company, so another company is out_of_scope
+// whether or not it is configured.
+func (h *handlers) scopeCompany(ctx context.Context, id string) error {
+	return h.deps.Scope.CheckCompany(callRequest(ctx), id)
+}
+
+// scopeRange refuses a read of from..to outside the call's run scope.
+// Handlers call it once the arguments parse, before any ERPNext request.
+func (h *handlers) scopeRange(ctx context.Context, id string, from, to time.Time) error {
+	return h.deps.Scope.CheckRange(callRequest(ctx), id, from.Format(dateLayout), to.Format(dateLayout))
+}
+
 func (h *handlers) now() time.Time {
 	if h.deps.Now != nil {
 		return h.deps.Now()
@@ -453,6 +471,9 @@ func (h *handlers) now() time.Time {
 
 func (h *handlers) getTrialBalance(ctx context.Context, in TrialBalanceInput) (TrialBalanceOutput, error) {
 	var out TrialBalanceOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -463,6 +484,9 @@ func (h *handlers) getTrialBalance(ctx context.Context, in TrialBalanceInput) (T
 	}
 	from, to, err := dateRange(in.FromDate, in.ToDate)
 	if err != nil {
+		return out, err
+	}
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
 		return out, err
 	}
 	tb, err := TrialBalance(ctx, FrappeLedger{C: c}, erp, from, to)
@@ -484,6 +508,9 @@ func (h *handlers) getTrialBalance(ctx context.Context, in TrialBalanceInput) (T
 
 func (h *handlers) listGLEntries(ctx context.Context, in GLEntriesInput) (GLEntriesOutput, error) {
 	var out GLEntriesOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -494,6 +521,9 @@ func (h *handlers) listGLEntries(ctx context.Context, in GLEntriesInput) (GLEntr
 	}
 	from, to, err := dateRange(in.FromDate, in.ToDate)
 	if err != nil {
+		return out, err
+	}
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
 		return out, err
 	}
 	if err := checkOptionalText("account", in.Account); err != nil {
@@ -569,6 +599,9 @@ func glPage(ctx context.Context, c *frappe.Client, erp string, from, to time.Tim
 
 func (h *handlers) listPurchaseInvoices(ctx context.Context, in PurchaseInvoicesInput) (PurchaseInvoicesOutput, error) {
 	var out PurchaseInvoicesOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -579,6 +612,9 @@ func (h *handlers) listPurchaseInvoices(ctx context.Context, in PurchaseInvoices
 	}
 	from, to, err := dateRange(in.FromDate, in.ToDate)
 	if err != nil {
+		return out, err
+	}
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
 		return out, err
 	}
 	if err := checkOptionalText("supplier", in.Supplier); err != nil {
@@ -597,6 +633,9 @@ func (h *handlers) listPurchaseInvoices(ctx context.Context, in PurchaseInvoices
 
 func (h *handlers) listSalesInvoices(ctx context.Context, in SalesInvoicesInput) (SalesInvoicesOutput, error) {
 	var out SalesInvoicesOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -607,6 +646,9 @@ func (h *handlers) listSalesInvoices(ctx context.Context, in SalesInvoicesInput)
 	}
 	from, to, err := dateRange(in.FromDate, in.ToDate)
 	if err != nil {
+		return out, err
+	}
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
 		return out, err
 	}
 	invs, err := salesInvoices(ctx, c, erp, from, to)
@@ -630,6 +672,9 @@ func (h *handlers) listSalesInvoices(ctx context.Context, in SalesInvoicesInput)
 
 func (h *handlers) listPayments(ctx context.Context, in PaymentsInput) (PaymentsOutput, error) {
 	var out PaymentsOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -640,6 +685,9 @@ func (h *handlers) listPayments(ctx context.Context, in PaymentsInput) (Payments
 	}
 	from, to, err := dateRange(in.FromDate, in.ToDate)
 	if err != nil {
+		return out, err
+	}
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
 		return out, err
 	}
 	if err := checkOptionalText("party", in.Party); err != nil {
@@ -658,6 +706,9 @@ func (h *handlers) listPayments(ctx context.Context, in PaymentsInput) (Payments
 
 func (h *handlers) getAccountHistory(ctx context.Context, in AccountHistoryInput) (AccountHistoryOutput, error) {
 	var out AccountHistoryOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -675,10 +726,22 @@ func (h *handlers) getAccountHistory(ctx context.Context, in AccountHistoryInput
 	if err := checkCount("months", in.Months); err != nil {
 		return out, err
 	}
+	// An empty through_month is the run's month when the call is scoped,
+	// and the current month otherwise.
 	through := in.ThroughMonth
 	if through == "" {
-		through = h.now().UTC().Format(monthLayout)
-	} else if _, err := parseMonth("through_month", through); err != nil {
+		if sc, ok := h.deps.Scope.Scope(callRequest(ctx)); ok {
+			through = sc.Month()
+		} else {
+			through = h.now().UTC().Format(monthLayout)
+		}
+	}
+	last, err := parseMonth("through_month", through)
+	if err != nil {
+		return out, err
+	}
+	// The months read: months-1 months before through_month, to its end.
+	if err := h.scopeRange(ctx, in.Company, last.AddDate(0, -(in.Months-1), 0), last.AddDate(0, 1, -1)); err != nil {
 		return out, err
 	}
 	// Check the account first so a wrong name is an input error the model
@@ -699,6 +762,9 @@ func (h *handlers) getAccountHistory(ctx context.Context, in AccountHistoryInput
 
 func (h *handlers) listRecurringSuppliers(ctx context.Context, in RecurringSuppliersInput) (RecurringSuppliersOutput, error) {
 	var out RecurringSuppliersOutput
+	if err := h.scopeCompany(ctx, in.Company); err != nil {
+		return out, err
+	}
 	c, err := h.client()
 	if err != nil {
 		return out, err
@@ -725,6 +791,9 @@ func (h *handlers) listRecurringSuppliers(ctx context.Context, in RecurringSuppl
 		}
 	}
 	from, to := RecurringWindow(before, in.LookbackMonths)
+	if err := h.scopeRange(ctx, in.Company, from, to); err != nil {
+		return out, err
+	}
 	invs, err := purchaseInvoices(ctx, c, erp, from, to, "", "lookback_months")
 	if err != nil {
 		return out, fmt.Errorf("%s: %w", ToolListRecurringSuppliers, err)

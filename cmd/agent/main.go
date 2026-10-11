@@ -4,6 +4,7 @@
 //
 //	agent close --company sharma --month 2026-09 [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
 //	agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
+//	agent mint-scope --company sharma --month 2026-09 [--ttl 1h]
 //
 // Each finding is explained by the LLM explainer (CC-704) through
 // LLM_PROVIDER: claude-cli (the default, the local claude -p, no API key)
@@ -32,7 +33,12 @@
 //
 // The agent reaches ERPNext and the evidence store only through the
 // read-only MCP servers; this binary must not link the ERPNext client
-// (deps_test.go).
+// (deps_test.go). Each run's MCP calls carry a scope signed with
+// MCP_SCOPE_KEY that binds them to the run's company and months (CC-506).
+// mint-scope prints such a scope (an X-Run-Scope header value, valid for
+// --ttl, at most 24h) and nothing else, for a manual MCP Inspector session;
+// it needs MCP_SCOPE_KEY, and, like every command, the variables cli.Main
+// requires, though it uses none of them.
 package main
 
 import (
@@ -46,6 +52,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -54,6 +61,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
@@ -84,6 +92,9 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	cmd, err := parseArgs(args)
 	if err != nil {
 		return err
+	}
+	if cmd.name == cmdMintScope {
+		return mintScope(cfg, cmd, time.Now(), stdout)
 	}
 	stopTrace, err := telemetry.Init(ctx, "agent", cfg, log)
 	if err != nil {
@@ -196,6 +207,25 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 			_, _ = fmt.Fprintln(stdout, string(line))
 		}
 	}
+	return err
+}
+
+// mintScope prints the X-Run-Scope header value of a manual session of
+// cmd.company for cmd.month, valid for cmd.ttl from now. The run ID is
+// manual-<uuid>, which the audit log shows as agent:run/manual-<uuid>.
+func mintScope(cfg config.Config, cmd command, now time.Time, out io.Writer) error {
+	if cfg.MCPScopeKey.IsZero() {
+		return errors.New("agent: mint-scope needs " + config.EnvMCPScopeKey + " (the key the MCP servers verify with)")
+	}
+	sc, err := mcpkit.Window(cmd.company, "manual-"+uuid.NewString(), cmd.month, now.Add(cmd.ttl))
+	if err != nil {
+		return fmt.Errorf("agent: mint-scope: %w", err)
+	}
+	header, err := mcpkit.Mint([]byte(cfg.MCPScopeKey.Reveal()), sc)
+	if err != nil {
+		return fmt.Errorf("agent: mint-scope: %w", err)
+	}
+	_, err = fmt.Fprintln(out, header)
 	return err
 }
 

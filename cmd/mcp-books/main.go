@@ -40,7 +40,7 @@ func main() {
 func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string) error {
 	fs := flag.NewFlagSet("mcp-books", flag.ContinueOnError)
 	fs.SetOutput(os.Stderr)
-	transport := fs.String("transport", "http", "transport: http or stdio")
+	transport := fs.String("transport", "http", "transport: http (scoped: needs MCP_SCOPE_KEY, and every /mcp request a valid X-Run-Scope) or stdio (unscoped: a local process with no network)")
 	addr := fs.String("addr", ":7001", "listen address for HTTP transport")
 	companies := fs.String("companies", "config/companies", "directory of company profiles (<id>.yaml) that map company IDs to ERPNext company names")
 
@@ -60,6 +60,9 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if *transport != "http" && *transport != "stdio" {
 		return fmt.Errorf("mcp-books: unknown transport %q (want http or stdio)", *transport)
 	}
+	if *transport == "http" && cfg.MCPScopeKey.IsZero() {
+		return errNoScopeKey
+	}
 
 	// Fail on bad company profiles before touching the database.
 	if _, err := seed.LoadProfiles(*companies); err != nil {
@@ -72,35 +75,65 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	}
 	defer st.Close()
 
-	booksServer, err := newBooksServer(cfg, *companies, log, st)
-	if err != nil {
-		return err
-	}
-
 	switch *transport {
 	case "stdio":
+		// Unscoped: a local process with no network, driven by one user.
+		booksServer, err := newBooksServer(cfg, *companies, log, nil, st)
+		if err != nil {
+			return err
+		}
 		log.Info("starting mcp-books in stdio mode")
 		return mcpkit.RunStdio(ctx, booksServer)
 	case "http":
-		adminServer := mcpkit.NewServer("close-copilot-books-admin", buildinfo.Version)
-		routes := map[string]mcpkit.Route{
-			"/mcp":       mcpkit.NewAgentRoute(booksServer, cfg),
-			"/mcp-admin": mcpkit.NewAdminRoute(adminServer, cfg),
+		routes, opts, err := httpRoutes(cfg, *companies, log, st)
+		if err != nil {
+			return err
 		}
-		return mcpkit.ServeHTTP(ctx, *addr, routes, log, mcpkit.WithActors(map[string]string{
-			"/mcp":       "agent",
-			"/mcp-admin": "admin",
-		}))
+		return mcpkit.ServeHTTP(ctx, *addr, routes, log, opts...)
 	default:
 		return fmt.Errorf("mcp-books: unknown transport %q (want http or stdio)", *transport)
 	}
+}
+
+// errNoScopeKey refuses an HTTP server without MCP_SCOPE_KEY: /mcp would
+// otherwise read any company and any month.
+var errNoScopeKey = errors.New("mcp-books: --transport http needs " + config.EnvMCPScopeKey +
+	" (see .env.example); without it /mcp can't bind calls to a run")
+
+// httpRoutes is what --transport http serves: the scoped read-only books
+// tools at /mcp and the admin server at /mcp-admin, which is never scoped.
+// The same Scoper guards /mcp at the HTTP layer (401 without a valid
+// X-Run-Scope) and in every tool handler (out_of_scope).
+func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, sinks ...mcpkit.AuditSink) (map[string]mcpkit.Route, []mcpkit.Option, error) {
+	if cfg.MCPScopeKey.IsZero() {
+		return nil, nil, errNoScopeKey
+	}
+	scoper, err := mcpkit.NewScoper(cfg.MCPScopeKey.Reveal())
+	if err != nil {
+		return nil, nil, fmt.Errorf("mcp-books: %w", err)
+	}
+	booksServer, err := newBooksServer(cfg, companiesDir, log, scoper, sinks...)
+	if err != nil {
+		return nil, nil, err
+	}
+	adminServer := mcpkit.NewServer("close-copilot-books-admin", buildinfo.Version)
+	routes := map[string]mcpkit.Route{
+		"/mcp":           mcpkit.NewAgentRoute(booksServer, cfg),
+		mcpkit.AdminPath: mcpkit.NewAdminRoute(adminServer, cfg),
+	}
+	opts := []mcpkit.Option{
+		mcpkit.WithActors(map[string]string{"/mcp": "agent", mcpkit.AdminPath: "admin"}),
+		mcpkit.WithScoper(scoper, "/mcp"),
+	}
+	return routes, opts, nil
 }
 
 // newBooksServer builds the /mcp server with the read-only books tools: it
 // loads the company profiles from companiesDir and an ERPNext client with
 // the bot key (ERP_API_KEY, ERP_API_SECRET), never the seeder key. Failed
 // tool calls are logged to log in full; the model sees fixed messages.
-func newBooksServer(cfg config.Config, companiesDir string, log *slog.Logger, sinks ...mcpkit.AuditSink) (*mcp.Server, error) {
+// scope binds calls to their run (nil only for stdio and tests).
+func newBooksServer(cfg config.Config, companiesDir string, log *slog.Logger, scope *mcpkit.Scoper, sinks ...mcpkit.AuditSink) (*mcp.Server, error) {
 	profiles, err := seed.LoadProfiles(companiesDir)
 	if err != nil {
 		return nil, fmt.Errorf("mcp-books: company profiles: %w", err)
@@ -118,6 +151,7 @@ func newBooksServer(cfg config.Config, companiesDir string, log *slog.Logger, si
 		Companies: books.ProfileCompanies(profiles),
 		Now:       time.Now,
 		Logger:    log,
+		Scope:     scope,
 	})
 	return s, nil
 }

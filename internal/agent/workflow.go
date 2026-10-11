@@ -70,6 +70,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
@@ -414,6 +415,10 @@ type outcome struct {
 func (w *Workflow) drive(parent context.Context, run store.CloseRun) (Result, error) {
 	ctx, cancel := context.WithTimeout(parent, w.runTimeout())
 	defer cancel()
+	ctx, err := w.scopeRun(ctx, run)
+	if err != nil {
+		return w.end(parent, ctx, run, outcome{}, err)
+	}
 
 	// A resumed run is a new trace; its ID replaces the stored one. The
 	// span holds the run ID and month only, never names or amounts.
@@ -434,7 +439,7 @@ func (w *Workflow) drive(parent context.Context, run store.CloseRun) (Result, er
 	}
 
 	var out outcome
-	err := w.Store.SetRunState(ctx, run.ID, store.RunRunning, "")
+	err = w.Store.SetRunState(ctx, run.ID, store.RunRunning, "")
 	if err == nil {
 		out, err = w.stages(ctx, run)
 	}
@@ -444,6 +449,31 @@ func (w *Workflow) drive(parent context.Context, run store.CloseRun) (Result, er
 		telemetry.Fail(span, "close run failed")
 	}
 	return res, err
+}
+
+// scopeRun puts the run's MCP scope (CC-506) on ctx: its company, the
+// window of its month (mcpkit.Window), valid until a minute after the
+// run's deadline. Every MCP call of the run sends it, and the servers
+// refuse anything outside it. A resume mints a new scope for its new
+// deadline. Without MCP_SCOPE_KEY (unscoped test servers) ctx is returned
+// as it is.
+func (w *Workflow) scopeRun(ctx context.Context, run store.CloseRun) (context.Context, error) {
+	if w.Config.MCPScopeKey.IsZero() {
+		return ctx, nil
+	}
+	deadline, ok := ctx.Deadline()
+	if !ok {
+		return ctx, errors.New("agent: run scope: the run has no deadline")
+	}
+	sc, err := mcpkit.Window(run.CompanyID, run.ID.String(), run.Month, deadline.Add(time.Minute))
+	if err != nil {
+		return ctx, fmt.Errorf("agent: run scope: %w", err)
+	}
+	header, err := mcpkit.Mint([]byte(w.Config.MCPScopeKey.Reveal()), sc)
+	if err != nil {
+		return ctx, fmt.Errorf("agent: run scope: %w", err)
+	}
+	return WithRunScope(ctx, header), nil
 }
 
 // end records the run's final state on a fresh context, so a cancelled or

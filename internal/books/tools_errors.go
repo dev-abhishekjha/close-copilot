@@ -10,6 +10,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/abhishekjha/close-copilot/internal/frappe"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 )
 
 // Bounds on one tool call.
@@ -47,7 +48,8 @@ func tool[In, Out any](h *handlers, fn func(context.Context, In) (Out, error)) m
 	return func(ctx context.Context, req *mcp.CallToolRequest, in In) (*mcp.CallToolResult, Out, error) {
 		ctx, cancel := context.WithTimeout(ctx, h.timeout)
 		defer cancel()
-		out, err := fn(ctx, in)
+		// The handlers read the call's run scope through ctx (callRequest).
+		out, err := fn(context.WithValue(ctx, callRequestKey{}, req), in)
 		if err != nil {
 			var zero Out
 			name := ""
@@ -60,14 +62,29 @@ func tool[In, Out any](h *handlers, fn func(context.Context, In) (Out, error)) m
 	}
 }
 
-// toModelError maps err to what the model may see. Bad input keeps its
-// field-named message; everything else becomes one of the fixed messages
-// by class, and the full error is logged.
+// callRequestKey holds the *mcp.CallToolRequest of the call in a
+// handler's context.
+type callRequestKey struct{}
+
+// callRequest is the request of the call ctx belongs to, or nil.
+func callRequest(ctx context.Context) *mcp.CallToolRequest {
+	req, _ := ctx.Value(callRequestKey{}).(*mcp.CallToolRequest)
+	return req
+}
+
+// toModelError maps err to what the model may see. Bad input and an
+// out_of_scope refusal keep their own message (neither carries ERPNext
+// detail); everything else becomes one of the fixed messages by class,
+// and the full error is logged.
 func (h *handlers) toModelError(ctx context.Context, toolName string, err error) error {
 	var ie *inputError
 	if errors.As(err, &ie) {
 		h.logger().InfoContext(ctx, "books tool: invalid input", "tool", toolName, "err", ie.Error())
 		return ie
+	}
+	if errors.Is(err, mcpkit.ErrOutOfScope) {
+		h.logger().WarnContext(ctx, "books tool: call outside the run scope refused", "tool", toolName)
+		return err
 	}
 	h.logger().ErrorContext(ctx, "books tool failed", "tool", toolName, "err", err.Error())
 	switch {

@@ -550,9 +550,22 @@ tasks:
     depends_on: [CC-502, CC-503, CC-504a]
     needs_erpnext: false
     files:
-      - "internal/mcpkit/scope.go"
+      - "internal/mcpkit/scope*.go"
+      - "internal/mcpkit/http.go"
+      - "internal/mcpkit/*_test.go"
       - "internal/books/tools*.go"
-      - "internal/evidence/tools.go"
+      - "internal/books/contract_test.go"
+      - "internal/evidence/tools*.go"
+      - "internal/evidence/contract_test.go"
+      - "cmd/mcp-books/*.go"
+      - "cmd/mcp-evidence/*.go"
+      - "internal/agent/registry*.go"
+      - "internal/agent/workflow*.go"
+      - "internal/agent/explain*.go"
+      - "internal/store/explanations*.go"
+      - "internal/store/verdicts_integration_test.go"
+      - "cmd/agent/main.go"
+      - "cmd/agent/args*.go"
     check: "Out-of-scope arguments return a tool error; contract test"
   - id: CC-603
     title: "Duplicate vendor payment detector"
