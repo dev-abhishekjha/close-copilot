@@ -38,7 +38,7 @@ const (
 const (
 	ReasonNoMatch    = "no_match"    // the finding matches no truth item
 	ReasonDuplicate  = "duplicate"   // its truth item is already matched by another finding
-	ReasonCleanMonth = "clean_month" // any scored finding in the clean control month
+	ReasonCleanMonth = "clean_month" // a clean-month finding that matches none of that month's truth items, or a duplicate
 	// ReasonRunFailed is a missed item's reason when its month's run failed.
 	ReasonRunFailed = "run_failed"
 )
@@ -704,19 +704,10 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 			ts(f.Type).Findings++
 		}
 
-		if e.Control {
-			s.Clean.Findings += int64(len(scored))
-			for _, f := range sortFindings(scored) {
-				s.Clean.FalseAlarms++
-				ts(f.Type).FalseAlarms++
-				s.FalseAlarms = append(s.FalseAlarms, falseAlarm(e, f, ReasonCleanMonth, repro, m.ResultPath))
-			}
-			// A clean month's truth has no planted items (LoadGroundTruth
-			// rejects a clean month with any); its investigations, if
-			// any, are not graded there.
-			continue
-		}
-
+		// Clean and normal months are matched and graded the same way. A
+		// clean month's truth has no planted items (LoadGroundTruth
+		// rejects a clean month with any), so only its expected items and
+		// investigations can be targets there.
 		mm := matchMonth(m.Truth, scored)
 		for ti, t := range mm.targets {
 			fi := mm.byTarget[ti]
@@ -759,6 +750,23 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 				}
 				s.Investigations = append(s.Investigations, out)
 			}
+		}
+		if e.Control {
+			// A clean-month finding that matches one of the month's own
+			// expected or investigation items is correct. Every other
+			// one, a duplicate included, is a clean_month false alarm:
+			// Compare fails a run only on that reason.
+			s.Clean.Findings += int64(len(mm.findings))
+			for fi, f := range mm.findings {
+				if mm.byFind[fi] >= 0 {
+					ts(f.Type).Correct++
+					continue
+				}
+				s.Clean.FalseAlarms++
+				ts(f.Type).FalseAlarms++
+				s.FalseAlarms = append(s.FalseAlarms, falseAlarm(e, f, ReasonCleanMonth, repro, m.ResultPath))
+			}
+			continue
 		}
 		for fi, f := range mm.findings {
 			if mm.byFind[fi] >= 0 {

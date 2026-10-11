@@ -776,3 +776,199 @@ func TestScoreMonthsVerifierSums(t *testing.T) {
 		t.Errorf("score.json lacks the verifier counts")
 	}
 }
+
+// cleanGateway is a clean month whose truth lists one gateway settlement
+// as an investigation and one expected finding.
+func cleanGateway() GroundTruth {
+	return GroundTruth{
+		Clean:          true,
+		Expected:       []TruthExpected{{Type: "gstr2b_missing_in_2b", Keys: k("supplier_gstin", "29AAAAA0000A1Z5", "invoice_no_norm", "INV1")}},
+		Investigations: []TruthInvestigation{{ID: "X01", Keys: k("bank_txn_id", "BNK-20260811-002"), ExpectedResolution: "gateway_settlement"}},
+	}
+}
+
+// normalSept is a normal month with three planted charges, all caught.
+func normalSept() MonthInput {
+	return monthIn("sharma", "2026-09", false, threeCharges(),
+		fnd(1, bc, k("bank_txn_id", "BT-1")), fnd(2, bc, k("bank_txn_id", "BT-2")), fnd(3, bc, k("bank_txn_id", "BT-3")))
+}
+
+// checkCleanCount asserts that Clean.FalseAlarms equals the number of
+// clean_month false alarms, and that no other reason appears in the
+// clean month.
+func checkCleanCount(t *testing.T, s Score) {
+	t.Helper()
+	var n int64
+	for _, fa := range s.FalseAlarms {
+		if fa.Reason == ReasonCleanMonth {
+			n++
+			if fa.Month != "2026-08" || fa.Repro == "" || !strings.HasSuffix(fa.Evidence, "#finding/"+fa.FindingID) {
+				t.Errorf("clean false alarm %+v", fa)
+			}
+		} else if fa.Month == "2026-08" {
+			t.Errorf("clean-month false alarm with reason %q: %+v", fa.Reason, fa)
+		}
+	}
+	if s.Clean.FalseAlarms != n {
+		t.Errorf("Clean.FalseAlarms = %d, clean_month false alarms = %d", s.Clean.FalseAlarms, n)
+	}
+}
+
+// cleanCompare runs Compare against a baseline from the normal month
+// alone and returns the clean_false_alarm failure keys.
+func cleanCompare(t *testing.T, s Score) []string {
+	t.Helper()
+	base, err := NewBaseline(mustScore(t, normalSept()), nil, "x")
+	if err != nil {
+		t.Fatal(err)
+	}
+	c, err := Compare(base, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var keys []string
+	for _, f := range c.Failures {
+		if f.Kind == CompareCleanFalseAlarm {
+			keys = append(keys, f.Key)
+		} else {
+			t.Errorf("unexpected compare failure %+v", f)
+		}
+	}
+	return keys
+}
+
+func requireCleanZero(t *testing.T, s Score) error {
+	t.Helper()
+	r, err := ParseRequire("clean.false_alarms==0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	return r.Check(s)
+}
+
+// (a), (g), (h): a gateway finding listed as an investigation is correct.
+func TestScoreCleanInvestigationSurfaced(t *testing.T) {
+	s := mustScore(t, normalSept(),
+		monthIn("sharma", "2026-08", true, cleanGateway(), fnd(9, typeUnmatchedBank, k("bank_txn_id", "BNK-20260811-002", "hint", "gateway"))))
+	if s.Clean.FalseAlarms != 0 || s.Clean.Findings != 1 || s.Clean.Months != 1 || len(s.FalseAlarms) != 0 {
+		t.Errorf("clean %+v false alarms %+v", s.Clean, s.FalseAlarms)
+	}
+	if got := s.Types[typeUnmatchedBank]; got.Correct != 1 || got.FalseAlarms != 0 || got.Findings != 1 {
+		t.Errorf("unmatched_bank_line %+v", got)
+	}
+	if len(s.Investigations) != 1 {
+		t.Fatalf("investigations %+v", s.Investigations)
+	}
+	if x := s.Investigations[0]; x.Outcome != OutcomeSurfaced || x.FindingID != fid(9).String() || x.Key != "sharma-2026-08/X01" {
+		t.Errorf("investigation %+v", x)
+	}
+	if s.Overall.Precision != NewRatio(4, 4) || s.Overall.Recall != NewRatio(3, 3) {
+		t.Errorf("overall %+v", s.Overall)
+	}
+	checkCleanCount(t, s)
+	if err := requireCleanZero(t, s); err != nil {
+		t.Errorf("require clean.false_alarms==0: %v", err)
+	}
+	if keys := cleanCompare(t, s); len(keys) != 0 {
+		t.Errorf("compare clean false alarms %v", keys)
+	}
+}
+
+// (b), (g), (h): the same finding with no truth item is a false alarm.
+func TestScoreCleanNoTruthItem(t *testing.T) {
+	s := mustScore(t, normalSept(),
+		monthIn("sharma", "2026-08", true, GroundTruth{Clean: true}, fnd(9, typeUnmatchedBank, k("bank_txn_id", "BNK-20260811-002", "hint", "gateway"))))
+	if s.Clean.FalseAlarms != 1 || s.Clean.Findings != 1 || len(s.FalseAlarms) != 1 || s.FalseAlarms[0].Reason != ReasonCleanMonth ||
+		s.FalseAlarms[0].FindingID != fid(9).String() {
+		t.Errorf("clean %+v false alarms %+v", s.Clean, s.FalseAlarms)
+	}
+	if got := s.Types[typeUnmatchedBank]; got.Correct != 0 || got.FalseAlarms != 1 {
+		t.Errorf("unmatched_bank_line %+v", got)
+	}
+	checkCleanCount(t, s)
+	if err := requireCleanZero(t, s); err == nil || !strings.Contains(err.Error(), "clean.false_alarms is 1") {
+		t.Errorf("require = %v", err)
+	}
+	if keys := cleanCompare(t, s); len(keys) != 1 || keys[0] != "sharma-2026-08/"+fid(9).String() {
+		t.Errorf("compare clean false alarms %v", keys)
+	}
+}
+
+// (c): a finding that matches an expected item is not a false alarm.
+func TestScoreCleanExpected(t *testing.T) {
+	s := mustScore(t, monthIn("sharma", "2026-08", true, cleanGateway(),
+		fnd(9, "gstr2b_missing_in_2b", k("supplier_gstin", "29AAAAA0000A1Z5", "invoice_no_norm", "INV1"))))
+	if s.Clean.FalseAlarms != 0 || s.Clean.Findings != 1 || len(s.FalseAlarms) != 0 {
+		t.Errorf("clean %+v false alarms %+v", s.Clean, s.FalseAlarms)
+	}
+	if got := s.Types["gstr2b_missing_in_2b"]; got.Correct != 1 {
+		t.Errorf("gstr2b_missing_in_2b %+v", got)
+	}
+	// The investigation no finding surfaced is graded and listed.
+	if len(s.Investigations) != 1 || s.Investigations[0].Outcome != OutcomeNotSurfaced {
+		t.Errorf("investigations %+v", s.Investigations)
+	}
+	checkCleanCount(t, s)
+}
+
+// (d), (h): a second finding for the same investigation keeps reason
+// clean_month, never duplicate.
+func TestScoreCleanDuplicate(t *testing.T) {
+	s := mustScore(t, normalSept(), monthIn("sharma", "2026-08", true, cleanGateway(),
+		fnd(9, typeUnmatchedBank, k("bank_txn_id", "BNK-20260811-002")),
+		fnd(10, typeUnmatchedBank, k("bank_txn_id", "BNK-20260811-002"))))
+	if s.Clean.FalseAlarms != 1 || s.Clean.Findings != 2 || len(s.FalseAlarms) != 1 {
+		t.Fatalf("clean %+v false alarms %+v", s.Clean, s.FalseAlarms)
+	}
+	if fa := s.FalseAlarms[0]; fa.Reason != ReasonCleanMonth || fa.FindingID != fid(10).String() {
+		t.Errorf("false alarm %+v", fa)
+	}
+	if x := s.Investigations[0]; x.Outcome != OutcomeSurfaced || x.FindingID != fid(9).String() {
+		t.Errorf("investigation %+v", x)
+	}
+	if got := s.Types[typeUnmatchedBank]; got.Correct != 1 || got.FalseAlarms != 1 || got.Findings != 2 {
+		t.Errorf("unmatched_bank_line %+v", got)
+	}
+	checkCleanCount(t, s)
+	if keys := cleanCompare(t, s); len(keys) != 1 || keys[0] != "sharma-2026-08/"+fid(10).String() {
+		t.Errorf("compare clean false alarms %v", keys)
+	}
+}
+
+// (e), (h): a clean-month unmatched_bank_line whose keys differ from every
+// item is a false alarm; so is an investigation's keys on another type.
+func TestScoreCleanKeysDiffer(t *testing.T) {
+	s := mustScore(t, normalSept(), monthIn("sharma", "2026-08", true, cleanGateway(),
+		fnd(9, typeUnmatchedBank, k("bank_txn_id", "BNK-20260811-003")),
+		fnd(10, bc, k("bank_txn_id", "BNK-20260811-002"))))
+	if s.Clean.FalseAlarms != 2 || s.Clean.Findings != 2 || len(s.FalseAlarms) != 2 {
+		t.Fatalf("clean %+v false alarms %+v", s.Clean, s.FalseAlarms)
+	}
+	for _, fa := range s.FalseAlarms {
+		if fa.Reason != ReasonCleanMonth {
+			t.Errorf("false alarm %+v", fa)
+		}
+	}
+	if s.Investigations[0].Outcome != OutcomeNotSurfaced {
+		t.Errorf("investigation %+v", s.Investigations[0])
+	}
+	checkCleanCount(t, s)
+	if keys := cleanCompare(t, s); len(keys) != 2 {
+		t.Errorf("compare clean false alarms %v", keys)
+	}
+}
+
+// (f): an unscored type in a clean month is listed, never a false alarm
+// and never matched.
+func TestScoreCleanUnscored(t *testing.T) {
+	s := mustScore(t, monthIn("sharma", "2026-08", true, cleanGateway(),
+		fnd(9, "variance", k("bank_txn_id", "BNK-20260811-002")),
+		fnd(10, "unmatched_ledger_entry", k("gl_entry", "GLE-1"))))
+	if s.Clean.FalseAlarms != 0 || s.Clean.Findings != 0 || len(s.FalseAlarms) != 0 || s.Overall.Unscored != 2 || len(s.Unscored) != 2 {
+		t.Errorf("clean %+v false alarms %+v unscored %+v", s.Clean, s.FalseAlarms, s.Unscored)
+	}
+	if s.Investigations[0].Outcome != OutcomeNotSurfaced {
+		t.Errorf("investigation %+v", s.Investigations[0])
+	}
+	checkCleanCount(t, s)
+}
