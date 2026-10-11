@@ -547,7 +547,7 @@ tasks:
     owner: integration-engineer
     risk: regulated
     human_review: true
-    depends_on: [CC-502, CC-503]
+    depends_on: [CC-502, CC-503, CC-504a]
     needs_erpnext: false
     files:
       - "internal/mcpkit/scope.go"
