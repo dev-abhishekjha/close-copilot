@@ -1,0 +1,117 @@
+{
+  "tiers": {
+    "llm": null,
+    "replay": {
+      "agent": false,
+      "aggregates": {
+        "clean": {
+          "failed_months": 0,
+          "false_alarms": 0,
+          "findings": 3,
+          "months": 1
+        },
+        "overall": {
+          "caught": 3,
+          "correct": 8,
+          "false_alarms": 0,
+          "findings": 8,
+          "missed": 0,
+          "planted": 3,
+          "precision": {
+            "den": 8,
+            "num": 8,
+            "percent": "100.0%"
+          },
+          "recall": {
+            "den": 3,
+            "num": 3,
+            "percent": "100.0%"
+          },
+          "unscored": 0
+        },
+        "runs": {
+          "cost_usd": {
+            "mean": "0",
+            "p95": "0",
+            "total": "0"
+          },
+          "duration_ms": {
+            "mean": 43,
+            "p95": 59,
+            "total": 86
+          },
+          "runs": 2,
+          "tokens": {
+            "cache_read": 0,
+            "input": 0,
+            "output": 0
+          }
+        },
+        "types": {
+          "unmatched_bank_line": {
+            "caught": 0,
+            "correct": 5,
+            "false_alarms": 0,
+            "findings": 5,
+            "missed": 0,
+            "planted": 0,
+            "precision": {
+              "den": 5,
+              "num": 5,
+              "percent": "100.0%"
+            },
+            "recall": {
+              "den": 0,
+              "num": 0,
+              "percent": "n/a"
+            }
+          },
+          "unrecorded_bank_charge": {
+            "caught": 3,
+            "correct": 3,
+            "false_alarms": 0,
+            "findings": 3,
+            "missed": 0,
+            "planted": 3,
+            "precision": {
+              "den": 3,
+              "num": 3,
+              "percent": "100.0%"
+            },
+            "recall": {
+              "den": 3,
+              "num": 3,
+              "percent": "100.0%"
+            }
+          }
+        },
+        "verified_rate": {
+          "den": 8,
+          "num": 0,
+          "percent": "0.0%"
+        }
+      },
+      "commit": "dev",
+      "investigations": {
+        "sharma-2026-08/X01": "surfaced",
+        "sharma-2026-08/X02": "surfaced",
+        "sharma-2026-08/X03": "surfaced",
+        "sharma-2026-09/X01": "surfaced",
+        "sharma-2026-09/X02": "surfaced"
+      },
+      "items": {
+        "sharma-2026-09/E01": "caught",
+        "sharma-2026-09/E02": "caught",
+        "sharma-2026-09/E03": "caught"
+      },
+      "models": {
+        "fast": "haiku",
+        "strong": "sonnet"
+      },
+      "noise": {},
+      "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
+      "suite": "suite-skeleton"
+    }
+  },
+  "version": 2
+}
