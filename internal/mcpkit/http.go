@@ -26,10 +26,28 @@ func RequestIDFromContext(ctx context.Context) string {
 	return ""
 }
 
+// Option configures BuildHandler and ServeHTTP.
+type Option func(*handlerOptions)
+
+type handlerOptions struct {
+	actors map[string]string
+}
+
+// WithActors maps a route path to the audit actor of calls on it, for example
+// "/mcp" to "agent" and "/mcp-admin" to "admin". The actor is set server-side
+// from which route authenticated, never from the request body.
+func WithActors(actors map[string]string) Option {
+	return func(o *handlerOptions) { o.actors = actors }
+}
+
 // BuildHandler constructs an http.Handler with health check, routes, and middleware chain.
-func BuildHandler(routes map[string]Route, log *slog.Logger) http.Handler {
+func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) http.Handler {
 	if log == nil {
 		log = slog.Default()
+	}
+	var o handlerOptions
+	for _, opt := range opts {
+		opt(&o)
 	}
 
 	mux := http.NewServeMux()
@@ -48,7 +66,13 @@ func BuildHandler(routes map[string]Route, log *slog.Logger) http.Handler {
 		}, nil)
 
 		// Authenticate with Bearer token
-		authed := RequireBearer(r.Token, streamHandler)
+		var inner http.Handler = streamHandler
+		if actor, ok := o.actors[path]; ok {
+			inner = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+				streamHandler.ServeHTTP(w, req.WithContext(ContextWithActor(req.Context(), actor)))
+			})
+		}
+		authed := RequireBearer(r.Token, inner)
 		mux.Handle(path, authed)
 	}
 
@@ -58,12 +82,12 @@ func BuildHandler(routes map[string]Route, log *slog.Logger) http.Handler {
 
 // ServeHTTP starts an HTTP server serving the given routes and shuts down
 // gracefully with a 10-second timeout when ctx is cancelled.
-func ServeHTTP(ctx context.Context, addr string, routes map[string]Route, log *slog.Logger) error {
+func ServeHTTP(ctx context.Context, addr string, routes map[string]Route, log *slog.Logger, opts ...Option) error {
 	if log == nil {
 		log = slog.Default()
 	}
 
-	handler := BuildHandler(routes, log)
+	handler := BuildHandler(routes, log, opts...)
 	srv := &http.Server{
 		Addr:              addr,
 		Handler:           handler,

@@ -28,6 +28,7 @@ import (
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/abhishekjha/close-copilot/internal/frappe"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/money"
 	"github.com/abhishekjha/close-copilot/internal/seed"
 )
@@ -123,7 +124,7 @@ func readOnly() *mcp.ToolAnnotations {
 // RegisterTools adds the seven read-only books tools to s.
 func RegisterTools(s *mcp.Server, deps ToolDeps) {
 	h := &handlers{deps: deps, timeout: toolTimeout}
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolGetTrialBalance,
 		Description: "Trial balance of the company for a date range, computed from submitted GL Entries: " +
 			"one row per leaf account with a non-zero value, giving the opening balance, the period's debit and credit totals " +
@@ -133,7 +134,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"All amounts are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
 		Annotations: readOnly(),
 	}, tool(h, h.getTrialBalance))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolListGLEntries,
 		Description: "General-ledger entries (submitted, not cancelled) of the company posted in a date range, ordered by entry name, " +
 			"500 a page. Optionally filter by exact account name (e.g. \"HDFC Current 0001 - STPL\") or exact party name. " +
@@ -142,7 +143,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"Debit and credit are integers in paise (1 rupee = 100 paise). Dates are YYYY-MM-DD; the range is at most 400 days.",
 		Annotations: readOnly(),
 	}, tool(h, h.listGLEntries))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolListPurchaseInvoices,
 		Description: "Submitted purchase invoices (supplier bills) of the company posted in a date range, optionally for one supplier, " +
 			"with the supplier's GSTIN, bill number and date, taxable value, IGST, CGST and SGST, each expense line " +
@@ -151,7 +152,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"Dates are YYYY-MM-DD; the range is at most 400 days.",
 		Annotations: readOnly(),
 	}, tool(h, h.listPurchaseInvoices))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolListSalesInvoices,
 		Description: "Submitted sales invoices of the company posted in a date range, with customer, totals, outstanding amount, " +
 			"lines and tax rows, and collected_via: the account the customer's payment went into (the bank account, or " +
@@ -160,7 +161,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"Dates are YYYY-MM-DD; the range is at most 400 days.",
 		Annotations: readOnly(),
 	}, tool(h, h.listSalesInvoices))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolListPayments,
 		Description: "Submitted payment entries (payments to suppliers, receipts from customers, internal transfers) of the company " +
 			"posted in a date range, optionally for one party (exact party name), with amount, bank reference number, " +
@@ -169,7 +170,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"Dates are YYYY-MM-DD; the range is at most 400 days.",
 		Annotations: readOnly(),
 	}, tool(h, h.listPayments))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolGetAccountHistory,
 		Description: "Monthly debit, credit and net (debit minus credit) of one leaf account over the last 1 to 12 calendar months " +
 			"ending with through_month (default: the current month), oldest first, with zeros for months without entries. " +
@@ -177,7 +178,7 @@ func RegisterTools(s *mcp.Server, deps ToolDeps) {
 			"Amounts are integers in paise (1 rupee = 100 paise); months are YYYY-MM.",
 		Annotations: readOnly(),
 	}, tool(h, h.getAccountHistory))
-	mcp.AddTool(s, &mcp.Tool{
+	mcpkit.AddTool(s, &mcp.Tool{
 		Name: ToolListRecurringSuppliers,
 		Description: "Suppliers that billed regularly in the lookback_months calendar months before before_month: billed in at least " +
 			"min_occurrences distinct months with every bill within amount_band_pct percent (default 20) of their median. " +
