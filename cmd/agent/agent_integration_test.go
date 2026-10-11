@@ -385,4 +385,33 @@ func TestCloseCLI(t *testing.T) {
 			t.Errorf("bad arguments created %d runs", after-before)
 		}
 	})
+
+	// CC-710: explaining fails closed without a valid PSEUDONYM_KEY, before
+	// any run or model call, and never prints the value.
+	t.Run("explaining without a valid PSEUDONYM_KEY refuses to start", func(t *testing.T) {
+		var before int
+		_ = e.st.Pool().QueryRow(ctx, `SELECT count(*) FROM close_runs`).Scan(&before)
+		const badKey = "not-a-hex-key-zz"
+		for _, env := range [][]string{nil, {"PSEUDONYM_KEY=" + badKey}} {
+			cmd, stdout, stderr := e.command(t, "close", "--company", "sharma", "--month", "2026-09")
+			if cmd.Args[len(cmd.Args)-1] != "--no-explain" {
+				t.Fatalf("command args %v", cmd.Args)
+			}
+			cmd.Args = cmd.Args[:len(cmd.Args)-1]
+			cmd.Env = append(cmd.Env, env...)
+			err := cmd.Run()
+			var exit *exec.ExitError
+			if !errors.As(err, &exit) || exit.ExitCode() == 0 {
+				t.Errorf("env %v: exit %v, want non-zero", env, err)
+			}
+			if !strings.Contains(stderr.String(), "PSEUDONYM_KEY") || strings.Contains(stderr.String()+stdout.String(), badKey) {
+				t.Errorf("env %v: stderr %q must name PSEUDONYM_KEY and not the value", env, stderr)
+			}
+		}
+		var after int
+		_ = e.st.Pool().QueryRow(ctx, `SELECT count(*) FROM close_runs`).Scan(&after)
+		if after != before {
+			t.Errorf("a refused start created %d runs", after-before)
+		}
+	})
 }

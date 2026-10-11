@@ -7,6 +7,7 @@ import (
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"sync"
@@ -501,7 +502,7 @@ func TestExplainStoreErrors(t *testing.T) {
 func TestExplainPseudonymiser(t *testing.T) {
 	args := withField(t, "explanation", `"COMPANY_1 has an unbooked charge of ₹5.90."`)
 	fx, model := newExplainFixture(t, answer(args))
-	fx.ex.Pseudonymiser = maskCompany{}
+	fx.ex.NewPseudonymiser = func(uuid.UUID) Pseudonymiser { return maskCompany{} }
 	res, err := fx.ex.Explain(t.Context(), fx.req)
 	if err != nil || res.Status != store.StepDone {
 		t.Fatalf("result %+v, %v", res, err)
@@ -697,5 +698,259 @@ func TestExplainFaultCorruptsTheStoredExplanation(t *testing.T) {
 	a2, _ := fx.st.GetArtifact(t.Context(), res2.OutputRefs[0])
 	if strings.Contains(string(a2.Content), "fault_injected") {
 		t.Error("the fault fired twice")
+	}
+}
+
+// ---- pseudonymisation (CC-710) ----
+
+// maskAccount is a test pseudonymiser that rewrites one account name, as
+// a pseudonymiser would rewrite an account named after a person.
+type maskAccount struct{ restoreTo string }
+
+func (m maskAccount) Mask(data []byte) ([]byte, func([]byte) []byte, error) {
+	masked := bytes.ReplaceAll(data, []byte(chargeAccount), []byte("ACCOUNT_1"))
+	to := cmpOr(m.restoreTo, chargeAccount)
+	return masked, func(b []byte) []byte { return bytes.ReplaceAll(b, []byte("ACCOUNT_1"), []byte(to)) }, nil
+}
+
+func cmpOr(a, b string) string {
+	if a != "" {
+		return a
+	}
+	return b
+}
+
+func TestExplainMasksAccounts(t *testing.T) {
+	masked := strings.ReplaceAll(validArgs, chargeAccount, "ACCOUNT_1")
+
+	// ACCOUNT_1 is in ACCOUNTS; the answer naming it is stored with the
+	// real name.
+	fx, model := newExplainFixture(t, answer(masked))
+	fx.ex.NewPseudonymiser = func(uuid.UUID) Pseudonymiser { return maskAccount{} }
+	res, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil || res.Status != store.StepDone {
+		t.Fatalf("result %+v, %v", res, err)
+	}
+	c, _ := model.LastCall()
+	sys := c.System[0].Text
+	if strings.Contains(sys, chargeAccount) || !strings.Contains(sys, `"ACCOUNT_1"`) {
+		t.Errorf("ACCOUNTS is not masked:\n%s", sys[strings.Index(sys, "ACCOUNTS ("):])
+	}
+	set := fx.st.set[fx.req.Finding.ID]
+	if set.proposal == nil || set.proposal.Payload.Lines[0].Account != chargeAccount {
+		t.Errorf("stored proposal %+v, want %q restored", set.proposal, chargeAccount)
+	}
+	a, _ := fx.st.GetArtifact(t.Context(), res.OutputRefs[0])
+	if bytes.Contains(a.Content, []byte("ACCOUNT_1")) || !bytes.Contains(a.Content, []byte(chargeAccount)) {
+		t.Errorf("explanation artifact %s", a.Content)
+	}
+
+	// The real name is not in the masked ACCOUNTS: rejected, twice.
+	fx2, _ := newExplainFixture(t, answer(validArgs), answer(validArgs))
+	fx2.ex.NewPseudonymiser = func(uuid.UUID) Pseudonymiser { return maskAccount{} }
+	res2, err := fx2.ex.Explain(t.Context(), fx2.req)
+	if err != nil || res2.Status != store.StepFailed || res2.Reason != reasonExplainMalformed+" (proposal.lines.account)" {
+		t.Errorf("real account name: result %+v, %v", res2, err)
+	}
+
+	// A masked name that restores to no real account is never stored.
+	fx3, _ := newExplainFixture(t, answer(masked))
+	fx3.ex.NewPseudonymiser = func(uuid.UUID) Pseudonymiser { return maskAccount{restoreTo: "Suspense - STPL"} }
+	res3, err := fx3.ex.Explain(t.Context(), fx3.req)
+	if err != nil || res3.Status != store.StepFailed || res3.Reason != reasonExplainMalformed+" (proposal.lines.account)" || len(fx3.st.set) != 0 {
+		t.Errorf("bad restore: result %+v, %v, %d stored", res3, err, len(fx3.st.set))
+	}
+}
+
+// redactAccount is an account named after the individual supplier.
+const redactAccount = testPerson + " Capital - STPL"
+
+// newRedactFixture is newExplainFixture with evidence holding a sole
+// proprietor's GSTIN, PAN and name, the Redactor as pseudonymiser, and an
+// account named after the proprietor.
+func newRedactFixture(t *testing.T, script ...llm.ScriptedCall) (*explainFixture, *llm.FakeProvider) {
+	t.Helper()
+	fx, model := newExplainFixture(t, script...)
+	sep := func(d int) time.Time { return time.Date(2026, 9, d, 0, 0, 0, 0, time.UTC) }
+	bank := toolSnapshot{
+		Server: ServerEvidence, Tool: toolListBankLines,
+		Args: map[string]any{"company": explainCompany, "from_date": "2026-09-01", "to_date": "2026-09-30"},
+		Result: []store.BankLine{{CompanyID: explainCompany, TxnID: "HDFC-20260915-C1", TxnDate: sep(15),
+			Narration: "NEFT RAMESH IYER " + testGSTIN + " PAN " + barePAN, AmountPaise: -590}},
+	}
+	invoices := toolSnapshot{
+		Server: ServerBooks, Tool: "list_purchase_invoices",
+		Args: map[string]any{"company": explainCompany},
+		Result: []map[string]any{{"name": "PINV-0001", "supplier": testPerson, "supplier_gstin": testGSTIN,
+			"supplier_pan": testPAN, "company_gstin": otherGSTIN, "grand_total": 590}},
+	}
+	var refs []store.EvidenceRef
+	var shas []string
+	for _, s := range []struct {
+		snap toolSnapshot
+		id   string
+	}{{bank, "HDFC-20260915-C1"}, {invoices, "PINV-0001"}} {
+		sha, err := fx.st.PutArtifact(t.Context(), store.ArtifactToolResult, uuid.Nil, uuid.Nil, s.snap)
+		if err != nil {
+			t.Fatal(err)
+		}
+		shas = append(shas, sha)
+		refs = append(refs, store.EvidenceRef{Server: s.snap.Server, Tool: s.snap.Tool, Args: json.RawMessage(`{"company":"sharma"}`), IDs: []string{s.id}, Artifact: sha})
+	}
+	fx.req.EvidenceRefs = shas
+	fx.req.Finding.Title = "Unrecorded bank charge from " + testPerson + " (" + testGSTIN + ")"
+	fx.req.Finding.Keys = map[string]string{"bank_txn_id": "HDFC-20260915-C1", "supplier_gstin": testGSTIN}
+	fx.req.Finding.Evidence = refs
+	fx.accounts.list = append(slices.Clone(explainAccounts), redactAccount)
+	fx.ex.NewPseudonymiser = func(run uuid.UUID) Pseudonymiser { return NewRedactor(testKey, run, []string{testPerson}) }
+	return fx, model
+}
+
+// redactAnswer is the same answer written with tokens (what the model
+// sees) or with real values.
+func redactAnswer(run uuid.UUID, masked bool) string {
+	name, gstin, pan, acct := testPerson, testGSTIN, testPAN, redactAccount
+	if masked {
+		r := NewRedactor(testKey, run, []string{testPerson})
+		name, gstin, pan, acct = r.MaskString(name), r.MaskString(gstin), r.MaskString(pan), r.MaskString(acct)
+	}
+	return `{"explanation":"` + name + ` (GSTIN ` + gstin + `, PAN ` + pan + `) was paid ₹5.90 on 15 Sep 2026; the books have no entry.",
+"suggested_action":"book_entry","action_note":"Ask ` + name + ` for the invoice.","cited_amounts_paise":[590],"citations":[],
+"needs_review":false,"proposal":{"posting_date":"2026-09-15","lines":[
+{"account":"` + acct + `","debit_paise":590,"credit_paise":0},
+{"account":"HDFC Current 0001 - STPL","debit_paise":0,"credit_paise":590}],"remark":"Paid to ` + name + ` ` + gstin + `"}}`
+}
+
+func TestExplainPseudonymiserRoundTrip(t *testing.T) {
+	run := uuid.MustParse("00000000-0000-4000-8000-000000000001")
+	fx, model := newRedactFixture(t, answer(redactAnswer(run, true)))
+	res, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil || res.Status != store.StepDone {
+		t.Fatalf("result %+v, %v", res, err)
+	}
+	r := NewRedactor(testKey, fx.req.RunID, []string{testPerson})
+	c, _ := model.LastCall()
+	user, sys := c.Messages[0].Content, c.System[0].Text
+	for _, tok := range []string{r.MaskString(testGSTIN), r.MaskString(testPAN), r.MaskString(barePAN), r.MaskString(otherGSTIN), r.MaskString(testPerson)} {
+		if !strings.Contains(user, tok) {
+			t.Errorf("user message lacks token %s", tok)
+		}
+	}
+	if !strings.Contains(sys, `"`+r.MaskString(redactAccount)+`"`) || strings.Contains(sys, testPerson) {
+		t.Error("ACCOUNTS does not hold the masked account")
+	}
+	for _, leak := range []string{testGSTIN, testPAN, barePAN, otherGSTIN, testPerson, strings.ToUpper(testPerson)} {
+		if strings.Contains(user, leak) || strings.Contains(sys, leak) {
+			t.Errorf("prompt holds %q", leak)
+		}
+	}
+	set := fx.st.set[fx.req.Finding.ID]
+	wantExpl := testPerson + " (GSTIN " + testGSTIN + ", PAN " + testPAN + ") was paid ₹5.90 on 15 Sep 2026; the books have no entry."
+	if set.explanation != wantExpl {
+		t.Errorf("explanation %q", set.explanation)
+	}
+	if set.proposal == nil || set.proposal.Payload.Lines[0].Account != redactAccount || set.proposal.Payload.Remark != "Paid to "+testPerson+" "+testGSTIN {
+		t.Errorf("proposal %+v", set.proposal)
+	}
+	a, _ := fx.st.GetArtifact(t.Context(), res.OutputRefs[0])
+	var art ExplanationArtifact
+	if err := json.Unmarshal(a.Content, &art); err != nil {
+		t.Fatal(err)
+	}
+	if art.ActionNote != "Ask "+testPerson+" for the invoice." || tokenRe.MatchString(string(a.Content)) {
+		t.Errorf("artifact %s", a.Content)
+	}
+}
+
+// TestExplainPromptScan is the G5 scan: every stored prompt artifact is
+// free of GSTIN and PAN patterns and of the individual's name, and the
+// stored answer equals the one the same run stores with redaction off.
+func TestExplainPromptScan(t *testing.T) {
+	run := uuid.MustParse("00000000-0000-4000-8000-000000000001")
+	explain := func(t *testing.T, redact bool) (*explainFixture, []byte) {
+		t.Helper()
+		fx, model := newRedactFixture(t, answer(`{"explanation":"half"}`), answer(redactAnswer(run, redact)))
+		if !redact {
+			fx.ex.NewPseudonymiser = nil
+		}
+		fx.req.Model = NewRecordingProvider(model, fx.st, fx.req.RunID, fx.req.StepID)
+		res, err := fx.ex.Explain(t.Context(), fx.req)
+		if err != nil || res.Status != store.StepDone {
+			t.Fatalf("result %+v, %v", res, err)
+		}
+		a, err := fx.st.GetArtifact(t.Context(), res.OutputRefs[0])
+		if err != nil {
+			t.Fatal(err)
+		}
+		return fx, a.Content
+	}
+	prompts := func(fx *explainFixture) []llm.Request {
+		f := fx.st.fakeArtifactStore
+		f.mu.Lock()
+		defer f.mu.Unlock()
+		var out []llm.Request
+		for sha, kind := range f.kinds {
+			if kind != store.ArtifactPrompt {
+				continue
+			}
+			var r llm.Request
+			if err := json.Unmarshal(f.content[sha], &r); err != nil {
+				t.Fatal(err)
+			}
+			out = append(out, r)
+		}
+		return out
+	}
+	leaks := func(r llm.Request) []string {
+		var texts []string
+		for _, b := range r.System {
+			texts = append(texts, b.Text)
+		}
+		for _, m := range r.Messages {
+			texts = append(texts, m.Content)
+			for _, tr := range m.ToolResults {
+				texts = append(texts, tr.Content)
+			}
+			for _, c := range m.ToolCalls {
+				texts = append(texts, string(c.Args))
+			}
+		}
+		var found []string
+		for _, s := range texts {
+			found = append(found, gstinRe.FindAllString(s, -1)...)
+			found = append(found, panRe.FindAllString(s, -1)...)
+			if strings.Contains(strings.ToLower(s), strings.ToLower(testPerson)) {
+				found = append(found, "<name>")
+			}
+		}
+		return found
+	}
+
+	fx, redacted := explain(t, true)
+	ps := prompts(fx)
+	if len(ps) != 2 {
+		t.Fatalf("%d stored prompts, want 2 (one retry)", len(ps))
+	}
+	for i, p := range ps {
+		if l := leaks(p); len(l) != 0 {
+			t.Errorf("stored prompt %d holds %d identifiers", i, len(l))
+		}
+	}
+
+	// The scan finds identifiers when redaction is off, and the stored
+	// answer is the same.
+	fxPlain, plain := explain(t, false)
+	found := false
+	for _, p := range prompts(fxPlain) {
+		found = found || len(leaks(p)) > 0
+	}
+	if !found {
+		t.Error("the scan found nothing in unredacted prompts; it would miss a leak")
+	}
+	if !bytes.Equal(redacted, plain) {
+		t.Errorf("stored explanation differs with redaction:\n%s\n%s", redacted, plain)
+	}
+	if !reflect.DeepEqual(fx.st.set, fxPlain.st.set) {
+		t.Errorf("findings rows differ:\n%+v\n%+v", fx.st.set, fxPlain.st.set)
 	}
 }

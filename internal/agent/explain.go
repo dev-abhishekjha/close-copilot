@@ -132,16 +132,18 @@ func (b BooksAccounts) Accounts(ctx context.Context, company, month string) ([]s
 	return slices.Compact(out), nil
 }
 
-// Pseudonymiser masks identifiers (GSTINs, PANs, person names) in the user
-// message before a model call (CC-710). Mask takes the message's JSON and
-// returns the masked JSON, which must still be JSON with the same
-// top-level keys, and an unmask function for text the model wrote.
+// Pseudonymiser masks identifiers (GSTINs, PANs, person names) before a
+// model call (CC-710). Mask takes JSON (the user message's object, or the
+// ACCOUNTS list) and returns the masked JSON, which must still be JSON of
+// the same shape (an object keeps its top-level keys, a list its length),
+// and an unmask function for text the model wrote. *Redactor implements
+// it.
 type Pseudonymiser interface {
 	Mask(data []byte) ([]byte, func([]byte) []byte, error)
 }
 
-// identityPseudonymiser masks nothing. It stands in until CC-710; all data
-// in this project is synthetic.
+// identityPseudonymiser masks nothing: the explainer's default when no
+// NewPseudonymiser is set (tests and tools that send no real identifiers).
 type identityPseudonymiser struct{}
 
 func (identityPseudonymiser) Mask(data []byte) ([]byte, func([]byte) []byte, error) {
@@ -158,9 +160,11 @@ type LLMExplainer struct {
 	// empty StrongModel falls back to FastModel.
 	FastModel   string
 	StrongModel string
-	// Pseudonymiser masks the user message; nil means identity, which
-	// logs once that identifiers go unmasked.
-	Pseudonymiser Pseudonymiser
+	// NewPseudonymiser builds the run's pseudonymiser, which masks the
+	// user message and ACCOUNTS (CC-710). It is per run because tokens are
+	// keyed by the run ID. Nil means identity, which logs once that
+	// identifiers go unmasked.
+	NewPseudonymiser func(runID uuid.UUID) Pseudonymiser
 	// Fault is the COPILOT_FAULT injector (fault.go); nil is off.
 	Fault *Fault
 	Log   *slog.Logger
@@ -179,14 +183,41 @@ func (e *LLMExplainer) log() *slog.Logger {
 	return e.Log
 }
 
-func (e *LLMExplainer) pseudonymiser() Pseudonymiser {
-	if e.Pseudonymiser != nil {
-		return e.Pseudonymiser
+func (e *LLMExplainer) pseudonymiser(runID uuid.UUID) Pseudonymiser {
+	if e.NewPseudonymiser != nil {
+		if p := e.NewPseudonymiser(runID); p != nil {
+			return p
+		}
 	}
 	e.warnOnce.Do(func() {
-		e.log().Warn("explainer: identifiers are sent to the model unmasked; pseudonymisation arrives with CC-710")
+		e.log().Warn("explainer: no pseudonymiser configured; identifiers are sent to the model unmasked")
 	})
 	return identityPseudonymiser{}
+}
+
+// maskAccounts passes the account list through the pseudonymiser as a JSON
+// list and returns the masked list, the same length and order, and its
+// unmask function.
+func maskAccounts(p Pseudonymiser, accounts []string) ([]string, func([]byte) []byte, error) {
+	if accounts == nil {
+		accounts = []string{}
+	}
+	raw, err := json.Marshal(accounts)
+	if err != nil {
+		return nil, nil, fmt.Errorf("agent: encode accounts: %w", err)
+	}
+	maskedRaw, unmask, err := p.Mask(raw)
+	if err != nil {
+		return nil, nil, fmt.Errorf("agent: pseudonymise accounts: %w", err)
+	}
+	var masked []string
+	if err := json.Unmarshal(maskedRaw, &masked); err != nil {
+		return nil, nil, fmt.Errorf("agent: pseudonymise accounts: %w", err)
+	}
+	if len(masked) != len(accounts) {
+		return nil, nil, fmt.Errorf("agent: pseudonymise accounts: %d names became %d", len(accounts), len(masked))
+	}
+	return masked, unmask, nil
 }
 
 // model is the model for a step attempt.
@@ -292,20 +323,33 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 	if err != nil {
 		return StepResult{}, err
 	}
-	masked, unmask, err := e.pseudonymiser().Mask(data)
+	pseudo := e.pseudonymiser(req.RunID)
+	masked, unmaskUser, err := pseudo.Mask(data)
 	if err != nil {
 		return StepResult{}, fmt.Errorf("agent: pseudonymise: %w", err)
+	}
+	maskedAccounts, unmaskAccounts, err := maskAccounts(pseudo, accounts)
+	if err != nil {
+		return StepResult{}, err
+	}
+	unmask := func(s string) string { return string(unmaskUser(unmaskAccounts([]byte(s)))) }
+	if c, ok := pseudo.(interface{ Len() int }); ok {
+		// Counts only: never values, tokens or names.
+		e.log().DebugContext(ctx, "explainer: identifiers pseudonymised", "run_id", req.RunID, "step_id", req.StepID, "distinct", c.Len())
 	}
 	user, err := renderUserMessage(masked)
 	if err != nil {
 		return StepResult{}, err
 	}
-	system, err := explainSystem(accounts)
+	// ACCOUNTS holds only masked names; tokens are stable per run, so the
+	// cached block stays identical across the run's findings.
+	system, err := explainSystem(maskedAccounts)
 	if err != nil {
 		return StepResult{}, err
 	}
 
-	v := validator{accounts: accounts, from: from, to: to}
+	// Proposals are validated against the masked list the model saw.
+	v := validator{accounts: maskedAccounts, from: from, to: to}
 	model := e.model(req.Attempt)
 	messages := []llm.Message{llm.NewUserTextMessage(user)}
 	var out explainOutput
@@ -339,9 +383,9 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 
 	art := ExplanationArtifact{
 		RunID: req.RunID.String(), FindingID: req.Finding.ID.String(), Model: resolved,
-		Explanation:       string(unmask([]byte(out.explanation))),
+		Explanation:       unmask(out.explanation),
 		SuggestedAction:   out.action,
-		ActionNote:        string(unmask([]byte(out.actionNote))),
+		ActionNote:        unmask(out.actionNote),
 		CitedAmountsPaise: out.amounts,
 		Citations:         out.citations,
 		NeedsReview:       out.needsReview,
@@ -349,7 +393,17 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 		Retried:           retried,
 	}
 	if art.Proposal != nil {
-		art.Proposal.Remark = string(unmask([]byte(art.Proposal.Remark)))
+		art.Proposal.Remark = unmask(art.Proposal.Remark)
+		for i := range art.Proposal.Lines {
+			name := unmask(art.Proposal.Lines[i].Account)
+			if !slices.Contains(accounts, name) {
+				// The masked name was valid but does not restore to a real
+				// account: never store it.
+				e.log().WarnContext(ctx, "explanation malformed", "run_id", req.RunID, "step_id", req.StepID, "field", "proposal.lines.account", "stage", "unmask")
+				return StepResult{StepID: req.StepID, Status: store.StepFailed, Reason: reasonExplainMalformed + " (proposal.lines.account)"}, nil
+			}
+			art.Proposal.Lines[i].Account = name
+		}
 	}
 	if art.AccountsRef, err = e.putAccounts(ctx, req, accounts, from, to); err != nil {
 		return StepResult{}, err

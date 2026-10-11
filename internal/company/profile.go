@@ -93,6 +93,22 @@ type Supplier struct {
 	// months in which the supplier is active.
 	StartMonth string `yaml:"start_month"`
 	EndMonth   string `yaml:"end_month"`
+	// Individual marks a supplier that is a person (a sole proprietor):
+	// its name is personal data and is pseudonymised before any model
+	// call (CC-710). Default false.
+	Individual bool `yaml:"individual"`
+}
+
+// IndividualNames returns the names of the profile's suppliers marked
+// individual, in profile order, without empties or repeats.
+func (p Profile) IndividualNames() []string {
+	var out []string
+	for _, s := range p.Suppliers {
+		if s.Individual && s.Name != "" && !slices.Contains(out, s.Name) {
+			out = append(out, s.Name)
+		}
+	}
+	return out
 }
 
 // Payroll is the monthly salary run.
