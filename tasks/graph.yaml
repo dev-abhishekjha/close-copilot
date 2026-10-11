@@ -609,6 +609,20 @@ tasks:
     files:
       - "internal/checks/variance.go"
     check: "Every prepaid case also yields a linked variance"
+  # CC-608 is not in the tickets doc. It comes from the Phase 2 detector merges
+  # (2026-10-11): CC-603 to 607 exist but the close workflow doesn't run them.
+  - id: CC-608
+    title: "Register the Phase 2 detectors in the close workflow"
+    phase: 2
+    owner: llm-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-603, CC-604, CC-605, CC-606, CC-607, CC-703]
+    needs_erpnext: false
+    files:
+      - "internal/agent/workflow.go"
+      - "internal/agent/workflow_test.go"
+    check: "A close on the suite fixture runs CC-603 to 607; every prepaid finding has a linked variance; recall holds"
   - id: CC-706
     title: "Exceptions investigator agent"
     phase: 2
@@ -650,10 +664,22 @@ tasks:
     owner: implementer
     risk: data-sensitive
     human_review: false
-    depends_on: [CC-703, CC-104]
+    depends_on: [CC-703, CC-104, CC-608]
     needs_erpnext: false
     files:
       - "internal/telemetry/**"
+      - "internal/agent/workflow.go"
+      - "internal/agent/workflow_test.go"
+      - "internal/agent/report.go"
+      - "internal/agent/report_test.go"
+      - "internal/mcpkit/http.go"
+      - "internal/mcpkit/mcpkit_test.go"
+      - "internal/httpx/httpx.go"
+      - "internal/httpx/httpx_test.go"
+      - "cmd/agent/main.go"
+      - "cmd/mcp-books/main.go"
+      - "cmd/mcp-evidence/main.go"
+      - ".env.example"
     check: "One trace spans agent and both MCP servers; no prompt text in attributes"
   - id: CC-1103
     title: "Prompt-injection defences"
