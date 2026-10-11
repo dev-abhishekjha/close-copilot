@@ -10,6 +10,7 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-005 Close the static analyzer gaps | 0 | implementer | regulated | |
 | CC-104 Redact secrets in config | 1 | implementer | data-sensitive | CC-701, CC-904 |
 | CC-205 Harden the Frappe client, probe and API-user script | 1 | integration-engineer | data-sensitive | CC-502 |
+| CC-007 Score a clean month's expected and investigation findings as correct | 1 | eval-engineer | regulated | Gate B (clean month raises nothing), a usable `evals/baseline.json` |
 | CC-006 Guard hook self-protection and path-expansion parity | 0 | implementer | regulated | |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
@@ -153,6 +154,34 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 - `make check`
 
 **Files.** `.claude/hooks/guard-edit.sh`, `gates/hook_test.go` (both protected). Phase 0, implementer, regulated.
+
+---
+
+### CC-007 · Score a clean month's expected and investigation findings as correct
+
+**Goal.** A clean control month stops counting a finding as a false alarm when that month's own ground truth lists the finding as an `expected` or `investigations` item, so `clean.false_alarms==0` can hold on `suite-skeleton` and a baseline can be taken.
+
+**Finding** (Gate B run, 2026-10-11, `results/suite-skeleton/20261011T095154Z`)
+- `suite-skeleton` clean month `sharma 2026-08` raised 3 `unmatched_bank_line` findings (`hint=gateway`, bank lines `BNK-20260811-002`, `BNK-20260818-002`, `BNK-20260825-002`). The scorer called all three `clean_month` false alarms: clean month false alarms 3, precision 5/8.
+- The detector is right. CC-602 raises a `PG SETTL` line the books don't record as `unmatched_bank_line` with `hint=gateway`. The seeder is right: CC-306 records every gateway settlement batch under `investigations` (`expected_resolution: "gateway_settlement"`), and `ground_truth/sharma-2026-08.json` lists them as X01 to X03.
+- The scorer is the odd one out: in `ScoreMonths` (`internal/evals/score.go`, the `if e.Control` branch) every scored finding of a control month is a false alarm, and the comment says the month's investigations "are not graded there". The same truth says they are expected, so the report contradicts its own truth file.
+- Left as is, `--compare` lists every clean-month false alarm as a regression, so no baseline can pass on this suite.
+
+**Subtasks**
+- In the control-month branch, match the scored findings to the month's truth with `matchMonth` (a clean month has no planted items, so the targets are `expected` and `investigations`). A finding that matches a target counts as correct for its type; one that matches nothing stays a `clean_month` false alarm.
+- Grade the clean month's investigations like any other month (`surfaced`, `not_surfaced`, `unmatchable`) so the report shows them.
+- `Clean.Findings` stays the number of scored findings in control months; `Clean.FalseAlarms` counts only the unmatched ones.
+- Unit tests: a clean month with a finding matching an investigation item (no false alarm, `Correct` up, precision up); the same finding with no matching item (false alarm); an `expected` item match; a duplicate finding for one investigation item (the second is a `clean_month` false alarm); an unscored finding type (unchanged).
+- Keep every existing clean-month test and golden file that doesn't involve a truth item passing as is.
+
+**Acceptance**
+- `go test ./internal/evals/... -race -count=1`
+- `make check`
+- Human check: re-score the recorded run with `go run ./cmd/eval score results/suite-skeleton/20261011T095154Z --require 'clean.false_alarms==0' --require 'unrecorded_bank_charge.recall>=3/3'`; the three gateway lines show as surfaced investigations and the clean month has 0 false alarms.
+
+**Files.** `internal/evals/score.go`, `internal/evals/score_test.go`, `internal/evals/testdata/score/**`. Phase 1, eval-engineer, regulated (scoring code, owner review).
+
+**Not in this ticket.** The seeder, the checks and the Gate B checklist wording stay as they are. Taking `evals/baseline.json` is a separate `baseline-update` commit by the owner.
 
 ---
 

@@ -201,6 +201,21 @@ tasks:
       - ".env.example"
       - "docs/erpnext-schema/README.md"
     check: "Injection shapes in fields/order_by are refused; default deadline; probe uses the hardened client"
+  # CC-007 comes from the Gate B run (2026-10-11); its ticket text is in
+  # tasks/hardening.md.
+  - id: CC-007
+    title: "Score a clean month's expected and investigation findings as correct"
+    phase: 1
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-902, CC-905]
+    needs_erpnext: false
+    files:
+      - "internal/evals/score.go"
+      - "internal/evals/score_test.go"
+      - "internal/evals/testdata/score/**"
+    check: "Gateway settlement findings in the clean month are not false alarms; an unrelated clean-month finding still is"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
