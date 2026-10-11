@@ -16,7 +16,9 @@ package agent
 // refused call counts), MaxInvestigateDuration, and MaxInvestigateTokens
 // input plus output tokens. A breach, or maxInvestigateRefusals refused
 // calls, stops the investigation with the partial trail and marks the
-// finding needs_review; it never fails the run.
+// finding needs_review; it never fails the run. An investigation that
+// answers after even one refused call ends needs_review and its proposal
+// is dropped (CC-1103), so a steered model never leaves a proposal.
 //
 // Tool results are projected before the model sees them: free-text fields
 // (remarks, descriptions, party names, references) are dropped, a bank
@@ -396,6 +398,15 @@ func (iv *LLMInvestigator) finish(ctx context.Context, req InvestigateRequest, s
 	if err != nil {
 		return StepResult{}, err
 	}
+	// Investigator guard (CC-1103): a model that asked for a tool outside
+	// the allowlist may have been steered by the data, so even one refused
+	// call ends the investigation needs_review without a proposal.
+	refused := run.refusals > 0
+	if refused {
+		out.proposal = nil
+		iv.log().WarnContext(ctx, "investigation asked for a tool outside the allowlist; proposal dropped, finding needs review",
+			"run_id", req.RunID, "step_id", req.StepID, "refused", run.refusals)
+	}
 	action, note := checks.ActionInvestigate, "Review the investigation and its evidence."
 	if out.proposal != nil {
 		action, note = checks.ActionBookEntry, "Review the proposed entry before approving it."
@@ -408,7 +419,7 @@ func (iv *LLMInvestigator) finish(ctx context.Context, req InvestigateRequest, s
 			ActionNote:        note,
 			CitedAmountsPaise: []money.Paise{},
 			Citations:         []store.Citation{},
-			NeedsReview:       out.resolution == ResolutionUnknown,
+			NeedsReview:       out.resolution == ResolutionUnknown || refused,
 			Proposal:          out.proposal,
 			Retried:           retried,
 			AccountsRef:       accountsRef,
