@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Faithfulness judge hand labels",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["labels"],
+  "properties": {
+    "labels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["item", "verdict"],
+        "properties": {
+          "item": {"type": "string", "minLength": 1, "description": "Finding key from evals.ItemKey: type|k=v|k=v with keys sorted."},
+          "verdict": {"type": "string", "enum": ["supported", "partially", "unsupported"]},
+          "note": {"type": "string"}
+        }
+      }
+    }
+  }
+}
