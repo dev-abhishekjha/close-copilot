@@ -28,14 +28,16 @@ func main() {
 func newRun(stdout io.Writer) cli.RunFunc {
 	return func(ctx context.Context, cfg config.Config, log *slog.Logger, args []string) error {
 		if len(args) == 0 {
-			return errors.New("load: subcommand required (available: bank)")
+			return errors.New("load: subcommand required (available: bank, gstr2b)")
 		}
 
 		switch args[0] {
 		case "bank":
 			return runBank(ctx, cfg, log, args[1:], stdout)
+		case "gstr2b":
+			return runGSTR2B(ctx, cfg, log, args[1:], stdout)
 		default:
-			return fmt.Errorf("load: unknown subcommand %q (available: bank)", args[0])
+			return fmt.Errorf("load: unknown subcommand %q (available: bank, gstr2b)", args[0])
 		}
 	}
 }
@@ -104,6 +106,72 @@ func runBank(ctx context.Context, cfg config.Config, log *slog.Logger, args []st
 	b, err := json.MarshalIndent(res, "", "  ")
 	if err != nil {
 		return fmt.Errorf("load bank: encode summary: %w", err)
+	}
+	_, err = stdout.Write(append(b, '\n'))
+	return err
+}
+
+func runGSTR2B(ctx context.Context, cfg config.Config, log *slog.Logger, args []string, stdout io.Writer) error {
+	fs := flag.NewFlagSet("load gstr2b", flag.ContinueOnError)
+	fs.SetOutput(stdout)
+	company := fs.String("company", "", "company id, such as sharma")
+	month := fs.String("month", "", "month as YYYY-MM")
+	file := fs.String("file", "", "path to gstr2b.json (default data/external/<company>/<month>/gstr2b.json)")
+	dataDir := fs.String("data-dir", "", "root directory of external data")
+
+	if err := fs.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return nil
+		}
+		return fmt.Errorf("load gstr2b: %w", err)
+	}
+
+	if *company == "" || *month == "" {
+		return errors.New("load gstr2b: --company and --month are required")
+	}
+
+	if _, err := time.Parse("2006-01", *month); err != nil {
+		return fmt.Errorf("load gstr2b: invalid --month %q (want YYYY-MM): %w", *month, err)
+	}
+
+	path := *file
+	if path == "" {
+		root := *dataDir
+		if root == "" {
+			root = cfg.DataDir
+		}
+		if root == "" {
+			root = "data/external"
+		}
+		path = filepath.Join(root, *company, *month, "gstr2b.json")
+	}
+
+	st, err := store.Open(ctx, cfg.DatabaseURL.Reveal())
+	if err != nil {
+		return fmt.Errorf("load gstr2b: connect database: %w", err)
+	}
+	defer st.Close()
+
+	// Seed companies from profiles on startup so foreign keys resolve
+	_ = st.SeedCompaniesFromDir(ctx, "config/companies")
+
+	res, err := evidence.LoadGSTR2BFile(ctx, st, *company, *month, path)
+	if err != nil {
+		return fmt.Errorf("load gstr2b: %w", err)
+	}
+
+	log.Info("loaded gstr2b",
+		"company", res.Company,
+		"month", res.Month,
+		"total", res.Total,
+		"inserted", res.Inserted,
+		"updated", res.Updated,
+		"source", res.SourceFile,
+	)
+
+	b, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return fmt.Errorf("load gstr2b: encode summary: %w", err)
 	}
 	_, err = stdout.Write(append(b, '\n'))
 	return err
