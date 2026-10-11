@@ -1,0 +1,239 @@
+{
+  "args": {
+    "company": "sharma",
+    "from": "2026-08-01",
+    "to": "2026-08-31"
+  },
+  "result": [
+    {
+      "amount_paise": -118000,
+      "balance_paise": 249882000,
+      "company_id": "sharma",
+      "narration": "SMS/ACCT CHARGES INCL GST",
+      "source_file": "",
+      "txn_date": "2026-08-08T00:00:00Z",
+      "txn_id": "BNK-20260808-001"
+    },
+    {
+      "amount_paise": -531000,
+      "balance_paise": 249351000,
+      "company_id": "sharma",
+      "narration": "NEFT-STOCKBOOK CLOUD",
+      "ref": "N5330574",
+      "source_file": "",
+      "txn_date": "2026-08-09T00:00:00Z",
+      "txn_id": "BNK-20260809-001"
+    },
+    {
+      "amount_paise": 6233864,
+      "balance_paise": 255584864,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR252306371",
+      "source_file": "",
+      "txn_date": "2026-08-10T00:00:00Z",
+      "txn_id": "BNK-20260810-001"
+    },
+    {
+      "amount_paise": 3214699,
+      "balance_paise": 258799563,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-040",
+      "ref": "UTR352076443",
+      "source_file": "",
+      "txn_date": "2026-08-11T00:00:00Z",
+      "txn_id": "BNK-20260811-001"
+    },
+    {
+      "amount_paise": 1431551,
+      "balance_paise": 260231114,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0811 BATCH 1388",
+      "ref": "PGS1388",
+      "source_file": "",
+      "txn_date": "2026-08-11T00:00:00Z",
+      "txn_id": "BNK-20260811-002"
+    },
+    {
+      "amount_paise": 5136488,
+      "balance_paise": 265367602,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-005",
+      "ref": "UTR683715595",
+      "source_file": "",
+      "txn_date": "2026-08-14T00:00:00Z",
+      "txn_id": "BNK-20260814-001"
+    },
+    {
+      "amount_paise": -17700000,
+      "balance_paise": 247667602,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-AUG-OMKAR ESTATES",
+      "ref": "N9628566",
+      "source_file": "",
+      "txn_date": "2026-08-14T00:00:00Z",
+      "txn_id": "BNK-20260814-002"
+    },
+    {
+      "amount_paise": -469219,
+      "balance_paise": 247198383,
+      "company_id": "sharma",
+      "narration": "NEFT-BLUENET BROADBAND",
+      "ref": "N2425475",
+      "source_file": "",
+      "txn_date": "2026-08-15T00:00:00Z",
+      "txn_id": "BNK-20260815-001"
+    },
+    {
+      "amount_paise": 2389814,
+      "balance_paise": 249588197,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR683551413",
+      "source_file": "",
+      "txn_date": "2026-08-17T00:00:00Z",
+      "txn_id": "BNK-20260817-001"
+    },
+    {
+      "amount_paise": 4779569,
+      "balance_paise": 254367766,
+      "company_id": "sharma",
+      "narration": "UPI/UTR445394246/CUST-025",
+      "ref": "UTR445394246",
+      "source_file": "",
+      "txn_date": "2026-08-18T00:00:00Z",
+      "txn_id": "BNK-20260818-001"
+    },
+    {
+      "amount_paise": 370825,
+      "balance_paise": 254738591,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0818 BATCH 6142",
+      "ref": "PGS6142",
+      "source_file": "",
+      "txn_date": "2026-08-18T00:00:00Z",
+      "txn_id": "BNK-20260818-002"
+    },
+    {
+      "amount_paise": -7624994,
+      "balance_paise": 247113597,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N3402376",
+      "source_file": "",
+      "txn_date": "2026-08-20T00:00:00Z",
+      "txn_id": "BNK-20260820-001"
+    },
+    {
+      "amount_paise": 4898898,
+      "balance_paise": 252012495,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-038",
+      "ref": "UTR259135975",
+      "source_file": "",
+      "txn_date": "2026-08-21T00:00:00Z",
+      "txn_id": "BNK-20260821-001"
+    },
+    {
+      "amount_paise": 1884632,
+      "balance_paise": 253897127,
+      "company_id": "sharma",
+      "narration": "UPI/UTR485619324/CUST-014",
+      "ref": "UTR485619324",
+      "source_file": "",
+      "txn_date": "2026-08-21T00:00:00Z",
+      "txn_id": "BNK-20260821-002"
+    },
+    {
+      "amount_paise": -10030000,
+      "balance_paise": 243867127,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-AUG-LAKEVIEW WAREHOUSING LLP",
+      "ref": "N8253672",
+      "source_file": "",
+      "txn_date": "2026-08-23T00:00:00Z",
+      "txn_id": "BNK-20260823-001"
+    },
+    {
+      "amount_paise": -5493954,
+      "balance_paise": 238373173,
+      "company_id": "sharma",
+      "narration": "NEFT-SUNDARAM STEELWARE",
+      "ref": "N7098501",
+      "source_file": "",
+      "txn_date": "2026-08-23T00:00:00Z",
+      "txn_id": "BNK-20260823-002"
+    },
+    {
+      "amount_paise": 6201846,
+      "balance_paise": 244575019,
+      "company_id": "sharma",
+      "narration": "UPI/UTR967154200/CUST-010",
+      "ref": "UTR967154200",
+      "source_file": "",
+      "txn_date": "2026-08-24T00:00:00Z",
+      "txn_id": "BNK-20260824-001"
+    },
+    {
+      "amount_paise": 2145104,
+      "balance_paise": 246720123,
+      "company_id": "sharma",
+      "narration": "UPI/UTR199714122/CUST-020",
+      "ref": "UTR199714122",
+      "source_file": "",
+      "txn_date": "2026-08-25T00:00:00Z",
+      "txn_id": "BNK-20260825-001"
+    },
+    {
+      "amount_paise": 9638140,
+      "balance_paise": 256358263,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0825 BATCH 5685",
+      "ref": "PGS5685",
+      "source_file": "",
+      "txn_date": "2026-08-25T00:00:00Z",
+      "txn_id": "BNK-20260825-002"
+    },
+    {
+      "amount_paise": -1306900,
+      "balance_paise": 255051363,
+      "company_id": "sharma",
+      "narration": "NEFT-SWIFT COURIERS",
+      "ref": "N9670673",
+      "source_file": "",
+      "txn_date": "2026-08-27T00:00:00Z",
+      "txn_id": "BNK-20260827-001"
+    },
+    {
+      "amount_paise": -1910969,
+      "balance_paise": 253140394,
+      "company_id": "sharma",
+      "narration": "NEFT-CITY POWER CO",
+      "ref": "N7477860",
+      "source_file": "",
+      "txn_date": "2026-08-28T00:00:00Z",
+      "txn_id": "BNK-20260828-001"
+    },
+    {
+      "amount_paise": -392147,
+      "balance_paise": 252748247,
+      "company_id": "sharma",
+      "narration": "NEFT-VAANI TELECOM SERVICES",
+      "ref": "N6658758",
+      "source_file": "",
+      "txn_date": "2026-08-29T00:00:00Z",
+      "txn_id": "BNK-20260829-001"
+    },
+    {
+      "amount_paise": -60000000,
+      "balance_paise": 192748247,
+      "company_id": "sharma",
+      "narration": "SALARY BATCH AUG 2026",
+      "ref": "SAL365447",
+      "source_file": "",
+      "txn_date": "2026-08-31T00:00:00Z",
+      "txn_id": "BNK-20260831-001"
+    }
+  ],
+  "tool": "list_bank_lines"
+}

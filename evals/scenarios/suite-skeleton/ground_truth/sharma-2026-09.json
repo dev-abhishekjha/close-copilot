@@ -1,0 +1,49 @@
+{
+  "scenario": "suite-skeleton",
+  "company": "sharma",
+  "month": "2026-09",
+  "clean": false,
+  "planted": [
+    {
+      "id": "E01",
+      "type": "unrecorded_bank_charge",
+      "keys": {
+        "bank_txn_id": "BNK-20260919-001"
+      },
+      "amount_paise": 118000
+    },
+    {
+      "id": "E02",
+      "type": "unrecorded_bank_charge",
+      "keys": {
+        "bank_txn_id": "BNK-20260910-003"
+      },
+      "amount_paise": 118000
+    },
+    {
+      "id": "E03",
+      "type": "unrecorded_bank_charge",
+      "keys": {
+        "bank_txn_id": "BNK-20260904-001"
+      },
+      "amount_paise": 118000
+    }
+  ],
+  "expected": [],
+  "investigations": [
+    {
+      "id": "X01",
+      "keys": {
+        "bank_txn_id": "BNK-20260922-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    },
+    {
+      "id": "X02",
+      "keys": {
+        "bank_txn_id": "BNK-20260929-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    }
+  ]
+}
