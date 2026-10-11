@@ -1,12 +1,15 @@
 package main
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
+
+	"github.com/abhishekjha/close-copilot/internal/config"
 )
 
 // TestNoERPClientDependency checks that the production agent binary
@@ -59,4 +62,25 @@ func goTool(t *testing.T) string {
 		t.Fatalf("no go command: %v", err)
 	}
 	return p
+}
+
+// TestPseudonymKey checks that explaining fails closed on a missing or
+// malformed PSEUDONYM_KEY with a fixed error that names the variable and
+// never the value (CC-710).
+func TestPseudonymKey(t *testing.T) {
+	good := strings.Repeat("a1", 32)
+	key, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(good)})
+	if err != nil || len(key) != 32 || key[0] != 0xa1 {
+		t.Fatalf("valid key: %x, %v", key, err)
+	}
+	for _, bad := range []string{"", "sekret-pseudonym-zz", strings.Repeat("a1", 16), strings.Repeat("a1", 33), strings.Repeat("g1", 32)} {
+		_, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(bad)})
+		if !errors.Is(err, errPseudonymKey) {
+			t.Errorf("key of %d chars: err %v, want errPseudonymKey", len(bad), err)
+			continue
+		}
+		if !strings.Contains(err.Error(), config.EnvPseudonymKey) || (bad != "" && strings.Contains(err.Error(), bad)) {
+			t.Errorf("error %q must name %s and not the value", err, config.EnvPseudonymKey)
+		}
+	}
 }

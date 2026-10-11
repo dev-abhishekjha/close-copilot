@@ -120,6 +120,40 @@ func TestLoadProfileChecksFileName(t *testing.T) {
 	}
 }
 
+// TestLoadProfileIndividual checks that individual: true loads (CC-710)
+// and that the shipped profiles mark no supplier as an individual.
+func TestLoadProfileIndividual(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join(companiesDir, "sharma.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	shipped, err := LoadProfile(filepath.Join(companiesDir, "sharma.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if names := shipped.IndividualNames(); len(names) != 0 {
+		t.Errorf("shipped profile individuals %v, want none", names)
+	}
+	const line = "  - {id: city-power, name: City Power Co,"
+	if !strings.Contains(string(data), line) {
+		t.Fatalf("sharma.yaml has no %q line", line)
+	}
+	path := filepath.Join(t.TempDir(), "sharma.yaml")
+	writeFile(t, path, strings.Replace(string(data), line, line+" individual: true,", 1))
+	p, err := LoadProfile(path)
+	if err != nil {
+		t.Fatalf("LoadProfile with individual: true: %v", err)
+	}
+	for _, s := range p.Suppliers {
+		if s.Individual != (s.ID == "city-power") {
+			t.Errorf("supplier %s individual %v", s.ID, s.Individual)
+		}
+	}
+	if got := p.IndividualNames(); !reflect.DeepEqual(got, []string{"City Power Co"}) {
+		t.Errorf("IndividualNames %v", got)
+	}
+}
+
 func TestLoadRules(t *testing.T) {
 	got, err := LoadRules(rulesPath)
 	if err != nil {

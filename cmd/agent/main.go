@@ -14,6 +14,12 @@
 // <config-dir>/pricing.yaml. --no-explain calls no model: the explain and
 // verify steps are skipped and the run ends partial.
 //
+// Explaining needs PSEUDONYM_KEY (32 random bytes, hex): GSTINs, PANs and
+// the names of suppliers marked individual in the company profile are
+// replaced by per-run tokens before any model call and restored in what
+// the model writes (CC-710). close and resume refuse to start without a
+// valid key unless --no-explain is given.
+//
 // COPILOT_FAULT=corrupt_explanation (testing only) corrupts one
 // explanation on its first attempt so the verifier's retry can be seen;
 // the run report says when it is on.
@@ -31,12 +37,15 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -74,8 +83,12 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if err != nil {
 		return err
 	}
+	var pseudonymKeyBytes []byte
 	if !cmd.noExplain {
 		if err := cfg.CheckLLM(); err != nil {
+			return err
+		}
+		if pseudonymKeyBytes, err = pseudonymKey(cfg); err != nil {
 			return err
 		}
 	}
@@ -132,14 +145,28 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		if fault != nil {
 			log.Warn("COPILOT_FAULT is on: one explanation will be corrupted on its first attempt", "fault", fault.Mode())
 		}
+		companyID := cmd.company
+		if cmd.name == cmdResume {
+			r, err := st.GetCloseRun(ctx, cmd.runID)
+			if err != nil {
+				return err
+			}
+			companyID = r.CompanyID
+		}
+		names := byID[companyID].IndividualNames()
+		// Counts only: names are personal data.
+		log.Info("pseudonymisation on", "individual_names", len(names))
 		wf.Model = model
 		wf.Explainer = &agent.LLMExplainer{
 			Store:       st,
 			Accounts:    agent.BooksAccounts{Books: books},
 			FastModel:   cfg.LLMModelFast,
 			StrongModel: cfg.LLMModelStrong,
-			Fault:       fault,
-			Log:         log,
+			NewPseudonymiser: func(runID uuid.UUID) agent.Pseudonymiser {
+				return agent.NewRedactor(pseudonymKeyBytes, runID, names)
+			},
+			Fault: fault,
+			Log:   log,
 		}
 		wf.Verifier = &agent.CodeVerifier{Store: st, Citations: st}
 	}
@@ -161,6 +188,23 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		}
 	}
 	return err
+}
+
+// errPseudonymKey is the fixed error for a missing or malformed
+// PSEUDONYM_KEY; it never carries the value.
+var errPseudonymKey = errors.New("agent: " + config.EnvPseudonymKey +
+	" must be 32 random bytes as 64 hex digits to explain findings (see .env.example), or pass --no-explain")
+
+// pseudonymKey decodes PSEUDONYM_KEY: 32 bytes of hex, or errPseudonymKey.
+func pseudonymKey(cfg config.Config) ([]byte, error) {
+	if cfg.PseudonymKey.IsZero() {
+		return nil, errPseudonymKey
+	}
+	key, err := hex.DecodeString(strings.TrimSpace(cfg.PseudonymKey.Reveal()))
+	if err != nil || len(key) != 32 {
+		return nil, errPseudonymKey
+	}
+	return key, nil
 }
 
 // newProvider builds the model provider LLM_PROVIDER names, priced from
