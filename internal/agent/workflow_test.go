@@ -60,7 +60,11 @@ type memStore struct {
 	afterReopen func(store.Step) error
 	// cleared counts ClearFindingExplanation calls.
 	cleared int
+	// resolutions counts SetFindingResolution calls.
+	resolutions int
 }
+
+var _ InvestigateStore = (*memStore)(nil)
 
 var _ RunStore = (*memStore)(nil)
 
@@ -337,6 +341,42 @@ func (m *memStore) ClearFindingExplanation(_ context.Context, runID, id uuid.UUI
 			m.cleared++
 			return nil
 		}
+	}
+	return store.ErrNotFound
+}
+
+// SetFindingResolution has the store's semantics: a finding of the run
+// and its company gets keys.resolution, and the refs whose artifact it
+// doesn't name yet are appended in order.
+func (m *memStore) SetFindingResolution(_ context.Context, runID, id uuid.UUID, companyID, resolution string, evidence []store.EvidenceRef) error {
+	if resolution == "" || companyID == "" {
+		return errors.New("mem: empty resolution or company")
+	}
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if r, ok := m.runs[runID]; !ok || r.CompanyID != companyID {
+		return store.ErrNotFound
+	}
+	for i := range m.findings {
+		f := &m.findings[i]
+		if f.ID != id || f.RunID != runID {
+			continue
+		}
+		keys := maps.Clone(f.Keys)
+		if keys == nil {
+			keys = map[string]string{}
+		}
+		keys[store.ResolutionKey] = resolution
+		f.Keys = keys
+		ev := slices.Clone(f.Evidence)
+		for _, e := range evidence {
+			if !slices.ContainsFunc(ev, func(x store.EvidenceRef) bool { return x.Artifact == e.Artifact }) {
+				ev = append(ev, e)
+			}
+		}
+		f.Evidence = ev
+		m.resolutions++
+		return nil
 	}
 	return store.ErrNotFound
 }
@@ -1532,5 +1572,240 @@ func TestScopedCloseRunAllChecks(t *testing.T) {
 	gstr2b := (&checks.GSTR2BCheck{}).Name()
 	if st := r.stepStatuses(res.RunID)[store.StepKindCheckPrefix+gstr2b]; !slices.Equal(st, []string{"done"}) {
 		t.Errorf("GSTR-2B check step %v, want done", st)
+	}
+}
+
+// ---- investigating (CC-706) ----
+
+// routeModel sends the investigator's calls (those offering
+// emit_resolution) to investigate and every other call to explain.
+type routeModel struct {
+	explain, investigate llm.Provider
+}
+
+func (m routeModel) Complete(ctx context.Context, req llm.Request) (llm.Response, error) {
+	if slices.ContainsFunc(req.Tools, func(s llm.ToolSpec) bool { return s.Name == InvestigateToolName }) {
+		return m.investigate.Complete(ctx, req)
+	}
+	return m.explain.Complete(ctx, req)
+}
+
+// synthGSTIN is a made-up, well-formed GSTIN a tool result carries.
+const synthGSTIN = "27AABCV5678B1Z8"
+
+const wfTimingArgs = `{"resolution_type":"timing_difference","explanation":"The customer's receipt is booked in the next days.","evidence_ids":["TXN-0004"]}`
+
+// newInvestigateRig is the workflow rig with the LLMInvestigator: its
+// model answers after one GSTR-2B call.
+func newInvestigateRig(t *testing.T, script ...llm.ScriptedCall) (*testRig, *llm.FakeProvider, *fakeTools) {
+	t.Helper()
+	r := newRig(t)
+	if len(script) == 0 {
+		script = []llm.ScriptedCall{
+			turn(1000, toolCall("g1", "evidence__list_gstr2b_entries", `{"company":"testco","period":"2026-08"}`)),
+			turn(1000, emitCall(wfTimingArgs)),
+		}
+	}
+	inv := llm.NewFakeProvider(script...)
+	tools := newFakeTools()
+	tools.results["evidence__list_gstr2b_entries"] = `[{"supplier_gstin":"` + synthGSTIN + `","invoice_no":"INV-1","taxable":100000}]`
+	r.wf.Model = routeModel{explain: r.model, investigate: inv}
+	r.wf.Investigator = &LLMInvestigator{Store: r.st, Tools: tools, Accounts: &staticAccounts{list: []string{synthBank, "Sales - TC"}}, Model: invModel, Log: discardLog()}
+	key := []byte("0123456789abcdef0123456789abcdef")
+	r.wf.NewRedactor = func(runID uuid.UUID) *Redactor { return NewRedactor(key, runID, nil) }
+	return r, inv, tools
+}
+
+func unmatchedBankLine(t *testing.T, r *testRig, runID uuid.UUID) store.Finding {
+	t.Helper()
+	fs, _ := r.st.ListFindingsByRun(t.Context(), runID)
+	for _, f := range fs {
+		if f.Type == checks.TypeUnmatchedBankLine {
+			return f
+		}
+	}
+	t.Fatal("no unmatched_bank_line finding")
+	return store.Finding{}
+}
+
+func TestWorkflowInvestigatesUnmatchedBankLines(t *testing.T) {
+	r, inv, tools := newInvestigateRig(t)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	if res.Status != store.RunDone {
+		t.Fatalf("result %+v", res)
+	}
+	wantSteps(t, r.stepStatuses(res.RunID), map[string][]string{
+		"check.bankrec": {"done"},
+		"explain":       repeat("done", 4),
+		"investigate":   {"done"},
+		"retrieve":      {"skipped"},
+		"router":        {"done"},
+		"synthesize":    {"done"},
+		"verify":        repeat("done", 5),
+	})
+	f := unmatchedBankLine(t, r, res.RunID)
+	if f.Keys[store.ResolutionKey] != ResolutionTimingDifference || f.Status != checks.StatusOpen {
+		t.Errorf("finding keys %v status %s", f.Keys, f.Status)
+	}
+	if n := len(f.Evidence); n != 2 || f.Evidence[1].Tool != toolListGSTR2BEntries {
+		t.Errorf("evidence %+v", f.Evidence)
+	}
+	if got := tools.executedNames(); !slices.Equal(got, []string{"evidence__list_gstr2b_entries"}) {
+		t.Errorf("executed %v", got)
+	}
+
+	// The investigate step's output is verified under its own subject.
+	steps := r.st.stepsByKind(res.RunID)
+	istep := steps["investigate"][0]
+	if istep.Subject != f.ID.String() || len(istep.OutputRefs) != 1 || istep.Error != nil {
+		t.Fatalf("investigate step %+v", istep)
+	}
+	var vstep store.Step
+	for _, s := range steps["verify"] {
+		if s.Subject == investigateVerifyPrefix+f.ID.String() {
+			vstep = s
+		}
+	}
+	if vstep.ID == uuid.Nil || vstep.Status != store.StepDone || vstep.Error != nil || len(vstep.OutputRefs) != 1 {
+		t.Fatalf("investigation verify step %+v", vstep)
+	}
+	vb, _, _ := r.st.getAny(vstep.OutputRefs[0])
+	if !strings.Contains(string(vb), istep.OutputRefs[0]) {
+		t.Errorf("verdict %s does not name the investigation", vb)
+	}
+
+	// Both investigator calls are recorded against the investigate step,
+	// and identifiers are pseudonymised before the model and the recorder.
+	var invCalls int
+	for _, c := range r.st.runCalls(res.RunID) {
+		if c.StepID == istep.ID {
+			invCalls++
+			p, _, _ := r.st.getAny(c.PromptSHA256)
+			if strings.Contains(string(p), synthGSTIN) {
+				t.Error("a recorded investigator prompt holds a raw GSTIN")
+			}
+		}
+	}
+	if invCalls != 2 || inv.CallCount() != 2 {
+		t.Errorf("investigator calls recorded %d, made %d; want 2", invCalls, inv.CallCount())
+	}
+	second := inv.Calls()[1]
+	tr := second.Messages[len(second.Messages)-1].ToolResults
+	if len(tr) != 1 || strings.Contains(tr[0].Content, synthGSTIN) || !strings.Contains(tr[0].Content, "GSTIN_") {
+		t.Errorf("tool result reached the model unmasked: %+v", tr)
+	}
+}
+
+func TestWorkflowInvestigateBreachNeedsReview(t *testing.T) {
+	gl := toolCall("c", "books__get_trial_balance", `{"company":"testco","from_date":"2026-08-01","to_date":"2026-08-31"}`)
+	r, inv, _ := newInvestigateRig(t, turn(100, gl))
+	inv.WithFallback(turn(100, gl).Response)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil || res.Status != store.RunDone {
+		t.Fatalf("result %+v, %v", res, err)
+	}
+	f := unmatchedBankLine(t, r, res.RunID)
+	if f.Status != checks.StatusNeedsReview || f.Keys[store.ResolutionKey] != ResolutionUnknown {
+		t.Errorf("finding status %s keys %v", f.Status, f.Keys)
+	}
+	steps := r.st.stepsByKind(res.RunID)
+	if s := steps["investigate"][0]; s.Status != store.StepDone || s.Error == nil || *s.Error != reasonLimitCalls {
+		t.Errorf("investigate step %+v", s)
+	}
+	for _, s := range steps["verify"] {
+		if s.Subject == investigateVerifyPrefix+f.ID.String() && (s.Status != store.StepSkipped || *s.Error != reasonNoResolution) {
+			t.Errorf("investigation verify step %+v", s)
+		}
+	}
+}
+
+func TestWorkflowInvestigateFailedVerificationNeedsReview(t *testing.T) {
+	r, _, _ := newInvestigateRig(t)
+	r.ver.reviewType = checks.TypeUnmatchedBankLine // the fake verifier flags it
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil || res.Status != store.RunDone {
+		t.Fatalf("result %+v, %v", res, err)
+	}
+	if f := unmatchedBankLine(t, r, res.RunID); f.Status != checks.StatusNeedsReview {
+		t.Errorf("status %s", f.Status)
+	}
+}
+
+func TestWorkflowInvestigateRefusedWithoutRedactor(t *testing.T) {
+	r, inv, _ := newInvestigateRig(t)
+	r.wf.NewRedactor = nil
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if inv.CallCount() != 0 {
+		t.Errorf("investigator model called %d times without a redactor", inv.CallCount())
+	}
+	s := r.st.stepsByKind(res.RunID)["investigate"]
+	if len(s) != 1 || s[0].Subject != SubjectClose || s[0].Status != store.StepSkipped || *s[0].Error != reasonNoRedactor {
+		t.Errorf("investigate steps %+v", s)
+	}
+}
+
+func TestWorkflowInvestigateSkippedWithoutTargets(t *testing.T) {
+	r, inv, _ := newInvestigateRig(t)
+	r.wf.Checks = []checks.Check{&checks.DuplicatePaymentCheck{}}
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	s := r.st.stepsByKind(res.RunID)["investigate"]
+	if len(s) != 1 || s[0].Status != store.StepSkipped || *s[0].Error != reasonNothingToInvestigate || inv.CallCount() != 0 {
+		t.Errorf("investigate steps %+v", s)
+	}
+}
+
+// TestWorkflowInvestigateResume: a crash after the investigation ran but
+// before its step ended re-runs it on resume; the trail is not added twice.
+func TestWorkflowInvestigateResume(t *testing.T) {
+	first := []llm.ScriptedCall{
+		turn(1000, toolCall("g1", "evidence__list_gstr2b_entries", `{"company":"testco","period":"2026-08"}`)),
+		turn(1000, emitCall(wfTimingArgs)),
+	}
+	r, inv, tools := newInvestigateRig(t, slices.Concat(first, first)...)
+	errCrash := errors.New("synthetic crash")
+	crashed := false
+	r.st.finishHook = func(s store.Step, _ string) error {
+		if s.Kind == store.StepKindInvestigate && !crashed {
+			crashed = true
+			return errCrash
+		}
+		return nil
+	}
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if !errors.Is(err, errCrash) || res.Status != store.RunFailed {
+		t.Fatalf("first run %+v, %v", res, err)
+	}
+	f := unmatchedBankLine(t, r, res.RunID)
+	if len(f.Evidence) != 2 {
+		t.Fatalf("evidence after the crash %d", len(f.Evidence))
+	}
+
+	res, err = r.wf.ResumeClose(t.Context(), res.RunID)
+	if err != nil || res.Status != store.RunDone {
+		t.Fatalf("resume %+v, %v", res, err)
+	}
+	istep := r.st.stepsByKind(res.RunID)["investigate"][0]
+	if istep.Attempt != 2 || istep.Status != store.StepDone || len(istep.OutputRefs) != 1 {
+		t.Errorf("investigate step %+v", istep)
+	}
+	f = unmatchedBankLine(t, r, res.RunID)
+	if len(f.Evidence) != 2 || f.Keys[store.ResolutionKey] != ResolutionTimingDifference {
+		t.Errorf("finding after resume: evidence %d keys %v", len(f.Evidence), f.Keys)
+	}
+	if inv.CallCount() != 4 || len(tools.executedNames()) != 2 {
+		t.Errorf("model calls %d, tool calls %d", inv.CallCount(), len(tools.executedNames()))
+	}
+	// A resume after the run is done re-runs nothing.
+	if _, err := r.wf.ResumeClose(t.Context(), res.RunID); !errors.Is(err, ErrRunDone) {
+		t.Errorf("second resume: %v", err)
 	}
 }

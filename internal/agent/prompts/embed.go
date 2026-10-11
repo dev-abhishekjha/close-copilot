@@ -9,3 +9,10 @@ import _ "embed" // for go:embed
 //
 //go:embed explain.txt
 var Explain string
+
+// Investigate is the exceptions investigator's static system prompt
+// (CC-706). The account list is appended at run time, in the same cached
+// block.
+//
+//go:embed investigate.txt
+var Investigate string

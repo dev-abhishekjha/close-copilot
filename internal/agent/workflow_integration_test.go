@@ -27,6 +27,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/checks"
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -444,5 +445,106 @@ func TestWorkflowGateBVerifyFault(t *testing.T) {
 		if !strings.Contains(string(md), want) {
 			t.Errorf("report lacks %q:\n%s", want, md)
 		}
+	}
+}
+
+// relabelCheck raises an unmatched_bank_line for one planted charge of the
+// skeleton month, read through the run's snapshotting reader, so the
+// workflow has a line to investigate (the skeleton plants none).
+type relabelCheck struct{ txn string }
+
+func (relabelCheck) Name() string { return "testunmatched" }
+
+func (c relabelCheck) Run(ctx context.Context, in checks.Inputs) ([]checks.Finding, error) {
+	from, to, err := monthRange(in.Month)
+	if err != nil {
+		return nil, err
+	}
+	lines, err := in.Evidence.BankLines(ctx, in.Company, from, to)
+	if err != nil {
+		return nil, err
+	}
+	for _, l := range lines {
+		if l.TxnID != c.txn {
+			continue
+		}
+		amt := l.AmountPaise
+		if amt < 0 {
+			amt = -amt
+		}
+		return []checks.Finding{{
+			Type: checks.TypeUnmatchedBankLine, Severity: checks.SeverityMedium, Title: "Unmatched bank line (synthetic)",
+			AmountPaise: &amt, Keys: map[string]string{"bank_txn_id": l.TxnID},
+			Evidence: []checks.EvidenceRef{checks.EvidenceEvidence(toolListBankLines, map[string]string{"company": in.Company, "txn_id": l.TxnID}, l.TxnID)},
+			Status:   checks.StatusOpen,
+		}}, nil
+	}
+	return nil, nil
+}
+
+// TestWorkflowGateBInvestigates: with an investigator, the workflow runs
+// one investigate step and one verify step per unmatched_bank_line
+// finding, over the real MCP servers and Postgres, and records the
+// resolution on the finding.
+func TestWorkflowGateBInvestigates(t *testing.T) {
+	g := setupGateB(t)
+	ctx := t.Context()
+	wf, _ := g.workflow(t)
+	wf.Checks = []checks.Check{&checks.BankRecCheck{}, relabelCheck{txn: skeletonCharge}}
+	inv := llm.NewFakeProvider(
+		turn(1000, toolCall("c1", "evidence__list_bank_lines", `{"company":"sharma","from_date":"2026-09-14","to_date":"2026-09-16"}`)),
+		turn(1000, emitCall(chargeResolution)),
+	)
+	wf.Model = routeModel{explain: fakeModel(), investigate: inv}
+	wf.Investigator = &LLMInvestigator{
+		Store: g.st, Tools: g.reg, Model: invModel, Log: discardLog(),
+		Accounts: BooksAccounts{Books: wf.Books},
+	}
+	key := []byte("0123456789abcdef0123456789abcdef")
+	wf.NewRedactor = func(runID uuid.UUID) *Redactor { return NewRedactor(key, runID, nil) }
+
+	res, err := wf.RunClose(ctx, skeletonCompany, skeletonMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	if res.Status != store.RunDone || res.Findings != 4 {
+		t.Fatalf("result %+v, want done with 4 findings", res)
+	}
+	wantSteps(t, stepStatuses(t, g.st, res.RunID), map[string][]string{
+		"check.bankrec":       {"done"},
+		"check.testunmatched": {"done"},
+		"explain":             repeat("done", 4),
+		"investigate":         {"done"},
+		"retrieve":            {"skipped"},
+		"router":              {"done"},
+		"synthesize":          {"done"},
+		"verify":              repeat("done", 5),
+	})
+	fs, err := g.st.ListFindingsByRun(ctx, res.RunID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var target store.Finding
+	for _, f := range fs {
+		if f.Type == checks.TypeUnmatchedBankLine {
+			target = f
+		}
+	}
+	if target.Keys[store.ResolutionKey] != ResolutionUnrecordedCharge || len(target.Evidence) != 2 || target.Status != checks.StatusOpen {
+		t.Errorf("investigated finding keys %v evidence %d status %s", target.Keys, len(target.Evidence), target.Status)
+	}
+	steps, _ := g.st.ListSteps(ctx, res.RunID)
+	for _, s := range steps {
+		if s.Kind == store.StepKindVerify && s.Subject == investigateVerifyPrefix+target.ID.String() && (s.Error != nil || len(s.OutputRefs) != 1) {
+			t.Errorf("investigation verify step %+v", s)
+		}
+	}
+	if inv.CallCount() != 2 {
+		t.Errorf("investigator calls %d", inv.CallCount())
+	}
+
+	// Resuming the done run is refused; nothing runs twice.
+	if _, err := wf.ResumeClose(ctx, res.RunID); err == nil {
+		t.Error("resumed a done run")
 	}
 }
