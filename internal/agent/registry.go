@@ -9,6 +9,11 @@ package agent
 // model's tool call; the MCP-backed readers in readers.go share the same
 // sessions.
 //
+// Every request carries a run scope (CC-506) in X-Run-Scope: the run's,
+// set on the context by WithRunScope, or, outside a run (connecting,
+// listing tools, reconnecting), a discovery scope that can list tools but
+// read nothing. The servers, not the agent, enforce the scope.
+//
 // The registry never connects to /mcp-admin and never reads the admin
 // token. Tool results pass through unchanged (fencing is CC-706/CC-1103),
 // and nothing here logs result content: only tool names, durations and
@@ -37,6 +42,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/httpx"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 )
 
 // Server names, the prefix of every tool name the model sees.
@@ -183,10 +189,17 @@ func NewRegistry(ctx context.Context, cfg config.Config, log *slog.Logger, opts 
 	// Never follow a redirect: a 307 from /mcp could point at /mcp-admin
 	// or at another allowlisted host. The SDK sees the 3xx as a failure.
 	hc.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	scopeKey := []byte(cfg.MCPScopeKey.Reveal())
+	if len(scopeKey) == 0 {
+		// The servers refuse to start without a key, so this is only for
+		// unscoped test servers.
+		log.WarnContext(ctx, "agent: "+config.EnvMCPScopeKey+" is empty; MCP requests carry no run scope")
+	}
 	hc.Transport = &bearerTransport{
-		base:    hc.Transport,
-		token:   token,
-		allowed: map[string]bool{booksKey: true, evidenceKey: true},
+		base:     hc.Transport,
+		token:    token,
+		allowed:  map[string]bool{booksKey: true, evidenceKey: true},
+		scopeKey: scopeKey,
 	}
 
 	r := &Registry{
@@ -603,24 +616,58 @@ func (sc *serverConn) close() {
 // endpoints; it names no URL.
 var errOffEndpoint = errors.New("agent: request outside the configured MCP endpoints refused")
 
-// bearerTransport adds the agent token to requests to the two configured
-// MCP endpoints and refuses every other request, so the token can't
-// follow a redirect or reach another allowlisted host. It wraps the httpx
-// transport, so the host allowlist still applies.
+// runScopeKey holds a run's X-Run-Scope header value in a context.
+type runScopeKey struct{}
+
+// WithRunScope returns ctx carrying a run's scope header (mcpkit.Mint of
+// mcpkit.Window). Every MCP request made under ctx sends it, so the
+// servers bind the call to the run's company and window. The registry is
+// shared by runs; the scope travels with each call's context.
+func WithRunScope(ctx context.Context, header string) context.Context {
+	return context.WithValue(ctx, runScopeKey{}, header)
+}
+
+func runScopeFrom(ctx context.Context) (string, bool) {
+	h, ok := ctx.Value(runScopeKey{}).(string)
+	return h, ok && h != ""
+}
+
+// bearerTransport adds the agent token and the run scope to requests to
+// the two configured /mcp endpoints and refuses every other request, so
+// neither can follow a redirect, reach /mcp-admin or another allowlisted
+// host. It wraps the httpx transport, so the host allowlist still applies.
 type bearerTransport struct {
 	base    http.RoundTripper
 	token   string
 	allowed map[string]bool // endpointKey of the books and evidence URLs
+	// scopeKey signs the discovery scope; empty sends no scope at all.
+	scopeKey []byte
 }
 
 func (b *bearerTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	if !b.allowed[endpointKey(req.URL)] {
+	closeBody := func() {
 		if req.Body != nil {
 			_ = req.Body.Close() // RoundTrippers must close the body, even on error
 		}
+	}
+	if !b.allowed[endpointKey(req.URL)] {
+		closeBody()
 		return nil, errOffEndpoint
 	}
 	clone := req.Clone(req.Context())
 	clone.Header.Set("Authorization", "Bearer "+b.token)
+	if len(b.scopeKey) > 0 {
+		scope, ok := runScopeFrom(req.Context())
+		if !ok {
+			// Outside a run: a fresh discovery scope, which lists tools
+			// and reads nothing.
+			var err error
+			if scope, err = mcpkit.Mint(b.scopeKey, mcpkit.DiscoveryScope(time.Now())); err != nil {
+				closeBody()
+				return nil, errors.New("agent: discovery scope could not be minted")
+			}
+		}
+		clone.Header.Set(mcpkit.ScopeHeader, scope)
+	}
 	return b.base.RoundTrip(clone)
 }

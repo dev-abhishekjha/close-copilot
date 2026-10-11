@@ -15,6 +15,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
@@ -139,6 +140,51 @@ func TestAudit_ActorIgnoresArguments(t *testing.T) {
 	call(t, sess, "struct_tool", map[string]any{"company": "sharma", "actor": "admin"})
 	if len(sink.rows) != 1 || sink.rows[0].Actor != "agent" {
 		t.Fatalf("actor: %+v", sink.rows)
+	}
+}
+
+// TestScopedActor: on a scoped route the audit actor is agent:run/<run_id>
+// from the verified scope (which must override the route's actor), and an
+// actor argument is ignored.
+func TestScopedActor(t *testing.T) {
+	sink := &fakeSink{}
+	s := newTestScoper(t)
+	srv := mcpkit.NewServer("test", "1.0.0")
+	mcpkit.EnableAudit(srv, "books", sink)
+	mcpkit.AddTool(srv, &mcp.Tool{Name: "struct_tool", Description: "d", Annotations: &mcp.ToolAnnotations{ReadOnlyHint: true}},
+		func(_ context.Context, _ *mcp.CallToolRequest, _ auditIn) (*mcp.CallToolResult, auditOut, error) {
+			return nil, auditOut{OK: true}, nil
+		})
+	h := mcpkit.BuildHandler(map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(srv, "tok")}, testLogger(),
+		mcpkit.WithActors(map[string]string{"/mcp": "agent"}), mcpkit.WithScoper(s, "/mcp"))
+	ts := httptest.NewServer(h)
+	t.Cleanup(ts.Close)
+
+	tr := &scopeTransport{token: "tok"}
+	tr.set(liveScope(t)) // run-1
+	sess, err := mcp.NewClient(&mcp.Implementation{Name: "c", Version: "1"}, nil).Connect(context.Background(),
+		&mcp.StreamableClientTransport{Endpoint: ts.URL + "/mcp", HTTPClient: &http.Client{Transport: tr}}, nil)
+	if err != nil {
+		t.Fatalf("connect: %v", err)
+	}
+	t.Cleanup(func() { _ = sess.Close() })
+	call(t, sess, "struct_tool", map[string]any{"company": "sharma", "actor": "admin"})
+
+	// The same session, the next request under another run's scope: the
+	// actor follows the request's scope, not the session's first one.
+	other := goodScope()
+	other.RunID, other.Exp = "run-2", time.Now().Add(time.Hour).Unix()
+	tr.set(mustMint(t, scopeKey, other))
+	call(t, sess, "struct_tool", map[string]any{"company": "sharma"})
+
+	if len(sink.rows) != 2 {
+		t.Fatalf("rows: %d, want 2", len(sink.rows))
+	}
+	if a := sink.rows[0].Actor; a != "agent:run/run-1" {
+		t.Errorf("actor %q, want agent:run/run-1", a)
+	}
+	if a := sink.rows[1].Actor; a != "agent:run/run-2" {
+		t.Errorf("actor %q, want agent:run/run-2", a)
 	}
 }
 

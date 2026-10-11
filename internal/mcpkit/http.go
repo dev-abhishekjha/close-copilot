@@ -35,6 +35,28 @@ type Option func(*handlerOptions)
 
 type handlerOptions struct {
 	actors map[string]string
+	scoper *Scoper
+	scoped map[string]bool
+}
+
+// AdminPath is the route of the approved-write tools. It is never scoped:
+// approvals carry no run.
+const AdminPath = "/mcp-admin"
+
+// WithScoper requires a valid X-Run-Scope (see Scoper) on each listed
+// path, after bearer auth: a missing, expired or tampered scope gets 401.
+// A scoped call's audit actor is agent:run/<run_id>. AdminPath is never
+// scoped, even when listed. A nil s refuses every request on the paths.
+func WithScoper(s *Scoper, paths ...string) Option {
+	return func(o *handlerOptions) {
+		o.scoper = s
+		o.scoped = map[string]bool{}
+		for _, p := range paths {
+			if p != AdminPath {
+				o.scoped[p] = true
+			}
+		}
+	}
 }
 
 // WithActors maps a route path to the audit actor of calls on it, for example
@@ -70,11 +92,18 @@ func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) htt
 			return server
 		}, nil)
 
-		// Authenticate with Bearer token
+		// Built inside out, so a request passes bearer auth, then gets the
+		// route's actor, then (on a scoped path) has its run scope verified,
+		// which overrides the actor with agent:run/<run_id>.
 		var inner http.Handler = streamHandler
+		if o.scoped[path] {
+			inner = requireScope(o.scoper, inner)
+			scopeActors(server, o.scoper)
+		}
 		if actor, ok := o.actors[path]; ok {
+			next := inner
 			inner = http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-				streamHandler.ServeHTTP(w, req.WithContext(ContextWithActor(req.Context(), actor)))
+				next.ServeHTTP(w, req.WithContext(ContextWithActor(req.Context(), actor)))
 			})
 		}
 		authed := RequireBearer(r.Token, inner)
@@ -206,6 +235,36 @@ func (w *statusWriter) Flush() {
 	if f, ok := w.ResponseWriter.(http.Flusher); ok {
 		f.Flush()
 	}
+}
+
+// scopeActored remembers the servers that already carry the scope-actor
+// middleware.
+var scopeActored sync.Map
+
+// scopeActors makes every tools/call on s run with the audit actor
+// agent:run/<run_id> of the scope on the HTTP request that carried it. The
+// SDK hands a tool handler the context of the session's first request, not
+// of the request carrying the call, so the HTTP layer's actor alone would
+// name the run that opened the session; the call's own headers
+// (req.Extra.Header) are per request. A call without a valid scope keeps
+// the context's actor; the HTTP layer has already refused it.
+func scopeActors(s *mcp.Server, sc *Scoper) {
+	if s == nil || sc == nil {
+		return
+	}
+	if _, loaded := scopeActored.LoadOrStore(s, struct{}{}); loaded {
+		return
+	}
+	s.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
+		return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
+			if call, ok := req.(*mcp.CallToolRequest); ok && method == "tools/call" {
+				if id, ok := sc.RunID(call); ok {
+					ctx = ContextWithActor(ctx, "agent:run/"+id)
+				}
+			}
+			return next(ctx, method, req)
+		}
+	})
 }
 
 // traced remembers the servers that already carry the tool-call span

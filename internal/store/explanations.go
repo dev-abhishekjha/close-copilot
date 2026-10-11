@@ -16,8 +16,10 @@ import (
 // SetFindingExplanation sets a finding's explanation, suggested action,
 // citations and proposed journal entry. A nil proposal clears the column;
 // nil citations are stored as an empty list. Writing the same values again
-// is harmless, so a re-run explain step may repeat it.
-func (s *Store) SetFindingExplanation(ctx context.Context, findingID uuid.UUID, explanation, action string, citations []Citation, proposal *JournalProposal) error {
+// is harmless, so a re-run explain step may repeat it. The finding must
+// belong to run runID of company companyID (CC-506): a finding of another
+// run or company is ErrNotFound and is left unchanged.
+func (s *Store) SetFindingExplanation(ctx context.Context, findingID, runID uuid.UUID, companyID, explanation, action string, citations []Citation, proposal *JournalProposal) error {
 	if explanation == "" {
 		return errors.New("store: set finding explanation: empty explanation")
 	}
@@ -38,16 +40,17 @@ func (s *Store) SetFindingExplanation(ctx context.Context, findingID uuid.UUID, 
 		}
 	}
 	const query = `
-		UPDATE findings
-		SET explanation = $2, action = $3, citations = $4, proposal = $5
-		WHERE id = $1;
+		UPDATE findings f
+		SET explanation = $4, action = $5, citations = $6, proposal = $7
+		FROM close_runs r
+		WHERE f.id = $1 AND f.run_id = $2 AND r.id = f.run_id AND r.company_id = $3;
 	`
-	tag, err := s.pool.Exec(ctx, query, findingID, explanation, action, citationsJSON, proposalJSON)
+	tag, err := s.pool.Exec(ctx, query, findingID, runID, companyID, explanation, action, citationsJSON, proposalJSON)
 	if err != nil {
 		return fmt.Errorf("store: set finding %s explanation: %w", findingID, err)
 	}
 	if tag.RowsAffected() == 0 {
-		return fmt.Errorf("%w: finding %s", ErrNotFound, findingID)
+		return fmt.Errorf("%w: finding %s in run %s", ErrNotFound, findingID, runID)
 	}
 	return nil
 }

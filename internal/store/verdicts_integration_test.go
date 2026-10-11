@@ -75,7 +75,7 @@ func TestClearFindingExplanation(t *testing.T) {
 	fid := f.ID
 	proposal := &store.JournalProposal{FindingID: &fid, CompanyID: "testcorp", Status: "proposed", Payload: store.JournalPayload{
 		PostingDate: "2026-09-30", Lines: []store.JournalLine{{Account: "A", DebitPaise: 590}, {Account: "B", CreditPaise: 590}}}}
-	if err := st.SetFindingExplanation(ctx, f.ID, "Rejected text.", "book_entry", []store.Citation{{DocID: "D", Section: "1"}}, proposal); err != nil {
+	if err := st.SetFindingExplanation(ctx, f.ID, run, "testcorp", "Rejected text.", "book_entry", []store.Citation{{DocID: "D", Section: "1"}}, proposal); err != nil {
 		t.Fatal(err)
 	}
 	if err := st.SetFindingVerified(ctx, run, f.ID, true); err != nil {

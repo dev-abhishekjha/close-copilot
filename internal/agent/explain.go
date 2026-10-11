@@ -90,7 +90,9 @@ var SuggestedActions = []string{
 type ExplainStore interface {
 	ArtifactPutter
 	GetArtifact(ctx context.Context, sha string) (store.Artifact, error)
-	SetFindingExplanation(ctx context.Context, findingID uuid.UUID, explanation, action string, citations []store.Citation, proposal *store.JournalProposal) error
+	// SetFindingExplanation writes only a finding of run runID of company
+	// companyID; another run's finding is store.ErrNotFound (CC-506).
+	SetFindingExplanation(ctx context.Context, findingID, runID uuid.UUID, companyID, explanation, action string, citations []store.Citation, proposal *store.JournalProposal) error
 }
 
 var _ ExplainStore = (*store.Store)(nil)
@@ -421,7 +423,7 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 		fid := req.Finding.ID
 		proposal = &store.JournalProposal{FindingID: &fid, CompanyID: req.Company, Payload: *art.Proposal, Status: "proposed"}
 	}
-	if err := e.Store.SetFindingExplanation(ctx, req.Finding.ID, art.Explanation, art.SuggestedAction, art.Citations, proposal); err != nil {
+	if err := e.Store.SetFindingExplanation(ctx, req.Finding.ID, req.RunID, req.Company, art.Explanation, art.SuggestedAction, art.Citations, proposal); err != nil {
 		return StepResult{}, err
 	}
 	return StepResult{StepID: req.StepID, Status: store.StepDone, OutputRefs: []string{sha}}, nil

@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -56,10 +57,10 @@ type testServer struct {
 	initializes atomic.Int32
 }
 
-func startServer(t *testing.T, s *mcp.Server) *testServer {
+func startServer(t *testing.T, s *mcp.Server, opts ...mcpkit.Option) *testServer {
 	t.Helper()
 	ts := &testServer{}
-	h := mcpkit.BuildHandler(map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(s, testToken)}, slog.New(slog.NewTextHandler(io.Discard, nil)))
+	h := mcpkit.BuildHandler(map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(s, testToken)}, slog.New(slog.NewTextHandler(io.Discard, nil)), opts...)
 	ts.Server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ts.requests.Add(1)
 		ts.paths.Store(r.URL.Path, true)
@@ -730,4 +731,180 @@ func TestRegistryDiscoverBounds(t *testing.T) {
 			t.Errorf("error carries the whole server-supplied name: %v", err)
 		}
 	})
+}
+
+// ---- run scopes (CC-506) ----
+
+// testScopeKey is a made-up MCP_SCOPE_KEY.
+const testScopeKey = "agent-scope-test-key"
+
+func mintWindow(t *testing.T, company, runID, month string) string {
+	t.Helper()
+	sc, err := mcpkit.Window(company, runID, month, time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	h, err := mcpkit.Mint([]byte(testScopeKey), sc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return h
+}
+
+// scopedCall is one list_bank_lines call as the server saw it: the
+// company asked for and the run of the scope it came with.
+type scopedCall struct{ company, run string }
+
+// TestRegistryRunScopes: two runs for two companies share one registry,
+// each call goes out with its own run's scope (read on the server side
+// from the call's own HTTP request), and a run can't read the other
+// company. Outside a run the registry sends a discovery scope, which
+// lists tools and reads nothing.
+func TestRegistryRunScopes(t *testing.T) {
+	scoper, err := mcpkit.NewScoper(testScopeKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var mu sync.Mutex
+	var seen []scopedCall
+	ev := mcp.NewServer(&mcp.Implementation{Name: "scoped-evidence", Version: "test"}, nil)
+	mcp.AddTool(ev, &mcp.Tool{Name: "list_bank_lines", Description: "bank lines", Annotations: ro()},
+		func(_ context.Context, req *mcp.CallToolRequest, in rangeArgs) (*mcp.CallToolResult, []wireBankLine, error) {
+			run, _ := scoper.RunID(req)
+			mu.Lock()
+			seen = append(seen, scopedCall{in.Company, run})
+			mu.Unlock()
+			if err := scoper.CheckRange(req, in.Company, in.FromDate, in.ToDate); err != nil {
+				return nil, nil, err
+			}
+			return nil, []wireBankLine{{TxnID: "T-" + in.Company, Date: "2026-09-03", Narration: "line of " + in.Company, Amount: -100}}, nil
+		})
+	mcp.AddTool(ev, &mcp.Tool{Name: "list_gstr2b_entries", Description: "gstr2b", Annotations: ro()},
+		func(context.Context, *mcp.CallToolRequest, periodArgs) (*mcp.CallToolResult, []wireGSTR2BEntry, error) {
+			return nil, nil, nil
+		})
+	scoped := mcpkit.WithScoper(scoper, "/mcp")
+	e := &env{books: startServer(t, fakeBooks(), scoped), evidence: startServer(t, ev, scoped), logs: &bytes.Buffer{}}
+	e.log = slog.New(slog.NewJSONHandler(&lockedWriter{w: e.logs}, nil))
+	e.cfg = config.Config{
+		BooksMCPURL:    e.books.URL + "/mcp",
+		EvidenceMCPURL: e.evidence.URL + "/mcp",
+		MCPTokenAgent:  config.NewSecret(testToken),
+		MCPScopeKey:    config.NewSecret(testScopeKey),
+	}
+	r := e.registry(t) // connects and lists tools under the discovery scope
+	evidence := &MCPEvidence{Registry: r}
+	from, to := time.Date(2026, 9, 1, 0, 0, 0, 0, time.UTC), time.Date(2026, 9, 30, 0, 0, 0, 0, time.UTC)
+
+	runs := map[string]context.Context{
+		"sharma": WithRunScope(t.Context(), mintWindow(t, "sharma", "run-a", "2026-09")),
+		"mehta":  WithRunScope(t.Context(), mintWindow(t, "mehta", "run-b", "2026-09")),
+	}
+	var wg sync.WaitGroup
+	errs := make(chan error, 64)
+	for range 4 {
+		for own, ctx := range runs {
+			wg.Add(2)
+			go func() {
+				defer wg.Done()
+				lines, err := evidence.BankLines(ctx, own, from, to)
+				if err != nil || len(lines) != 1 || lines[0].Narration != "line of "+own {
+					errs <- fmt.Errorf("%s reading its own lines: %v %+v", own, err, lines)
+				}
+			}()
+			go func() {
+				defer wg.Done()
+				other := map[string]string{"sharma": "mehta", "mehta": "sharma"}[own]
+				if _, err := evidence.BankLines(ctx, other, from, to); !errors.Is(err, ErrToolError) {
+					errs <- fmt.Errorf("%s's run reading %s: %v, want a tool error", own, other, err)
+				}
+			}()
+		}
+	}
+	wg.Wait()
+	close(errs)
+	for err := range errs {
+		t.Error(err)
+	}
+
+	// The model's path: an out-of-scope call is an error result.
+	res := r.Execute(runs["sharma"], call("evidence__list_bank_lines", `{"company":"mehta","from_date":"2026-09-01","to_date":"2026-09-30"}`))
+	if !res.IsError || res.Content != MsgToolError {
+		t.Errorf("Execute across companies = %+v, want %q", res, MsgToolError)
+	}
+	// Outside a run nothing can be read.
+	if _, err := evidence.BankLines(t.Context(), "sharma", from, to); !errors.Is(err, ErrToolError) {
+		t.Errorf("read without a run scope: %v, want a tool error", err)
+	}
+
+	// Each call reached the server with the scope of the context it was
+	// made under: four own reads and four cross reads per run, the
+	// Execute call, and the discovery read last.
+	mu.Lock()
+	defer mu.Unlock()
+	count := map[scopedCall]int{}
+	for _, c := range seen {
+		count[c]++
+	}
+	want := map[scopedCall]int{
+		{"sharma", "run-a"}: 4, {"mehta", "run-b"}: 4,
+		{"mehta", "run-a"}: 5, {"sharma", "run-b"}: 4,
+		{"sharma", "discovery"}: 1,
+	}
+	if !maps.Equal(count, want) {
+		t.Errorf("calls by (company, scope run) = %v, want %v", count, want)
+	}
+	if last := seen[len(seen)-1]; last.run != "discovery" {
+		t.Errorf("a call outside a run came with scope %q, want discovery", last.run)
+	}
+}
+
+// TestBearerTransportScopeHeader: a request under a run's context carries
+// that run's scope; any other carries a fresh discovery scope; without a
+// key none is sent; /mcp-admin is refused before anything is sent.
+func TestBearerTransportScopeHeader(t *testing.T) {
+	var got []string
+	base := roundTripFunc(func(r *http.Request) (*http.Response, error) {
+		got = append(got, r.Header.Get(mcpkit.ScopeHeader))
+		return &http.Response{StatusCode: http.StatusOK, Body: io.NopCloser(strings.NewReader("")), Request: r}, nil
+	})
+	endpoint := "http://books.local:8081/mcp"
+	bt := &bearerTransport{base: base, token: testToken, scopeKey: []byte(testScopeKey),
+		allowed: map[string]bool{endpointKey(mustURL(t, endpoint)): true}}
+	send := func(bt *bearerTransport, ctx context.Context, raw string) error {
+		req, _ := http.NewRequestWithContext(ctx, http.MethodPost, raw, strings.NewReader("{}"))
+		resp, err := bt.RoundTrip(req)
+		if resp != nil {
+			_ = resp.Body.Close()
+		}
+		return err
+	}
+	runScope := mintWindow(t, "sharma", "run-a", "2026-09")
+	if err := send(bt, WithRunScope(t.Context(), runScope), endpoint); err != nil {
+		t.Fatal(err)
+	}
+	if err := send(bt, t.Context(), endpoint); err != nil {
+		t.Fatal(err)
+	}
+	if err := send(bt, WithRunScope(t.Context(), runScope), "http://books.local:8081/mcp-admin"); !errors.Is(err, errOffEndpoint) {
+		t.Errorf("/mcp-admin: %v, want refusal", err)
+	}
+	unkeyed := *bt
+	unkeyed.scopeKey = nil
+	if err := send(&unkeyed, WithRunScope(t.Context(), runScope), endpoint); err != nil {
+		t.Fatal(err)
+	}
+	if len(got) != 3 {
+		t.Fatalf("%d requests reached the transport, want 3", len(got))
+	}
+	if got[0] != runScope {
+		t.Error("a run's request did not carry the run's scope")
+	}
+	sc, err := mcpkit.Verify([]byte(testScopeKey), got[1], time.Now())
+	if err != nil || sc.RunID != "discovery" {
+		t.Errorf("request outside a run: scope %+v %v, want the discovery scope", sc, err)
+	}
+	if got[2] != "" {
+		t.Error("a registry without a scope key sent a scope")
+	}
 }

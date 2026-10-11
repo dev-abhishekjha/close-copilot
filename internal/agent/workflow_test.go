@@ -18,11 +18,14 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/abhishekjha/close-copilot/internal/checks"
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/ledger"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
@@ -1290,5 +1293,244 @@ func TestResumeStoresNewTraceID(t *testing.T) {
 	run := r.st.runs[res.RunID]
 	if run.TraceID == nil || *run.TraceID == first {
 		t.Errorf("resumed run trace ID %v, want a new one (first %s)", run.TraceID, first)
+	}
+}
+
+// ---- run scope (CC-506) ----
+
+// heldBackEvidence records the deadline of each BankLines call, makes the
+// call over MCP (so the server sees the scope), then fails it, so the run
+// is refused at preflight and can be resumed.
+type heldBackEvidence struct {
+	inner     checks.EvidenceReader
+	mu        sync.Mutex
+	deadlines []time.Time
+}
+
+func (h *heldBackEvidence) BankLines(ctx context.Context, company string, from, to time.Time) ([]store.BankLine, error) {
+	d, ok := ctx.Deadline()
+	if !ok {
+		return nil, errors.New("test: the run's context has no deadline")
+	}
+	h.mu.Lock()
+	h.deadlines = append(h.deadlines, d)
+	h.mu.Unlock()
+	if _, err := h.inner.BankLines(ctx, company, from, to); err != nil {
+		return nil, err
+	}
+	return nil, errors.New("test: evidence held back")
+}
+
+func (h *heldBackEvidence) GSTR2BEntries(ctx context.Context, company, period string) ([]store.GSTR2BEntry, error) {
+	return h.inner.GSTR2BEntries(ctx, company, period)
+}
+
+// TestDriveMintsRunScope: RunClose and ResumeClose each put the run's
+// scope on every MCP call: the run's company and window, valid until a
+// minute after that drive's deadline. Without it every call would go out
+// under the discovery scope and be refused in production.
+func TestDriveMintsRunScope(t *testing.T) {
+	scoper, err := mcpkit.NewScoper(testScopeKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var mu sync.Mutex
+	var headers []string
+	ev := mcp.NewServer(&mcp.Implementation{Name: "scoped-evidence", Version: "test"}, nil)
+	mcp.AddTool(ev, &mcp.Tool{Name: "list_bank_lines", Description: "bank lines", Annotations: ro()},
+		func(_ context.Context, req *mcp.CallToolRequest, in rangeArgs) (*mcp.CallToolResult, []wireBankLine, error) {
+			mu.Lock()
+			headers = append(headers, req.Extra.Header.Get(mcpkit.ScopeHeader))
+			mu.Unlock()
+			if err := scoper.CheckRange(req, in.Company, in.FromDate, in.ToDate); err != nil {
+				return nil, nil, err
+			}
+			return nil, []wireBankLine{{TxnID: "T1", Date: "2026-08-03", Narration: "NEFT", Amount: -100}}, nil
+		})
+	mcp.AddTool(ev, &mcp.Tool{Name: "list_gstr2b_entries", Description: "gstr2b", Annotations: ro()},
+		func(context.Context, *mcp.CallToolRequest, periodArgs) (*mcp.CallToolResult, []wireGSTR2BEntry, error) {
+			return nil, nil, nil
+		})
+	scoped := mcpkit.WithScoper(scoper, "/mcp")
+	books, evidence := startServer(t, fakeBooks(), scoped), startServer(t, ev, scoped)
+	cfg := config.Config{
+		BooksMCPURL: books.URL + "/mcp", EvidenceMCPURL: evidence.URL + "/mcp",
+		MCPTokenAgent: config.NewSecret(testToken), MCPScopeKey: config.NewSecret(testScopeKey),
+		LLMRunTokenCap: 100000, LLMDailyBudgetUSD: 2,
+	}
+	reg, err := NewRegistry(t.Context(), cfg, discardLog())
+	if err != nil {
+		t.Fatalf("NewRegistry: %v", err)
+	}
+	t.Cleanup(reg.Close)
+
+	r := newRig(t)
+	held := &heldBackEvidence{inner: &MCPEvidence{Registry: reg}}
+	r.wf.Evidence, r.wf.Config = held, cfg
+
+	// verify checks the scope of the n-th call against the run and the
+	// n-th recorded deadline.
+	verify := func(n int, runID uuid.UUID) int64 {
+		t.Helper()
+		mu.Lock()
+		defer mu.Unlock()
+		if len(headers) != n+1 || len(held.deadlines) != n+1 {
+			t.Fatalf("%d calls reached the server, %d deadlines recorded; want %d", len(headers), len(held.deadlines), n+1)
+		}
+		got, err := mcpkit.Verify([]byte(testScopeKey), headers[n], time.Now())
+		if err != nil {
+			t.Fatalf("call %d: scope does not verify: %v", n, err)
+		}
+		want, err := mcpkit.Window(synthCompany, runID.String(), synthMonth, held.deadlines[n].Add(time.Minute))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got != want {
+			t.Errorf("call %d: scope %+v, want %+v", n, got, want)
+		}
+		if got.Exp != held.deadlines[n].Add(time.Minute).Unix() {
+			t.Errorf("call %d: exp %d, want the deadline plus a minute", n, got.Exp)
+		}
+		return got.Exp
+	}
+
+	r.wf.Timeout = 9 * time.Minute
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if !errors.Is(err, ErrPreflightRefused) || res.RunID == uuid.Nil {
+		t.Fatalf("RunClose: %+v %v, want a preflight refusal", res, err)
+	}
+	first := verify(0, res.RunID)
+
+	r.wf.Timeout = 7 * time.Minute // a different deadline, so a fresh exp
+	if _, err := r.wf.ResumeClose(t.Context(), res.RunID); !errors.Is(err, ErrPreflightRefused) {
+		t.Fatalf("ResumeClose: %v, want a preflight refusal", err)
+	}
+	if second := verify(1, res.RunID); second == first {
+		t.Errorf("the resume reused the first scope's exp %d", first)
+	}
+}
+
+// scopeCall is one read a detector made: the company and the inclusive
+// date range it covers.
+type scopeCall struct {
+	what, company, from, to string
+}
+
+// recordingBooks and recordingEvidence wrap the synthetic readers and
+// record the range of every read.
+type recordingBooks struct {
+	synthBooks
+	mu    sync.Mutex
+	calls []scopeCall
+}
+
+func (b *recordingBooks) add(what, company string, from, to time.Time) {
+	b.mu.Lock()
+	b.calls = append(b.calls, scopeCall{what, company, from.Format(time.DateOnly), to.Format(time.DateOnly)})
+	b.mu.Unlock()
+}
+
+func (b *recordingBooks) TrialBalance(ctx context.Context, c string, from, to time.Time) (ledger.TB, error) {
+	b.add("trial_balance", c, from, to)
+	return b.synthBooks.TrialBalance(ctx, c, from, to)
+}
+
+func (b *recordingBooks) GLEntries(ctx context.Context, c string, from, to time.Time) ([]ledger.GLEntry, error) {
+	b.add("gl_entries", c, from, to)
+	return b.synthBooks.GLEntries(ctx, c, from, to)
+}
+
+func (b *recordingBooks) PurchaseInvoices(ctx context.Context, c string, from, to time.Time) ([]ledger.PurchaseInvoice, error) {
+	b.add("purchase_invoices", c, from, to)
+	return b.synthBooks.PurchaseInvoices(ctx, c, from, to)
+}
+
+func (b *recordingBooks) SalesInvoices(ctx context.Context, c string, from, to time.Time) ([]ledger.SalesInvoice, error) {
+	b.add("sales_invoices", c, from, to)
+	return b.synthBooks.SalesInvoices(ctx, c, from, to)
+}
+
+func (b *recordingBooks) PaymentEntries(ctx context.Context, c string, from, to time.Time) ([]ledger.PaymentEntry, error) {
+	b.add("payments", c, from, to)
+	return b.synthBooks.PaymentEntries(ctx, c, from, to)
+}
+
+// AccountHistory reads months-1 months before through to through's end.
+func (b *recordingBooks) AccountHistory(ctx context.Context, c, account, through string, months int) ([]ledger.MonthTotal, error) {
+	last, err := time.Parse("2006-01", through)
+	if err != nil {
+		return nil, err
+	}
+	b.add("account_history", c, last.AddDate(0, -(months-1), 0), last.AddDate(0, 1, -1))
+	return b.synthBooks.AccountHistory(ctx, c, account, through, months)
+}
+
+// RecurringSuppliers reads the lookback months before before_month (the
+// books tool's RecurringWindow, computed here: internal/agent must not
+// import internal/books).
+func (b *recordingBooks) RecurringSuppliers(ctx context.Context, c, before string, lookback, minOcc, band int) ([]checks.RecurringSupplier, error) {
+	m, err := time.Parse("2006-01", before)
+	if err != nil {
+		return nil, err
+	}
+	b.add("recurring_suppliers", c, m.AddDate(0, -lookback, 0), m.AddDate(0, 0, -1))
+	return b.synthBooks.RecurringSuppliers(ctx, c, before, lookback, minOcc, band)
+}
+
+type recordingEvidence struct {
+	synthEvidence
+	books *recordingBooks // shares the call log
+}
+
+func (e *recordingEvidence) BankLines(ctx context.Context, c string, from, to time.Time) ([]store.BankLine, error) {
+	e.books.add("bank_lines", c, from, to)
+	return e.synthEvidence.BankLines(ctx, c, from, to)
+}
+
+// GSTR2BEntries reads the first to the last day of the period.
+func (e *recordingEvidence) GSTR2BEntries(ctx context.Context, c, period string) ([]store.GSTR2BEntry, error) {
+	m, err := time.Parse("2006-01", period)
+	if err != nil {
+		return nil, err
+	}
+	e.books.add("gstr2b_entries", c, m, m.AddDate(0, 1, -1))
+	return e.synthEvidence.GSTR2BEntries(ctx, c, period)
+}
+
+// TestScopedCloseRunAllChecks runs a close with every default check and
+// requires every read the detectors make to sit inside the run's scope
+// window, so the scoped servers never refuse a real run. A future detector
+// that reads outside the window breaks this test.
+func TestScopedCloseRunAllChecks(t *testing.T) {
+	r := newRig(t)
+	books := &recordingBooks{}
+	r.wf.Books, r.wf.Evidence = books, &recordingEvidence{books: books}
+	r.wf.Checks = DefaultChecks()
+	r.wf.Explainer, r.wf.Verifier = nil, nil
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	sc, err := mcpkit.Window(synthCompany, res.RunID.String(), synthMonth, time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	books.mu.Lock()
+	defer books.mu.Unlock()
+	kinds := map[string]bool{}
+	for _, c := range books.calls {
+		kinds[c.what] = true
+		if err := sc.Allows(c.company, c.from, c.to); err != nil {
+			t.Errorf("%s %s %s..%s: %v", c.what, c.company, c.from, c.to, err)
+		}
+	}
+	for _, k := range []string{"bank_lines", "trial_balance", "gl_entries", "purchase_invoices", "gstr2b_entries", "recurring_suppliers", "payments"} {
+		if !kinds[k] {
+			t.Errorf("no %s read recorded; the test no longer covers it (reads: %v)", k, slices.Sorted(maps.Keys(kinds)))
+		}
+	}
+	gstr2b := (&checks.GSTR2BCheck{}).Name()
+	if st := r.stepStatuses(res.RunID)[store.StepKindCheckPrefix+gstr2b]; !slices.Equal(st, []string{"done"}) {
+		t.Errorf("GSTR-2B check step %v, want done", st)
 	}
 }

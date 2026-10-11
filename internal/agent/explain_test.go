@@ -42,9 +42,21 @@ func newExplainStore() *explainStore {
 	return &explainStore{memStore: newMemStore(), set: map[uuid.UUID]setExplanation{}}
 }
 
-func (s *explainStore) SetFindingExplanation(_ context.Context, id uuid.UUID, explanation, action string, citations []store.Citation, proposal *store.JournalProposal) error {
+func (s *explainStore) SetFindingExplanation(_ context.Context, id, runID uuid.UUID, companyID, explanation, action string, citations []store.Citation, proposal *store.JournalProposal) error {
 	if s.setErr != nil {
 		return s.setErr
+	}
+	// Like the store's UPDATE, a finding of another run is not found.
+	s.mu.Lock()
+	for _, f := range s.findings {
+		if f.ID == id && f.RunID != runID {
+			s.mu.Unlock()
+			return store.ErrNotFound
+		}
+	}
+	s.mu.Unlock()
+	if companyID == "" {
+		return errors.New("explainStore: no company")
 	}
 	s.setMu.Lock()
 	defer s.setMu.Unlock()

@@ -59,15 +59,37 @@ type GSTR2BEntryOutput struct {
 	ITCAvailable  bool        `json:"itc_available"`
 }
 
+// Option configures RegisterTools.
+type Option func(*options)
+
+type options struct {
+	scope *mcpkit.Scoper
+}
+
+// WithScope binds every call to its run's company and window (CC-506): a
+// call outside it gets an out_of_scope tool error before any Postgres
+// read. Without it the tools are unscoped (stdio and tests only); the HTTP
+// server always sets it.
+func WithScope(s *mcpkit.Scoper) Option {
+	return func(o *options) { o.scope = s }
+}
+
 // RegisterTools registers the evidence MCP tools on the provided MCP server.
-func RegisterTools(server *mcp.Server, st *store.Store) {
+func RegisterTools(server *mcp.Server, st *store.Store, opts ...Option) {
+	var o options
+	for _, opt := range opts {
+		opt(&o)
+	}
 	mcpkit.AddTool(server, &mcp.Tool{
 		Name:        "list_bank_lines",
 		Description: "List bank statement lines for a company within a date range, ordered by transaction date and txn_id.",
 		Annotations: &mcp.ToolAnnotations{
 			ReadOnlyHint: true,
 		},
-	}, func(ctx context.Context, _ *mcp.CallToolRequest, in ListBankLinesInput) (*mcp.CallToolResult, []BankLineOutput, error) {
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in ListBankLinesInput) (*mcp.CallToolResult, []BankLineOutput, error) {
+		if err := o.scope.CheckCompany(req, in.Company); err != nil {
+			return nil, nil, err
+		}
 		if in.Company == "" {
 			return nil, nil, errors.New("company is required")
 		}
@@ -88,6 +110,9 @@ func RegisterTools(server *mcp.Server, st *store.Store) {
 		}
 		if fromDate.After(toDate) {
 			return nil, nil, fmt.Errorf("from_date %q cannot be after to_date %q", in.FromDate, in.ToDate)
+		}
+		if err := o.scope.CheckRange(req, in.Company, fromDate.Format(dateLayout), toDate.Format(dateLayout)); err != nil {
+			return nil, nil, err
 		}
 
 		filter := store.BankLineFilter{
@@ -123,15 +148,23 @@ func RegisterTools(server *mcp.Server, st *store.Store) {
 		Annotations: &mcp.ToolAnnotations{
 			ReadOnlyHint: true,
 		},
-	}, func(ctx context.Context, _ *mcp.CallToolRequest, in ListGSTR2BEntriesInput) (*mcp.CallToolResult, []GSTR2BEntryOutput, error) {
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in ListGSTR2BEntriesInput) (*mcp.CallToolResult, []GSTR2BEntryOutput, error) {
+		if err := o.scope.CheckCompany(req, in.Company); err != nil {
+			return nil, nil, err
+		}
 		if in.Company == "" {
 			return nil, nil, errors.New("company is required")
 		}
 		if in.Period == "" {
 			return nil, nil, errors.New("period is required (YYYY-MM)")
 		}
-		if _, err := time.Parse("2006-01", in.Period); err != nil {
+		period, err := time.Parse("2006-01", in.Period)
+		if err != nil {
 			return nil, nil, fmt.Errorf("invalid period %q: must be YYYY-MM", in.Period)
+		}
+		// The period reads the first to the last day of its month.
+		if err := o.scope.CheckRange(req, in.Company, period.Format(dateLayout), period.AddDate(0, 1, -1).Format(dateLayout)); err != nil {
+			return nil, nil, err
 		}
 
 		entries, err := st.ListGSTR2BEntries(ctx, in.Company, in.Period)
