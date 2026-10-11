@@ -126,6 +126,7 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		Evidence:   &agent.MCPEvidence{Registry: reg},
 		Profiles:   byID,
 		Rules:      rules,
+		Checks:     agent.DefaultChecks(),
 		Config:     cfg,
 		ResultsDir: cmd.resultsDir,
 		Timeout:    cmd.timeout,

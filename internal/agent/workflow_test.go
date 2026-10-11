@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"maps"
 	"os"
 	"slices"
 	"strings"
@@ -980,3 +981,207 @@ func TestRunCloseExplainerFailureIsPartial(t *testing.T) {
 }
 
 func discardLog() *slog.Logger { return slog.New(slog.NewTextHandler(io.Discard, nil)) }
+
+// ---- default checks and variance linking ----
+
+func TestDefaultChecks(t *testing.T) {
+	var got []string
+	for _, c := range DefaultChecks() {
+		got = append(got, c.Name())
+	}
+	if len(got) != 6 || got[0] != "bankrec" || got[len(got)-1] != checks.TypeVariance {
+		t.Fatalf("DefaultChecks %v, want six checks, bankrec first and variance last", got)
+	}
+	want := []checks.Check{&checks.BankRecCheck{}, &checks.DuplicatePaymentCheck{}, &checks.GSTR2BCheck{},
+		&checks.MissingAccrualCheck{}, &checks.PolicyRulesCheck{}, &checks.VarianceCheck{}}
+	for i, c := range DefaultChecks() {
+		if c.Name() != want[i].Name() {
+			t.Errorf("check %d is %s, want %s", i, c.Name(), want[i].Name())
+		}
+	}
+	if got := (&Workflow{}).checks(); len(got) != 1 || got[0].Name() != "bankrec" {
+		t.Errorf("a nil Checks runs %d checks, want bank reconciliation only", len(got))
+	}
+}
+
+func TestRunCloseDoneWithDefaultChecks(t *testing.T) {
+	r := newRig(t)
+	r.wf.Checks = DefaultChecks()
+	r.wf.Explainer, r.wf.Verifier = nil, nil
+	var order []string
+	r.st.beginHook = func(kind, _ string) error {
+		if strings.HasPrefix(kind, store.StepKindCheckPrefix) {
+			order = append(order, strings.TrimPrefix(kind, store.StepKindCheckPrefix))
+		}
+		return nil
+	}
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	var want []string
+	for _, c := range DefaultChecks() {
+		want = append(want, c.Name())
+	}
+	if !slices.Equal(order, want) {
+		t.Errorf("check steps ran %v, want %v", order, want)
+	}
+	for _, name := range want {
+		if st := r.stepStatuses(res.RunID)[store.StepKindCheckPrefix+name]; !slices.Equal(st, []string{"done"}) {
+			t.Errorf("step check.%s %v, want done", name, st)
+		}
+	}
+}
+
+// scriptedCheck returns fixed findings under a fixed name. Each carries
+// the evidence of the rig's first bank reconciliation finding, read
+// through the step's snapshotting readers so the step can annotate it.
+type scriptedCheck struct {
+	name string
+	fs   []store.Finding
+}
+
+func (c *scriptedCheck) Name() string { return c.name }
+
+func (c *scriptedCheck) Run(ctx context.Context, in checks.Inputs) ([]store.Finding, error) {
+	real, err := (&checks.BankRecCheck{}).Run(ctx, in)
+	if err != nil || len(real) == 0 {
+		return nil, fmt.Errorf("scripted check %s: no evidence to borrow: %w", c.name, err)
+	}
+	out := make([]store.Finding, len(c.fs))
+	for i, f := range c.fs {
+		f.Keys = maps.Clone(f.Keys)
+		f.Evidence = slices.Clone(real[0].Evidence)
+		out[i] = f
+	}
+	return out, nil
+}
+
+func linkRig(t *testing.T) *testRig {
+	t.Helper()
+	r := newRig(t)
+	r.wf.Explainer, r.wf.Verifier = nil, nil
+	finding := func(typ, account string) store.Finding {
+		return store.Finding{Type: typ, Severity: checks.SeverityLow, Title: typ + " " + account,
+			Keys: map[string]string{"account": account, "month": synthMonth}}
+	}
+	r.wf.Checks = []checks.Check{
+		&scriptedCheck{name: "rules", fs: []store.Finding{finding(checks.TypeMisclassifiedExpense, "Rent - SYN")}},
+		&scriptedCheck{name: checks.TypeVariance, fs: []store.Finding{
+			finding(checks.TypeVariance, "Rent - SYN"),
+			finding(checks.TypeVariance, "Travel - SYN"),
+		}},
+	}
+	return r
+}
+
+// wantLinked checks the run's variances: the Rent one points at the rules
+// finding, the Travel one at nothing. It returns the rules finding's ID.
+func wantLinked(t *testing.T, fs []store.Finding) uuid.UUID {
+	t.Helper()
+	var target uuid.UUID
+	for _, f := range fs {
+		if f.Type == checks.TypeMisclassifiedExpense {
+			target = f.ID
+		}
+	}
+	if target == uuid.Nil {
+		t.Fatalf("no rules finding stored")
+	}
+	n := 0
+	for _, f := range fs {
+		if f.Type != checks.TypeVariance {
+			if _, ok := f.Keys[relatedKey]; ok {
+				t.Errorf("stored %s finding was rewritten with related", f.Type)
+			}
+			continue
+		}
+		n++
+		switch f.Keys["account"] {
+		case "Rent - SYN":
+			if f.Keys[relatedKey] != target.String() {
+				t.Errorf("Rent variance related %q, want %s", f.Keys[relatedKey], target)
+			}
+		default:
+			if r, ok := f.Keys[relatedKey]; ok {
+				t.Errorf("unmatched variance related %q, want unset", r)
+			}
+		}
+	}
+	if n != 2 {
+		t.Errorf("%d variance findings stored, want 2", n)
+	}
+	return target
+}
+
+func TestRunCloseLinksVariance(t *testing.T) {
+	r := linkRig(t)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	before, _ := r.st.ListFindingsByRun(t.Context(), res.RunID)
+	if len(before) != 3 {
+		t.Fatalf("%d findings, want 3", len(before))
+	}
+	wantLinked(t, before)
+
+	// A resume skips the finished variance step: nothing is relinked or
+	// duplicated.
+	r.wf.Explainer, r.wf.Verifier = r.expl, r.ver
+	if _, err := r.wf.ResumeClose(t.Context(), res.RunID); err != nil {
+		t.Fatalf("ResumeClose: %v", err)
+	}
+	after, _ := r.st.ListFindingsByRun(t.Context(), res.RunID)
+	if !slices.EqualFunc(after, before, func(a, b store.Finding) bool {
+		return a.ID == b.ID && a.Keys[relatedKey] == b.Keys[relatedKey]
+	}) {
+		t.Errorf("findings changed across the resume")
+	}
+}
+
+func TestRunCloseLinksVarianceAfterKill(t *testing.T) {
+	r := linkRig(t)
+	killed := false
+	r.st.finishHook = func(s store.Step, _ string) error {
+		if s.Kind == store.StepKindCheckPrefix+checks.TypeVariance && !killed {
+			killed = true
+			return errors.New("killed")
+		}
+		return nil
+	}
+	if _, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth); err == nil {
+		t.Fatalf("RunClose survived the kill")
+	}
+	var runID uuid.UUID
+	for id := range r.st.runs {
+		runID = id
+	}
+	stored, _ := r.st.ListFindingsByRun(t.Context(), runID)
+	if len(stored) != 1 {
+		t.Fatalf("%d findings stored before the variance step, want 1", len(stored))
+	}
+	if _, err := r.wf.ResumeClose(t.Context(), runID); err != nil {
+		t.Fatalf("ResumeClose: %v", err)
+	}
+	fs, _ := r.st.ListFindingsByRun(t.Context(), runID)
+	if len(fs) != 3 {
+		t.Fatalf("%d findings after resume, want 3", len(fs))
+	}
+	if got := wantLinked(t, fs); got != stored[0].ID {
+		t.Errorf("variance linked to %s, want the finding stored before the kill %s", got, stored[0].ID)
+	}
+}
+
+func TestSortFindingsIgnoresRelated(t *testing.T) {
+	mk := func(voucher, related string) store.Finding {
+		return store.Finding{ID: uuid.New(), Type: checks.TypeVariance,
+			Keys: map[string]string{"account": "Rent - SYN", "month": synthMonth, relatedKey: related, "voucher": voucher}}
+	}
+	// related sorts before voucher and its values run opposite to it.
+	fs := []store.Finding{mk("B", "0000"), mk("A", "ffff")}
+	sortFindings(fs)
+	if fs[0].Keys["voucher"] != "A" {
+		t.Errorf("sortFindings ordered by related: %v first", fs[0].Keys)
+	}
+}
