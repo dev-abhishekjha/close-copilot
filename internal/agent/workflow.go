@@ -244,7 +244,8 @@ type Workflow struct {
 	Profiles map[string]company.Profile
 	Rules    company.Rules
 	// Checks run in order in the checking state; nil means bank
-	// reconciliation only (Phase 1).
+	// reconciliation only (Phase 1), which is all the recorded
+	// suite-skeleton fixtures cover. cmd/agent sets DefaultChecks.
 	Checks []checks.Check
 	// Explainer and Verifier may be nil: their steps are then skipped and
 	// the run ends partial.
@@ -307,6 +308,22 @@ func (w *Workflow) parallel() int {
 		return w.Parallel
 	}
 	return DefaultExplainParallel
+}
+
+// DefaultChecks are bank reconciliation and the Phase 2 detectors, in a
+// fixed order; cmd/agent sets them as Workflow.Checks.
+// Variance is last because runCheck links each variance finding to a
+// finding stored by an earlier check (checks.LinkVariances), so every
+// other check must have finished first.
+func DefaultChecks() []checks.Check {
+	return []checks.Check{
+		&checks.BankRecCheck{},
+		&checks.DuplicatePaymentCheck{},
+		&checks.GSTR2BCheck{},
+		&checks.MissingAccrualCheck{},
+		&checks.PolicyRulesCheck{},
+		&checks.VarianceCheck{},
+	}
 }
 
 func (w *Workflow) checks() []checks.Check {
@@ -539,9 +556,29 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 // month lists them alike.
 func sortFindings(fs []store.Finding) {
 	slices.SortStableFunc(fs, func(a, b store.Finding) int {
-		return cmp.Or(cmp.Compare(checks.DedupeKey(a), checks.DedupeKey(b)), cmp.Compare(a.ID.String(), b.ID.String()))
+		return cmp.Or(cmp.Compare(unlinkedKey(a), unlinkedKey(b)),
+			cmp.Compare(checks.DedupeKey(a), checks.DedupeKey(b)), cmp.Compare(a.ID.String(), b.ID.String()))
 	})
 }
+
+// unlinkedKey is f's dedupe key without keys.related, which holds a random
+// finding ID (checks.LinkVariances), so report order does not depend on it.
+func unlinkedKey(f store.Finding) string {
+	if _, ok := f.Keys[relatedKey]; !ok {
+		return checks.DedupeKey(f)
+	}
+	keys := make(map[string]string, len(f.Keys))
+	for k, v := range f.Keys {
+		if k != relatedKey {
+			keys[k] = v
+		}
+	}
+	f.Keys = keys
+	return checks.DedupeKey(f)
+}
+
+// relatedKey is the finding key checks.LinkVariances fills.
+const relatedKey = "related"
 
 // progress writes the run's token and cost rollup after a state.
 func (w *Workflow) progress(ctx context.Context, runID uuid.UUID) error {
@@ -690,11 +727,37 @@ func (w *Workflow) runCheck(ctx context.Context, run store.CloseRun, profile com
 	if err := snap.Annotate(fs); err != nil {
 		return w.failStep(ctx, step, err)
 	}
+	if name == checks.TypeVariance {
+		if fs, err = w.linkVariances(ctx, run.ID, fs); err != nil {
+			return w.failStep(ctx, step, err)
+		}
+	}
 	if err := w.Store.FinishWithFindings(ctx, step, snap.Refs(), fs); err != nil {
 		return err
 	}
 	w.log().InfoContext(ctx, "step finished", "run_id", run.ID, "kind", step.Kind, "subject", name, "status", store.StepDone, "findings", len(fs))
 	return nil
+}
+
+// linkVariances links the variance step's findings fs to the run's
+// already-stored findings (and to each other's non-variance peers, should
+// the step raise any) and returns only fs, linked. Stored findings are
+// read, never rewritten.
+func (w *Workflow) linkVariances(ctx context.Context, runID uuid.UUID, fs []store.Finding) ([]store.Finding, error) {
+	if len(fs) == 0 {
+		return fs, nil
+	}
+	stored, err := w.Store.ListFindingsByRun(ctx, runID)
+	if err != nil {
+		return nil, fmt.Errorf("agent: link variances: %w", err)
+	}
+	// Stored findings go first so a variance links to an earlier check's
+	// finding in stored order; variances among them are left alone.
+	all := make([]store.Finding, 0, len(stored)+len(fs))
+	all = append(all, stored...)
+	all = append(all, fs...)
+	linked := checks.LinkVariances(all)
+	return linked[len(stored):], nil
 }
 
 // ---- explaining and verifying ----
