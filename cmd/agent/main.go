@@ -55,6 +55,8 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/store"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
+	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
 )
 
 // stdout receives the result line.
@@ -83,6 +85,12 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if err != nil {
 		return err
 	}
+	stopTrace, err := telemetry.Init(ctx, "agent", cfg, log)
+	if err != nil {
+		return err
+	}
+	defer stopTrace()
+
 	var pseudonymKeyBytes []byte
 	if !cmd.noExplain {
 		if err := cfg.CheckLLM(); err != nil {
@@ -157,7 +165,7 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		names := byID[companyID].IndividualNames()
 		// Counts only: names are personal data.
 		log.Info("pseudonymisation on", "individual_names", len(names))
-		wf.Model = model
+		wf.Model = llmtrace.Provider(model)
 		wf.Explainer = &agent.LLMExplainer{
 			Store:       st,
 			Accounts:    agent.BooksAccounts{Books: books},

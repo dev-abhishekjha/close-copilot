@@ -8,10 +8,14 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"regexp"
 	"runtime/debug"
+	"sync"
 	"time"
 
 	"github.com/modelcontextprotocol/go-sdk/mcp"
+
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
 
 type contextKey string
@@ -61,6 +65,7 @@ func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) htt
 
 	for path, r := range routes {
 		server := r.Server
+		traceToolCalls(server)
 		streamHandler := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server {
 			return server
 		}, nil)
@@ -77,7 +82,7 @@ func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) htt
 	}
 
 	// Wrap mux with global middleware: Request ID, Slog Access Log, Recovery
-	return withRecovery(withLogging(withRequestID(mux), log), log)
+	return telemetry.WrapHandler(withRecovery(withLogging(withRequestID(mux), log), log))
 }
 
 // ServeHTTP starts an HTTP server serving the given routes and shuts down
@@ -201,4 +206,44 @@ func (w *statusWriter) Flush() {
 	if f, ok := w.ResponseWriter.(http.Flusher); ok {
 		f.Flush()
 	}
+}
+
+// traced remembers the servers that already carry the tool-call span
+// middleware, so building a handler twice never doubles the spans.
+var traced sync.Map
+
+var toolNameRE = regexp.MustCompile(`^[a-z][a-z0-9_]{0,63}$`)
+
+// traceToolCalls makes every tools/call on s record an
+// "mcp.tools/call <tool>" span under the caller's trace. The span holds the
+// tool name and method only, never the arguments or the result.
+func traceToolCalls(s *mcp.Server) {
+	if s == nil {
+		return
+	}
+	if _, loaded := traced.LoadOrStore(s, struct{}{}); loaded {
+		return
+	}
+	s.AddReceivingMiddleware(func(next mcp.MethodHandler) mcp.MethodHandler {
+		return func(ctx context.Context, method string, req mcp.Request) (mcp.Result, error) {
+			if method != "tools/call" {
+				return next(ctx, method, req)
+			}
+			tool := "unknown"
+			// The name is client-supplied: use it only when it looks like a
+			// tool name, so identifiers never reach a span name.
+			if call, ok := req.(*mcp.CallToolRequest); ok && call.Params != nil && toolNameRE.MatchString(call.Params.Name) {
+				tool = call.Params.Name
+			}
+			ctx, span := telemetry.StartTool(ctx, tool)
+			defer span.End()
+			res, err := next(ctx, method, req)
+			if err != nil {
+				telemetry.Fail(span, "tool call failed")
+			} else if r, ok := res.(*mcp.CallToolResult); ok && r != nil && r.IsError {
+				telemetry.Fail(span, "tool returned an error result")
+			}
+			return res, err
+		}
+	})
 }

@@ -12,6 +12,8 @@ import (
 	"time"
 
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
+	"github.com/abhishekjha/close-copilot/internal/telemetry/telemetrytest"
 )
 
 func get(t *testing.T, c *http.Client, rawURL string) (*http.Response, error) {
@@ -205,10 +207,7 @@ func TestIgnoresProxyEnv(t *testing.T) {
 			if !ok {
 				t.Fatalf("Transport is %T, want *guard", c.Transport)
 			}
-			tr, ok := g.base.(*http.Transport)
-			if !ok {
-				t.Fatalf("guard base is %T, want *http.Transport", g.base)
-			}
+			tr := g.tr
 			if tr.Proxy == nil {
 				return
 			}
@@ -244,5 +243,82 @@ func TestTimeoutApplies(t *testing.T) {
 	if err == nil {
 		_ = resp.Body.Close()
 		t.Fatal("want a timeout error")
+	}
+}
+
+func TestGuardStillRefusesWithTracingOn(t *testing.T) {
+	telemetrytest.Install(t)
+	var reached bool
+	refused := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		reached = true
+	}))
+	defer refused.Close()
+	var traceparent string
+	allowed := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		traceparent = r.Header.Get("traceparent")
+	}))
+	defer allowed.Close()
+
+	c, err := New(config.Config{ERPBaseURL: allowed.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, span := telemetry.Start(context.Background(), "x")
+	defer span.End()
+	do := func(u string) error {
+		req, _ := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+		resp, err := c.Do(req)
+		if err == nil {
+			_ = resp.Body.Close()
+		}
+		return err
+	}
+	if err := do(refused.URL); err == nil {
+		t.Error("a host that is not allowlisted was reached with tracing on")
+	}
+	if reached {
+		t.Error("the refused server received a request")
+	}
+	if err := do(allowed.URL); err != nil {
+		t.Fatalf("allowed host: %v", err)
+	}
+	if traceparent == "" {
+		t.Error("no traceparent header on an allowed request")
+	}
+}
+
+func TestTracedClientDoesNotExportURLQuery(t *testing.T) {
+	rec := telemetrytest.Install(t)
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	defer srv.Close()
+	c, err := New(config.Config{ERPBaseURL: srv.URL})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, span := telemetry.Start(context.Background(), "root")
+	u := srv.URL + "/api/resource/GL%20Entry/29AAAAA0000A1Z5?filters=" +
+		url.QueryEscape(`[["party","=","Ramesh Kumar"]]`)
+	req, _ := http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	resp, err := c.Do(req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_ = resp.Body.Close()
+	// A failing call must not leak the URL through error text either.
+	srv.Close()
+	req, _ = http.NewRequestWithContext(ctx, http.MethodGet, u, nil)
+	if resp, err := c.Do(req); err == nil {
+		_ = resp.Body.Close()
+	}
+	span.End()
+
+	all := strings.Join(append(telemetrytest.Strings(rec), telemetrytest.EventStrings(rec)...), "\n")
+	for _, bad := range []string{"Ramesh", "Kumar", "29AAAAA0000A1Z5", "GL%20Entry", "GL Entry", "filters"} {
+		if strings.Contains(all, bad) {
+			t.Errorf("span data holds %q:\n%s", bad, all)
+		}
+	}
+	if !strings.Contains(all, "http.request.method=GET") && !strings.Contains(all, "server.address=") {
+		t.Errorf("client span lost its safe attributes:\n%s", all)
 	}
 }

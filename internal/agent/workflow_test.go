@@ -10,6 +10,7 @@ import (
 	"log/slog"
 	"maps"
 	"os"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -23,6 +24,9 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/store"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
+	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
+	"github.com/abhishekjha/close-copilot/internal/telemetry/telemetrytest"
 )
 
 // ---- an in-memory RunStore ----
@@ -74,6 +78,16 @@ func (m *memStore) CreateCloseRun(_ context.Context, r store.CloseRun) error {
 	}
 	m.runs[r.ID] = &r
 	m.history[r.ID] = append(m.history[r.ID], r.Status)
+	return nil
+}
+
+func (m *memStore) UpdateCloseRun(_ context.Context, r store.CloseRun) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	if _, ok := m.runs[r.ID]; !ok {
+		return fmt.Errorf("%w: close run %s", store.ErrNotFound, r.ID)
+	}
+	*m.runs[r.ID] = r
 	return nil
 }
 
@@ -1183,5 +1197,98 @@ func TestSortFindingsIgnoresRelated(t *testing.T) {
 	sortFindings(fs)
 	if fs[0].Keys["voucher"] != "A" {
 		t.Errorf("sortFindings ordered by related: %v first", fs[0].Keys)
+	}
+}
+
+func TestRunCloseTraces(t *testing.T) {
+	rec := telemetrytest.Install(t)
+	r := newRig(t)
+	r.wf.Model = llmtrace.Provider(r.model)
+	const headerSecret = "Authorization=Basic c3VwZXItc2VjcmV0LWtleQ"
+	r.wf.Config.OTLPHeaders = config.NewSecret(headerSecret)
+	r.ver.useModel = true
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+
+	seen := map[string]bool{}
+	traces := map[string]bool{}
+	for _, s := range rec.Ended() {
+		name := s.Name()
+		if strings.HasPrefix(name, telemetry.SpanCheckPrefix) {
+			name = "check.*"
+		}
+		seen[name] = true
+		traces[s.SpanContext().TraceID().String()] = true
+	}
+	for _, want := range []string{telemetry.SpanCloseRun, "check.*", telemetry.SpanExplain, telemetry.SpanVerify, telemetry.SpanChat} {
+		if !seen[want] {
+			t.Errorf("span %q missing; saw %v", want, seen)
+		}
+	}
+	if seen[telemetry.SpanInvestigate] {
+		t.Error("investigate span emitted before CC-706")
+	}
+	if len(traces) != 1 {
+		t.Errorf("%d traces, want one", len(traces))
+	}
+
+	run := r.st.runs[res.RunID]
+	if run.TraceID == nil || !traces[*run.TraceID] {
+		t.Errorf("stored trace ID %v is not the run's trace %v", run.TraceID, traces)
+	}
+	md, err := os.ReadFile(res.ReportPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if run.TraceID != nil && !strings.Contains(string(md), "| Trace | `"+*run.TraceID+"` |") {
+		t.Errorf("report lacks the trace ID:\n%s", md)
+	}
+
+	gstin := regexp.MustCompile(`\b\d{2}[A-Z]{5}\d{4}[A-Z][1-9A-Z]Z[0-9A-Z]\b`)
+	pan := regexp.MustCompile(`\b[A-Z]{5}\d{4}[A-Z]\b`)
+	for _, v := range append(telemetrytest.Strings(rec), telemetrytest.EventStrings(rec)...) {
+		if gstin.MatchString(v) || pan.MatchString(v) || strings.Contains(v, "c3VwZXItc2VjcmV0LWtleQ") || strings.Contains(v, headerSecret) {
+			t.Errorf("span attribute %q holds an identifier or secret", v)
+		}
+	}
+}
+
+func TestRunCloseWithoutTracingHasNoTraceID(t *testing.T) {
+	telemetrytest.Off(t)
+	r := newRig(t)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if r.st.runs[res.RunID].TraceID != nil {
+		t.Error("trace ID stored with tracing off")
+	}
+	md, _ := os.ReadFile(res.ReportPath)
+	if strings.Contains(string(md), "| Trace |") {
+		t.Error("report shows a trace row with tracing off")
+	}
+}
+
+func TestResumeStoresNewTraceID(t *testing.T) {
+	telemetrytest.Install(t)
+	r := newRig(t)
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	first := *r.st.runs[res.RunID].TraceID
+	// Reopen the run as failed, with usage that a stale write would clobber.
+	r.st.mu.Lock()
+	r.st.runs[res.RunID].Status = store.RunFailed
+	r.st.runs[res.RunID].InputTokens = 777
+	r.st.mu.Unlock()
+	if _, err := r.wf.ResumeClose(t.Context(), res.RunID); err != nil {
+		t.Fatal(err)
+	}
+	run := r.st.runs[res.RunID]
+	if run.TraceID == nil || *run.TraceID == first {
+		t.Errorf("resumed run trace ID %v, want a new one (first %s)", run.TraceID, first)
 	}
 }

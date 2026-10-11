@@ -48,6 +48,9 @@ type ReportData struct {
 	// ("" for none): the workflow reads it from the explanation artifacts'
 	// fault_injected mark, never from the process environment.
 	Fault string
+	// TraceID is the run's trace ID ("" when tracing is off); the report
+	// shows it so the trace can be found.
+	TraceID string
 }
 
 // ReportArtifact is the content of a report artifact.
@@ -108,6 +111,9 @@ func RenderReport(d ReportData) string {
 	p("| Company | %s |\n", cell(d.Company))
 	p("| Month | %s |\n", cell(d.Month))
 	p("| Outcome | %s |\n", cell(d.Outcome))
+	if d.TraceID != "" {
+		p("| Trace | `%s` |\n", cell(d.TraceID))
+	}
 	if d.Reason != "" {
 		p("| Note | %s |\n", cell(d.Reason))
 	}

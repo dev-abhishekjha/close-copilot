@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
 
 // DefaultTimeout bounds a whole request, redirects and body read included.
@@ -73,7 +74,7 @@ func New(cfg config.Config, opts ...Option) (*http.Client, error) {
 	tr.Proxy = nil
 	return &http.Client{
 		Timeout:   o.timeout,
-		Transport: &guard{base: tr, allowed: allowed},
+		Transport: &guard{base: telemetry.WrapTransport(tr), tr: tr, allowed: allowed},
 	}, nil
 }
 
@@ -126,7 +127,8 @@ func hostKey(scheme, host string) string {
 
 // guard is the allowlisting RoundTripper.
 type guard struct {
-	base    http.RoundTripper
+	base    http.RoundTripper // tr wrapped in the tracing transport
+	tr      *http.Transport   // the transport under base, kept for tests
 	allowed map[string]bool
 }
 
