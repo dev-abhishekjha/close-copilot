@@ -50,7 +50,10 @@ jobs:
           --health-timeout 5s
           --health-retries 20
     env:
-      SUITE: suite-skeleton
+      # Tier 1 replays and gates every suite here, in this one job (a
+      # matrix would rename the required check). Tier 2 runs LLM_SUITE only.
+      SUITES: "suite-skeleton suite-v1"
+      LLM_SUITE: suite-skeleton
       # A throwaway service container on the runner, not a secret.
       DATABASE_URL: postgres://copilot:copilot@localhost:5432/copilot?sslmode=disable
     steps:
@@ -108,18 +111,41 @@ jobs:
       - name: fixtures present (fail closed)
         if: steps.tier.outputs.replay == 'true' || steps.tier.outputs.llm == 'true'
         working-directory: pr
+        env:
+          LLM: ${{ steps.tier.outputs.llm }}
         run: |
-          if [ ! -f "evals/fixtures/$SUITE/index.json" ]; then
+          # An empty SUITES would loop zero times and pass with nothing gated.
+          if [ -z "${SUITES// /}" ]; then
+            echo "::error::eval (G4): SUITES is empty"
+            exit 1
+          fi
+          suites="$SUITES"
+          if [ "$LLM" = true ]; then
+            case " $suites " in
+              *" $LLM_SUITE "*) ;;
+              *) suites="$suites $LLM_SUITE" ;;
+            esac
+          fi
+          missing=""
+          for s in $suites; do
+            if [ ! -f "evals/fixtures/$s/index.json" ]; then
+              missing="$missing $s"
+            fi
+          done
+          if [ -n "$missing" ]; then
             {
-              echo "## eval (G4): no recorded fixtures for $SUITE"
-              echo
-              echo "evals/fixtures/$SUITE/index.json is missing, so the eval gate can't run. Bootstrap:"
-              echo "1. reset ERPNext, seed and load the suite (Makefile targets erp-reset, seed, load)"
-              echo "2. record the fixtures (Makefile target record-fixtures)"
-              echo "3. commit evals/fixtures/$SUITE"
-              echo "4. the owner scores a replay and commits evals/baseline.json in a baseline-update commit"
+              for s in $missing; do
+                echo "## eval (G4): no recorded fixtures for $s"
+                echo
+                echo "evals/fixtures/$s/index.json is missing, so the eval gate can't run. Bootstrap:"
+                echo "1. reset ERPNext, seed and load the suite (Makefile targets erp-reset, seed, load)"
+                echo "2. record the fixtures (Makefile target record-fixtures)"
+                echo "3. commit evals/fixtures/$s"
+                echo "4. the owner scores a replay and commits evals/baseline.json in a baseline-update commit"
+                echo
+              done
             } | tee -a "$RUNNER_TEMP/notice.md"
-            echo "::error::eval (G4): no fixtures index for $SUITE; see the job summary for the bootstrap steps"
+            echo "::error::eval (G4): no fixtures index for$missing; see the job summary for the bootstrap steps"
             exit 1
           fi
 
@@ -146,26 +172,34 @@ jobs:
             cp "$GITHUB_WORKSPACE/base/evals/baseline.json" "$RUNNER_TEMP/candidate/baseline.json"
           fi
 
-      # Tier 1: no secret, no model. The candidate baseline replaces only
-      # the replay section of the copy of the base baseline.
+      # Tier 1: no secret, no model. Per suite, the candidate baseline
+      # replaces only that suite's replay section of the copy of the base
+      # baseline. A failed month's run is recorded (replay-rc-<suite>) and
+      # judged in the gate; a missing manifest or a scorer failure is an
+      # infrastructure error and stops the step here.
       - name: "tier 1: replay without the model and score"
         id: replay
         if: steps.tier.outputs.replay == 'true'
         working-directory: pr
         run: |
-          set +e
-          go run ./cmd/eval run --replay --no-llm --suite "$SUITE" --results-dir "$RUNNER_TEMP/results-replay" >"$RUNNER_TEMP/replay.out"
-          rc=$?
-          set -e
-          manifest="$(tail -n 1 "$RUNNER_TEMP/replay.out")"
-          if [ ! -f "$manifest" ]; then
-            echo "::error::eval run --replay wrote no manifest (exit $rc)"
-            exit 1
-          fi
-          echo "dir=$(dirname "$manifest")" >>"$GITHUB_OUTPUT"
-          echo "run_rc=$rc" >>"$GITHUB_OUTPUT"
-          "$RUNNER_TEMP/evalbase/eval" score "$(dirname "$manifest")" --out "$RUNNER_TEMP/score-replay" \
-            --baseline-out "$RUNNER_TEMP/candidate/baseline.json" --pricing config/pricing.yaml
+          for s in $SUITES; do
+            set +e
+            go run ./cmd/eval run --replay --no-llm --suite "$s" --results-dir "$RUNNER_TEMP/results-replay-$s" >"$RUNNER_TEMP/replay-$s.out"
+            rc=$?
+            set -e
+            echo "$rc" >"$RUNNER_TEMP/replay-rc-$s"
+            manifest="$(tail -n 1 "$RUNNER_TEMP/replay-$s.out")"
+            if [ ! -f "$manifest" ]; then
+              echo "::error::eval run --replay for $s wrote no manifest (exit $rc)"
+              exit 1
+            fi
+            dirname "$manifest" >"$RUNNER_TEMP/replay-dir-$s"
+            if ! "$RUNNER_TEMP/evalbase/eval" score "$(dirname "$manifest")" --out "$RUNNER_TEMP/score-replay-$s" \
+              --baseline-out "$RUNNER_TEMP/candidate/baseline.json" --pricing config/pricing.yaml; then
+              echo "::error::eval score for $s failed"
+              exit 1
+            fi
+          done
 
       # Tier 2: never on pull_request (PR code would run with the key).
       - name: "tier 2: replay with the model, three runs, and noise"
@@ -180,7 +214,7 @@ jobs:
           rc_all=0
           for i in 1 2 3; do
             set +e
-            go run ./cmd/eval run --replay --suite "$SUITE" --results-dir "$RUNNER_TEMP/results-llm-$i" >"$RUNNER_TEMP/llm-$i.out"
+            go run ./cmd/eval run --replay --suite "$LLM_SUITE" --results-dir "$RUNNER_TEMP/results-llm-$i" >"$RUNNER_TEMP/llm-$i.out"
             rc=$?
             set -e
             [ "$rc" = 0 ] || rc_all=$rc
@@ -216,51 +250,101 @@ jobs:
           REPLAY: ${{ steps.tier.outputs.replay }}
           LLM: ${{ steps.tier.outputs.llm }}
         run: |
+          # Accepts a version 3 baseline (per-suite sections) or a version 2
+          # one (one suite, named in each tier).
           baseline="$GITHUB_WORKSPACE/base/evals/baseline.json"
           missing=""
           if [ ! -f "$baseline" ]; then
-            missing="evals/baseline.json"
+            missing=" evals/baseline.json"
           else
             for tier in replay llm; do
-              if [ "$tier" = replay ] && [ "$REPLAY" != true ]; then continue; fi
-              if [ "$tier" = llm ] && [ "$LLM" != true ]; then continue; fi
-              if ! jq -e --arg t "$tier" '.version == 2 and .tiers[$t] != null' "$baseline" >/dev/null; then
-                missing="$missing evals/baseline.json tier $tier"
-              fi
+              case "$tier" in
+                replay)
+                  [ "$REPLAY" = true ] || continue
+                  suites="$SUITES"
+                  ;;
+                llm)
+                  [ "$LLM" = true ] || continue
+                  suites="$LLM_SUITE"
+                  ;;
+              esac
+              for s in $suites; do
+                if ! jq -e --arg s "$s" --arg t "$tier" \
+                  '(.version == 3 and .suites[$s][$t] != null) or (.version == 2 and .tiers[$t] != null and .tiers[$t].suite == $s)' \
+                  "$baseline" >/dev/null; then
+                  missing="$missing $s/$tier"
+                fi
+              done
             done
           fi
           if [ -n "$missing" ]; then
             {
-              echo "## eval (G4): no baseline ($missing)"
+              echo "## eval (G4): no baseline for$missing"
               echo
               echo "The base branch has no baseline to judge this run by, so the gate fails closed. Bootstrap:"
               echo "1. reset ERPNext, seed and load the suite (Makefile targets erp-reset, seed, load)"
-              echo "2. record the fixtures (Makefile target record-fixtures) and commit evals/fixtures/$SUITE"
-              echo "3. dispatch this workflow; it uploads a candidate baseline (artifact eval-results)"
+              echo "2. record the fixtures (Makefile target record-fixtures) and commit evals/fixtures/<suite>"
+              echo '3. replay tier: the owner scores a replay locally (`eval score --baseline-out`) and commits it in a baseline-update commit;'
+              echo '   llm tier: dispatch this workflow and download the candidate baseline (artifact eval-results)'
               echo "4. the owner reviews it and commits evals/baseline.json in its own baseline-update commit"
             } | tee -a "$RUNNER_TEMP/notice.md"
-            echo "::error::eval (G4): no baseline for this tier; see the job summary for the bootstrap steps"
+            echo "::error::eval (G4): no baseline for$missing; see the job summary for the bootstrap steps"
             exit 1
           fi
 
       - name: "tier 1 gate: compare with the baseline"
         if: steps.tier.outputs.replay == 'true'
         working-directory: pr
-        env:
-          RESULTS: ${{ steps.replay.outputs.dir }}
-          RUN_RC: ${{ steps.replay.outputs.run_rc }}
         run: |
-          set +e
-          "$RUNNER_TEMP/evalbase/eval" score "$RESULTS" --out "$RUNNER_TEMP/gate-replay" \
-            --compare "$GITHUB_WORKSPACE/base/evals/baseline.json" \
-            --require 'unrecorded_bank_charge.recall>=3/3' --require 'clean.false_alarms==0'
-          rc=$?
-          set -e
-          if [ "$RUN_RC" != 0 ]; then
-            echo "::error::eval run --replay exited $RUN_RC: a month's run failed (see failed runs in the summary)"
+          # Every suite is judged, even after an earlier one fails; the step
+          # exits with the worst code. A suite with no requirements, or no
+          # recorded replay, fails closed, and so does judging no suite at all.
+          if [ -z "${SUITES// /}" ]; then
+            echo "::error::eval (G4): SUITES is empty"
             exit 1
           fi
-          exit $rc
+          worst=0
+          judged=0
+          for s in $SUITES; do
+            case "$s" in
+              suite-skeleton) req=(--require 'unrecorded_bank_charge.recall>=3/3' --require 'clean.false_alarms==0') ;;
+              suite-v1) req=(--require 'clean.false_alarms==0') ;;
+              *)
+                echo "::error::no gate requirements for $s"
+                [ "$worst" -ge 1 ] || worst=1
+                continue
+                ;;
+            esac
+            dir=""
+            run_rc=""
+            if [ -f "$RUNNER_TEMP/replay-dir-$s" ]; then dir="$(cat "$RUNNER_TEMP/replay-dir-$s")"; fi
+            if [ -f "$RUNNER_TEMP/replay-rc-$s" ]; then run_rc="$(cat "$RUNNER_TEMP/replay-rc-$s")"; fi
+            if [ -z "$dir" ] || [ -z "$run_rc" ]; then
+              echo "::error::eval (G4): no recorded replay for $s (replay-dir-$s or replay-rc-$s missing or empty)"
+              [ "$worst" -ge 1 ] || worst=1
+              continue
+            fi
+            set +e
+            "$RUNNER_TEMP/evalbase/eval" score "$dir" --out "$RUNNER_TEMP/gate-replay-$s" \
+              --compare "$GITHUB_WORKSPACE/base/evals/baseline.json" \
+              "${req[@]}"
+            rc=$?
+            set -e
+            judged=$((judged + 1))
+            if [ "$rc" != 0 ]; then
+              echo "::error::eval (G4): $s failed the comparison with the baseline (exit $rc)"
+              [ "$worst" -ge "$rc" ] || worst=$rc
+            fi
+            if [ "$run_rc" != 0 ]; then
+              echo "::error::eval run --replay for $s exited $run_rc: a month's run failed (see failed runs in the summary)"
+              [ "$worst" -ge 1 ] || worst=1
+            fi
+          done
+          if [ "$judged" = 0 ]; then
+            echo "::error::eval (G4): no suite in SUITES was judged"
+            exit 1
+          fi
+          exit "$worst"
 
       - name: "tier 2 gate: compare with the baseline, latency and cost"
         if: steps.tier.outputs.llm == 'true' && github.event_name != 'pull_request'
@@ -291,7 +375,15 @@ jobs:
           if [ -f "$RUNNER_TEMP/notice.md" ]; then
             cat "$RUNNER_TEMP/notice.md" >>"$GITHUB_STEP_SUMMARY"
           fi
-          for tier in replay llm; do
+          for s in $SUITES; do
+            for f in "$RUNNER_TEMP/gate-replay-$s/summary.md" "$RUNNER_TEMP/score-replay-$s/score.md"; do
+              if [ -f "$f" ]; then
+                { echo "## tier 1 (replay): $s"; echo; cat "$f"; echo; } >>"$GITHUB_STEP_SUMMARY"
+                break
+              fi
+            done
+          done
+          for tier in llm; do
             if [ -f "$RUNNER_TEMP/gate-$tier/summary.md" ]; then
               cat "$RUNNER_TEMP/gate-$tier/summary.md" >>"$GITHUB_STEP_SUMMARY"
             elif [ -f "$RUNNER_TEMP/score-$tier/score.md" ]; then
