@@ -13,9 +13,15 @@ import (
 	"strings"
 )
 
-// BaselineVersion is the baseline file format version. Version 2 holds
-// one section per tier; version 1 (a single section) is rejected.
-const BaselineVersion = 2
+// BaselineVersion is the baseline file format version. Version 3 holds
+// one section per tier per suite. Version 2 (one suite's tiers) is still
+// read and is upgraded to version 3 on write; version 1 (a single
+// section) and any other version are rejected.
+const BaselineVersion = 3
+
+// legacyBaselineVersion is the older format LoadBaseline still reads:
+// {"version":2,"tiers":{"replay":...,"llm":...}} for a single suite.
+const legacyBaselineVersion = 2
 
 // Baseline tiers: Tier 1 replays recorded fixtures without the model
 // (agent false); Tier 2 runs the explainer and verifier (agent true).
@@ -33,10 +39,18 @@ func TierFor(agent bool) string {
 }
 
 // BaselineFile is evals/baseline.json: one protected file with a section
-// per tier, {"version":2,"tiers":{"replay":...,"llm":...}}. The scorer
-// only writes candidates; the owner commits the real file in its own
-// baseline-update commit.
+// per tier per suite,
+// {"version":3,"suites":{"<suite>":{"replay":...,"llm":...}}}. It is the
+// in-memory shape for version 2 files too. The scorer only writes
+// candidates; the owner commits the real file in its own baseline-update
+// commit. Suites are written in sorted order (marshalSorted).
 type BaselineFile struct {
+	Version int                      `json:"version"`
+	Suites  map[string]BaselineTiers `json:"suites"`
+}
+
+// legacyBaselineFile is the version 2 shape: one suite's tiers.
+type legacyBaselineFile struct {
 	Version int           `json:"version"`
 	Tiers   BaselineTiers `json:"tiers"`
 }
@@ -47,30 +61,38 @@ type BaselineTiers struct {
 	LLM    *Baseline `json:"llm"`
 }
 
-// ErrBaselineTier is a baseline file with no section for a score's tier.
-var ErrBaselineTier = errors.New("evals: baseline has no section for this tier")
+// ErrBaselineTier is a baseline file with no section for a score's suite
+// and tier.
+var ErrBaselineTier = errors.New("evals: baseline has no section for this suite and tier")
 
-// Section is the section for a score's agent flag; a missing one is
-// ErrBaselineTier (fail closed).
-func (f BaselineFile) Section(agent bool) (Baseline, error) {
-	b := f.Tiers.Replay
+// Section is the section for a suite and agent flag; a missing suite or
+// tier is ErrBaselineTier (fail closed).
+func (f BaselineFile) Section(suite string, agent bool) (Baseline, error) {
+	t, ok := f.Suites[suite]
+	b := t.Replay
 	if agent {
-		b = f.Tiers.LLM
+		b = t.LLM
 	}
-	if b == nil {
-		return Baseline{}, fmt.Errorf("%w %q (agent %t)", ErrBaselineTier, TierFor(agent), agent)
+	if !ok || b == nil {
+		return Baseline{}, fmt.Errorf("%w: suite %.64q tier %q (agent %t)", ErrBaselineTier, suite, TierFor(agent), agent)
 	}
 	return *b, nil
 }
 
-// Set replaces the section for b's agent flag and keeps the other.
+// Set replaces the section for b's suite and agent flag and keeps every
+// other suite and tier. It creates the Suites map when it is nil.
 func (f *BaselineFile) Set(b Baseline) {
+	if f.Suites == nil {
+		f.Suites = map[string]BaselineTiers{}
+	}
+	t := f.Suites[b.Suite]
 	c := b
 	if b.Agent {
-		f.Tiers.LLM = &c
+		t.LLM = &c
 	} else {
-		f.Tiers.Replay = &c
+		t.Replay = &c
 	}
+	f.Suites[b.Suite] = t
 }
 
 // Baseline is one tier's section: every item's outcome, the aggregates,
@@ -248,10 +270,12 @@ func protectedDir(p string) (string, bool) {
 	return "", false
 }
 
-// WriteBaseline writes a candidate baseline atomically: it replaces only
-// b's tier section of the file at path and keeps the other (creating the
-// file if absent). It refuses any path CheckOutputPath refuses,
-// evals/baseline.json above all, and an existing file it can't read.
+// WriteBaseline writes a candidate baseline atomically, always as version
+// 3: it replaces only b's suite and tier section of the file at path and
+// keeps every other suite and tier (creating the file if absent; a
+// version 2 file is upgraded). It refuses any path CheckOutputPath
+// refuses, evals/baseline.json above all, an existing file it can't load
+// (which is left untouched), and a result that wouldn't load.
 func WriteBaseline(path string, b Baseline) error {
 	if err := CheckOutputPath("--baseline-out", path); err != nil {
 		return err
@@ -264,14 +288,19 @@ func WriteBaseline(path string, b Baseline) error {
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("evals: --baseline-out %s: %w", path, err)
 	}
+	f.Version = BaselineVersion
 	f.Set(b)
+	if err := f.validate(path); err != nil {
+		return fmt.Errorf("evals: --baseline-out %s: refusing to write a baseline that wouldn't load: %w", path, err)
+	}
 	return writeJSON(path, f)
 }
 
-// LoadBaseline reads a baseline file strictly. A missing or malformed
-// file, another version, and a section that isn't a valid baseline of
-// its tier are errors, never an empty baseline. A file may lack a
-// section; Section fails closed on it.
+// LoadBaseline reads a baseline file strictly, version 3 or version 2 (a
+// version 2 file becomes one suite). A missing or malformed file, another
+// version, and a section that isn't a valid baseline of its suite and
+// tier are errors, never an empty baseline. A suite may lack one tier;
+// Section fails closed on it.
 func LoadBaseline(path string) (BaselineFile, error) {
 	// The version first, leniently, so an old file says so plainly.
 	var v struct {
@@ -280,33 +309,111 @@ func LoadBaseline(path string) (BaselineFile, error) {
 	if err := readJSONFile(path, &v); err != nil {
 		return BaselineFile{}, fmt.Errorf("evals: baseline: %w", err)
 	}
-	if v.Version != BaselineVersion {
-		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, v.Version, BaselineVersion)
+	switch v.Version {
+	case BaselineVersion:
+		var f BaselineFile
+		if err := readStrict(path, &f); err != nil {
+			return BaselineFile{}, fmt.Errorf("evals: baseline: %w", err)
+		}
+		if f.Version != BaselineVersion {
+			return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, f.Version, BaselineVersion)
+		}
+		if err := f.validate(path); err != nil {
+			return BaselineFile{}, err
+		}
+		return f, nil
+	case legacyBaselineVersion:
+		return loadLegacyBaseline(path)
+	default:
+		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d or %d",
+			path, v.Version, BaselineVersion, legacyBaselineVersion)
 	}
-	var f BaselineFile
-	if err := readStrict(path, &f); err != nil {
+}
+
+// loadLegacyBaseline reads a version 2 file strictly and converts it to
+// one suite, named by its sections' suite fields.
+func loadLegacyBaseline(path string) (BaselineFile, error) {
+	var l legacyBaselineFile
+	if err := readStrict(path, &l); err != nil {
 		return BaselineFile{}, fmt.Errorf("evals: baseline: %w", err)
 	}
-	if f.Version != BaselineVersion {
-		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, f.Version, BaselineVersion)
+	if l.Version != legacyBaselineVersion {
+		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d, want %d", path, l.Version, legacyBaselineVersion)
+	}
+	if err := checkTiers(path, "", l.Tiers); err != nil {
+		return BaselineFile{}, err
+	}
+	suite := ""
+	for _, b := range []*Baseline{l.Tiers.Replay, l.Tiers.LLM} {
+		switch {
+		case b == nil:
+		case suite == "":
+			suite = b.Suite
+		case b.Suite != suite:
+			return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d sections name two suites, %.64q and %.64q",
+				path, legacyBaselineVersion, suite, b.Suite)
+		}
+	}
+	if suite == "" {
+		return BaselineFile{}, fmt.Errorf("evals: baseline %s: version %d file has no section", path, legacyBaselineVersion)
+	}
+	return BaselineFile{Version: legacyBaselineVersion, Suites: map[string]BaselineTiers{suite: l.Tiers}}, nil
+}
+
+// validate checks a version 3 file's suites: at least one; every key a
+// suite name; every suite with a section; every section valid for its
+// tier and naming the key it sits under.
+func (f BaselineFile) validate(path string) error {
+	if len(f.Suites) == 0 {
+		return fmt.Errorf("evals: baseline %s: suites is missing or empty", path)
+	}
+	keys := make([]string, 0, len(f.Suites))
+	for k := range f.Suites {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	for _, k := range keys {
+		if !nameRe.MatchString(k) {
+			return fmt.Errorf("evals: baseline %s: suite key %.64q is not a suite name", path, k)
+		}
+		t := f.Suites[k]
+		if t.Replay == nil && t.LLM == nil {
+			return fmt.Errorf("evals: baseline %s: suite %s has no section", path, k)
+		}
+		if err := checkTiers(path, k, t); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// checkTiers checks each non-null section: a valid suite name, items
+// present, the agent flag of its tier, and (when key isn't empty) the
+// suite it sits under.
+func checkTiers(path, key string, t BaselineTiers) error {
+	where := ""
+	if key != "" {
+		where = "suite " + key + ": "
 	}
 	for _, sec := range []struct {
 		tier  string
 		agent bool
 		b     *Baseline
-	}{{TierReplay, false, f.Tiers.Replay}, {TierLLM, true, f.Tiers.LLM}} {
+	}{{TierReplay, false, t.Replay}, {TierLLM, true, t.LLM}} {
 		b := sec.b
 		switch {
 		case b == nil:
 		case !nameRe.MatchString(b.Suite):
-			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s: suite %.64q is not a suite name", path, sec.tier, b.Suite)
+			return fmt.Errorf("evals: baseline %s: %stier %s: suite %.64q is not a suite name", path, where, sec.tier, b.Suite)
+		case key != "" && b.Suite != key:
+			return fmt.Errorf("evals: baseline %s: tier %s under suite %s names suite %.64q", path, sec.tier, key, b.Suite)
 		case b.Items == nil:
-			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s: items is missing", path, sec.tier)
+			return fmt.Errorf("evals: baseline %s: %stier %s: items is missing", path, where, sec.tier)
 		case b.Agent != sec.agent:
-			return BaselineFile{}, fmt.Errorf("evals: baseline %s: tier %s has agent %t", path, sec.tier, b.Agent)
+			return fmt.Errorf("evals: baseline %s: %stier %s has agent %t", path, where, sec.tier, b.Agent)
 		}
 	}
-	return f, nil
+	return nil
 }
 
 // PricingVersion is the sha256 (hex) of the pricing file.
@@ -356,14 +463,16 @@ type Comparison struct {
 	New      []CompareEntry `json:"new"`
 }
 
-// CompareTier judges a score against its tier's section of a baseline
-// file. A missing section is a failure (fail closed), never a pass.
+// CompareTier judges a score against its suite and tier's section of a
+// baseline file. A missing suite or tier is a failure (fail closed),
+// never a pass.
 func CompareTier(f BaselineFile, s Score) (Comparison, error) {
-	b, err := f.Section(s.Agent)
+	b, err := f.Section(s.Suite, s.Agent)
 	if err != nil {
-		return Comparison{Failures: []CompareEntry{{Kind: CompareTierMissing, Key: TierFor(s.Agent),
+		key := s.Suite + "/" + TierFor(s.Agent)
+		return Comparison{Failures: []CompareEntry{{Kind: CompareTierMissing, Key: key,
 			Detail: err.Error() + "; the owner commits it in a baseline-update commit (evals/fixtures/README.md)",
-			Repro:  compareRepro, Evidence: "baseline tiers/" + TierFor(s.Agent)}}, New: []CompareEntry{}}, nil
+			Repro:  compareRepro, Evidence: "baseline suites/" + key}}, New: []CompareEntry{}}, nil
 	}
 	return Compare(b, s)
 }
@@ -441,7 +550,7 @@ func compareConfig(b Baseline, s Score) []CompareEntry {
 	if len(b.Items) == 0 {
 		out = append(out, CompareEntry{Kind: CompareEmptyBaseline, Key: TierFor(s.Agent),
 			Detail: "the baseline has no items, so no regression could fail; re-measure it", Repro: compareRepro,
-			Evidence: "baseline tiers/" + TierFor(s.Agent) + "/items"})
+			Evidence: "baseline suites/" + s.Suite + "/" + TierFor(s.Agent) + "/items"})
 	}
 	if b.Agent != s.Agent {
 		out = append(out, CompareEntry{Kind: CompareAgentMismatch, Key: "agent", Was: fmt.Sprint(b.Agent), Now: fmt.Sprint(s.Agent),
