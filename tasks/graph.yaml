@@ -378,6 +378,7 @@ tasks:
     needs_erpnext: false
     files:
       - ".github/workflows/eval.yml"
+      - "evals/ci/check-eval-workflow.sh"
       - "evals/baseline.json"
     check: "a PR's G4 check replays and compares suite-skeleton and suite-v1 under one job named eval (G4)"
   - id: CC-017
@@ -397,6 +398,25 @@ tasks:
       - "Makefile"
       - "evals/fixtures/README.md"
     check: "A reload of a smaller file leaves only its rows; make load SUITE=suite-v1 loads every seeded month"
+  # CC-018 is not in the tickets doc; see tasks/hardening.md (G5 findings on CC-016).
+  - id: CC-018
+    title: "Close the scorer's output-path and duplicate-key gaps"
+    phase: 2
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-016]
+    needs_erpnext: false
+    files:
+      - "internal/evals/baseline.go"
+      - "internal/evals/baseline_test.go"
+      - "internal/evals/result.go"
+      - "internal/evals/result_test.go"
+      - "internal/evals/score.go"
+      - "internal/evals/score_test.go"
+      - "cmd/eval/score.go"
+      - "cmd/eval/score_test.go"
+    check: "out/link/../x.json into a protected folder is refused; a baseline with a repeated key is refused"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
