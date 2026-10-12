@@ -1,9 +1,11 @@
 package evals
 
 import (
+	"bytes"
 	"errors"
 	"os"
 	"path/filepath"
+	"reflect"
 	"slices"
 	"strings"
 	"testing"
@@ -70,11 +72,11 @@ func TestBaselineWriteAndLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	got, err := f.Section(false)
+	got, err := f.Section("suite-test", false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := f.Section(true); !errors.Is(err, ErrBaselineTier) {
+	if _, err := f.Section("suite-test", true); !errors.Is(err, ErrBaselineTier) {
 		t.Errorf("llm section of a replay-only file = %v", err)
 	}
 	if got.Items["sharma-2026-09/E01"] != OutcomeCaught || got.Aggregates.Types[bc].Caught != 3 {
@@ -375,15 +377,15 @@ func TestBaselineTiers(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	r, err := f.Section(false)
+	r, err := f.Section("suite-test", false)
 	if err != nil || r.Agent || r.PricingVersion != "p1" || r.Items["sharma-2026-09/E02"] != OutcomeCaught {
 		t.Errorf("replay section %+v, %v", r, err)
 	}
-	l, err := f.Section(true)
+	l, err := f.Section("suite-test", true)
 	if err != nil || !l.Agent || l.PricingVersion != "p2" || l.Items["sharma-2026-09/E02"] != OutcomeMissed || l.Models.Fast != "haiku-x" {
 		t.Errorf("llm section %+v, %v", l, err)
 	}
-	if f.Version != BaselineVersion || BaselineVersion != 2 {
+	if f.Version != BaselineVersion || BaselineVersion != 3 {
 		t.Errorf("version %d", f.Version)
 	}
 
@@ -393,10 +395,10 @@ func TestBaselineTiers(t *testing.T) {
 		t.Fatal(err)
 	}
 	f, _ = LoadBaseline(path)
-	if r, _ := f.Section(false); r.PricingVersion != "p3" {
+	if r, _ := f.Section("suite-test", false); r.PricingVersion != "p3" {
 		t.Errorf("replay not replaced: %+v", r)
 	}
-	if l, err := f.Section(true); err != nil || l.PricingVersion != "p2" {
+	if l, err := f.Section("suite-test", true); err != nil || l.PricingVersion != "p2" {
 		t.Errorf("llm section lost: %+v, %v", l, err)
 	}
 
@@ -425,12 +427,388 @@ func TestCompareTierMissing(t *testing.T) {
 	llm := pass
 	llm.Agent = true
 	c, err = CompareTier(f, llm)
-	if err != nil || len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing || c.Failures[0].Key != TierLLM ||
+	if err != nil || len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing || c.Failures[0].Key != "suite-test/"+TierLLM ||
 		c.Failures[0].Repro == "" || c.Failures[0].Evidence == "" {
 		t.Errorf("missing llm tier = %+v, %v", c, err)
 	}
 	if c, _ := CompareTier(BaselineFile{Version: BaselineVersion}, pass); len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing {
 		t.Errorf("missing replay tier = %+v", c)
+	}
+}
+
+// suiteBaseline is a baseline built from run for the given suite name and
+// agent flag.
+func suiteBaseline(t *testing.T, run, suite string, agent bool, pricing string) (Baseline, Score) {
+	t.Helper()
+	s := scoreDir(t, run)
+	s.Suite = suite
+	s.Agent = agent
+	if agent {
+		s.Models = ScoreModels{Fast: "haiku-x", Strong: "sonnet-x"}
+	}
+	b, err := NewBaseline(s, nil, pricing)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return b, s
+}
+
+// writeLegacy writes a version 2 file with the given sections.
+func writeLegacy(t *testing.T, path string, replay, llm *Baseline) []byte {
+	t.Helper()
+	data, err := marshalSorted(legacyBaselineFile{Version: legacyBaselineVersion, Tiers: BaselineTiers{Replay: replay, LLM: llm}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(path, data, 0o600); err != nil {
+		t.Fatal(err)
+	}
+	return data
+}
+
+func readBytes(t *testing.T, path string) []byte {
+	t.Helper()
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return data
+}
+
+// TestLoadBaselineV2: a version 2 file becomes one suite; one whose two
+// sections name different suites, one with no section, and one with a
+// suites field are rejected.
+func TestLoadBaselineV2(t *testing.T) {
+	dir := t.TempDir()
+	replay, pass := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	llm, _ := suiteBaseline(t, "run-miss", "suite-test", true, "p2")
+	path := filepath.Join(dir, "v2.json")
+	writeLegacy(t, path, &replay, &llm)
+	f, err := LoadBaseline(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(f.Suites) != 1 {
+		t.Fatalf("suites %v", f.Suites)
+	}
+	if r, err := f.Section("suite-test", false); err != nil || r.PricingVersion != "p1" {
+		t.Errorf("replay %+v, %v", r, err)
+	}
+	if l, err := f.Section("suite-test", true); err != nil || l.PricingVersion != "p2" {
+		t.Errorf("llm %+v, %v", l, err)
+	}
+	if c, err := CompareTier(f, pass); err != nil || len(c.Failures) != 0 {
+		t.Errorf("compare = %+v, %v", c, err)
+	}
+
+	// The replay section alone also names the suite.
+	writeLegacy(t, path, &replay, nil)
+	if f, err := LoadBaseline(path); err != nil || len(f.Suites) != 1 || f.Suites["suite-test"].LLM != nil {
+		t.Errorf("replay only = %+v, %v", f, err)
+	}
+
+	other, _ := suiteBaseline(t, "run-miss", "suite-other", true, "p2")
+	two := filepath.Join(dir, "two.json")
+	writeLegacy(t, two, &replay, &other)
+	if _, err := LoadBaseline(two); err == nil || !strings.Contains(err.Error(), "two suites") {
+		t.Errorf("two suite names = %v", err)
+	}
+	for name, body := range map[string]string{
+		"none.json":   `{"version":2,"tiers":{"replay":null,"llm":null}}`,
+		"empty.json":  `{"version":2,"tiers":{}}`,
+		"suites.json": `{"version":2,"tiers":{"replay":{"suite":"suite-test","items":{}},"llm":null},"suites":{}}`,
+	} {
+		p := filepath.Join(dir, name)
+		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := LoadBaseline(p); err == nil {
+			t.Errorf("%s accepted", name)
+		}
+	}
+}
+
+// TestLoadBaselineV3MultiSuite: two suites in one file, a score judged
+// against each, a stable sorted round trip.
+func TestLoadBaselineV3MultiSuite(t *testing.T) {
+	dir := t.TempDir()
+	a, sa := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	b, sb := suiteBaseline(t, "run-miss", "suite-other", false, "p2")
+	bl, sbl := suiteBaseline(t, "run-miss", "suite-other", true, "p3")
+
+	p1 := filepath.Join(dir, "one.json")
+	for _, x := range []Baseline{a, b, bl} {
+		if err := WriteBaseline(p1, x); err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Another write order gives the same bytes.
+	p2 := filepath.Join(dir, "two.json")
+	for _, x := range []Baseline{bl, b, a} {
+		if err := WriteBaseline(p2, x); err != nil {
+			t.Fatal(err)
+		}
+	}
+	raw1, raw2 := readBytes(t, p1), readBytes(t, p2)
+	if !bytes.Equal(raw1, raw2) {
+		t.Errorf("write order changed the bytes:\n%s\n%s", raw1, raw2)
+	}
+	if i, j := bytes.Index(raw1, []byte(`"suite-other": {`)), bytes.Index(raw1, []byte(`"suite-test": {`)); i < 0 || j < 0 || i > j {
+		t.Errorf("suites not sorted (%d, %d):\n%s", i, j, raw1)
+	}
+
+	f, err := LoadBaseline(p1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if f.Version != BaselineVersion || len(f.Suites) != 2 {
+		t.Fatalf("file %+v", f)
+	}
+	for _, s := range []Score{sa, sb, sbl} {
+		if c, err := CompareTier(f, s); err != nil || len(c.Failures) != 0 {
+			t.Errorf("%s/%s = %+v, %v", s.Suite, TierFor(s.Agent), c.Failures, err)
+		}
+	}
+	// The suite-test score against suite-other's section would regress;
+	// against its own it passes, so each suite is judged by its own section.
+	miss := sa
+	miss.Items = sb.Items
+	if c, _ := CompareTier(f, miss); len(c.Failures) == 0 {
+		t.Error("a regression in suite-test passed")
+	}
+	if c, _ := CompareTier(f, Score{Suite: "suite-test", Agent: true}); len(c.Failures) != 1 || c.Failures[0].Kind != CompareTierMissing {
+		t.Errorf("suite-test llm = %+v", c)
+	}
+
+	// Round trip: write the loaded file, load it again, equal and same bytes.
+	p3 := filepath.Join(dir, "three.json")
+	if err := writeJSON(p3, f); err != nil {
+		t.Fatal(err)
+	}
+	g, err := LoadBaseline(p3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(f, g) {
+		t.Errorf("round trip differs:\n%+v\n%+v", f, g)
+	}
+	if raw3 := readBytes(t, p3); !bytes.Equal(raw1, raw3) {
+		t.Errorf("round trip bytes differ:\n%s\n%s", raw1, raw3)
+	}
+}
+
+// TestLoadBaselineV3Invalid: every malformed version 3 file and every
+// other version is rejected.
+func TestLoadBaselineV3Invalid(t *testing.T) {
+	dir := t.TempDir()
+	ok := `{"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`
+	p := filepath.Join(dir, "ok.json")
+	if err := os.WriteFile(p, []byte(ok), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := LoadBaseline(p); err != nil {
+		t.Fatalf("valid file rejected: %v", err)
+	}
+	for name, c := range map[string]struct{ body, want string }{
+		"nosuites":    {`{"version":3}`, "suites"},
+		"nullsuites":  {`{"version":3,"suites":null}`, "suites"},
+		"emptysuites": {`{"version":3,"suites":{}}`, "suites"},
+		"badkey":      {`{"version":3,"suites":{"Bad Key":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, "suite key"},
+		"bothnull":    {`{"version":3,"suites":{"suite-test":{"replay":null,"llm":null}}}`, "no section"},
+		"notiers":     {`{"version":3,"suites":{"suite-test":{}}}`, "no section"},
+		"mismatch":    {`{"version":3,"suites":{"suite-a":{"replay":{"suite":"suite-b","items":{}},"llm":null}}}`, "suite-b"},
+		"tiers":       {`{"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}},"tiers":{}}`, "unknown field"},
+		"noitems":     {`{"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test"},"llm":null}}}`, "items"},
+		"agentflag":   {`{"version":3,"suites":{"suite-test":{"replay":null,"llm":{"suite":"suite-test","agent":false,"items":{}}}}}`, "agent"},
+		"unknowntier": {`{"version":3,"suites":{"suite-test":{"tier3":{"suite":"suite-test","items":{}}}}}`, "unknown field"},
+		"trailing":    {ok + ` {}`, "trailing"},
+		"version1":    {`{"version":1,"suite":"suite-test","items":{}}`, "version 1"},
+		"version4":    {`{"version":4,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, "version 4"},
+	} {
+		p := filepath.Join(dir, name+".json")
+		if err := os.WriteFile(p, []byte(c.body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		_, err := LoadBaseline(p)
+		if err == nil || !strings.Contains(err.Error(), c.want) {
+			t.Errorf("%s = %v, want an error containing %q", name, err, c.want)
+		}
+	}
+	// Both names appear in a mismatch error.
+	p = filepath.Join(dir, "mismatch.json")
+	if _, err := LoadBaseline(p); err == nil || !strings.Contains(err.Error(), "suite-a") {
+		t.Errorf("mismatch = %v", err)
+	}
+	p = filepath.Join(dir, "version4.json")
+	if _, err := LoadBaseline(p); err == nil || !strings.Contains(err.Error(), "want 3 or 2") {
+		t.Errorf("version 4 = %v", err)
+	}
+}
+
+// TestWriteBaselineUpgradesV2: writing into a version 2 file gives
+// version 3 and keeps its other tier.
+func TestWriteBaselineUpgradesV2(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "candidate.json")
+	llm, _ := suiteBaseline(t, "run-miss", "suite-test", true, "p2")
+	writeLegacy(t, path, nil, &llm)
+	replay, _ := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	if err := WriteBaseline(path, replay); err != nil {
+		t.Fatal(err)
+	}
+	raw := readBytes(t, path)
+	if !bytes.Contains(raw, []byte(`"version": 3`)) || !bytes.Contains(raw, []byte(`"suites"`)) || bytes.Contains(raw, []byte(`"tiers"`)) {
+		t.Errorf("not upgraded:\n%s", raw)
+	}
+	f, err := LoadBaseline(path)
+	if err != nil || f.Version != BaselineVersion {
+		t.Fatalf("load %+v, %v", f, err)
+	}
+	if l, err := f.Section("suite-test", true); err != nil || !reflect.DeepEqual(l, llm) {
+		t.Errorf("llm tier lost: %+v, %v", l, err)
+	}
+	if r, err := f.Section("suite-test", false); err != nil || !reflect.DeepEqual(r, replay) {
+		t.Errorf("replay %+v, %v", r, err)
+	}
+
+	// A v2 file for another suite keeps that suite too.
+	path2 := filepath.Join(t.TempDir(), "candidate.json")
+	other, _ := suiteBaseline(t, "run-miss", "suite-other", false, "p9")
+	writeLegacy(t, path2, &other, nil)
+	if err := WriteBaseline(path2, replay); err != nil {
+		t.Fatal(err)
+	}
+	f, err = LoadBaseline(path2)
+	if err != nil || len(f.Suites) != 2 {
+		t.Fatalf("load %+v, %v", f, err)
+	}
+	if o, err := f.Section("suite-other", false); err != nil || !reflect.DeepEqual(o, other) {
+		t.Errorf("suite-other lost: %+v, %v", o, err)
+	}
+}
+
+// TestWriteBaselineKeepsOtherSuite: replacing one suite's section keeps
+// every other suite's sections exactly.
+func TestWriteBaselineKeepsOtherSuite(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "candidate.json")
+	oR, _ := suiteBaseline(t, "run-miss", "suite-other", false, "o1")
+	oL, _ := suiteBaseline(t, "run-miss", "suite-other", true, "o2")
+	a, _ := suiteBaseline(t, "run-pass", "suite-test", false, "a1")
+	for _, x := range []Baseline{oR, oL, a} {
+		if err := WriteBaseline(path, x); err != nil {
+			t.Fatal(err)
+		}
+	}
+	a.PricingVersion = "a2"
+	if err := WriteBaseline(path, a); err != nil {
+		t.Fatal(err)
+	}
+	f, err := LoadBaseline(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := f.Suites["suite-other"]; got.Replay == nil || got.LLM == nil || !reflect.DeepEqual(*got.Replay, oR) || !reflect.DeepEqual(*got.LLM, oL) {
+		t.Errorf("suite-other changed: %+v", got)
+	}
+	if r, _ := f.Section("suite-test", false); r.PricingVersion != "a2" {
+		t.Errorf("suite-test not replaced: %+v", r)
+	}
+	if _, err := f.Section("suite-test", true); !errors.Is(err, ErrBaselineTier) {
+		t.Errorf("suite-test llm = %v", err)
+	}
+
+	// A baseline with an invalid suite name is refused; the file stays.
+	before := readBytes(t, path)
+	bad := a
+	bad.Suite = "Bad Suite"
+	if err := WriteBaseline(path, bad); err == nil {
+		t.Error("invalid suite name written")
+	}
+	if !bytes.Equal(before, readBytes(t, path)) {
+		t.Error("file changed by a refused write")
+	}
+}
+
+// TestWriteBaselineKeepsBadFile: an existing file that doesn't load is an
+// error and is never replaced.
+func TestWriteBaselineKeepsBadFile(t *testing.T) {
+	b, _ := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	dir := t.TempDir()
+	for name, body := range map[string]string{
+		"corrupt.json":  `{"version":3,`,
+		"version1.json": `{"version":1,"suite":"suite-test","items":{"sharma-2026-09/E01":"caught"}}`,
+		"version4.json": `{"version":4,"suites":{}}`,
+		"empty.json":    `{"version":3,"suites":{}}`,
+		"v2two.json":    `{"version":2,"tiers":{"replay":{"suite":"suite-a","items":{}},"llm":{"suite":"suite-b","agent":true,"items":{}}}}`,
+		"garbage.json":  `not json`,
+	} {
+		p := filepath.Join(dir, name)
+		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		if err := WriteBaseline(p, b); err == nil {
+			t.Errorf("%s: write accepted", name)
+		}
+		if got := readBytes(t, p); string(got) != body {
+			t.Errorf("%s changed: %s", name, got)
+		}
+	}
+}
+
+// TestWriteBaselineRefusesProtected: a version 2 evals/baseline.json is
+// never upgraded or written, by any spelling of its path.
+func TestWriteBaselineRefusesProtected(t *testing.T) {
+	root := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(root, "evals"), 0o750); err != nil {
+		t.Fatal(err)
+	}
+	protected := filepath.Join(root, "evals", "baseline.json")
+	replay, _ := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	before := writeLegacy(t, protected, &replay, nil)
+	other, _ := suiteBaseline(t, "run-miss", "suite-other", false, "p2")
+	t.Chdir(root)
+	for _, p := range []string{"evals/baseline.json", protected, "./evals/../evals/baseline.json", "EVALS/Baseline.JSON"} {
+		for _, b := range []Baseline{replay, other} {
+			if err := WriteBaseline(p, b); !errors.Is(err, ErrProtectedBaseline) {
+				t.Errorf("WriteBaseline(%q, %s) = %v, want ErrProtectedBaseline", p, b.Suite, err)
+			}
+		}
+	}
+	if got := readBytes(t, protected); !bytes.Equal(got, before) {
+		t.Errorf("evals/baseline.json changed:\n%s", got)
+	}
+}
+
+// TestCompareTierMissingSuite: a score for a suite the file lacks fails
+// closed with key <suite>/<tier>.
+func TestCompareTierMissingSuite(t *testing.T) {
+	b, _ := suiteBaseline(t, "run-pass", "suite-test", false, "p1")
+	var f BaselineFile
+	f.Set(b)
+	for _, agent := range []bool{false, true} {
+		_, s := suiteBaseline(t, "run-pass", "suite-v1", agent, "p1")
+		c, err := CompareTier(f, s)
+		key := "suite-v1/" + TierFor(agent)
+		if err != nil || len(c.Failures) != 1 {
+			t.Fatalf("%s = %+v, %v", key, c, err)
+		}
+		e := c.Failures[0]
+		if CompareTierMissing != "baseline_tier_missing" || e.Kind != CompareTierMissing || e.Key != key || e.Repro == "" ||
+			e.Evidence != "baseline suites/"+key || !strings.Contains(e.Detail, "suite-v1") || !strings.Contains(e.Detail, TierFor(agent)) {
+			t.Errorf("%s = %+v", key, e)
+		}
+	}
+}
+
+// TestLoadCommittedBaseline: the committed evals/baseline.json loads
+// (read-only) and has the suite-skeleton replay section. The version is
+// not asserted, so this passes before and after the file is upgraded.
+func TestLoadCommittedBaseline(t *testing.T) {
+	f, err := LoadBaseline(filepath.Join("..", "..", "evals", "baseline.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.Section("suite-skeleton", false); err != nil {
+		t.Errorf("suite-skeleton replay: %v", err)
 	}
 }
 

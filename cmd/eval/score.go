@@ -33,9 +33,11 @@ or empty type can't pass vacuously); <type>.false_alarms==0 is allowed
 there, since a clean type is a real claim.
 
 --compare <baseline.json> judges the score against the baseline file's
-section for its tier ("replay" for agent false, "llm" for agent true). A
-missing section, an empty one, and one whose agent flag (or, with the
-agent on, fast or strong model) differs all fail. Then any item caught in
+section for its suite and tier ("replay" for agent false, "llm" for agent
+true): suites/<suite>/<tier> in a version 3 file; a version 2 file (one
+suite) is still read. A missing suite or tier, an empty section, and one
+whose agent flag (or, with the agent on, fast or strong model) differs
+all fail. Then any item caught in
 the baseline and not now, and any clean-month false alarm, fails.
 --max-p95-increase-pct N fails a p95 close duration more than N percent
 above the baseline's, ignoring increases under --min-latency-delta-ms;
@@ -43,8 +45,10 @@ above the baseline's, ignoring increases under --min-latency-delta-ms;
 cost fails any cost). A threshold not given is skipped, and summary.md
 says so. Tier 1 (replay, no model) passes no threshold.
 
---baseline-out writes a candidate baseline: it replaces only the score's
-tier section of that file and keeps the other. It refuses
+--baseline-out writes a candidate baseline file, always version 3: it
+replaces only the score's suite and tier section of that file and keeps
+every other suite and tier (a version 2 file is upgraded; a file that
+doesn't load is an error and is left unchanged). It refuses
 evals/baseline.json, which only the owner commits. No output (--out,
 --baseline-out) may resolve to evals/baseline.json or under
 evals/scenarios/, evals/golden/ or gates/.
@@ -271,7 +275,7 @@ func runScore(f scoreFlags) error {
 		if err := evals.WriteBaseline(f.BaselineOut, b); err != nil {
 			return err
 		}
-		_, _ = fmt.Fprintf(stdout, "candidate baseline %s (tier %s)\n", f.BaselineOut, evals.TierFor(s.Agent))
+		_, _ = fmt.Fprintf(stdout, "candidate baseline %s (suite %s, tier %s)\n", f.BaselineOut, s.Suite, evals.TierFor(s.Agent))
 	}
 
 	var sm evals.Summary
@@ -309,15 +313,15 @@ func runScore(f scoreFlags) error {
 	return nil
 }
 
-// compareAll compares the score with its tier's section of the baseline,
-// then applies the latency and cost thresholds that were passed and notes
-// the ones that weren't.
+// compareAll compares the score with its suite and tier's section of the
+// baseline, then applies the latency and cost thresholds that were passed
+// and notes the ones that weren't.
 func compareAll(base evals.BaselineFile, s evals.Score, f scoreFlags, sm *evals.Summary) (evals.Comparison, error) {
 	c, err := evals.CompareTier(base, s)
 	if err != nil {
 		return evals.Comparison{}, err
 	}
-	sec, serr := base.Section(s.Agent)
+	sec, serr := base.Section(s.Suite, s.Agent)
 	if f.MaxP95IncreasePct.set {
 		if serr == nil {
 			c.Failures = append(c.Failures, evals.CompareLatencyP95(sec, s, f.MaxP95IncreasePct.v, f.MinLatencyDeltaMS.v)...)

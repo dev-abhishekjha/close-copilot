@@ -141,14 +141,19 @@ func TestScoreCLI(t *testing.T) {
 		}
 		var b struct {
 			Version int `json:"version"`
-			Tiers   map[string]*struct {
+			Suites  map[string]map[string]*struct {
 				PricingVersion string `json:"pricing_version"`
-			} `json:"tiers"`
+			} `json:"suites"`
 		}
 		raw, _ := os.ReadFile(base)
-		if err := json.Unmarshal(raw, &b); err != nil || b.Version != 2 || b.Tiers["replay"] == nil ||
-			len(b.Tiers["replay"].PricingVersion) != 64 || b.Tiers["llm"] != nil {
+		if err := json.Unmarshal(raw, &b); err != nil || len(b.Suites) != 1 {
 			t.Fatalf("candidate %s: %v", raw, err)
+		}
+		for _, tiers := range b.Suites {
+			if b.Version != 3 || tiers["replay"] == nil ||
+				len(tiers["replay"].PricingVersion) != 64 || tiers["llm"] != nil {
+				t.Fatalf("candidate %s", raw)
+			}
 		}
 		code, _, errText = runCLI(t, "score", filepath.Join(scoreData, "run-pass"), "--truth-dir", truth, "--out", t.TempDir(), "--compare", base)
 		if code != 0 {
