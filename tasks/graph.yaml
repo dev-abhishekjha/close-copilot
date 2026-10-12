@@ -337,6 +337,20 @@ tasks:
       - "evals/fixtures/README.md"
       - "evals/fixtures/suite-v1/**"
     check: "TestFixtureSize passes with the suite-v1 fixtures committed; gitleaks finds nothing in them"
+  # CC-015 is not in the tickets doc. Found 2026-10-12: CC-013 regenerated the
+  # suite-skeleton truth, so the skeleton fixtures' index hash went stale and
+  # the eval workflow (pinned to suite-skeleton) failed at tier 1.
+  - id: CC-015
+    title: "Re-record the suite-skeleton fixtures after the CC-013 truth change"
+    phase: 2
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-013, CC-014]
+    needs_erpnext: true
+    files:
+      - "evals/fixtures/suite-skeleton/**"
+    check: "make eval-replay on suite-skeleton passes against evals/baseline.json"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
