@@ -4,22 +4,7 @@
   "month": "2026-08",
   "clean": true,
   "planted": [],
-  "expected": [
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "VNT2026729",
-        "supplier_gstin": "27DYLCV3017V1Z0"
-      }
-    },
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "TCH2026743",
-        "supplier_gstin": "27FIWCT1460U1ZK"
-      }
-    }
-  ],
+  "expected": [],
   "investigations": [
     {
       "id": "X01",

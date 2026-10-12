@@ -8,22 +8,8 @@
     {
       "type": "gstr2b_wrong_period",
       "keys": {
-        "invoice_no_norm": "RDK2026524",
-        "supplier_gstin": "36VNOCR2477I1ZI"
-      }
-    },
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "LKV2026526",
-        "supplier_gstin": "29WFQCL5046J1Z0"
-      }
-    },
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "DCC2026559",
-        "supplier_gstin": "29WNECD3532M1Z2"
+        "invoice_no_norm": "VNT2026631",
+        "supplier_gstin": "27DYLCV3017V1Z0"
       }
     }
   ],

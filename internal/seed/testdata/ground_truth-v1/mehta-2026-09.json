@@ -63,7 +63,15 @@
       "amount_paise": 3960000
     }
   ],
-  "expected": [],
+  "expected": [
+    {
+      "type": "gstr2b_wrong_period",
+      "keys": {
+        "invoice_no_norm": "LDG2026959",
+        "supplier_gstin": "27EVWCL3042S1Z9"
+      }
+    }
+  ],
   "investigations": [
     {
       "id": "X01",

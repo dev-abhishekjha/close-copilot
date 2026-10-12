@@ -325,3 +325,42 @@ func TestGSTR2BErrors(t *testing.T) {
 		t.Error("empty return doesn't write b2b as []")
 	}
 }
+
+// TestCC013FullReturnHasNoSmallWorldInvoices: the 15 sharma 2026-08
+// gstr2b_missing_in_books false alarms of CC-013 are invoices of the
+// --small world's August return. The full-size return the seeder writes
+// holds none of them, so the seeder is not the cause: they are stale rows
+// a --small load left in gstr2b_entries (the loader upserts and never
+// deletes a period's old rows).
+func TestCC013FullReturnHasNoSmallWorldInvoices(t *testing.T) {
+	stale := []string{
+		"BHR2026819", "BLN2026824", "DCC2026828", "KVR2026852", "LKV2026832",
+		"OMK2026808", "RDK2026855", "SCR2026846", "SND2026842", "STC2026852",
+		"SWF2026821", "TCH2026743", "TCH2026806", "VNT2026729", "VNT2026840",
+	}
+	p := loadCompany(t, "sharma")
+	keys := func(opt Options) map[string]bool {
+		jul := mustGenerate(t, p, "2026-07", opt)
+		aug := mustGenerate(t, p, "2026-08", opt)
+		g := mustGSTR2B(t, p, "2026-08", []World{jul, aug}, DefaultGSTR2BOptions())
+		out := map[string]bool{}
+		for _, s := range g.Data.DocData.B2B {
+			for _, inv := range s.Inv {
+				out[NormInvoiceNo(inv.Inum)] = true
+			}
+		}
+		return out
+	}
+	full, small := keys(Options{}), keys(Options{Small: true})
+	if len(full) != 19 {
+		t.Errorf("full sharma 2026-08 return: %d invoices, want 19", len(full))
+	}
+	for _, k := range stale {
+		if full[k] {
+			t.Errorf("%s is in the full return", k)
+		}
+		if !small[k] {
+			t.Errorf("%s is not in the --small return", k)
+		}
+	}
+}

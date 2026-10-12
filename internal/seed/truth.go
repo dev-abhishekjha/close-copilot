@@ -172,6 +172,40 @@ func (c *truthCtx) keys(pe PlantedError, month string) (map[string]string, error
 	return nil, fmt.Errorf("planted error %s: unknown type %q", pe.ID, pe.Type)
 }
 
+// ExpectedGSTR2BWrongPeriod is the expected (not planted) finding for an
+// invoice its supplier filed late.
+const ExpectedGSTR2BWrongPeriod = "gstr2b_wrong_period"
+
+// wrongPeriodExpected lists the month's late-filed invoices as expected
+// gstr2b_wrong_period items. A late invoice dated in month M sits in M's
+// books but only in M+1's GSTR-2B (GSTR2BOptions.IsLate), so the mismatch
+// belongs to M, the books month: M's reconciliation finds a booked invoice
+// its own return lacks. In M+1 the return's entry matches an invoice already
+// booked in M, which is no mismatch, so the item is filed under M only
+// (CC-013). The invoices are opt.GSTR2B.Deferred, M's return being the one
+// passed in. Each must be a registered purchase in M's books, dated in M:
+// planting never touches a late invoice, so a miss is an error.
+func (c *truthCtx) wrongPeriodExpected(month string) ([]ExpectedFinding, error) {
+	out := make([]ExpectedFinding, 0)
+	if c.opt.GSTR2B == nil {
+		return out, nil
+	}
+	for _, ext := range c.opt.GSTR2B.Deferred {
+		ev, ok := c.books[ext]
+		if !ok || ev.Kind != EventPurchase || ev.Meta.SupplierGSTIN == "" || ev.InvoiceNo == "" {
+			return nil, fmt.Errorf("late invoice %s is not a registered purchase in the books", ext)
+		}
+		if !strings.HasPrefix(ev.Date, month+"-") {
+			return nil, fmt.Errorf("late invoice %s is dated %s, outside %s", ext, ev.Date, month)
+		}
+		out = append(out, ExpectedFinding{
+			Type: ExpectedGSTR2BWrongPeriod,
+			Keys: gstr2bKeys(ev.Meta.SupplierGSTIN, ev.InvoiceNo),
+		})
+	}
+	return out, nil
+}
+
 // BuildGroundTruth constructs the GroundTruth structure for a planted company-month world.
 func BuildGroundTruth(opt GroundTruthOptions) (GroundTruth, error) {
 	pw := opt.PlantedWorld
@@ -234,29 +268,9 @@ func BuildGroundTruth(opt GroundTruthOptions) (GroundTruth, error) {
 		}
 	}
 
-	expected := make([]ExpectedFinding, 0)
-	if opt.GSTR2B != nil && len(opt.GSTR2B.Late) > 0 {
-		type b2bInfo struct {
-			ctin string
-			inum string
-		}
-		lateInvs := make(map[string]b2bInfo)
-		for _, supp := range opt.GSTR2B.Data.DocData.B2B {
-			for _, inv := range supp.Inv {
-				lateInvs[inv.ExtID] = b2bInfo{ctin: supp.CTIN, inum: inv.Inum}
-			}
-		}
-		for _, extID := range opt.GSTR2B.Late {
-			if info, ok := lateInvs[extID]; ok {
-				expected = append(expected, ExpectedFinding{
-					Type: "gstr2b_wrong_period",
-					Keys: map[string]string{
-						"supplier_gstin":  info.ctin,
-						"invoice_no_norm": NormInvoiceNo(info.inum),
-					},
-				})
-			}
-		}
+	expected, err := ctx.wrongPeriodExpected(pw.Month)
+	if err != nil {
+		return GroundTruth{}, fmt.Errorf("build ground truth %s %s: %w", pw.Company, pw.Month, err)
 	}
 
 	return GroundTruth{

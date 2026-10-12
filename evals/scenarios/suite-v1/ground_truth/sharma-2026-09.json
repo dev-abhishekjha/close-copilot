@@ -55,29 +55,7 @@
       "amount_paise": 527356
     }
   ],
-  "expected": [
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "SWF2026813",
-        "supplier_gstin": "29PHGCS2431D1ZS"
-      }
-    },
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "SWF2026815",
-        "supplier_gstin": "29PHGCS2431D1ZS"
-      }
-    },
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "LDG2026803",
-        "supplier_gstin": "29SYJCL1381E1ZL"
-      }
-    }
-  ],
+  "expected": [],
   "investigations": [
     {
       "id": "X01",

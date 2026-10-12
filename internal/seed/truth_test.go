@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"slices"
+	"strings"
 	"testing"
 )
 
@@ -378,9 +379,9 @@ func TestGroundTruthWithGSTR2B(t *testing.T) {
 	}
 	validateAgainstSchema(t, schemaBytes, b)
 
-	if len(g2b.Late) > 0 {
-		if len(gt.Expected) != len(g2b.Late) {
-			t.Errorf("gt.Expected count %d != g2b.Late count %d", len(gt.Expected), len(g2b.Late))
+	if len(g2b.Deferred) > 0 {
+		if len(gt.Expected) != len(g2b.Deferred) {
+			t.Errorf("gt.Expected count %d != g2b.Deferred count %d", len(gt.Expected), len(g2b.Deferred))
 		}
 		for _, exp := range gt.Expected {
 			if exp.Type != "gstr2b_wrong_period" {
@@ -548,5 +549,157 @@ func TestGroundTruthKeysNeverDropped(t *testing.T) {
 	bad.PlantedErrors = []PlantedError{{ID: "E01", Type: "bogus", TouchedExtIDs: []string{"x"}}}
 	if _, err := BuildGroundTruth(GroundTruthOptions{PlantedWorld: bad}); err == nil {
 		t.Error("unknown type: no error")
+	}
+}
+
+// cc013Month is one month's true world, its GSTR-2B and its ground truth
+// with no planted errors (every view is the true world).
+type cc013Month struct {
+	w   World
+	g2b GSTR2B
+	gt  GroundTruth
+}
+
+// cc013Truth builds full-size true worlds for months (the first is only the
+// previous month of the second) and the ground truth of every month after
+// the first.
+func cc013Truth(t *testing.T, company string, months ...string) map[string]cc013Month {
+	t.Helper()
+	p := loadCompany(t, company)
+	worlds := make([]World, len(months))
+	for i, m := range months {
+		worlds[i] = mustGenerate(t, p, m, Options{})
+	}
+	out := map[string]cc013Month{}
+	for i := 1; i < len(months); i++ {
+		cur := worlds[i]
+		g := mustGSTR2B(t, p, cur.Month, []World{worlds[i-1], cur}, DefaultGSTR2BOptions())
+		pw := PlantedWorld{Scenario: "cc-013", Company: company, Month: cur.Month, BooksWorld: cur, BankWorld: cur, GSTR2BWorld: cur}
+		gt, err := BuildGroundTruth(GroundTruthOptions{PlantedWorld: pw, GSTR2B: &g})
+		if err != nil {
+			t.Fatalf("BuildGroundTruth %s %s: %v", company, cur.Month, err)
+		}
+		out[cur.Month] = cc013Month{w: cur, g2b: g, gt: gt}
+	}
+	return out
+}
+
+// TestCC013LateInvoiceTruthInBooksMonth: a late-filed invoice dated in M is
+// in M's books and only in M+1's GSTR-2B, so the gstr2b_wrong_period item is
+// filed under M, the month whose reconciliation finds it, and not under M+1.
+// The named invoices are the six suite-v1 false alarms of CC-013 (plus
+// LDG/2026/0803, masked in sharma 2026-08 by stale GSTR-2B rows).
+func TestCC013LateInvoiceTruthInBooksMonth(t *testing.T) {
+	known := map[string]map[string][]string{
+		"mehta":  {"2026-07": {"LTS2026742"}, "2026-08": {"FBR2026804"}},
+		"sharma": {"2026-06": {"VNT2026631"}, "2026-07": {"SWF2026735"}, "2026-08": {"LDG2026803", "SWF2026813", "SWF2026815"}},
+	}
+	months := map[string][]string{
+		"mehta":  {"2026-06", "2026-07", "2026-08", "2026-09"},
+		"sharma": {"2026-05", "2026-06", "2026-07", "2026-08", "2026-09"},
+	}
+	for company, ms := range months {
+		byMonth := cc013Truth(t, company, ms...)
+		for _, m := range ms[1:] {
+			cm := byMonth[m]
+			books := map[string]Event{}
+			for _, ev := range cm.w.Events {
+				if ev.Kind == EventPurchase && ev.Meta.SupplierGSTIN != "" {
+					books[gstr2bKeys(ev.Meta.SupplierGSTIN, ev.InvoiceNo)["invoice_no_norm"]] = ev
+				}
+			}
+			lateKeys := map[string]bool{}
+			for _, s := range cm.g2b.Data.DocData.B2B {
+				for _, inv := range s.Inv {
+					if slices.Contains(cm.g2b.Late, inv.ExtID) {
+						lateKeys[NormInvoiceNo(inv.Inum)] = true
+					}
+				}
+			}
+			if len(cm.gt.Expected) != len(cm.g2b.Deferred) {
+				t.Errorf("%s %s: %d expected items, want one per deferred invoice (%d)", company, m, len(cm.gt.Expected), len(cm.g2b.Deferred))
+			}
+			got := map[string]bool{}
+			for _, e := range cm.gt.Expected {
+				key := e.Keys["invoice_no_norm"]
+				got[key] = true
+				if e.Type != ExpectedGSTR2BWrongPeriod {
+					t.Errorf("%s %s %s: type %q", company, m, key, e.Type)
+				}
+				ev, ok := books[key]
+				switch {
+				case !ok:
+					t.Errorf("%s %s: expected %s is not a registered purchase in the month's books", company, m, key)
+				case !strings.HasPrefix(ev.Date, m+"-"):
+					t.Errorf("%s %s: expected %s is dated %s, not in the books month", company, m, key, ev.Date)
+				case !slices.Contains(cm.g2b.Deferred, ev.ExtID):
+					t.Errorf("%s %s: expected %s (%s) is not deferred to the next return", company, m, key, ev.ExtID)
+				case ev.Meta.SupplierGSTIN != e.Keys["supplier_gstin"]:
+					t.Errorf("%s %s: expected %s supplier_gstin %q, books %q", company, m, key, e.Keys["supplier_gstin"], ev.Meta.SupplierGSTIN)
+				}
+				if lateKeys[key] {
+					t.Errorf("%s %s: expected %s is a previous month's late invoice in this return", company, m, key)
+				}
+			}
+			for _, key := range known[company][m] {
+				if !got[key] {
+					t.Errorf("%s %s: late invoice %s not filed under its books month", company, m, key)
+				}
+				next, ok := byMonth[nextMonth(t, m)]
+				if !ok {
+					continue
+				}
+				for _, e := range next.gt.Expected {
+					if e.Keys["invoice_no_norm"] == key {
+						t.Errorf("%s %s: late invoice %s also filed under the next month", company, next.gt.Month, key)
+					}
+				}
+			}
+		}
+	}
+}
+
+// TestCC013SeedDeterministic builds suite-v1's GSTR-2B and ground truth
+// twice, with two planters, and compares the bytes.
+func TestCC013SeedDeterministic(t *testing.T) {
+	cfg := loadSuiteV1(t)
+	cfg.Small = true
+	build := func() map[string][]byte {
+		sp := NewSuitePlanter(cfg, suiteProfiles(t), Options{Small: true})
+		out := map[string][]byte{}
+		for _, cm := range suiteTargets(cfg) {
+			v := buildV1Truth(t, sp, cfg, cm)
+			gt, err := v.gt.JSON()
+			if err != nil {
+				t.Fatal(err)
+			}
+			g, err := v.g2b.JSON()
+			if err != nil {
+				t.Fatal(err)
+			}
+			out[cm.Company+"-"+cm.Month+"/truth"] = gt
+			out[cm.Company+"-"+cm.Month+"/gstr2b"] = g
+		}
+		return out
+	}
+	a, b := build(), build()
+	if len(a) != len(b) || len(a) == 0 {
+		t.Fatalf("%d and %d files", len(a), len(b))
+	}
+	for name, x := range a {
+		if !bytes.Equal(x, b[name]) {
+			t.Errorf("%s differs between two runs", name)
+		}
+	}
+	// The full-size worlds the CC-013 test reads are deterministic too.
+	x, y := cc013Truth(t, "sharma", "2026-07", "2026-08"), cc013Truth(t, "sharma", "2026-07", "2026-08")
+	for m := range x {
+		gx, _ := x[m].gt.JSON()
+		gy, _ := y[m].gt.JSON()
+		bx, _ := x[m].g2b.JSON()
+		by, _ := y[m].g2b.JSON()
+		if !bytes.Equal(gx, gy) || !bytes.Equal(bx, by) {
+			t.Errorf("full sharma %s differs between two runs", m)
+		}
 	}
 }
