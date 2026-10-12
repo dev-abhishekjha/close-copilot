@@ -116,6 +116,7 @@ func (v *VarianceCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 
 	act := ActionInvestigate
 	var findings []Finding
+	var read map[string]bool // purchase invoices read this month; nil until the first flagged account
 	for _, r := range rows {
 		hist, err := in.Books.AccountHistory(ctx, in.Company, r.Account, in.Month, varianceHistoryMonths)
 		if err != nil {
@@ -142,6 +143,16 @@ func (v *VarianceCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 		if !flag {
 			continue
 		}
+		if read == nil {
+			invs, err := in.Books.PurchaseInvoices(ctx, in.Company, start, end)
+			if err != nil {
+				return nil, fmt.Errorf("checks: variance load purchase invoices: %w", err)
+			}
+			read = make(map[string]bool, len(invs))
+			for _, inv := range invs {
+				read[inv.Name] = true
+			}
+		}
 		amt := money.Paise(varianceAbs(d3) / 3)
 		dir := "up"
 		if d3 < 0 {
@@ -153,7 +164,7 @@ func (v *VarianceCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 			Title:       fmt.Sprintf("%s %s by %s against the 3-month average", r.Account, dir, amt.Format()),
 			AmountPaise: &amt,
 			Keys:        map[string]string{"account": r.Account, "month": in.Month},
-			Evidence:    varianceEvidence(in, start, end, r.Account, byAccount[r.Account]),
+			Evidence:    varianceEvidence(in, start, end, r.Account, byAccount[r.Account], read),
 			Action:      &act,
 			Status:      StatusOpen,
 		})
@@ -161,7 +172,7 @@ func (v *VarianceCheck) Run(ctx context.Context, in Inputs) ([]Finding, error) {
 	return findings, nil
 }
 
-func varianceEvidence(in Inputs, start, end time.Time, account string, entries []ledger.GLEntry) []EvidenceRef {
+func varianceEvidence(in Inputs, start, end time.Time, account string, entries []ledger.GLEntry, readInvoices map[string]bool) []EvidenceRef {
 	sorted := slices.Clone(entries)
 	size := func(e ledger.GLEntry) int64 { return varianceAbs(int64(e.Debit - e.Credit)) }
 	slices.SortFunc(sorted, func(a, b ledger.GLEntry) int {
@@ -178,7 +189,7 @@ func varianceEvidence(in Inputs, start, end time.Time, account string, entries [
 		if i < varianceTopEntries {
 			glIDs = append(glIDs, e.Name)
 		}
-		if e.VoucherType == "Purchase Invoice" && e.VoucherNo != "" &&
+		if e.VoucherType == "Purchase Invoice" && e.VoucherNo != "" && readInvoices[e.VoucherNo] &&
 			len(invoices) < varianceMaxInvoices && !slices.Contains(invoices, e.VoucherNo) {
 			invoices = append(invoices, e.VoucherNo)
 		}
