@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Salaries - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-08"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 60000000,
+      "month": "2026-05",
+      "net": 60000000
+    },
+    {
+      "credit": 0,
+      "debit": 60000000,
+      "month": "2026-06",
+      "net": 60000000
+    },
+    {
+      "credit": 0,
+      "debit": 60000000,
+      "month": "2026-07",
+      "net": 60000000
+    },
+    {
+      "credit": 0,
+      "debit": 60000000,
+      "month": "2026-08",
+      "net": 60000000
+    }
+  ],
+  "tool": "get_account_history"
+}

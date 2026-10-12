@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Repairs and Maintenance - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-09"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-06",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 8046700,
+      "month": "2026-07",
+      "net": 8046700
+    },
+    {
+      "credit": 0,
+      "debit": 8260300,
+      "month": "2026-08",
+      "net": 8260300
+    },
+    {
+      "credit": 0,
+      "debit": 5619700,
+      "month": "2026-09",
+      "net": 5619700
+    }
+  ],
+  "tool": "get_account_history"
+}

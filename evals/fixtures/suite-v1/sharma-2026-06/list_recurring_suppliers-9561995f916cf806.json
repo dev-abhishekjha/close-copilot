@@ -1,0 +1,11 @@
+{
+  "args": {
+    "amount_band_pct": 20,
+    "before_month": "2026-06",
+    "company": "sharma",
+    "lookback_months": 4,
+    "min_occurrences": 3
+  },
+  "result": null,
+  "tool": "list_recurring_suppliers"
+}

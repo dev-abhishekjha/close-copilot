@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Professional Charges - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 10434203,
+      "month": "2026-04",
+      "net": 10434203
+    },
+    {
+      "credit": 0,
+      "debit": 9021912,
+      "month": "2026-05",
+      "net": 9021912
+    },
+    {
+      "credit": 0,
+      "debit": 11129007,
+      "month": "2026-06",
+      "net": 11129007
+    },
+    {
+      "credit": 0,
+      "debit": 7894897,
+      "month": "2026-07",
+      "net": 7894897
+    }
+  ],
+  "tool": "get_account_history"
+}

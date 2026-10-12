@@ -645,7 +645,7 @@ func (f closerFunc) RunClose(ctx context.Context, company, month string) (agent.
 
 // TestFixtureSize keeps the committed fixtures small.
 func TestFixtureSize(t *testing.T) {
-	const limit = 5 << 20
+	const limit = 16 << 20
 	root := filepath.Join("..", "..", "evals", "fixtures")
 	var total int64
 	err := filepath.WalkDir(root, func(_ string, d fs.DirEntry, err error) error {

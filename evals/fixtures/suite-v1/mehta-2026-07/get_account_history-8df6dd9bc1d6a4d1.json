@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Software Subscriptions - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 18665093,
+      "month": "2026-04",
+      "net": 18665093
+    },
+    {
+      "credit": 0,
+      "debit": 18336435,
+      "month": "2026-05",
+      "net": 18336435
+    },
+    {
+      "credit": 0,
+      "debit": 18584515,
+      "month": "2026-06",
+      "net": 18584515
+    },
+    {
+      "credit": 0,
+      "debit": 51645081,
+      "month": "2026-07",
+      "net": 51645081
+    }
+  ],
+  "tool": "get_account_history"
+}

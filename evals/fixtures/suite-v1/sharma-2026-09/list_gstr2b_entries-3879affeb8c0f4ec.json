@@ -1,0 +1,8 @@
+{
+  "args": {
+    "company": "sharma",
+    "period": "2026-10"
+  },
+  "result": [],
+  "tool": "list_gstr2b_entries"
+}

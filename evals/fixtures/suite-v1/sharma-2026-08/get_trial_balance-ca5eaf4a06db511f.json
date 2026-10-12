@@ -1,0 +1,219 @@
+{
+  "args": {
+    "company": "sharma",
+    "from": "2026-05-01",
+    "to": "2026-08-31"
+  },
+  "result": {
+    "company": "Sharma Traders Pvt Ltd",
+    "from_date": "2026-05-01T00:00:00Z",
+    "rows": [
+      {
+        "account": "Debtors - STPL",
+        "account_name": "Debtors",
+        "closing": 1129837026,
+        "credit": 2636763246,
+        "debit": 3580057045,
+        "opening": 186543227,
+        "root_type": "Asset"
+      },
+      {
+        "account": "HDFC Current 0001 - STPL",
+        "account_name": "HDFC Current 0001",
+        "closing": 1477841244,
+        "credit": 542243492,
+        "debit": 1701329287,
+        "opening": 318755449,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax CGST - STPL",
+        "account_name": "Input Tax CGST",
+        "closing": 16172718,
+        "credit": 0,
+        "debit": 12768669,
+        "opening": 3404049,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax IGST - STPL",
+        "account_name": "Input Tax IGST",
+        "closing": 31022615,
+        "credit": 0,
+        "debit": 23722133,
+        "opening": 7300482,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax SGST - STPL",
+        "account_name": "Input Tax SGST",
+        "closing": 16172718,
+        "credit": 0,
+        "debit": 12768669,
+        "opening": 3404049,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Office Equipment - STPL",
+        "account_name": "Office Equipment",
+        "closing": 6616900,
+        "credit": 0,
+        "debit": 0,
+        "opening": 6616900,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Payment Gateway Clearing - STPL",
+        "account_name": "Payment Gateway Clearing",
+        "closing": 1246337028,
+        "credit": 0,
+        "debit": 937229459,
+        "opening": 309107569,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Prepaid Expenses - STPL",
+        "account_name": "Prepaid Expenses",
+        "closing": -5000000,
+        "credit": 4000000,
+        "debit": 0,
+        "opening": -1000000,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Creditors - STPL",
+        "account_name": "Creditors",
+        "closing": -99360883,
+        "credit": 391874376,
+        "debit": 302007492,
+        "opening": -9493999,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Output Tax CGST - STPL",
+        "account_name": "Output Tax CGST",
+        "closing": -238538814,
+        "credit": 186583304,
+        "debit": 0,
+        "opening": -51955510,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Output Tax SGST - STPL",
+        "account_name": "Output Tax SGST",
+        "closing": -238538814,
+        "credit": 186583304,
+        "debit": 0,
+        "opening": -51955510,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Interest Income - STPL",
+        "account_name": "Interest Income",
+        "closing": -1795500,
+        "credit": 1795500,
+        "debit": 0,
+        "opening": 0,
+        "root_type": "Income"
+      },
+      {
+        "account": "Sales - STPL",
+        "account_name": "Sales",
+        "closing": -4075681224,
+        "credit": 3206890437,
+        "debit": 0,
+        "opening": -868790787,
+        "root_type": "Income"
+      },
+      {
+        "account": "Bank Charges - STPL",
+        "account_name": "Bank Charges",
+        "closing": 300000,
+        "credit": 0,
+        "debit": 200000,
+        "opening": 100000,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Cost of Goods Sold - STPL",
+        "account_name": "Cost of Goods Sold",
+        "closing": 235257358,
+        "credit": 0,
+        "debit": 185584566,
+        "opening": 49672792,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Electricity - STPL",
+        "account_name": "Electricity",
+        "closing": 11331516,
+        "credit": 0,
+        "debit": 9167622,
+        "opening": 2163894,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Professional Charges - STPL",
+        "account_name": "Professional Charges",
+        "closing": 49062502,
+        "credit": 0,
+        "debit": 38628299,
+        "opening": 10434203,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Rent - STPL",
+        "account_name": "Rent",
+        "closing": 109000000,
+        "credit": 0,
+        "debit": 85500000,
+        "opening": 23500000,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Repairs and Maintenance - STPL",
+        "account_name": "Repairs and Maintenance",
+        "closing": 7084700,
+        "credit": 0,
+        "debit": 7084700,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Salaries - STPL",
+        "account_name": "Salaries",
+        "closing": 300000000,
+        "credit": 0,
+        "debit": 240000000,
+        "opening": 60000000,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Software Subscriptions - STPL",
+        "account_name": "Software Subscriptions",
+        "closing": 19250000,
+        "credit": 0,
+        "debit": 17800000,
+        "opening": 1450000,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Telephone and Internet - STPL",
+        "account_name": "Telephone and Internet",
+        "closing": 3628910,
+        "credit": 0,
+        "debit": 2885718,
+        "opening": 743192,
+        "root_type": "Expense"
+      }
+    ],
+    "to_date": "2026-08-31T00:00:00Z",
+    "totals": {
+      "closing": 0,
+      "credit": 7156733659,
+      "debit": 7156733659,
+      "opening": 0
+    }
+  },
+  "tool": "get_trial_balance"
+}

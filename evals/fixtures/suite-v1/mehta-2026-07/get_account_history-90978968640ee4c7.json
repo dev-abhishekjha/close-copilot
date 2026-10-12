@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Electricity - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 3730721,
+      "month": "2026-04",
+      "net": 3730721
+    },
+    {
+      "credit": 0,
+      "debit": 3439850,
+      "month": "2026-05",
+      "net": 3439850
+    },
+    {
+      "credit": 0,
+      "debit": 3297797,
+      "month": "2026-06",
+      "net": 3297797
+    },
+    {
+      "credit": 0,
+      "debit": 4000962,
+      "month": "2026-07",
+      "net": 4000962
+    }
+  ],
+  "tool": "get_account_history"
+}

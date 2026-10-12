@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Rent - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-06"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-03",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 23500000,
+      "month": "2026-04",
+      "net": 23500000
+    },
+    {
+      "credit": 0,
+      "debit": 23500000,
+      "month": "2026-05",
+      "net": 23500000
+    },
+    {
+      "credit": 0,
+      "debit": 23500000,
+      "month": "2026-06",
+      "net": 23500000
+    }
+  ],
+  "tool": "get_account_history"
+}

@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Repairs and Maintenance - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-08"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-05",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-06",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 7084700,
+      "month": "2026-07",
+      "net": 7084700
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-08",
+      "net": 0
+    }
+  ],
+  "tool": "get_account_history"
+}

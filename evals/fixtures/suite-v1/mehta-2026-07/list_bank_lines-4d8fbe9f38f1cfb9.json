@@ -1,0 +1,827 @@
+{
+  "args": {
+    "company": "mehta",
+    "from": "2026-06-01",
+    "to": "2026-07-31"
+  },
+  "result": [
+    {
+      "amount_paise": 56247524,
+      "balance_paise": 456247524,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-018",
+      "ref": "UTR708604381",
+      "source_file": "",
+      "txn_date": "2026-06-04T00:00:00Z",
+      "txn_id": "BNK-20260604-001"
+    },
+    {
+      "amount_paise": 42861033,
+      "balance_paise": 499108557,
+      "company_id": "mehta",
+      "narration": "UPI/UTR459492158/CUST-012",
+      "ref": "UTR459492158",
+      "source_file": "",
+      "txn_date": "2026-06-05T00:00:00Z",
+      "txn_id": "BNK-20260605-001"
+    },
+    {
+      "amount_paise": 23346847,
+      "balance_paise": 522455404,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-002",
+      "ref": "UTR624058443",
+      "source_file": "",
+      "txn_date": "2026-06-06T00:00:00Z",
+      "txn_id": "BNK-20260606-001"
+    },
+    {
+      "amount_paise": -177000,
+      "balance_paise": 522278404,
+      "company_id": "mehta",
+      "narration": "SMS/ACCT CHARGES INCL GST",
+      "source_file": "",
+      "txn_date": "2026-06-06T00:00:00Z",
+      "txn_id": "BNK-20260606-002"
+    },
+    {
+      "amount_paise": 19211856,
+      "balance_paise": 541490260,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-017",
+      "ref": "UTR277545953",
+      "source_file": "",
+      "txn_date": "2026-06-07T00:00:00Z",
+      "txn_id": "BNK-20260607-001"
+    },
+    {
+      "amount_paise": 49411898,
+      "balance_paise": 590902158,
+      "company_id": "mehta",
+      "narration": "UPI/UTR959275282/CUST-023",
+      "ref": "UTR959275282",
+      "source_file": "",
+      "txn_date": "2026-06-08T00:00:00Z",
+      "txn_id": "BNK-20260608-001"
+    },
+    {
+      "amount_paise": -15321728,
+      "balance_paise": 575580430,
+      "company_id": "mehta",
+      "narration": "NEFT-HOSTMESA CLOUD",
+      "ref": "N8978822",
+      "source_file": "",
+      "txn_date": "2026-06-08T00:00:00Z",
+      "txn_id": "BNK-20260608-002"
+    },
+    {
+      "amount_paise": 6959858,
+      "balance_paise": 582540288,
+      "company_id": "mehta",
+      "narration": "UPI/UTR108717802/CUST-007",
+      "ref": "UTR108717802",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-001"
+    },
+    {
+      "amount_paise": 54582462,
+      "balance_paise": 637122750,
+      "company_id": "mehta",
+      "narration": "UPI/UTR662878140/CUST-025",
+      "ref": "UTR662878140",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-002"
+    },
+    {
+      "amount_paise": 7215974,
+      "balance_paise": 644338724,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-020",
+      "ref": "UTR761630681",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-003"
+    },
+    {
+      "amount_paise": -1722437,
+      "balance_paise": 642616287,
+      "company_id": "mehta",
+      "narration": "NEFT-FIBRELINK NETWORKS",
+      "ref": "N5508643",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-004"
+    },
+    {
+      "amount_paise": 22084225,
+      "balance_paise": 664700512,
+      "company_id": "mehta",
+      "narration": "UPI/UTR625589412/CUST-022",
+      "ref": "UTR625589412",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-001"
+    },
+    {
+      "amount_paise": 49179062,
+      "balance_paise": 713879574,
+      "company_id": "mehta",
+      "narration": "UPI/UTR920028396/CUST-021",
+      "ref": "UTR920028396",
+      "source_file": "",
+      "txn_date": "2026-06-14T00:00:00Z",
+      "txn_id": "BNK-20260614-001"
+    },
+    {
+      "amount_paise": 44281380,
+      "balance_paise": 758160954,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-004",
+      "ref": "UTR321486547",
+      "source_file": "",
+      "txn_date": "2026-06-14T00:00:00Z",
+      "txn_id": "BNK-20260614-002"
+    },
+    {
+      "amount_paise": 18575485,
+      "balance_paise": 776736439,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-010",
+      "ref": "UTR792568801",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-001"
+    },
+    {
+      "amount_paise": 28978927,
+      "balance_paise": 805715366,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-002",
+      "ref": "UTR331341085",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-002"
+    },
+    {
+      "amount_paise": 73143067,
+      "balance_paise": 878858433,
+      "company_id": "mehta",
+      "narration": "PG SETTL 0616 BATCH 6712",
+      "ref": "PGS6712",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-003"
+    },
+    {
+      "amount_paise": -2124000,
+      "balance_paise": 876734433,
+      "company_id": "mehta",
+      "narration": "NEFT-SECUREMAIL SUITE",
+      "ref": "N3071301",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-004"
+    },
+    {
+      "amount_paise": 32794634,
+      "balance_paise": 909529067,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-011",
+      "ref": "UTR128173973",
+      "source_file": "",
+      "txn_date": "2026-06-17T00:00:00Z",
+      "txn_id": "BNK-20260617-001"
+    },
+    {
+      "amount_paise": 7966053,
+      "balance_paise": 917495120,
+      "company_id": "mehta",
+      "narration": "UPI/UTR654218666/CUST-015",
+      "ref": "UTR654218666",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-001"
+    },
+    {
+      "amount_paise": 56009557,
+      "balance_paise": 973504677,
+      "company_id": "mehta",
+      "narration": "UPI/UTR639735750/CUST-005",
+      "ref": "UTR639735750",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-002"
+    },
+    {
+      "amount_paise": 48831283,
+      "balance_paise": 1022335960,
+      "company_id": "mehta",
+      "narration": "UPI/UTR920963118/CUST-011",
+      "ref": "UTR920963118",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-003"
+    },
+    {
+      "amount_paise": 30587922,
+      "balance_paise": 1052923882,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-020",
+      "ref": "UTR534790323",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-001"
+    },
+    {
+      "amount_paise": -228157,
+      "balance_paise": 1052695725,
+      "company_id": "mehta",
+      "narration": "NEFT-PAPERLINE STATIONERS",
+      "ref": "N5613147",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-002"
+    },
+    {
+      "amount_paise": 52841667,
+      "balance_paise": 1105537392,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-024",
+      "ref": "UTR244984491",
+      "source_file": "",
+      "txn_date": "2026-06-20T00:00:00Z",
+      "txn_id": "BNK-20260620-001"
+    },
+    {
+      "amount_paise": -1103481,
+      "balance_paise": 1104433911,
+      "company_id": "mehta",
+      "narration": "NEFT-TIFFIN CORNER CATERERS",
+      "ref": "N7786119",
+      "source_file": "",
+      "txn_date": "2026-06-20T00:00:00Z",
+      "txn_id": "BNK-20260620-002"
+    },
+    {
+      "amount_paise": 35240083,
+      "balance_paise": 1139673994,
+      "company_id": "mehta",
+      "narration": "UPI/UTR623817758/CUST-025",
+      "ref": "UTR623817758",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-001"
+    },
+    {
+      "amount_paise": -25960000,
+      "balance_paise": 1113713994,
+      "company_id": "mehta",
+      "narration": "NEFT-RENT-JUN-LOTUS BUSINESS PARKS",
+      "ref": "N5930534",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-002"
+    },
+    {
+      "amount_paise": 55213942,
+      "balance_paise": 1168927936,
+      "company_id": "mehta",
+      "narration": "UPI/UTR750296980/CUST-008",
+      "ref": "UTR750296980",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-001"
+    },
+    {
+      "amount_paise": 51554309,
+      "balance_paise": 1220482245,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-020",
+      "ref": "UTR623670175",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-002"
+    },
+    {
+      "amount_paise": -3297797,
+      "balance_paise": 1217184448,
+      "company_id": "mehta",
+      "narration": "NEFT-SAHYADRI POWER DISTRIBUTION",
+      "ref": "N6601655",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-003"
+    },
+    {
+      "amount_paise": 35464741,
+      "balance_paise": 1252649189,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-017",
+      "ref": "UTR873785361",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-001"
+    },
+    {
+      "amount_paise": 51419577,
+      "balance_paise": 1304068766,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-014",
+      "ref": "UTR437943497",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-002"
+    },
+    {
+      "amount_paise": -1804988,
+      "balance_paise": 1302263778,
+      "company_id": "mehta",
+      "narration": "NEFT-ORBIT PERIPHERALS",
+      "ref": "N0278016",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-003"
+    },
+    {
+      "amount_paise": -13072833,
+      "balance_paise": 1289190945,
+      "company_id": "mehta",
+      "narration": "NEFT-BLUEPEAK CONSULTING",
+      "ref": "N0756745",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-004"
+    },
+    {
+      "amount_paise": 25767597,
+      "balance_paise": 1314958542,
+      "company_id": "mehta",
+      "narration": "UPI/UTR321069792/CUST-007",
+      "ref": "UTR321069792",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-001"
+    },
+    {
+      "amount_paise": 25118690,
+      "balance_paise": 1340077232,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-004",
+      "ref": "UTR111464345",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-001"
+    },
+    {
+      "amount_paise": 38153881,
+      "balance_paise": 1378231113,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-007",
+      "ref": "UTR977691299",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-001"
+    },
+    {
+      "amount_paise": 52190755,
+      "balance_paise": 1430421868,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-024",
+      "ref": "UTR165420805",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-002"
+    },
+    {
+      "amount_paise": 16682907,
+      "balance_paise": 1447104775,
+      "company_id": "mehta",
+      "narration": "UPI/UTR566582558/CUST-007",
+      "ref": "UTR566582558",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-003"
+    },
+    {
+      "amount_paise": -6632640,
+      "balance_paise": 1440472135,
+      "company_id": "mehta",
+      "narration": "NEFT-NEXA COMPUTERS",
+      "ref": "N8903564",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-001"
+    },
+    {
+      "amount_paise": -14723442,
+      "balance_paise": 1425748693,
+      "company_id": "mehta",
+      "narration": "NEFT-TALENTBRIDGE STAFFING",
+      "ref": "N3416410",
+      "source_file": "",
+      "txn_date": "2026-06-29T00:00:00Z",
+      "txn_id": "BNK-20260629-001"
+    },
+    {
+      "amount_paise": 2755500,
+      "balance_paise": 1428504193,
+      "company_id": "mehta",
+      "narration": "INT CREDIT",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-001"
+    },
+    {
+      "amount_paise": 35322944,
+      "balance_paise": 1463827137,
+      "company_id": "mehta",
+      "narration": "PG SETTL 0630 BATCH 8644",
+      "ref": "PGS8644",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-002"
+    },
+    {
+      "amount_paise": -1009298,
+      "balance_paise": 1462817839,
+      "company_id": "mehta",
+      "narration": "NEFT-KONKAN MOBILE SERVICES",
+      "ref": "N4950780",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-003"
+    },
+    {
+      "amount_paise": -240000000,
+      "balance_paise": 1222817839,
+      "company_id": "mehta",
+      "narration": "SALARY BATCH JUN 2026",
+      "ref": "SAL678833",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-004"
+    },
+    {
+      "amount_paise": 6442273,
+      "balance_paise": 406442273,
+      "company_id": "mehta",
+      "narration": "UPI/UTR211931282/CUST-023",
+      "ref": "UTR211931282",
+      "source_file": "",
+      "txn_date": "2026-07-02T00:00:00Z",
+      "txn_id": "BNK-20260702-001"
+    },
+    {
+      "amount_paise": 38600892,
+      "balance_paise": 445043165,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-014",
+      "ref": "UTR530573051",
+      "source_file": "",
+      "txn_date": "2026-07-05T00:00:00Z",
+      "txn_id": "BNK-20260705-001"
+    },
+    {
+      "amount_paise": -177000,
+      "balance_paise": 444866165,
+      "company_id": "mehta",
+      "narration": "SMS/ACCT CHARGES INCL GST",
+      "source_file": "",
+      "txn_date": "2026-07-06T00:00:00Z",
+      "txn_id": "BNK-20260706-001"
+    },
+    {
+      "amount_paise": 19312380,
+      "balance_paise": 464178545,
+      "company_id": "mehta",
+      "narration": "UPI/UTR246816566/CUST-021",
+      "ref": "UTR246816566",
+      "source_file": "",
+      "txn_date": "2026-07-09T00:00:00Z",
+      "txn_id": "BNK-20260709-001"
+    },
+    {
+      "amount_paise": 28526587,
+      "balance_paise": 492705132,
+      "company_id": "mehta",
+      "narration": "UPI/UTR078424312/CUST-014",
+      "ref": "UTR078424312",
+      "source_file": "",
+      "txn_date": "2026-07-09T00:00:00Z",
+      "txn_id": "BNK-20260709-002"
+    },
+    {
+      "amount_paise": -7544991,
+      "balance_paise": 485160141,
+      "company_id": "mehta",
+      "narration": "NEFT-TALENTBRIDGE STAFFING",
+      "ref": "N4601360",
+      "source_file": "",
+      "txn_date": "2026-07-09T00:00:00Z",
+      "txn_id": "BNK-20260709-003"
+    },
+    {
+      "amount_paise": 47877577,
+      "balance_paise": 533037718,
+      "company_id": "mehta",
+      "narration": "UPI/UTR350363104/CUST-016",
+      "ref": "UTR350363104",
+      "source_file": "",
+      "txn_date": "2026-07-11T00:00:00Z",
+      "txn_id": "BNK-20260711-001"
+    },
+    {
+      "amount_paise": 28707134,
+      "balance_paise": 561744852,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-015",
+      "ref": "UTR148648781",
+      "source_file": "",
+      "txn_date": "2026-07-12T00:00:00Z",
+      "txn_id": "BNK-20260712-001"
+    },
+    {
+      "amount_paise": 51514105,
+      "balance_paise": 613258957,
+      "company_id": "mehta",
+      "narration": "UPI/UTR172127990/CUST-007",
+      "ref": "UTR172127990",
+      "source_file": "",
+      "txn_date": "2026-07-14T00:00:00Z",
+      "txn_id": "BNK-20260714-001"
+    },
+    {
+      "amount_paise": 6455696,
+      "balance_paise": 619714653,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR994894341",
+      "source_file": "",
+      "txn_date": "2026-07-14T00:00:00Z",
+      "txn_id": "BNK-20260714-002"
+    },
+    {
+      "amount_paise": -9495106,
+      "balance_paise": 610219547,
+      "company_id": "mehta",
+      "narration": "NEFT-NEXA COMPUTERS",
+      "ref": "N7085970",
+      "source_file": "",
+      "txn_date": "2026-07-14T00:00:00Z",
+      "txn_id": "BNK-20260714-003"
+    },
+    {
+      "amount_paise": 8136470,
+      "balance_paise": 618356017,
+      "company_id": "mehta",
+      "narration": "UPI/UTR526341882/CUST-012",
+      "ref": "UTR526341882",
+      "source_file": "",
+      "txn_date": "2026-07-15T00:00:00Z",
+      "txn_id": "BNK-20260715-001"
+    },
+    {
+      "amount_paise": 57449844,
+      "balance_paise": 675805861,
+      "company_id": "mehta",
+      "narration": "UPI/UTR752265256/CUST-007",
+      "ref": "UTR752265256",
+      "source_file": "",
+      "txn_date": "2026-07-16T00:00:00Z",
+      "txn_id": "BNK-20260716-001"
+    },
+    {
+      "amount_paise": -4000962,
+      "balance_paise": 671804899,
+      "company_id": "mehta",
+      "narration": "NEFT-SAHYADRI POWER DISTRIBUTION",
+      "ref": "N6123506",
+      "source_file": "",
+      "txn_date": "2026-07-16T00:00:00Z",
+      "txn_id": "BNK-20260716-002"
+    },
+    {
+      "amount_paise": -13977196,
+      "balance_paise": 657827703,
+      "company_id": "mehta",
+      "narration": "NEFT-HOSTMESA CLOUD",
+      "ref": "N7046251",
+      "source_file": "",
+      "txn_date": "2026-07-16T00:00:00Z",
+      "txn_id": "BNK-20260716-003"
+    },
+    {
+      "amount_paise": 53357596,
+      "balance_paise": 711185299,
+      "company_id": "mehta",
+      "narration": "UPI/UTR905416388/CUST-024",
+      "ref": "UTR905416388",
+      "source_file": "",
+      "txn_date": "2026-07-17T00:00:00Z",
+      "txn_id": "BNK-20260717-001"
+    },
+    {
+      "amount_paise": -371463,
+      "balance_paise": 710813836,
+      "company_id": "mehta",
+      "narration": "NEFT-PAPERLINE STATIONERS",
+      "ref": "N5552387",
+      "source_file": "",
+      "txn_date": "2026-07-18T00:00:00Z",
+      "txn_id": "BNK-20260718-001"
+    },
+    {
+      "amount_paise": -25960000,
+      "balance_paise": 684853836,
+      "company_id": "mehta",
+      "narration": "NEFT-RENT-JUL-LOTUS BUSINESS PARKS",
+      "ref": "N3506645",
+      "source_file": "",
+      "txn_date": "2026-07-19T00:00:00Z",
+      "txn_id": "BNK-20260719-001"
+    },
+    {
+      "amount_paise": -518576,
+      "balance_paise": 684335260,
+      "company_id": "mehta",
+      "narration": "NEFT-PAPERLINE STATIONERS",
+      "ref": "N6058556",
+      "source_file": "",
+      "txn_date": "2026-07-19T00:00:00Z",
+      "txn_id": "BNK-20260719-002"
+    },
+    {
+      "amount_paise": 46700994,
+      "balance_paise": 731036254,
+      "company_id": "mehta",
+      "narration": "UPI/UTR706073546/CUST-013",
+      "ref": "UTR706073546",
+      "source_file": "",
+      "txn_date": "2026-07-20T00:00:00Z",
+      "txn_id": "BNK-20260720-001"
+    },
+    {
+      "amount_paise": 8309584,
+      "balance_paise": 739345838,
+      "company_id": "mehta",
+      "narration": "UPI/UTR490867966/CUST-002",
+      "ref": "UTR490867966",
+      "source_file": "",
+      "txn_date": "2026-07-20T00:00:00Z",
+      "txn_id": "BNK-20260720-002"
+    },
+    {
+      "amount_paise": -1502230,
+      "balance_paise": 737843608,
+      "company_id": "mehta",
+      "narration": "NEFT-FIBRELINK NETWORKS",
+      "ref": "N5783549",
+      "source_file": "",
+      "txn_date": "2026-07-22T00:00:00Z",
+      "txn_id": "BNK-20260722-001"
+    },
+    {
+      "amount_paise": -29382239,
+      "balance_paise": 708461369,
+      "company_id": "mehta",
+      "narration": "NEFT-NEXA COMPUTERS",
+      "ref": "N1308387",
+      "source_file": "",
+      "txn_date": "2026-07-23T00:00:00Z",
+      "txn_id": "BNK-20260723-001"
+    },
+    {
+      "amount_paise": 49367780,
+      "balance_paise": 757829149,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-025",
+      "ref": "UTR398423385",
+      "source_file": "",
+      "txn_date": "2026-07-25T00:00:00Z",
+      "txn_id": "BNK-20260725-001"
+    },
+    {
+      "amount_paise": -646098,
+      "balance_paise": 757183051,
+      "company_id": "mehta",
+      "narration": "NEFT-SWIFTMOVE CABS",
+      "ref": "N6005211",
+      "source_file": "",
+      "txn_date": "2026-07-25T00:00:00Z",
+      "txn_id": "BNK-20260725-002"
+    },
+    {
+      "amount_paise": 12009740,
+      "balance_paise": 769192791,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-018",
+      "ref": "UTR815360005",
+      "source_file": "",
+      "txn_date": "2026-07-26T00:00:00Z",
+      "txn_id": "BNK-20260726-001"
+    },
+    {
+      "amount_paise": -7544991,
+      "balance_paise": 761647800,
+      "company_id": "mehta",
+      "narration": "NEFT-TALENTBRIDGE STAFFING",
+      "ref": "N5847512",
+      "source_file": "",
+      "txn_date": "2026-07-26T00:00:00Z",
+      "txn_id": "BNK-20260726-002"
+    },
+    {
+      "amount_paise": -629672,
+      "balance_paise": 761018128,
+      "company_id": "mehta",
+      "narration": "NEFT-SWIFTMOVE CABS",
+      "ref": "N1761250",
+      "source_file": "",
+      "txn_date": "2026-07-26T00:00:00Z",
+      "txn_id": "BNK-20260726-003"
+    },
+    {
+      "amount_paise": 39476803,
+      "balance_paise": 800494931,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-013",
+      "ref": "UTR168612713",
+      "source_file": "",
+      "txn_date": "2026-07-27T00:00:00Z",
+      "txn_id": "BNK-20260727-001"
+    },
+    {
+      "amount_paise": 47814375,
+      "balance_paise": 848309306,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-001",
+      "ref": "UTR548635037",
+      "source_file": "",
+      "txn_date": "2026-07-27T00:00:00Z",
+      "txn_id": "BNK-20260727-002"
+    },
+    {
+      "amount_paise": -13977196,
+      "balance_paise": 834332110,
+      "company_id": "mehta",
+      "narration": "NEFT-HOSTMESA CLOUD",
+      "ref": "N3989173",
+      "source_file": "",
+      "txn_date": "2026-07-27T00:00:00Z",
+      "txn_id": "BNK-20260727-003"
+    },
+    {
+      "amount_paise": 10566677,
+      "balance_paise": 844898787,
+      "company_id": "mehta",
+      "narration": "PG SETTL 0728 BATCH 2762",
+      "ref": "PGS2762",
+      "source_file": "",
+      "txn_date": "2026-07-28T00:00:00Z",
+      "txn_id": "BNK-20260728-001"
+    },
+    {
+      "amount_paise": -5973533,
+      "balance_paise": 838925254,
+      "company_id": "mehta",
+      "narration": "NEFT-BLUEPEAK CONSULTING",
+      "ref": "N2986638",
+      "source_file": "",
+      "txn_date": "2026-07-28T00:00:00Z",
+      "txn_id": "BNK-20260728-002"
+    },
+    {
+      "amount_paise": -364552,
+      "balance_paise": 838560702,
+      "company_id": "mehta",
+      "narration": "NEFT-TIFFIN CORNER CATERERS",
+      "ref": "N8415454",
+      "source_file": "",
+      "txn_date": "2026-07-28T00:00:00Z",
+      "txn_id": "BNK-20260728-003"
+    },
+    {
+      "amount_paise": 28725974,
+      "balance_paise": 867286676,
+      "company_id": "mehta",
+      "narration": "NEFT-CUST-016",
+      "ref": "UTR662565291",
+      "source_file": "",
+      "txn_date": "2026-07-31T00:00:00Z",
+      "txn_id": "BNK-20260731-001"
+    },
+    {
+      "amount_paise": -240000000,
+      "balance_paise": 627286676,
+      "company_id": "mehta",
+      "narration": "SALARY BATCH JUL 2026",
+      "ref": "SAL607571",
+      "source_file": "",
+      "txn_date": "2026-07-31T00:00:00Z",
+      "txn_id": "BNK-20260731-002"
+    }
+  ],
+  "tool": "list_bank_lines"
+}

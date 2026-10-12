@@ -1,0 +1,2213 @@
+{
+  "args": {
+    "company": "mehta",
+    "from": "2026-06-01",
+    "to": "2026-07-31"
+  },
+  "result": [
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01077",
+      "PaidAmount": 56247524,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-04T00:00:00Z",
+      "ReceivedAmount": 56247524,
+      "ReferenceDate": "2026-06-04T00:00:00Z",
+      "ReferenceNo": "UTR708604381",
+      "References": [
+        {
+          "AllocatedAmount": 56247524,
+          "Name": "q1hcevu7vg",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01253",
+          "TotalAmount": 56247524
+        }
+      ],
+      "Remarks": "Receipt from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01078",
+      "PaidAmount": 42861033,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-05T00:00:00Z",
+      "ReceivedAmount": 42861033,
+      "ReferenceDate": "2026-06-05T00:00:00Z",
+      "ReferenceNo": "UTR459492158",
+      "References": [
+        {
+          "AllocatedAmount": 42861033,
+          "Name": "q1i1bkmkre",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01257",
+          "TotalAmount": 42861033
+        }
+      ],
+      "Remarks": "Receipt from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01079",
+      "PaidAmount": 23346847,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-06T00:00:00Z",
+      "ReceivedAmount": 23346847,
+      "ReferenceDate": "2026-06-06T00:00:00Z",
+      "ReferenceNo": "UTR624058443",
+      "References": [
+        {
+          "AllocatedAmount": 23346847,
+          "Name": "q1jun62hud",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01258",
+          "TotalAmount": 23346847
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01080",
+      "PaidAmount": 19211856,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-07T00:00:00Z",
+      "ReceivedAmount": 19211856,
+      "ReferenceDate": "2026-06-07T00:00:00Z",
+      "ReferenceNo": "UTR277545953",
+      "References": [
+        {
+          "AllocatedAmount": 19211856,
+          "Name": "q1kt0har1i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01259",
+          "TotalAmount": 19211856
+        }
+      ],
+      "Remarks": "Receipt from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01081",
+      "PaidAmount": 49411898,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-023",
+      "PartyName": "CUST-023",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-08T00:00:00Z",
+      "ReceivedAmount": 49411898,
+      "ReferenceDate": "2026-06-08T00:00:00Z",
+      "ReferenceNo": "UTR959275282",
+      "References": [
+        {
+          "AllocatedAmount": 49411898,
+          "Name": "q1lhrt3drc",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01262",
+          "TotalAmount": 49411898
+        }
+      ],
+      "Remarks": "Receipt from CUST-023",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01082",
+      "PaidAmount": 15321728,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Hostmesa Cloud",
+      "PartyName": "Hostmesa Cloud",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-08T00:00:00Z",
+      "ReceivedAmount": 15321728,
+      "ReferenceDate": "2026-06-08T00:00:00Z",
+      "ReferenceNo": "N8978822",
+      "References": [
+        {
+          "AllocatedAmount": 15321728,
+          "Name": "q1mb57nvmp",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00192",
+          "TotalAmount": 15321728
+        }
+      ],
+      "Remarks": "Payment for HST/2026/0617 to Hostmesa Cloud",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01083",
+      "PaidAmount": 6959858,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-12T00:00:00Z",
+      "ReceivedAmount": 6959858,
+      "ReferenceDate": "2026-06-12T00:00:00Z",
+      "ReferenceNo": "UTR108717802",
+      "References": [
+        {
+          "AllocatedAmount": 6959858,
+          "Name": "q1nuo5s4cd",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01251",
+          "TotalAmount": 6959858
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01084",
+      "PaidAmount": 54582462,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-12T00:00:00Z",
+      "ReceivedAmount": 54582462,
+      "ReferenceDate": "2026-06-12T00:00:00Z",
+      "ReferenceNo": "UTR662878140",
+      "References": [
+        {
+          "AllocatedAmount": 54582462,
+          "Name": "q1n25mafr4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01255",
+          "TotalAmount": 54582462
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01085",
+      "PaidAmount": 7215974,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-12T00:00:00Z",
+      "ReceivedAmount": 7215974,
+      "ReferenceDate": "2026-06-12T00:00:00Z",
+      "ReferenceNo": "UTR761630681",
+      "References": [
+        {
+          "AllocatedAmount": 7215974,
+          "Name": "q1oth4jjf5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01260",
+          "TotalAmount": 7215974
+        }
+      ],
+      "Remarks": "Receipt from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01086",
+      "PaidAmount": 1722437,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "FibreLink Networks",
+      "PartyName": "FibreLink Networks",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-12T00:00:00Z",
+      "ReceivedAmount": 1722437,
+      "ReferenceDate": "2026-06-12T00:00:00Z",
+      "ReferenceNo": "N5508643",
+      "References": [
+        {
+          "AllocatedAmount": 1722437,
+          "Name": "q1pcbr2ibs",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00196",
+          "TotalAmount": 1722437
+        }
+      ],
+      "Remarks": "Payment for FBR/2026/0653 to FibreLink Networks",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01087",
+      "PaidAmount": 22084225,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-022",
+      "PartyName": "CUST-022",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-13T00:00:00Z",
+      "ReceivedAmount": 22084225,
+      "ReferenceDate": "2026-06-13T00:00:00Z",
+      "ReferenceNo": "UTR625589412",
+      "References": [
+        {
+          "AllocatedAmount": 22084225,
+          "Name": "q1q1ueo31a",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01267",
+          "TotalAmount": 22084225
+        }
+      ],
+      "Remarks": "Receipt from CUST-022",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01088",
+      "PaidAmount": 42868168,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "Payment Gateway Clearing - MTSPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "ReceivedAmount": 42868168,
+      "ReferenceDate": "2026-06-14T00:00:00Z",
+      "ReferenceNo": "EVT-mehta-2026-06-0044",
+      "References": [
+        {
+          "AllocatedAmount": 42868168,
+          "Name": "q1r6i6p3oi",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01256",
+          "TotalAmount": 42868168
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01089",
+      "PaidAmount": 32042797,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "Payment Gateway Clearing - MTSPL",
+      "Party": "CUST-023",
+      "PartyName": "CUST-023",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "ReceivedAmount": 32042797,
+      "ReferenceDate": "2026-06-14T00:00:00Z",
+      "ReferenceNo": "EVT-mehta-2026-06-0047",
+      "References": [
+        {
+          "AllocatedAmount": 32042797,
+          "Name": "q1sgci8hfb",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01265",
+          "TotalAmount": 32042797
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-023",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01090",
+      "PaidAmount": 49179062,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "ReceivedAmount": 49179062,
+      "ReferenceDate": "2026-06-14T00:00:00Z",
+      "ReferenceNo": "UTR920028396",
+      "References": [
+        {
+          "AllocatedAmount": 49179062,
+          "Name": "q1tmjcg048",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01249",
+          "TotalAmount": 49179062
+        }
+      ],
+      "Remarks": "Receipt from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01091",
+      "PaidAmount": 44281380,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-004",
+      "PartyName": "CUST-004",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "ReceivedAmount": 44281380,
+      "ReferenceDate": "2026-06-14T00:00:00Z",
+      "ReferenceNo": "UTR321486547",
+      "References": [
+        {
+          "AllocatedAmount": 44281380,
+          "Name": "q1u3c84d13",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01268",
+          "TotalAmount": 44281380
+        }
+      ],
+      "Remarks": "Receipt from CUST-004",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01092",
+      "PaidAmount": 18575485,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-010",
+      "PartyName": "CUST-010",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-16T00:00:00Z",
+      "ReceivedAmount": 18575485,
+      "ReferenceDate": "2026-06-16T00:00:00Z",
+      "ReferenceNo": "UTR792568801",
+      "References": [
+        {
+          "AllocatedAmount": 18575485,
+          "Name": "q20llo7ou6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01252",
+          "TotalAmount": 18575485
+        }
+      ],
+      "Remarks": "Receipt from CUST-010",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01093",
+      "PaidAmount": 28978927,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-16T00:00:00Z",
+      "ReceivedAmount": 28978927,
+      "ReferenceDate": "2026-06-16T00:00:00Z",
+      "ReferenceNo": "UTR331341085",
+      "References": [
+        {
+          "AllocatedAmount": 28978927,
+          "Name": "q21k937l3b",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01250",
+          "TotalAmount": 28978927
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01094",
+      "PaidAmount": 2124000,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "SecureMail Suite",
+      "PartyName": "SecureMail Suite",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-16T00:00:00Z",
+      "ReceivedAmount": 2124000,
+      "ReferenceDate": "2026-06-16T00:00:00Z",
+      "ReferenceNo": "N3071301",
+      "References": [
+        {
+          "AllocatedAmount": 2124000,
+          "Name": "q22tkmo20a",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00193",
+          "TotalAmount": 2124000
+        }
+      ],
+      "Remarks": "Payment for SCR/2026/0614 to SecureMail Suite",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01095",
+      "PaidAmount": 32794634,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-17T00:00:00Z",
+      "ReceivedAmount": 32794634,
+      "ReferenceDate": "2026-06-17T00:00:00Z",
+      "ReferenceNo": "UTR128173973",
+      "References": [
+        {
+          "AllocatedAmount": 32794634,
+          "Name": "q23cvgffpc",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01254",
+          "TotalAmount": 32794634
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01096",
+      "PaidAmount": 7966053,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-015",
+      "PartyName": "CUST-015",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-18T00:00:00Z",
+      "ReceivedAmount": 7966053,
+      "ReferenceDate": "2026-06-18T00:00:00Z",
+      "ReferenceNo": "UTR654218666",
+      "References": [
+        {
+          "AllocatedAmount": 7966053,
+          "Name": "q2479tdpfm",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01273",
+          "TotalAmount": 7966053
+        }
+      ],
+      "Remarks": "Receipt from CUST-015",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01097",
+      "PaidAmount": 56009557,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-005",
+      "PartyName": "CUST-005",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-18T00:00:00Z",
+      "ReceivedAmount": 56009557,
+      "ReferenceDate": "2026-06-18T00:00:00Z",
+      "ReferenceNo": "UTR639735750",
+      "References": [
+        {
+          "AllocatedAmount": 56009557,
+          "Name": "q25nd5vcss",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01275",
+          "TotalAmount": 56009557
+        }
+      ],
+      "Remarks": "Receipt from CUST-005",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01098",
+      "PaidAmount": 48831283,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-18T00:00:00Z",
+      "ReceivedAmount": 48831283,
+      "ReferenceDate": "2026-06-18T00:00:00Z",
+      "ReferenceNo": "UTR920963118",
+      "References": [
+        {
+          "AllocatedAmount": 48831283,
+          "Name": "q262mnnu02",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01261",
+          "TotalAmount": 48831283
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01099",
+      "PaidAmount": 30587922,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-19T00:00:00Z",
+      "ReceivedAmount": 30587922,
+      "ReferenceDate": "2026-06-19T00:00:00Z",
+      "ReferenceNo": "UTR534790323",
+      "References": [
+        {
+          "AllocatedAmount": 30587922,
+          "Name": "q27ajqaind",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01274",
+          "TotalAmount": 30587922
+        }
+      ],
+      "Remarks": "Receipt from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01100",
+      "PaidAmount": 228157,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Paperline Stationers",
+      "PartyName": "Paperline Stationers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-19T00:00:00Z",
+      "ReceivedAmount": 228157,
+      "ReferenceDate": "2026-06-19T00:00:00Z",
+      "ReferenceNo": "N5613147",
+      "References": [
+        {
+          "AllocatedAmount": 228157,
+          "Name": "q28p566a3c",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00198",
+          "TotalAmount": 228157
+        }
+      ],
+      "Remarks": "Payment for PPR/2026/0651 to Paperline Stationers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01101",
+      "PaidAmount": 52841667,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-20T00:00:00Z",
+      "ReceivedAmount": 52841667,
+      "ReferenceDate": "2026-06-20T00:00:00Z",
+      "ReferenceNo": "UTR244984491",
+      "References": [
+        {
+          "AllocatedAmount": 52841667,
+          "Name": "q29o0l1g7f",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01269",
+          "TotalAmount": 52841667
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01102",
+      "PaidAmount": 1103481,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Tiffin Corner Caterers",
+      "PartyName": "Tiffin Corner Caterers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-20T00:00:00Z",
+      "ReceivedAmount": 1103481,
+      "ReferenceDate": "2026-06-20T00:00:00Z",
+      "ReferenceNo": "N7786119",
+      "References": [
+        {
+          "AllocatedAmount": 1103481,
+          "Name": "q2a3qldlsq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00201",
+          "TotalAmount": 1103481
+        }
+      ],
+      "Remarks": "Payment for TFF/2026/0634 to Tiffin Corner Caterers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01103",
+      "PaidAmount": 35240083,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-21T00:00:00Z",
+      "ReceivedAmount": 35240083,
+      "ReferenceDate": "2026-06-21T00:00:00Z",
+      "ReferenceNo": "UTR623817758",
+      "References": [
+        {
+          "AllocatedAmount": 35240083,
+          "Name": "q2ap7hjeek",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01264",
+          "TotalAmount": 35240083
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01104",
+      "PaidAmount": 25960000,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Lotus Business Parks",
+      "PartyName": "Lotus Business Parks",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-21T00:00:00Z",
+      "ReceivedAmount": 25960000,
+      "ReferenceDate": "2026-06-21T00:00:00Z",
+      "ReferenceNo": "N5930534",
+      "References": [
+        {
+          "AllocatedAmount": 25960000,
+          "Name": "q2btnd3i8f",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00191",
+          "TotalAmount": 25960000
+        }
+      ],
+      "Remarks": "Payment for LTS/2026/0609 to Lotus Business Parks",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01105",
+      "PaidAmount": 36176714,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "Payment Gateway Clearing - MTSPL",
+      "Party": "CUST-004",
+      "PartyName": "CUST-004",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-22T00:00:00Z",
+      "ReceivedAmount": 36176714,
+      "ReferenceDate": "2026-06-22T00:00:00Z",
+      "ReferenceNo": "EVT-mehta-2026-06-0074",
+      "References": [
+        {
+          "AllocatedAmount": 36176714,
+          "Name": "q2da560ju9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01270",
+          "TotalAmount": 36176714
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-004",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01106",
+      "PaidAmount": 55213942,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-22T00:00:00Z",
+      "ReceivedAmount": 55213942,
+      "ReferenceDate": "2026-06-22T00:00:00Z",
+      "ReferenceNo": "UTR750296980",
+      "References": [
+        {
+          "AllocatedAmount": 55213942,
+          "Name": "q2egpnct6c",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01272",
+          "TotalAmount": 55213942
+        }
+      ],
+      "Remarks": "Receipt from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01107",
+      "PaidAmount": 51554309,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-22T00:00:00Z",
+      "ReceivedAmount": 51554309,
+      "ReferenceDate": "2026-06-22T00:00:00Z",
+      "ReferenceNo": "UTR623670175",
+      "References": [
+        {
+          "AllocatedAmount": 51554309,
+          "Name": "q2fpsoc4su",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01266",
+          "TotalAmount": 51554309
+        }
+      ],
+      "Remarks": "Receipt from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01108",
+      "PaidAmount": 3297797,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Sahyadri Power Distribution",
+      "PartyName": "Sahyadri Power Distribution",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-22T00:00:00Z",
+      "ReceivedAmount": 3297797,
+      "ReferenceDate": "2026-06-22T00:00:00Z",
+      "ReferenceNo": "N6601655",
+      "References": [
+        {
+          "AllocatedAmount": 3297797,
+          "Name": "q2g3tegm91",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00197",
+          "TotalAmount": 3297797
+        }
+      ],
+      "Remarks": "Payment for SHY/2026/0655 to Sahyadri Power Distribution",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01109",
+      "PaidAmount": 35464741,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-23T00:00:00Z",
+      "ReceivedAmount": 35464741,
+      "ReferenceDate": "2026-06-23T00:00:00Z",
+      "ReferenceNo": "UTR873785361",
+      "References": [
+        {
+          "AllocatedAmount": 35464741,
+          "Name": "q2hh17k2jq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01263",
+          "TotalAmount": 35464741
+        }
+      ],
+      "Remarks": "Receipt from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01110",
+      "PaidAmount": 51419577,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-23T00:00:00Z",
+      "ReceivedAmount": 51419577,
+      "ReferenceDate": "2026-06-23T00:00:00Z",
+      "ReferenceNo": "UTR437943497",
+      "References": [
+        {
+          "AllocatedAmount": 51419577,
+          "Name": "q2i2oathfd",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01280",
+          "TotalAmount": 51419577
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01111",
+      "PaidAmount": 1804988,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Orbit Peripherals",
+      "PartyName": "Orbit Peripherals",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-23T00:00:00Z",
+      "ReceivedAmount": 1804988,
+      "ReferenceDate": "2026-06-23T00:00:00Z",
+      "ReferenceNo": "N0278016",
+      "References": [
+        {
+          "AllocatedAmount": 1804988,
+          "Name": "q2jhgnff82",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00194",
+          "TotalAmount": 1804988
+        }
+      ],
+      "Remarks": "Payment for ORB/2026/0610 to Orbit Peripherals",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01112",
+      "PaidAmount": 13072833,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Bluepeak Consulting",
+      "PartyName": "Bluepeak Consulting",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-23T00:00:00Z",
+      "ReceivedAmount": 13072833,
+      "ReferenceDate": "2026-06-23T00:00:00Z",
+      "ReferenceNo": "N0756745",
+      "References": [
+        {
+          "AllocatedAmount": 13072833,
+          "Name": "q2ks1g1hs7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00195",
+          "TotalAmount": 13072833
+        }
+      ],
+      "Remarks": "Payment for BLP/2026/0648 to Bluepeak Consulting",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01113",
+      "PaidAmount": 25767597,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-25T00:00:00Z",
+      "ReceivedAmount": 25767597,
+      "ReferenceDate": "2026-06-25T00:00:00Z",
+      "ReferenceNo": "UTR321069792",
+      "References": [
+        {
+          "AllocatedAmount": 25767597,
+          "Name": "q2lc8e08s6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01271",
+          "TotalAmount": 25767597
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01114",
+      "PaidAmount": 25118690,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-004",
+      "PartyName": "CUST-004",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-26T00:00:00Z",
+      "ReceivedAmount": 25118690,
+      "ReferenceDate": "2026-06-26T00:00:00Z",
+      "ReferenceNo": "UTR111464345",
+      "References": [
+        {
+          "AllocatedAmount": 25118690,
+          "Name": "q2m2bbctnp",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01277",
+          "TotalAmount": 25118690
+        }
+      ],
+      "Remarks": "Receipt from CUST-004",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01115",
+      "PaidAmount": 38153881,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-27T00:00:00Z",
+      "ReceivedAmount": 38153881,
+      "ReferenceDate": "2026-06-27T00:00:00Z",
+      "ReferenceNo": "UTR977691299",
+      "References": [
+        {
+          "AllocatedAmount": 38153881,
+          "Name": "q2nno0rcf0",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01283",
+          "TotalAmount": 38153881
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01116",
+      "PaidAmount": 52190755,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-27T00:00:00Z",
+      "ReceivedAmount": 52190755,
+      "ReferenceDate": "2026-06-27T00:00:00Z",
+      "ReferenceNo": "UTR165420805",
+      "References": [
+        {
+          "AllocatedAmount": 52190755,
+          "Name": "q2otjp61nk",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01284",
+          "TotalAmount": 52190755
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01117",
+      "PaidAmount": 16682907,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-06-27T00:00:00Z",
+      "ReceivedAmount": 16682907,
+      "ReferenceDate": "2026-06-27T00:00:00Z",
+      "ReferenceNo": "UTR566582558",
+      "References": [
+        {
+          "AllocatedAmount": 16682907,
+          "Name": "q2pd55q0e5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01279",
+          "TotalAmount": 16682907
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01118",
+      "PaidAmount": 6632640,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Nexa Computers",
+      "PartyName": "Nexa Computers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-28T00:00:00Z",
+      "ReceivedAmount": 6632640,
+      "ReferenceDate": "2026-06-28T00:00:00Z",
+      "ReferenceNo": "N8903564",
+      "References": [
+        {
+          "AllocatedAmount": 6632640,
+          "Name": "q2q2m86k6f",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00203",
+          "TotalAmount": 6632640
+        }
+      ],
+      "Remarks": "Payment for NXC/2026/0618 to Nexa Computers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01119",
+      "PaidAmount": 14723442,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "TalentBridge Staffing",
+      "PartyName": "TalentBridge Staffing",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-29T00:00:00Z",
+      "ReceivedAmount": 14723442,
+      "ReferenceDate": "2026-06-29T00:00:00Z",
+      "ReferenceNo": "N3416410",
+      "References": [
+        {
+          "AllocatedAmount": 14723442,
+          "Name": "q2rrl0fe4c",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00199",
+          "TotalAmount": 14723442
+        }
+      ],
+      "Remarks": "Payment for TLN/2026/0655 to TalentBridge Staffing",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01120",
+      "PaidAmount": 1009298,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Konkan Mobile Services",
+      "PartyName": "Konkan Mobile Services",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-06-30T00:00:00Z",
+      "ReceivedAmount": 1009298,
+      "ReferenceDate": "2026-06-30T00:00:00Z",
+      "ReferenceNo": "N4950780",
+      "References": [
+        {
+          "AllocatedAmount": 1009298,
+          "Name": "q2s9eh7rsr",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00200",
+          "TotalAmount": 1009298
+        }
+      ],
+      "Remarks": "Payment for KNK/2026/0601 to Konkan Mobile Services",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01121",
+      "PaidAmount": 6442273,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-023",
+      "PartyName": "CUST-023",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-02T00:00:00Z",
+      "ReceivedAmount": 6442273,
+      "ReferenceDate": "2026-07-02T00:00:00Z",
+      "ReferenceNo": "UTR211931282",
+      "References": [
+        {
+          "AllocatedAmount": 6442273,
+          "Name": "q5d6hlaurq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01289",
+          "TotalAmount": 6442273
+        }
+      ],
+      "Remarks": "Receipt from CUST-023",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01122",
+      "PaidAmount": 38600892,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-05T00:00:00Z",
+      "ReceivedAmount": 38600892,
+      "ReferenceDate": "2026-07-05T00:00:00Z",
+      "ReferenceNo": "UTR530573051",
+      "References": [
+        {
+          "AllocatedAmount": 38600892,
+          "Name": "q5e0o5bgtq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01292",
+          "TotalAmount": 38600892
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01123",
+      "PaidAmount": 19312380,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "ReceivedAmount": 19312380,
+      "ReferenceDate": "2026-07-09T00:00:00Z",
+      "ReferenceNo": "UTR246816566",
+      "References": [
+        {
+          "AllocatedAmount": 19312380,
+          "Name": "q5famkckj4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01291",
+          "TotalAmount": 19312380
+        }
+      ],
+      "Remarks": "Receipt from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01124",
+      "PaidAmount": 28526587,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "ReceivedAmount": 28526587,
+      "ReferenceDate": "2026-07-09T00:00:00Z",
+      "ReferenceNo": "UTR078424312",
+      "References": [
+        {
+          "AllocatedAmount": 28526587,
+          "Name": "q5g6msh2na",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01288",
+          "TotalAmount": 28526587
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01125",
+      "PaidAmount": 7544991,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "TalentBridge Staffing",
+      "PartyName": "TalentBridge Staffing",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "ReceivedAmount": 7544991,
+      "ReferenceDate": "2026-07-09T00:00:00Z",
+      "ReferenceNo": "N4601360",
+      "References": [
+        {
+          "AllocatedAmount": 7544991,
+          "Name": "q5hv3mqm35",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00210",
+          "TotalAmount": 7544991
+        }
+      ],
+      "Remarks": "Payment for TLN/2026/0706 to TalentBridge Staffing",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01126",
+      "PaidAmount": 47877577,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-016",
+      "PartyName": "CUST-016",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-11T00:00:00Z",
+      "ReceivedAmount": 47877577,
+      "ReferenceDate": "2026-07-11T00:00:00Z",
+      "ReferenceNo": "UTR350363104",
+      "References": [
+        {
+          "AllocatedAmount": 47877577,
+          "Name": "q5ir42l702",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01290",
+          "TotalAmount": 47877577
+        }
+      ],
+      "Remarks": "Receipt from CUST-016",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01127",
+      "PaidAmount": 28707134,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-015",
+      "PartyName": "CUST-015",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-12T00:00:00Z",
+      "ReceivedAmount": 28707134,
+      "ReferenceDate": "2026-07-12T00:00:00Z",
+      "ReferenceNo": "UTR148648781",
+      "References": [
+        {
+          "AllocatedAmount": 28707134,
+          "Name": "q5jgc3kcet",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01293",
+          "TotalAmount": 28707134
+        }
+      ],
+      "Remarks": "Receipt from CUST-015",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01128",
+      "PaidAmount": 51514105,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-14T00:00:00Z",
+      "ReceivedAmount": 51514105,
+      "ReferenceDate": "2026-07-14T00:00:00Z",
+      "ReferenceNo": "UTR172127990",
+      "References": [
+        {
+          "AllocatedAmount": 51514105,
+          "Name": "q5kmog00d7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01298",
+          "TotalAmount": 51514105
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01129",
+      "PaidAmount": 6455696,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-14T00:00:00Z",
+      "ReceivedAmount": 6455696,
+      "ReferenceDate": "2026-07-14T00:00:00Z",
+      "ReferenceNo": "UTR994894341",
+      "References": [
+        {
+          "AllocatedAmount": 6455696,
+          "Name": "q5lfvgqb06",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01297",
+          "TotalAmount": 6455696
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01130",
+      "PaidAmount": 9495106,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Nexa Computers",
+      "PartyName": "Nexa Computers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-14T00:00:00Z",
+      "ReceivedAmount": 9495106,
+      "ReferenceDate": "2026-07-14T00:00:00Z",
+      "ReferenceNo": "N7085970",
+      "References": [
+        {
+          "AllocatedAmount": 9495106,
+          "Name": "q5m9olstlt",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00212",
+          "TotalAmount": 9495106
+        }
+      ],
+      "Remarks": "Payment for NXC/2026/0750 to Nexa Computers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01131",
+      "PaidAmount": 8136470,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-15T00:00:00Z",
+      "ReceivedAmount": 8136470,
+      "ReferenceDate": "2026-07-15T00:00:00Z",
+      "ReferenceNo": "UTR526341882",
+      "References": [
+        {
+          "AllocatedAmount": 8136470,
+          "Name": "q5n5f7epih",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01295",
+          "TotalAmount": 8136470
+        }
+      ],
+      "Remarks": "Receipt from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01132",
+      "PaidAmount": 57449844,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-16T00:00:00Z",
+      "ReceivedAmount": 57449844,
+      "ReferenceDate": "2026-07-16T00:00:00Z",
+      "ReferenceNo": "UTR752265256",
+      "References": [
+        {
+          "AllocatedAmount": 57449844,
+          "Name": "q5o28ebiqu",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01294",
+          "TotalAmount": 57449844
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01133",
+      "PaidAmount": 4000962,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Sahyadri Power Distribution",
+      "PartyName": "Sahyadri Power Distribution",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-16T00:00:00Z",
+      "ReceivedAmount": 4000962,
+      "ReferenceDate": "2026-07-16T00:00:00Z",
+      "ReferenceNo": "N6123506",
+      "References": [
+        {
+          "AllocatedAmount": 4000962,
+          "Name": "q5poiifkk6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00214",
+          "TotalAmount": 4000962
+        }
+      ],
+      "Remarks": "Payment for SHY/2026/0739 to Sahyadri Power Distribution",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01134",
+      "PaidAmount": 13977196,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Hostmesa Cloud",
+      "PartyName": "Hostmesa Cloud",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-16T00:00:00Z",
+      "ReceivedAmount": 13977196,
+      "ReferenceDate": "2026-07-16T00:00:00Z",
+      "ReferenceNo": "N7046251",
+      "References": [
+        {
+          "AllocatedAmount": 13977196,
+          "Name": "q5qvjdmrnt",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00211",
+          "TotalAmount": 13977196
+        }
+      ],
+      "Remarks": "Payment for HST/2026/0707 to Hostmesa Cloud",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01135",
+      "PaidAmount": 53357596,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-17T00:00:00Z",
+      "ReceivedAmount": 53357596,
+      "ReferenceDate": "2026-07-17T00:00:00Z",
+      "ReferenceNo": "UTR905416388",
+      "References": [
+        {
+          "AllocatedAmount": 53357596,
+          "Name": "q5rh4tn551",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01299",
+          "TotalAmount": 53357596
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01136",
+      "PaidAmount": 371463,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Paperline Stationers",
+      "PartyName": "Paperline Stationers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-18T00:00:00Z",
+      "ReceivedAmount": 371463,
+      "ReferenceDate": "2026-07-18T00:00:00Z",
+      "ReferenceNo": "N5552387",
+      "References": [
+        {
+          "AllocatedAmount": 371463,
+          "Name": "q5s2idvupi",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00216",
+          "TotalAmount": 371463
+        }
+      ],
+      "Remarks": "Payment for PPR/2026/0740 to Paperline Stationers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01137",
+      "PaidAmount": 25960000,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Lotus Business Parks",
+      "PartyName": "Lotus Business Parks",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-19T00:00:00Z",
+      "ReceivedAmount": 25960000,
+      "ReferenceDate": "2026-07-19T00:00:00Z",
+      "ReferenceNo": "N3506645",
+      "References": [
+        {
+          "AllocatedAmount": 25960000,
+          "Name": "q5tii7fl41",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00209",
+          "TotalAmount": 25960000
+        }
+      ],
+      "Remarks": "Payment for LTS/2026/0742 to Lotus Business Parks",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01138",
+      "PaidAmount": 518576,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Paperline Stationers",
+      "PartyName": "Paperline Stationers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-19T00:00:00Z",
+      "ReceivedAmount": 518576,
+      "ReferenceDate": "2026-07-19T00:00:00Z",
+      "ReferenceNo": "N6058556",
+      "References": [
+        {
+          "AllocatedAmount": 518576,
+          "Name": "q5uq82859h",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00215",
+          "TotalAmount": 518576
+        }
+      ],
+      "Remarks": "Payment for PPR/2026/0739 to Paperline Stationers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01139",
+      "PaidAmount": 46700994,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-013",
+      "PartyName": "CUST-013",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-20T00:00:00Z",
+      "ReceivedAmount": 46700994,
+      "ReferenceDate": "2026-07-20T00:00:00Z",
+      "ReferenceNo": "UTR706073546",
+      "References": [
+        {
+          "AllocatedAmount": 46700994,
+          "Name": "q5v7bab0lt",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01296",
+          "TotalAmount": 46700994
+        }
+      ],
+      "Remarks": "Receipt from CUST-013",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01140",
+      "PaidAmount": 8309584,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-20T00:00:00Z",
+      "ReceivedAmount": 8309584,
+      "ReferenceDate": "2026-07-20T00:00:00Z",
+      "ReferenceNo": "UTR490867966",
+      "References": [
+        {
+          "AllocatedAmount": 8309584,
+          "Name": "q600auo3it",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01304",
+          "TotalAmount": 8309584
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01141",
+      "PaidAmount": 1502230,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "FibreLink Networks",
+      "PartyName": "FibreLink Networks",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-22T00:00:00Z",
+      "ReceivedAmount": 1502230,
+      "ReferenceDate": "2026-07-22T00:00:00Z",
+      "ReferenceNo": "N5783549",
+      "References": [
+        {
+          "AllocatedAmount": 1502230,
+          "Name": "q61j0bsagd",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00213",
+          "TotalAmount": 1502230
+        }
+      ],
+      "Remarks": "Payment for FBR/2026/0729 to FibreLink Networks",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01142",
+      "PaidAmount": 29382239,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Nexa Computers",
+      "PartyName": "Nexa Computers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-23T00:00:00Z",
+      "ReceivedAmount": 29382239,
+      "ReferenceDate": "2026-07-23T00:00:00Z",
+      "ReferenceNo": "N1308387",
+      "References": [
+        {
+          "AllocatedAmount": 29382239,
+          "Name": "q62a861n2r",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00223",
+          "TotalAmount": 29382239
+        }
+      ],
+      "Remarks": "Payment for NXC/2026/0749 to Nexa Computers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01143",
+      "PaidAmount": 10822079,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "Payment Gateway Clearing - MTSPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-25T00:00:00Z",
+      "ReceivedAmount": 10822079,
+      "ReferenceDate": "2026-07-25T00:00:00Z",
+      "ReferenceNo": "EVT-mehta-2026-07-0067",
+      "References": [
+        {
+          "AllocatedAmount": 10822079,
+          "Name": "q63ksptgsm",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01302",
+          "TotalAmount": 10822079
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01144",
+      "PaidAmount": 49367780,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-25T00:00:00Z",
+      "ReceivedAmount": 49367780,
+      "ReferenceDate": "2026-07-25T00:00:00Z",
+      "ReferenceNo": "UTR398423385",
+      "References": [
+        {
+          "AllocatedAmount": 49367780,
+          "Name": "q642ukr2p7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01301",
+          "TotalAmount": 49367780
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01145",
+      "PaidAmount": 646098,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Swiftmove Cabs",
+      "PartyName": "Swiftmove Cabs",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-25T00:00:00Z",
+      "ReceivedAmount": 646098,
+      "ReferenceDate": "2026-07-25T00:00:00Z",
+      "ReferenceNo": "N6005211",
+      "References": [
+        {
+          "AllocatedAmount": 646098,
+          "Name": "q658vpg6gc",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00217",
+          "TotalAmount": 646098
+        }
+      ],
+      "Remarks": "Payment for SWF/2026/0736 to Swiftmove Cabs",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01146",
+      "PaidAmount": 12009740,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-26T00:00:00Z",
+      "ReceivedAmount": 12009740,
+      "ReferenceDate": "2026-07-26T00:00:00Z",
+      "ReferenceNo": "UTR815360005",
+      "References": [
+        {
+          "AllocatedAmount": 12009740,
+          "Name": "q66ftp8ri5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01308",
+          "TotalAmount": 12009740
+        }
+      ],
+      "Remarks": "Receipt from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01147",
+      "PaidAmount": 7544991,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "TalentBridge Staffing",
+      "PartyName": "TalentBridge Staffing",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-26T00:00:00Z",
+      "ReceivedAmount": 7544991,
+      "ReferenceDate": "2026-07-26T00:00:00Z",
+      "ReferenceNo": "N5847512",
+      "References": [
+        {
+          "AllocatedAmount": 7544991,
+          "Name": "q67gql1a4l",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00219",
+          "TotalAmount": 7544991
+        }
+      ],
+      "Remarks": "Payment for TLN/2026/0707 to TalentBridge Staffing",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01148",
+      "PaidAmount": 629672,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Swiftmove Cabs",
+      "PartyName": "Swiftmove Cabs",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-26T00:00:00Z",
+      "ReceivedAmount": 629672,
+      "ReferenceDate": "2026-07-26T00:00:00Z",
+      "ReferenceNo": "N1761250",
+      "References": [
+        {
+          "AllocatedAmount": 629672,
+          "Name": "q68qu03hvq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00220",
+          "TotalAmount": 629672
+        }
+      ],
+      "Remarks": "Payment for SWF/2026/0737 to Swiftmove Cabs",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01149",
+      "PaidAmount": 39476803,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-013",
+      "PartyName": "CUST-013",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-27T00:00:00Z",
+      "ReceivedAmount": 39476803,
+      "ReferenceDate": "2026-07-27T00:00:00Z",
+      "ReferenceNo": "UTR168612713",
+      "References": [
+        {
+          "AllocatedAmount": 39476803,
+          "Name": "q69d5isoe1",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01300",
+          "TotalAmount": 39476803
+        }
+      ],
+      "Remarks": "Receipt from CUST-013",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01150",
+      "PaidAmount": 47814375,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-001",
+      "PartyName": "CUST-001",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-27T00:00:00Z",
+      "ReceivedAmount": 47814375,
+      "ReferenceDate": "2026-07-27T00:00:00Z",
+      "ReferenceNo": "UTR548635037",
+      "References": [
+        {
+          "AllocatedAmount": 47814375,
+          "Name": "q6atrul309",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01305",
+          "TotalAmount": 47814375
+        }
+      ],
+      "Remarks": "Receipt from CUST-001",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01151",
+      "PaidAmount": 13977196,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Hostmesa Cloud",
+      "PartyName": "Hostmesa Cloud",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-27T00:00:00Z",
+      "ReceivedAmount": 13977196,
+      "ReferenceDate": "2026-07-27T00:00:00Z",
+      "ReferenceNo": "N3989173",
+      "References": [],
+      "Remarks": "Payment for HST/2026/0707",
+      "UnallocatedAmount": 13977196
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01152",
+      "PaidAmount": 5973533,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Bluepeak Consulting",
+      "PartyName": "Bluepeak Consulting",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-28T00:00:00Z",
+      "ReceivedAmount": 5973533,
+      "ReferenceDate": "2026-07-28T00:00:00Z",
+      "ReferenceNo": "N2986638",
+      "References": [
+        {
+          "AllocatedAmount": 5973533,
+          "Name": "q6bf0kf35i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00222",
+          "TotalAmount": 5973533
+        }
+      ],
+      "Remarks": "Payment for BLP/2026/0738 to Bluepeak Consulting",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01153",
+      "PaidAmount": 364552,
+      "PaidFrom": "ICICI Current 0002 - MTSPL",
+      "PaidTo": "Creditors - MTSPL",
+      "Party": "Tiffin Corner Caterers",
+      "PartyName": "Tiffin Corner Caterers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-07-28T00:00:00Z",
+      "ReceivedAmount": 364552,
+      "ReferenceDate": "2026-07-28T00:00:00Z",
+      "ReferenceNo": "N8415454",
+      "References": [
+        {
+          "AllocatedAmount": 364552,
+          "Name": "q6cusoj91j",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00218",
+          "TotalAmount": 364552
+        }
+      ],
+      "Remarks": "Payment for TFF/2026/0737 to Tiffin Corner Caterers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01154",
+      "PaidAmount": 10084448,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "Payment Gateway Clearing - MTSPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-30T00:00:00Z",
+      "ReceivedAmount": 10084448,
+      "ReferenceDate": "2026-07-30T00:00:00Z",
+      "ReferenceNo": "EVT-mehta-2026-07-0086",
+      "References": [
+        {
+          "AllocatedAmount": 10084448,
+          "Name": "q6d7f8f9ji",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01306",
+          "TotalAmount": 10084448
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-01155",
+      "PaidAmount": 28725974,
+      "PaidFrom": "Debtors - MTSPL",
+      "PaidTo": "ICICI Current 0002 - MTSPL",
+      "Party": "CUST-016",
+      "PartyName": "CUST-016",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-07-31T00:00:00Z",
+      "ReceivedAmount": 28725974,
+      "ReferenceDate": "2026-07-31T00:00:00Z",
+      "ReferenceNo": "UTR662565291",
+      "References": [
+        {
+          "AllocatedAmount": 28725974,
+          "Name": "q6etcvo27j",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01303",
+          "TotalAmount": 28725974
+        }
+      ],
+      "Remarks": "Receipt from CUST-016",
+      "UnallocatedAmount": 0
+    }
+  ],
+  "tool": "list_payments"
+}

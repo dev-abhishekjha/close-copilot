@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Cost of Goods Sold - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 15203334,
+      "month": "2026-04",
+      "net": 15203334
+    },
+    {
+      "credit": 0,
+      "debit": 32739415,
+      "month": "2026-05",
+      "net": 32739415
+    },
+    {
+      "credit": 0,
+      "debit": 9592426,
+      "month": "2026-06",
+      "net": 9592426
+    },
+    {
+      "credit": 0,
+      "debit": 28064897,
+      "month": "2026-07",
+      "net": 28064897
+    }
+  ],
+  "tool": "get_account_history"
+}

@@ -1,0 +1,92 @@
+{
+  "args": {
+    "amount_band_pct": 20,
+    "before_month": "2026-07",
+    "company": "sharma",
+    "lookback_months": 4,
+    "min_occurrences": 3
+  },
+  "result": [
+    {
+      "median_amount": 437794,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "BlueNet Broadband",
+      "typical_day": 5
+    },
+    {
+      "median_amount": 2235652,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "City Power Co",
+      "typical_day": 10
+    },
+    {
+      "median_amount": 10030000,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Lakeview Warehousing LLP",
+      "typical_day": 5
+    },
+    {
+      "median_amount": 2950000,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Ledgerwise Associates",
+      "typical_day": 25
+    },
+    {
+      "median_amount": 17700000,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Omkar Estates",
+      "typical_day": 1
+    },
+    {
+      "median_amount": 3785482,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Securewell Guarding Services",
+      "typical_day": 28
+    },
+    {
+      "median_amount": 531000,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Stockbook Cloud",
+      "typical_day": 3
+    },
+    {
+      "median_amount": 366797,
+      "months_seen": [
+        "2026-04",
+        "2026-05",
+        "2026-06"
+      ],
+      "supplier": "Vaani Telecom Services",
+      "typical_day": 12
+    }
+  ],
+  "tool": "list_recurring_suppliers"
+}

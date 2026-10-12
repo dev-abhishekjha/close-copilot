@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Sales - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 868790787,
+      "debit": 0,
+      "month": "2026-04",
+      "net": -868790787
+    },
+    {
+      "credit": 745336346,
+      "debit": 0,
+      "month": "2026-05",
+      "net": -745336346
+    },
+    {
+      "credit": 990327342,
+      "debit": 0,
+      "month": "2026-06",
+      "net": -990327342
+    },
+    {
+      "credit": 714671990,
+      "debit": 0,
+      "month": "2026-07",
+      "net": -714671990
+    }
+  ],
+  "tool": "get_account_history"
+}

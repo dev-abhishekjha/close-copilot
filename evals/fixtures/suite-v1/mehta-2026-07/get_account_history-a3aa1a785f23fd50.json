@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Interest Income - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-04",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-05",
+      "net": 0
+    },
+    {
+      "credit": 2755500,
+      "debit": 0,
+      "month": "2026-06",
+      "net": -2755500
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-07",
+      "net": 0
+    }
+  ],
+  "tool": "get_account_history"
+}
