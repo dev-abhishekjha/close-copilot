@@ -1,0 +1,1015 @@
+%PDF-1.3
+%ÂµÂ¶
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 4 0 R>>
+endobj
+4 0 obj
+<</Length 5333>>
+stream
+0 J
+0 j
+0.57 w
+0.000 G
+0.000 g
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 19.00 Tf ET
+BT 59.53 747.68 Td (POL-001 Accounting Policy Manual)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 720.67 Td (Version 3.2. Applies to every company in the group that closes its books on ERPNext. All)Tj ET
+BT 59.53 702.81 Td (companies, names and figures in this manual are synthetic.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 682.97 Td (Owner: Group Finance Controller. Approved by: the Audit Committee. Review cycle: every twelve)Tj ET
+BT 59.53 665.11 Td (months, or earlier when a statutory rule changes.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 645.27 Td (This manual tells the finance team how to treat the ordinary transactions of a month, how to close)Tj ET
+BT 59.53 627.41 Td (the books, and who may approve what. Each rule is written in one paragraph under its own)Tj ET
+BT 59.53 609.55 Td (numbered heading so that it can be cited exactly. When a figure in this manual differs from a)Tj ET
+BT 59.53 591.69 Td (figure in a working paper, this manual is correct.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+BT 59.53 554.79 Td (1. Scope)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 521.49 Td (1.1 Companies covered)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 498.08 Td (This policy applies to every legal entity whose ledger is kept in the group ERPNext site. Each)Tj ET
+BT 59.53 480.22 Td (entity keeps its own books, its own bank account and its own GST registration, and each closes)Tj ET
+BT 59.53 462.36 Td (its own month. Nothing in this manual allows one entity to book a cost on behalf of another.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 433.83 Td (1.2 Who must follow it)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 410.42 Td (The policy binds the accounts payable clerk, the accounts receivable clerk, the bank)Tj ET
+BT 59.53 392.56 Td (reconciliation owner, the GST owner, the preparer of journals \(the maker\) and the reviewer of)Tj ET
+BT 59.53 374.70 Td (journals \(the checker\). It also binds the automated tools that help the team: a tool may propose)Tj ET
+BT 59.53 356.84 Td (an entry, but it never posts one, and every proposal is reviewed under section 9.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 328.31 Td (1.3 Basis of accounting)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 304.90 Td (Books are kept on the accrual basis in Indian rupees, in whole rupees on reports and in paise in)Tj ET
+BT 59.53 287.04 Td (the ledger. Revenue and expenses are recognised in the period they relate to, not in the period)Tj ET
+BT 59.53 269.18 Td (cash moves. Where this manual is silent, the team follows the Indian Accounting Standards as)Tj ET
+BT 59.53 251.32 Td (applicable to the entity, and asks the Group Finance Controller when in doubt.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 222.79 Td (1.4 Materiality)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 199.38 Td (A difference smaller than one rupee on a single document is a rounding difference and is left)Tj ET
+BT 59.53 181.52 Td (alone. Every other difference is explained before the month is closed. The team never nets two)Tj ET
+BT 59.53 163.66 Td (unrelated differences against each other to make a balance look clean.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 135.13 Td (1.5 Definitions)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 70.87 111.72 Td (-)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.00 Tf ET
+BT 82.21 111.72 Td (Close)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 112.16 111.72 Td (: the set of tasks that finishes with the month locked against further entries.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 70.87 91.87 Td (-)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.00 Tf ET
+BT 82.21 91.87 Td (Period)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 116.44 91.87 Td (: one calendar month, written YYYY-MM.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 70.87 72.03 Td (-)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.00 Tf ET
+BT 82.21 72.03 Td (Maker)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 114.00 72.03 Td (: the person or tool that prepares an entry.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+BT 233.61 28.78 Td (POL-001-accounting-policy - page 1)Tj ET
+
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 6 0 R>>
+endobj
+6 0 obj
+<</Length 6100>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.000 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 70.87 772.97 Td (-)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.00 Tf ET
+BT 82.21 772.97 Td (Checker)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 125.61 772.97 Td (: a different person who approves it.)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 70.87 753.13 Td (-)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.00 Tf ET
+BT 82.21 753.13 Td (Recurring supplier)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 180.01 753.13 Td (: a supplier that billed in most of the recent months, described in section)Tj ET
+BT 82.21 735.27 Td (5.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+BT 59.53 698.37 Td (2. Close calendar)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+BT 59.53 665.07 Td (2.1 Working days)Tj ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT 59.53 641.65 Td (The close runs in the first six working days after month end. Working day one is the first weekday)Tj ET
+BT 59.53 623.79 Td (after the month ends. A public holiday in the state of the registered office is not a working day.)Tj ET
+BT 59.53 605.94 Td (The table shows the target for each task.)Tj ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 9.50 Tf ET
+0.882 g
+56.69 598.32 81.92 -20.41 re B
+q 0.000 g BT 62.36 585.27 Td (Working day)Tj ET Q
+0.882 g
+138.61 598.32 221.67 -20.41 re B
+q 0.000 g BT 144.28 585.27 Td (Task)Tj ET Q
+0.882 g
+360.28 598.32 178.30 -20.41 re B
+q 0.000 g BT 365.95 585.27 Td (Owner)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 577.91 81.92 -20.41 re S
+q 0.000 g BT 62.36 564.86 Td (1)Tj ET Q
+138.61 577.91 221.67 -20.41 re S
+q 0.000 g BT 144.28 564.86 Td (Cut-off review of purchases and sales)Tj ET Q
+360.28 577.91 178.30 -20.41 re S
+q 0.000 g BT 365.95 564.86 Td (Accounts payable and receivable)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 557.50 81.92 -20.41 re S
+q 0.000 g BT 62.36 544.45 Td (2)Tj ET Q
+138.61 557.50 221.67 -20.41 re S
+q 0.000 g BT 144.28 544.45 Td (Bank statement loaded and reconciled)Tj ET Q
+360.28 557.50 178.30 -20.41 re S
+q 0.000 g BT 365.95 544.45 Td (Bank reconciliation owner)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 537.09 81.92 -35.15 re S
+q 0.000 g BT 62.36 524.04 Td (3)Tj ET Q
+138.61 537.09 221.67 -35.15 re S
+q 0.000 g BT 144.28 524.04 Td (Accruals, prepaid releases and fixed asset)Tj ET Q
+q 0.000 g BT 144.28 509.30 Td (checks)Tj ET Q
+360.28 537.09 178.30 -35.15 re S
+q 0.000 g BT 365.95 524.04 Td (General ledger accountant)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 501.95 81.92 -20.41 re S
+q 0.000 g BT 62.36 488.89 Td (4)Tj ET Q
+138.61 501.95 221.67 -20.41 re S
+q 0.000 g BT 144.28 488.89 Td (GST reconciliation against GSTR-2B)Tj ET Q
+360.28 501.95 178.30 -20.41 re S
+q 0.000 g BT 365.95 488.89 Td (GST owner)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 481.54 81.92 -20.41 re S
+q 0.000 g BT 62.36 468.48 Td (5)Tj ET Q
+138.61 481.54 221.67 -20.41 re S
+q 0.000 g BT 144.28 468.48 Td (Variance review and journal approvals)Tj ET Q
+360.28 481.54 178.30 -20.41 re S
+q 0.000 g BT 365.95 468.48 Td (Controller)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 461.13 81.92 -20.41 re S
+q 0.000 g BT 62.36 448.07 Td (6)Tj ET Q
+138.61 461.13 221.67 -20.41 re S
+q 0.000 g BT 144.28 448.07 Td (Month locked, close note written)Tj ET Q
+360.28 461.13 178.30 -20.41 re S
+q 0.000 g BT 365.95 448.07 Td (Controller)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 405.63 Td (2.2 Order of work)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 382.21 Td (Cut-off comes first because every later step depends on knowing which documents belong to the)Tj ET Q
+q 0.000 g BT 59.53 364.35 Td (month. The bank reconciliation comes before accruals because a cleared payment shows that a)Tj ET Q
+q 0.000 g BT 59.53 346.50 Td (bill is no longer accrued. GST comes after accruals because the credit depends on which)Tj ET Q
+q 0.000 g BT 59.53 328.64 Td (invoices are in the books. Nobody starts a step whose input is not final unless the Controller)Tj ET Q
+q 0.000 g BT 59.53 310.78 Td (agrees and notes it.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 282.25 Td (2.3 The close note)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 258.83 Td (On the last day of the close the Controller writes a short close note for the month. It records what)Tj ET Q
+q 0.000 g BT 59.53 240.98 Td (was unusual, which suppliers billed late, which annual costs fell due, and any decision that future)Tj ET Q
+q 0.000 g BT 59.53 223.12 Td (months should follow. The note is kept with the month's working papers and is read at the start of)Tj ET Q
+q 0.000 g BT 59.53 205.26 Td (the next close.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 176.73 Td (2.4 Locking the month)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 153.31 Td (After the Controller signs the close note the month is locked. A correction after locking is made in)Tj ET Q
+q 0.000 g BT 59.53 135.46 Td (the current open month with a clear reference to the original entry, never by reopening the locked)Tj ET Q
+q 0.000 g BT 59.53 117.60 Td (month, unless the Audit Committee allows it in writing.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 2)Tj ET Q
+
+endstream
+endobj
+7 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 8 0 R>>
+endobj
+8 0 obj
+<</Length 4901>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 755.91 Td (3. Fixed assets)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 722.61 Td (3.1 Capitalisation threshold)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 699.20 Td (An item that will serve the business for more than one year and costs Rs.50,000 or more, before)Tj ET Q
+q 0.000 g BT 59.53 681.34 Td (GST that can be claimed as credit, is capitalised as a fixed asset and depreciated; an item below)Tj ET Q
+q 0.000 g BT 59.53 663.48 Td (Rs.50,000 is expensed in the month it is bought.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 634.95 Td (3.2 What counts as an asset)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 611.53 Td (Laptops, printers, servers, furniture and air conditioners are the usual assets. The test is the)Tj ET Q
+q 0.000 g BT 59.53 593.68 Td (nature of the item, not the account it was first booked to. A laptop that was paid for through a)Tj ET Q
+q 0.000 g BT 59.53 575.82 Td (repairs invoice is still a laptop, and a purchase that looks like repairs and maintenance but adds a)Tj ET Q
+q 0.000 g BT 59.53 557.96 Td (new item of equipment above the threshold in 3.1 is capitalised.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 529.43 Td (3.3 Cost of an asset)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 506.02 Td (The cost includes the purchase price, import duty, freight, installation and any other cost needed)Tj ET Q
+q 0.000 g BT 59.53 488.16 Td (to bring the asset to working condition. Discounts are deducted. GST that the company can claim)Tj ET Q
+q 0.000 g BT 59.53 470.30 Td (as input tax credit is not part of the cost; GST that cannot be claimed is.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 441.77 Td (3.4 Bundles and part payments)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 418.35 Td (Several items bought together on one invoice are judged one at a time against the threshold in)Tj ET Q
+q 0.000 g BT 59.53 400.50 Td (3.1, unless they only work as a set, such as a server and its rack, in which case they are judged)Tj ET Q
+q 0.000 g BT 59.53 382.64 Td (together. A part payment is booked as an advance and capitalised when the asset is delivered.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 354.11 Td (3.5 Depreciation)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 330.69 Td (Depreciation starts in the month the asset is ready for use and follows the rates in the asset)Tj ET Q
+q 0.000 g BT 59.53 312.83 Td (category. A full month is charged for any asset ready on or before the fifteenth, and none for one)Tj ET Q
+q 0.000 g BT 59.53 294.98 Td (ready after it. The fixed asset register is updated on working day three of the close.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 266.44 Td (3.6 Repairs and maintenance)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 243.03 Td (Routine repair and upkeep of an existing asset is an expense. A repair that extends the life or)Tj ET Q
+q 0.000 g BT 59.53 225.17 Td (capacity of an asset beyond its original standard is capitalised. The accountant checks every)Tj ET Q
+q 0.000 g BT 59.53 207.31 Td (invoice booked to repairs and maintenance that mentions an asset keyword or is above the)Tj ET Q
+q 0.000 g BT 59.53 189.46 Td (threshold in 3.1, and moves it to the asset account when it qualifies.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 160.92 Td (3.7 Disposal)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 137.51 Td (When an asset is sold or scrapped the gain or loss is the difference between proceeds and the)Tj ET Q
+q 0.000 g BT 59.53 119.65 Td (carrying value on the date of disposal. The disposal is approved under section 9 before it is)Tj ET Q
+q 0.000 g BT 59.53 101.79 Td (posted.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 3)Tj ET Q
+
+endstream
+endobj
+9 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 10 0 R>>
+endobj
+10 0 obj
+<</Length 5003>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 764.28 Td (3.8 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 740.87 Td (A company buys a laptop for Rs.62,000 before GST on a day in the middle of a month. The)Tj ET Q
+q 0.000 g BT 59.53 723.01 Td (laptop will be used for several years and the price is above Rs.50,000, so it is booked to the)Tj ET Q
+q 0.000 g BT 59.53 705.15 Td (computer equipment account, entered in the fixed asset register and depreciated from the month)Tj ET Q
+q 0.000 g BT 59.53 687.29 Td (it is ready for use. A second laptop bought the same day for Rs.38,000 is below the threshold and)Tj ET Q
+q 0.000 g BT 59.53 669.43 Td (is expensed. The accountant records both decisions in the working paper with the invoice)Tj ET Q
+q 0.000 g BT 59.53 651.57 Td (numbers.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 614.67 Td (4. Prepaid expenses)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 581.37 Td (4.1 What is a prepaid expense)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 557.96 Td (A cost paid or invoiced for a period that extends beyond the month of the invoice is a prepaid)Tj ET Q
+q 0.000 g BT 59.53 540.10 Td (expense. Annual software licences, yearly insurance premiums, annual maintenance contracts)Tj ET Q
+q 0.000 g BT 59.53 522.24 Td (and renewal fees are the usual examples. The invoice text often says annual, yearly, renewal or)Tj ET Q
+q 0.000 g BT 59.53 504.39 Td (twelve months, and the team reads it for those words.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 475.85 Td (4.2 Spread annual costs monthly)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 452.44 Td (An annual cost of Rs.50,000 or more that is invoiced upfront is booked to a prepaid asset account)Tj ET Q
+q 0.000 g BT 59.53 434.58 Td (and released to expense in equal monthly amounts over the months of the service period, starting)Tj ET Q
+q 0.000 g BT 59.53 416.72 Td (with the month the service begins.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 388.19 Td (4.3 Small amounts)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 364.78 Td (An annual cost below Rs.50,000 may be expensed in the month of the invoice, because the)Tj ET Q
+q 0.000 g BT 59.53 346.92 Td (monthly effect is too small to matter. The Controller may still require spreading for a cost that is)Tj ET Q
+q 0.000 g BT 59.53 329.06 Td (repeated across many suppliers.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 300.53 Td (4.4 The release journal)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 277.12 Td (The release journal is prepared on working day three of every close. It names the original invoice,)Tj ET Q
+q 0.000 g BT 59.53 259.26 Td (the service period, the monthly amount and the months remaining. The last month takes the)Tj ET Q
+q 0.000 g BT 59.53 241.40 Td (rounding so that the full invoice is released and nothing remains on the prepaid account.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 212.87 Td (4.5 Early termination)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 189.46 Td (When a service ends early, the remaining prepaid balance is expensed in the month of)Tj ET Q
+q 0.000 g BT 59.53 171.60 Td (termination, unless the supplier refunds it, in which case the refund is booked against the prepaid)Tj ET Q
+q 0.000 g BT 59.53 153.74 Td (account.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 125.21 Td (4.6 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 101.79 Td (An annual software licence of Rs.3,60,000 before GST is invoiced in April for the twelve months)Tj ET Q
+q 0.000 g BT 59.53 83.94 Td (from April. The invoice is booked to the prepaid account. Each month from April the accountant)Tj ET Q
+q 0.000 g BT 59.53 66.08 Td (releases Rs.30,000 to the software expense account. After the March release the prepaid)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 4)Tj ET Q
+
+endstream
+endobj
+11 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 12 0 R>>
+endobj
+12 0 obj
+<</Length 4662>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 772.97 Td (balance is nil. If the same invoice had been expensed in April, April would show a cost twelve)Tj ET Q
+q 0.000 g BT 59.53 755.11 Td (times too high and every other month would show none, and the variance review in section 10)Tj ET Q
+q 0.000 g BT 59.53 737.25 Td (would flag both.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 700.35 Td (5. Accruals)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 667.05 Td (5.1 Accrue recurring suppliers at their usual amount)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 643.64 Td (When a recurring supplier has not billed for a month in which it delivered the service, the cost is)Tj ET Q
+q 0.000 g BT 59.53 625.78 Td (accrued at the supplier's usual amount, using the average of the recent months, and the accrual)Tj ET Q
+q 0.000 g BT 59.53 607.92 Td (is reversed when the real bill arrives.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 579.39 Td (5.2 Who is a recurring supplier)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 555.98 Td (A supplier is recurring when it billed in at least 3 of the last 4 months, with amounts within 20% of)Tj ET Q
+q 0.000 g BT 59.53 538.12 Td (one another. Rent, utilities, telecom, broadband and standing services such as security and)Tj ET Q
+q 0.000 g BT 59.53 520.26 Td (housekeeping are the usual examples. A supplier that billed once, or whose amount swings by)Tj ET Q
+q 0.000 g BT 59.53 502.40 Td (more than 20%, is not accrued automatically; the accountant decides case by case.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 473.87 Td (5.3 Typical bill timing)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 450.46 Td (Some bills always arrive after month end. An electricity bill usually arrives around the eighth of the)Tj ET Q
+q 0.000 g BT 59.53 432.60 Td (next month, and a telephone bill around the middle of it. The close notes record each supplier's)Tj ET Q
+q 0.000 g BT 59.53 414.74 Td (usual arrival day so that the accountant knows whether a missing bill is late or merely normal.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 386.21 Td (5.4 Reversal)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 362.79 Td (An accrual is reversed on the first day of the next month. The real invoice is then booked)Tj ET Q
+q 0.000 g BT 59.53 344.94 Td (normally. If the real invoice differs from the accrual, the difference falls in the month the invoice is)Tj ET Q
+q 0.000 g BT 59.53 327.08 Td (booked and is not chased back.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 298.55 Td (5.5 Evidence)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 275.13 Td (Every accrual journal names the supplier, the month, the amounts of the months it was based on,)Tj ET Q
+q 0.000 g BT 59.53 257.28 Td (and the reason the bill is missing. A journal without that evidence is returned to the maker.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 228.74 Td (5.6 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 205.33 Td (An electricity supplier billed Rs.30,000, Rs.33,000, Rs.36,000 and Rs.31,000 in the last four)Tj ET Q
+q 0.000 g BT 59.53 187.47 Td (months, so it is a recurring supplier. Its bill for the month just ended has not arrived, and the close)Tj ET Q
+q 0.000 g BT 59.53 169.61 Td (note says the bill usually arrives around the eighth of the next month. The accountant accrues the)Tj ET Q
+q 0.000 g BT 59.53 151.76 Td (average of the four months, Rs.32,500, with a journal that quotes those amounts. When the real)Tj ET Q
+q 0.000 g BT 59.53 133.90 Td (bill arrives the accrual is reversed and the invoice is booked.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 5)Tj ET Q
+
+endstream
+endobj
+13 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 14 0 R>>
+endobj
+14 0 obj
+<</Length 4618>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 755.91 Td (6. GST and input tax credit)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 722.61 Td (6.1 Claim credit only for invoices in GSTR-2B)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 699.20 Td (Input tax credit is claimed only for a purchase invoice that appears in the company's GSTR-2B for)Tj ET Q
+q 0.000 g BT 59.53 681.34 Td (the month, with a tax amount that agrees with the books to within Rs.1; credit for an invoice that is)Tj ET Q
+q 0.000 g BT 59.53 663.48 Td (missing from GSTR-2B, or whose tax differs by more than that, is held back until the supplier has)Tj ET Q
+q 0.000 g BT 59.53 645.62 Td (filed or corrected it.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 617.09 Td (6.2 Follow up with suppliers)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 593.68 Td (For each invoice held back under 6.1 the GST owner writes to the supplier within two working)Tj ET Q
+q 0.000 g BT 59.53 575.82 Td (days, quotes the invoice number and date, and records the reply. An invoice that is still missing at)Tj ET Q
+q 0.000 g BT 59.53 557.96 Td (the next close is escalated to the Controller, who decides whether to keep waiting, change)Tj ET Q
+q 0.000 g BT 59.53 540.10 Td (supplier or write the tax off.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 511.57 Td (6.3 Matching)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 488.16 Td (The GST owner matches books to GSTR-2B by supplier GSTIN, invoice number, invoice date)Tj ET Q
+q 0.000 g BT 59.53 470.30 Td (and amounts. The comparison is for each invoice, not in total. A small difference on one invoice is)Tj ET Q
+q 0.000 g BT 59.53 452.44 Td (never offset by an opposite difference on another.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 423.91 Td (6.4 Place of supply and the tax split)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 400.50 Td (A supplier in the same state as the company charges CGST and SGST in equal halves. A)Tj ET Q
+q 0.000 g BT 59.53 382.64 Td (supplier in another state charges IGST. A mismatch between the supplier's state and the tax)Tj ET Q
+q 0.000 g BT 59.53 364.78 Td (charged is queried before credit is claimed.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 336.25 Td (6.5 Unregistered suppliers)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 312.83 Td (A supplier that is not registered for GST does not charge GST and has no GSTIN. No credit is)Tj ET Q
+q 0.000 g BT 59.53 294.98 Td (claimed on its bills. The accountant must not book tax on such a bill, and the bill is checked for)Tj ET Q
+q 0.000 g BT 59.53 277.12 Td (the reverse charge rules where they apply.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 248.59 Td (6.6 Blocked credits)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 225.17 Td (Credit is not claimed for items the law blocks, such as personal use items or goods lost or stolen.)Tj ET Q
+q 0.000 g BT 59.53 207.31 Td (The accountant books the full amount, tax included, to the expense.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 178.78 Td (6.7 Returns)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 155.37 Td (The GST owner files the returns on the due dates. A return is prepared from the locked books)Tj ET Q
+q 0.000 g BT 59.53 137.51 Td (and reviewed by the Controller before filing. Any difference between the return and the books is)Tj ET Q
+q 0.000 g BT 59.53 119.65 Td (explained in writing.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 6)Tj ET Q
+
+endstream
+endobj
+15 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 16 0 R>>
+endobj
+16 0 obj
+<</Length 4737>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 764.28 Td (6.8 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 740.87 Td (The books hold five purchase invoices from one supplier in a month. GSTR-2B lists four of them.)Tj ET Q
+q 0.000 g BT 59.53 723.01 Td (The fifth is held back, no credit is claimed for it in the month, and the GST owner writes to the)Tj ET Q
+q 0.000 g BT 59.53 705.15 Td (supplier. If the supplier files later, credit is claimed in the month the invoice first appears in)Tj ET Q
+q 0.000 g BT 59.53 687.29 Td (GSTR-2B. If an invoice appears in GSTR-2B with tax Rs.2 different from the books, the difference)Tj ET Q
+q 0.000 g BT 59.53 669.43 Td (is above the Rs.1 limit and the credit is held back too, until the supplier or the books are)Tj ET Q
+q 0.000 g BT 59.53 651.57 Td (corrected.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 614.67 Td (7. Bank reconciliation)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 581.37 Td (7.1 Book bank charges monthly)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 557.96 Td (Every month the bank's charges for the current account, such as account maintenance,)Tj ET Q
+q 0.000 g BT 59.53 540.10 Td (transaction fees and cheque or transfer charges, are booked to the bank charges expense)Tj ET Q
+q 0.000 g BT 59.53 522.24 Td (account on the date the bank debited them, and the entry is made in the month the bank debited,)Tj ET Q
+q 0.000 g BT 59.53 504.39 Td (whether or not a debit advice has arrived.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 475.85 Td (7.2 Book gateway settlements with fee and GST)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 452.44 Td (A payment gateway settles to the bank after deducting its fee and the GST on that fee. The)Tj ET Q
+q 0.000 g BT 59.53 434.58 Td (settlement is booked as one entry with three parts: the net amount received in the bank, the)Tj ET Q
+q 0.000 g BT 59.53 416.72 Td (gateway fee to the gateway fee expense account, and the GST on the fee to input tax credit, with)Tj ET Q
+q 0.000 g BT 59.53 398.87 Td (the gross amount cleared against the customer receipts it settles.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 370.33 Td (7.3 Matching rule)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 346.92 Td (A bank transaction is matched to a ledger entry when the amount agrees exactly and the dates)Tj ET Q
+q 0.000 g BT 59.53 329.06 Td (are within 3 days of each other, taking the later of the two dates as the match date. A transaction)Tj ET Q
+q 0.000 g BT 59.53 311.20 Td (with no ledger entry within that window is unmatched and is explained before the month is closed.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 282.67 Td (7.4 Unmatched items)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 259.26 Td (Every unmatched item is listed on the reconciliation with its date, amount, and the action to be)Tj ET Q
+q 0.000 g BT 59.53 241.40 Td (taken. A debit on the bank statement with no ledger entry is usually a charge or a missing)Tj ET Q
+q 0.000 g BT 59.53 223.54 Td (payment entry. A credit with no ledger entry is usually a customer receipt or a gateway settlement)Tj ET Q
+q 0.000 g BT 59.53 205.68 Td (not yet booked.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 177.15 Td (7.5 Reconciliation statement)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 153.74 Td (The reconciliation ends with a statement that shows the closing balance per bank statement, the)Tj ET Q
+q 0.000 g BT 59.53 135.88 Td (items in transit, and the closing balance per books. The two sides must agree after the items in)Tj ET Q
+q 0.000 g BT 59.53 118.02 Td (transit. The statement is attached to the close note.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 7)Tj ET Q
+
+endstream
+endobj
+17 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 18 0 R>>
+endobj
+18 0 obj
+<</Length 4812>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 764.28 Td (7.6 Cheques and transfers in transit)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 740.87 Td (A payment made on the last days of the month that clears in the next month is an item in transit. It)Tj ET Q
+q 0.000 g BT 59.53 723.01 Td (is booked in the month it was issued and appears on the statement until the bank clears it.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 694.48 Td (7.7 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 671.06 Td (A gateway settles Rs.97,640 into the bank for sales of Rs.1,00,000. The gateway kept a fee of)Tj ET Q
+q 0.000 g BT 59.53 653.20 Td (Rs.2,000 and GST of Rs.360 on the fee. The accountant books a debit of Rs.97,640 to the bank,)Tj ET Q
+q 0.000 g BT 59.53 635.35 Td (Rs.2,000 to the gateway fee expense and Rs.360 to input tax credit, and a credit of Rs.1,00,000)Tj ET Q
+q 0.000 g BT 59.53 617.49 Td (to the gateway receivable account that holds the customer receipts. The bank statement line then)Tj ET Q
+q 0.000 g BT 59.53 599.63 Td (matches the ledger line for the net amount.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 562.73 Td (8. Cut-off)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 529.43 Td (8.1 Expenses belong to their service period)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 506.02 Td (An expense is recorded in the month in which the service was delivered or the goods were)Tj ET Q
+q 0.000 g BT 59.53 488.16 Td (received, and not in the month the invoice is dated or paid; an invoice for a service delivered in)Tj ET Q
+q 0.000 g BT 59.53 470.30 Td (one month and booked in the next is moved back to the month of service during the close of that)Tj ET Q
+q 0.000 g BT 59.53 452.44 Td (month.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 423.91 Td (8.2 Purchases)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 400.50 Td (On working day one the accounts payable clerk reviews every purchase invoice booked in the)Tj ET Q
+q 0.000 g BT 59.53 382.64 Td (first week of the new month and every goods receipt of the last week of the old month. An invoice)Tj ET Q
+q 0.000 g BT 59.53 364.78 Td (that relates to the old month is booked to the old month, with an accrual if the invoice has not yet)Tj ET Q
+q 0.000 g BT 59.53 346.92 Td (arrived.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 318.39 Td (8.3 Sales)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 294.98 Td (A sale is recognised when the goods are delivered or the service is performed. An invoice raised)Tj ET Q
+q 0.000 g BT 59.53 277.12 Td (in advance of delivery is deferred. The receivables clerk checks the dispatch records of the last)Tj ET Q
+q 0.000 g BT 59.53 259.26 Td (week of the month against the sales invoices.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 230.73 Td (8.4 Payroll)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 207.31 Td (Salaries are expensed in the month the employees worked, even when they are paid on the last)Tj ET Q
+q 0.000 g BT 59.53 189.46 Td (day or in the first days of the next month. A bonus or arrear is expensed in the month it is earned.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 160.92 Td (8.5 Duplicate invoices)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 137.51 Td (When a supplier's invoice is booked twice, the second entry is cancelled and the supplier's)Tj ET Q
+q 0.000 g BT 59.53 119.65 Td (contract is checked for the agreed amount and billing frequency, so that the right entry is the one)Tj ET Q
+q 0.000 g BT 59.53 101.79 Td (kept. A duplicate is never settled by paying twice and asking for a refund.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 8)Tj ET Q
+
+endstream
+endobj
+19 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 20 0 R>>
+endobj
+20 0 obj
+<</Length 4656>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 764.28 Td (8.6 Worked example)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 740.87 Td (A cleaning company delivers its service in the last week of a month and its invoice, dated the third)Tj ET Q
+q 0.000 g BT 59.53 723.01 Td (of the next month, reaches the accounts payable clerk on the fifth. On working day one the clerk)Tj ET Q
+q 0.000 g BT 59.53 705.15 Td (sees the invoice describes the service of the earlier month, books it to that month, and the cost)Tj ET Q
+q 0.000 g BT 59.53 687.29 Td (appears in the right period. If the invoice had not yet arrived, the clerk would have accrued the)Tj ET Q
+q 0.000 g BT 59.53 669.43 Td (cost under section 5.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 632.53 Td (9. Journal approvals)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 599.23 Td (9.1 Maker and checker)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 575.82 Td (Every manual journal has a maker and a checker, and they are different persons. The maker)Tj ET Q
+q 0.000 g BT 59.53 557.96 Td (prepares the entry with its evidence. The checker reads the evidence, confirms the amounts and)Tj ET Q
+q 0.000 g BT 59.53 540.10 Td (approves or rejects it. Nobody approves their own entry, and a tool that proposes an entry counts)Tj ET Q
+q 0.000 g BT 59.53 522.24 Td (as a maker.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 493.71 Td (9.2 Approval limits)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 470.30 Td (A checker who is an accountant may approve a journal of up to Rs.1,00,000. A journal above)Tj ET Q
+q 0.000 g BT 59.53 452.44 Td (that, up to Rs.10,00,000, needs the Controller. A journal above Rs.10,00,000, and any journal)Tj ET Q
+q 0.000 g BT 59.53 434.58 Td (that touches the retained earnings, needs the Group Finance Controller.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 406.05 Td (9.3 Evidence)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 382.64 Td (The journal states the reason, names the documents it is based on and quotes the section of this)Tj ET Q
+q 0.000 g BT 59.53 364.78 Td (manual that applies. The checker rejects a journal whose figures cannot be traced to a document.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 336.25 Td (9.4 Posting)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 312.83 Td (Only an approved journal is posted. The posting is made under the checker's approval and)Tj ET Q
+q 0.000 g BT 59.53 294.98 Td (carries the approval reference. A rejected journal is returned to the maker with the reason.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 266.44 Td (9.5 Reversals and corrections)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 243.03 Td (A journal is corrected by a reversing entry and a new entry, never by editing or deleting the)Tj ET Q
+q 0.000 g BT 59.53 225.17 Td (original. The reversal follows the same maker and checker steps.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 188.27 Td (10. Variance review)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 154.97 Td (10.1 Month-on-month review)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 131.56 Td (On working day five the Controller compares each expense and income account with the previous)Tj ET Q
+q 0.000 g BT 59.53 113.70 Td (month. A change of more than 25% that is also more than Rs.50,000 in amount is investigated)Tj ET Q
+q 0.000 g BT 59.53 95.84 Td (and explained in the close note.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 233.61 28.78 Td (POL-001-accounting-policy - page 9)Tj ET Q
+
+endstream
+endobj
+21 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 22 0 R>>
+endobj
+22 0 obj
+<</Length 6733>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 764.28 Td (10.2 Explaining a variance)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 740.87 Td (An explanation names the cause, such as a new supplier, a one-time purchase, a price change or)Tj ET Q
+q 0.000 g BT 59.53 723.01 Td (a cut-off error, and points to the documents. An explanation of the type the cost was higher this)Tj ET Q
+q 0.000 g BT 59.53 705.15 Td (month is not accepted.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 676.62 Td (10.3 Action)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 653.20 Td (A variance that arises from an error is corrected under section 9. A variance that is real and)Tj ET Q
+q 0.000 g BT 59.53 635.35 Td (expected is noted. A variance that cannot be explained is escalated before the month is locked.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 598.45 Td (11. Records)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 565.14 Td (11.1 Retention)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 541.73 Td (Books, vouchers, bank statements, GST returns and close notes are kept for the period the law)Tj ET Q
+q 0.000 g BT 59.53 523.87 Td (requires, and in any case not less than eight years. Documents are stored in the document)Tj ET Q
+q 0.000 g BT 59.53 506.02 Td (system with the month and the company, and are not deleted.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 477.48 Td (11.2 Access)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 454.07 Td (Access to the ledger is given by role. Writing to the ledger needs approval under section 9.)Tj ET Q
+q 0.000 g BT 59.53 436.21 Td (Reading is open to the finance team of the company and to the auditors.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 11.50 Tf ET
+q 0.000 g BT 59.53 407.68 Td (11.3 Changes to this manual)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 384.27 Td (A change to this manual is proposed by the Group Finance Controller, reviewed by the Audit)Tj ET Q
+q 0.000 g BT 59.53 366.41 Td (Committee and takes effect from the first day of a month. The previous version is kept. A figure)Tj ET Q
+q 0.000 g BT 59.53 348.55 Td (that is changed in the working rules of the finance system is changed here at the same time.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 311.65 Td (Appendix A. Summary of figures)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 287.04 Td (The figures below repeat the rules in the numbered sections. If a figure here differs from its)Tj ET Q
+q 0.000 g BT 59.53 269.18 Td (section, the section is correct.)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 9.50 Tf ET
+0.882 g
+56.69 261.57 188.57 -20.41 re B
+q 0.000 g BT 62.36 248.51 Td (Topic)Tj ET Q
+0.882 g
+245.26 261.57 68.09 -20.41 re B
+q 0.000 g BT 250.93 248.51 Td (Section)Tj ET Q
+0.882 g
+313.35 261.57 225.23 -20.41 re B
+q 0.000 g BT 319.02 248.51 Td (Figure)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 241.16 188.57 -20.41 re S
+q 0.000 g BT 62.36 228.10 Td (Capitalise an asset)Tj ET Q
+245.26 241.16 68.09 -20.41 re S
+q 0.000 g BT 250.93 228.10 Td (3.1)Tj ET Q
+313.35 241.16 225.23 -20.41 re S
+q 0.000 g BT 319.02 228.10 Td (Rs.50,000 or more)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 220.75 188.57 -20.41 re S
+q 0.000 g BT 62.36 207.69 Td (Spread an annual cost)Tj ET Q
+245.26 220.75 68.09 -20.41 re S
+q 0.000 g BT 250.93 207.69 Td (4.2)Tj ET Q
+313.35 220.75 225.23 -20.41 re S
+q 0.000 g BT 319.02 207.69 Td (Rs.50,000 or more)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 200.34 188.57 -20.41 re S
+q 0.000 g BT 62.36 187.28 Td (Recurring supplier history)Tj ET Q
+245.26 200.34 68.09 -20.41 re S
+q 0.000 g BT 250.93 187.28 Td (5.2)Tj ET Q
+313.35 200.34 225.23 -20.41 re S
+q 0.000 g BT 319.02 187.28 Td (3 of the last 4 months)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 179.93 188.57 -20.41 re S
+q 0.000 g BT 62.36 166.87 Td (Recurring supplier amount band)Tj ET Q
+245.26 179.93 68.09 -20.41 re S
+q 0.000 g BT 250.93 166.87 Td (5.2)Tj ET Q
+313.35 179.93 225.23 -20.41 re S
+q 0.000 g BT 319.02 166.87 Td (within 20%)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 159.52 188.57 -20.41 re S
+q 0.000 g BT 62.36 146.47 Td (GSTR-2B tax tolerance)Tj ET Q
+245.26 159.52 68.09 -20.41 re S
+q 0.000 g BT 250.93 146.47 Td (6.1)Tj ET Q
+313.35 159.52 225.23 -20.41 re S
+q 0.000 g BT 319.02 146.47 Td (Rs.1 per invoice)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 139.11 188.57 -20.41 re S
+q 0.000 g BT 62.36 126.06 Td (Bank matching date window)Tj ET Q
+245.26 139.11 68.09 -20.41 re S
+q 0.000 g BT 250.93 126.06 Td (7.3)Tj ET Q
+313.35 139.11 225.23 -20.41 re S
+q 0.000 g BT 319.02 126.06 Td (3 days)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 118.70 188.57 -20.41 re S
+q 0.000 g BT 62.36 105.65 Td (Variance review)Tj ET Q
+245.26 118.70 68.09 -20.41 re S
+q 0.000 g BT 250.93 105.65 Td (10.1)Tj ET Q
+313.35 118.70 225.23 -20.41 re S
+q 0.000 g BT 319.02 105.65 Td (more than 25% and more than Rs.50,000)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 98.29 188.57 -20.41 re S
+q 0.000 g BT 62.36 85.24 Td (Accountant approval limit)Tj ET Q
+245.26 98.29 68.09 -20.41 re S
+q 0.000 g BT 250.93 85.24 Td (9.2)Tj ET Q
+313.35 98.29 225.23 -20.41 re S
+q 0.000 g BT 319.02 85.24 Td (up to Rs.1,00,000)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 77.88 188.57 -20.41 re S
+q 0.000 g BT 62.36 64.83 Td (Controller approval limit)Tj ET Q
+245.26 77.88 68.09 -20.41 re S
+q 0.000 g BT 250.93 64.83 Td (9.2)Tj ET Q
+313.35 77.88 225.23 -20.41 re S
+q 0.000 g BT 319.02 64.83 Td (up to Rs.10,00,000)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 231.39 28.78 Td (POL-001-accounting-policy - page 10)Tj ET Q
+
+endstream
+endobj
+23 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/Contents 24 0 R>>
+endobj
+24 0 obj
+<</Length 2157>>
+stream
+0 J
+0 j
+0.57 w
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+0.000 G
+0.882 g
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 14.00 Tf ET
+q 0.000 g BT 59.53 755.91 Td (Appendix B. Document control)Tj ET Q
+BT /Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 9.50 Tf ET
+0.882 g
+56.69 743.53 78.31 -20.41 re B
+q 0.000 g BT 62.36 730.47 Td (Version)Tj ET Q
+0.882 g
+135.00 743.53 277.09 -20.41 re B
+q 0.000 g BT 140.67 730.47 Td (Change)Tj ET Q
+0.882 g
+412.09 743.53 126.50 -20.41 re B
+q 0.000 g BT 417.76 730.47 Td (Approved by)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 723.12 78.31 -20.41 re S
+q 0.000 g BT 62.36 710.06 Td (3.0)Tj ET Q
+135.00 723.12 277.09 -20.41 re S
+q 0.000 g BT 140.67 710.06 Td (Added the bank charge and gateway settlement rules)Tj ET Q
+412.09 723.12 126.50 -20.41 re S
+q 0.000 g BT 417.76 710.06 Td (Audit Committee)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 702.71 78.31 -20.41 re S
+q 0.000 g BT 62.36 689.65 Td (3.1)Tj ET Q
+135.00 702.71 277.09 -20.41 re S
+q 0.000 g BT 140.67 689.65 Td (Added the variance review and the worked examples)Tj ET Q
+412.09 702.71 126.50 -20.41 re S
+q 0.000 g BT 417.76 689.65 Td (Audit Committee)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 9.50 Tf ET
+56.69 682.30 78.31 -35.15 re S
+q 0.000 g BT 62.36 669.24 Td (3.2)Tj ET Q
+135.00 682.30 277.09 -35.15 re S
+q 0.000 g BT 140.67 669.24 Td (Clarified cut-off for payroll and the treatment of duplicate)Tj ET Q
+q 0.000 g BT 140.67 654.50 Td (invoices)Tj ET Q
+412.09 682.30 126.50 -35.15 re S
+q 0.000 g BT 417.76 669.24 Td (Audit Committee)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 11.00 Tf ET
+q 0.000 g BT 59.53 620.75 Td (Questions about this manual go to the Group Finance Controller. The team never relies on)Tj ET Q
+q 0.000 g BT 59.53 602.89 Td (memory or on an old copy: it reads the current version before each close.)Tj ET Q
+BT /F0a76705d18e0494dd24cb573e53aa0a8c710ec99 8.00 Tf ET
+q 0.000 g BT 231.39 28.78 Td (POL-001-accounting-policy - page 11)Tj ET Q
+
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R 7 0 R 9 0 R 11 0 R 13 0 R 15 0 R 17 0 R 19 0 R 21 0 R 23 0 R ]
+/Count 11
+/MediaBox [0 0 595.28 841.89]
+>>
+endobj
+25 0 obj
+<</Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+>>
+endobj
+26 0 obj
+<</Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F0a76705d18e0494dd24cb573e53aa0a8c710ec99 25 0 R
+/Ff5d2de5f3a71699ae4b2d83179e62d09e6fc4126 26 0 R
+>>
+/XObject <<
+>>
+/ColorSpace <<
+>>
+>>
+endobj
+27 0 obj
+<<
+/Producer (þÿ F P D F   1 . 7)
+/Title (POL-001-accounting-policy)
+/Author (Close Copilot synthetic corpus)
+/Creator (close-copilot corpus generator)
+/CreationDate (D:20260101000000)
+/ModDate (D:20260101000000)
+>>
+endobj
+28 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/Names <<
+/EmbeddedFiles << /Names [
+  
+] >>
+>>
+>>
+endobj
+xref
+0 29
+0000000000 65535 f 
+0000055158 00000 n 
+0000055512 00000 n 
+0000000015 00000 n 
+0000000093 00000 n 
+0000005476 00000 n 
+0000005554 00000 n 
+0000011704 00000 n 
+0000011782 00000 n 
+0000016733 00000 n 
+0000016812 00000 n 
+0000021866 00000 n 
+0000021946 00000 n 
+0000026659 00000 n 
+0000026739 00000 n 
+0000031408 00000 n 
+0000031488 00000 n 
+0000036276 00000 n 
+0000036356 00000 n 
+0000041219 00000 n 
+0000041299 00000 n 
+0000046006 00000 n 
+0000046086 00000 n 
+0000052870 00000 n 
+0000052950 00000 n 
+0000055313 00000 n 
+0000055410 00000 n 
+0000055724 00000 n 
+0000055956 00000 n 
+trailer
+<<
+/Size 29
+/Root 28 0 R
+/Info 27 0 R
+>>
+startxref
+56054
+%%EOF
