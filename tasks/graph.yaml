@@ -624,6 +624,27 @@ tasks:
       - "cmd/eval/main.go"
       - "cmd/eval/main_test.go"
     check: "make record-fixtures SUITE=suite-v1 records against scoped servers"
+  # CC-905b is not in the tickets doc. Found 2026-10-12 at the first Gate C replay:
+  # cmd/eval leaves Workflow.Checks nil, so suite-v1 ran bank reconciliation only
+  # (recall 6/40). Its spec is specs/CC-905b.md.
+  - id: CC-905b
+    title: "Eval runs the Phase 2 detectors on suite-v1"
+    phase: 2
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-905a, CC-608, CC-010]
+    needs_erpnext: false
+    files:
+      - "cmd/eval/main.go"
+      - "cmd/eval/args.go"
+      - "cmd/eval/args_test.go"
+      - "cmd/eval/main_test.go"
+      - "cmd/eval/replay_test.go"
+      - "internal/evals/result.go"
+      - "internal/evals/runner.go"
+      - "internal/evals/runner_test.go"
+    check: "go test ./cmd/eval/... ./internal/evals/...; the manifest records the checks that ran"
 
   # ---- Phase 2 ----
   - id: CC-403
