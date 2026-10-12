@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Sales - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 677375401,
+      "debit": 0,
+      "month": "2026-04",
+      "net": -677375401
+    },
+    {
+      "credit": 868718878,
+      "debit": 0,
+      "month": "2026-05",
+      "net": -868718878
+    },
+    {
+      "credit": 1140112034,
+      "debit": 0,
+      "month": "2026-06",
+      "net": -1140112034
+    },
+    {
+      "credit": 693936413,
+      "debit": 0,
+      "month": "2026-07",
+      "net": -693936413
+    }
+  ],
+  "tool": "get_account_history"
+}

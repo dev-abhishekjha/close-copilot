@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Electricity - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-06"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-03",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 2163894,
+      "month": "2026-04",
+      "net": 2163894
+    },
+    {
+      "credit": 0,
+      "debit": 2235652,
+      "month": "2026-05",
+      "net": 2235652
+    },
+    {
+      "credit": 0,
+      "debit": 2468340,
+      "month": "2026-06",
+      "net": 2468340
+    }
+  ],
+  "tool": "get_account_history"
+}

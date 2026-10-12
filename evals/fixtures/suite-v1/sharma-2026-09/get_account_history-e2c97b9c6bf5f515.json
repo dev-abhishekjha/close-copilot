@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Software Subscriptions - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-09"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 1450000,
+      "month": "2026-06",
+      "net": 1450000
+    },
+    {
+      "credit": 0,
+      "debit": 1450000,
+      "month": "2026-07",
+      "net": 1450000
+    },
+    {
+      "credit": 0,
+      "debit": 13450000,
+      "month": "2026-08",
+      "net": 13450000
+    },
+    {
+      "credit": 0,
+      "debit": 12450000,
+      "month": "2026-09",
+      "net": 12450000
+    }
+  ],
+  "tool": "get_account_history"
+}

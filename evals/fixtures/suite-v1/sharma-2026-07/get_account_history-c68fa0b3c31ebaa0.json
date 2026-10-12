@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Telephone and Internet - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 743192,
+      "month": "2026-04",
+      "net": 743192
+    },
+    {
+      "credit": 0,
+      "debit": 638698,
+      "month": "2026-05",
+      "net": 638698
+    },
+    {
+      "credit": 0,
+      "debit": 681857,
+      "month": "2026-06",
+      "net": 681857
+    },
+    {
+      "credit": 0,
+      "debit": 763476,
+      "month": "2026-07",
+      "net": 763476
+    }
+  ],
+  "tool": "get_account_history"
+}

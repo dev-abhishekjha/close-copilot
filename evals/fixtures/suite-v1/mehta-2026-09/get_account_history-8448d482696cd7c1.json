@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Telephone and Internet - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-09"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 2315030,
+      "month": "2026-06",
+      "net": 2315030
+    },
+    {
+      "credit": 0,
+      "debit": 1919660,
+      "month": "2026-07",
+      "net": 1919660
+    },
+    {
+      "credit": 0,
+      "debit": 2219779,
+      "month": "2026-08",
+      "net": 2219779
+    },
+    {
+      "credit": 0,
+      "debit": 1983925,
+      "month": "2026-09",
+      "net": 1983925
+    }
+  ],
+  "tool": "get_account_history"
+}

@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Cost of Goods Sold - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-08"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 53074275,
+      "month": "2026-05",
+      "net": 53074275
+    },
+    {
+      "credit": 0,
+      "debit": 51804396,
+      "month": "2026-06",
+      "net": 51804396
+    },
+    {
+      "credit": 0,
+      "debit": 43255185,
+      "month": "2026-07",
+      "net": 43255185
+    },
+    {
+      "credit": 0,
+      "debit": 37450710,
+      "month": "2026-08",
+      "net": 37450710
+    }
+  ],
+  "tool": "get_account_history"
+}

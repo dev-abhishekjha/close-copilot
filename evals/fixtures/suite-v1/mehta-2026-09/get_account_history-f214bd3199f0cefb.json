@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Professional Charges - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-09"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 45401359,
+      "month": "2026-06",
+      "net": 45401359
+    },
+    {
+      "credit": 0,
+      "debit": 45525141,
+      "month": "2026-07",
+      "net": 45525141
+    },
+    {
+      "credit": 0,
+      "debit": 46771088,
+      "month": "2026-08",
+      "net": 46771088
+    },
+    {
+      "credit": 0,
+      "debit": 49257992,
+      "month": "2026-09",
+      "net": 49257992
+    }
+  ],
+  "tool": "get_account_history"
+}

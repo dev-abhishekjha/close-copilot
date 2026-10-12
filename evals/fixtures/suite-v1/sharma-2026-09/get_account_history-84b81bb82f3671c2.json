@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Interest Income - STPL",
+    "company": "sharma",
+    "months": 4,
+    "through": "2026-09"
+  },
+  "result": [
+    {
+      "credit": 1795500,
+      "debit": 0,
+      "month": "2026-06",
+      "net": -1795500
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-07",
+      "net": 0
+    },
+    {
+      "credit": 0,
+      "debit": 0,
+      "month": "2026-08",
+      "net": 0
+    },
+    {
+      "credit": 1984875,
+      "debit": 0,
+      "month": "2026-09",
+      "net": -1984875
+    }
+  ],
+  "tool": "get_account_history"
+}

@@ -1,0 +1,4369 @@
+{
+  "args": {
+    "company": "sharma",
+    "from": "2026-08-01",
+    "to": "2026-08-31"
+  },
+  "result": [
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00698",
+      "PaidAmount": 4459087,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-003",
+      "PartyName": "CUST-003",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-01T00:00:00Z",
+      "ReceivedAmount": 4459087,
+      "ReferenceDate": "2026-08-01T00:00:00Z",
+      "ReferenceNo": "UTR252838997",
+      "References": [
+        {
+          "AllocatedAmount": 4459087,
+          "Name": "p4tcus04ea",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00831",
+          "TotalAmount": 4459087
+        }
+      ],
+      "Remarks": "Receipt from CUST-003",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00699",
+      "PaidAmount": 8967266,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-039",
+      "PartyName": "CUST-039",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-04T00:00:00Z",
+      "ReceivedAmount": 8967266,
+      "ReferenceDate": "2026-08-04T00:00:00Z",
+      "ReferenceNo": "UTR927157216",
+      "References": [
+        {
+          "AllocatedAmount": 8967266,
+          "Name": "p4u1f4uj9n",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00834",
+          "TotalAmount": 8967266
+        }
+      ],
+      "Remarks": "Receipt from CUST-039",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00700",
+      "PaidAmount": 397938,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-05T00:00:00Z",
+      "ReceivedAmount": 397938,
+      "ReferenceDate": "2026-08-05T00:00:00Z",
+      "ReferenceNo": "UTR584509897",
+      "References": [
+        {
+          "AllocatedAmount": 397938,
+          "Name": "p4vbful2b3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00854",
+          "TotalAmount": 397938
+        }
+      ],
+      "Remarks": "Receipt from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00701",
+      "PaidAmount": 5270668,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-07T00:00:00Z",
+      "ReceivedAmount": 5270668,
+      "ReferenceDate": "2026-08-07T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0054",
+      "References": [
+        {
+          "AllocatedAmount": 5270668,
+          "Name": "p50fjaifun",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00833",
+          "TotalAmount": 5270668
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00702",
+      "PaidAmount": 2396488,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-022",
+      "PartyName": "CUST-022",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-07T00:00:00Z",
+      "ReceivedAmount": 2396488,
+      "ReferenceDate": "2026-08-07T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0056",
+      "References": [
+        {
+          "AllocatedAmount": 2396488,
+          "Name": "p51e05p99u",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00865",
+          "TotalAmount": 2396488
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-022",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00703",
+      "PaidAmount": 7593169,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-031",
+      "PartyName": "CUST-031",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-07T00:00:00Z",
+      "ReceivedAmount": 7593169,
+      "ReferenceDate": "2026-08-07T00:00:00Z",
+      "ReferenceNo": "UTR854434482",
+      "References": [
+        {
+          "AllocatedAmount": 7593169,
+          "Name": "p52ggovjsi",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00860",
+          "TotalAmount": 7593169
+        }
+      ],
+      "Remarks": "Receipt from CUST-031",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00704",
+      "PaidAmount": 1466152,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "ReceivedAmount": 1466152,
+      "ReferenceDate": "2026-08-08T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0062",
+      "References": [
+        {
+          "AllocatedAmount": 1466152,
+          "Name": "p53j41grbj",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00836",
+          "TotalAmount": 1466152
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00705",
+      "PaidAmount": 3491090,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "ReceivedAmount": 3491090,
+      "ReferenceDate": "2026-08-08T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0065",
+      "References": [
+        {
+          "AllocatedAmount": 3491090,
+          "Name": "p543sf23ko",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00846",
+          "TotalAmount": 3491090
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00706",
+      "PaidAmount": 8095796,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "ReceivedAmount": 8095796,
+      "ReferenceDate": "2026-08-08T00:00:00Z",
+      "ReferenceNo": "UTR138711315",
+      "References": [
+        {
+          "AllocatedAmount": 8095796,
+          "Name": "p55matd3vq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00852",
+          "TotalAmount": 8095796
+        }
+      ],
+      "Remarks": "Receipt from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00707",
+      "PaidAmount": 4428344,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-039",
+      "PartyName": "CUST-039",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "ReceivedAmount": 4428344,
+      "ReferenceDate": "2026-08-08T00:00:00Z",
+      "ReferenceNo": "UTR853346036",
+      "References": [
+        {
+          "AllocatedAmount": 4428344,
+          "Name": "p57h3eusg4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00862",
+          "TotalAmount": 4428344
+        }
+      ],
+      "Remarks": "Receipt from CUST-039",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00708",
+      "PaidAmount": 606951,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-039",
+      "PartyName": "CUST-039",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-09T00:00:00Z",
+      "ReceivedAmount": 606951,
+      "ReferenceDate": "2026-08-09T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0072",
+      "References": [
+        {
+          "AllocatedAmount": 606951,
+          "Name": "p58hajdtjl",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00842",
+          "TotalAmount": 606951
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-039",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00709",
+      "PaidAmount": 440910,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-09T00:00:00Z",
+      "ReceivedAmount": 440910,
+      "ReferenceDate": "2026-08-09T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0075",
+      "References": [
+        {
+          "AllocatedAmount": 440910,
+          "Name": "p59ojekago",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00847",
+          "TotalAmount": 440910
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00710",
+      "PaidAmount": 3933518,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-09T00:00:00Z",
+      "ReceivedAmount": 3933518,
+      "ReferenceDate": "2026-08-09T00:00:00Z",
+      "ReferenceNo": "UTR047787782",
+      "References": [
+        {
+          "AllocatedAmount": 3933518,
+          "Name": "p5a7l5p9s0",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00830",
+          "TotalAmount": 3933518
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00711",
+      "PaidAmount": 3973875,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-09T00:00:00Z",
+      "ReceivedAmount": 3973875,
+      "ReferenceDate": "2026-08-09T00:00:00Z",
+      "ReferenceNo": "UTR122790587",
+      "References": [
+        {
+          "AllocatedAmount": 3973875,
+          "Name": "p5blf5o318",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00858",
+          "TotalAmount": 3973875
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00712",
+      "PaidAmount": 4489010,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-09T00:00:00Z",
+      "ReceivedAmount": 4489010,
+      "ReferenceDate": "2026-08-09T00:00:00Z",
+      "ReferenceNo": "UTR421227102",
+      "References": [
+        {
+          "AllocatedAmount": 4489010,
+          "Name": "p5chp94sh3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00835",
+          "TotalAmount": 4489010
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00713",
+      "PaidAmount": 7123618,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "ReceivedAmount": 7123618,
+      "ReferenceDate": "2026-08-10T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0084",
+      "References": [
+        {
+          "AllocatedAmount": 7123618,
+          "Name": "p5d1k5arc6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00853",
+          "TotalAmount": 7123618
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00714",
+      "PaidAmount": 1563477,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-001",
+      "PartyName": "CUST-001",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "ReceivedAmount": 1563477,
+      "ReferenceDate": "2026-08-10T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0089",
+      "References": [
+        {
+          "AllocatedAmount": 1563477,
+          "Name": "p5emvgh66a",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00887",
+          "TotalAmount": 1563477
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-001",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00715",
+      "PaidAmount": 6233864,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "ReceivedAmount": 6233864,
+      "ReferenceDate": "2026-08-10T00:00:00Z",
+      "ReferenceNo": "UTR252306371",
+      "References": [
+        {
+          "AllocatedAmount": 6233864,
+          "Name": "p5fl8pgfo5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00841",
+          "TotalAmount": 6233864
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00716",
+      "PaidAmount": 1801621,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "ReceivedAmount": 1801621,
+      "ReferenceDate": "2026-08-10T00:00:00Z",
+      "ReferenceNo": "UTR629839913",
+      "References": [
+        {
+          "AllocatedAmount": 1801621,
+          "Name": "p5gpavmk3v",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00864",
+          "TotalAmount": 1801621
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00717",
+      "PaidAmount": 3226584,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "ReceivedAmount": 3226584,
+      "ReferenceDate": "2026-08-10T00:00:00Z",
+      "ReferenceNo": "UTR211534197",
+      "References": [
+        {
+          "AllocatedAmount": 3226584,
+          "Name": "p5ikl65s66",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00881",
+          "TotalAmount": 3226584
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00718",
+      "PaidAmount": 7926628,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-005",
+      "PartyName": "CUST-005",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "ReceivedAmount": 7926628,
+      "ReferenceDate": "2026-08-11T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0102",
+      "References": [
+        {
+          "AllocatedAmount": 7926628,
+          "Name": "p5jmmf7gf3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00849",
+          "TotalAmount": 7926628
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-005",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00719",
+      "PaidAmount": 3214699,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-040",
+      "PartyName": "CUST-040",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "ReceivedAmount": 3214699,
+      "ReferenceDate": "2026-08-11T00:00:00Z",
+      "ReferenceNo": "UTR352076443",
+      "References": [
+        {
+          "AllocatedAmount": 3214699,
+          "Name": "p5kqciet6v",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00851",
+          "TotalAmount": 3214699
+        }
+      ],
+      "Remarks": "Receipt from CUST-040",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00720",
+      "PaidAmount": 531000,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Stockbook Cloud",
+      "PartyName": "Stockbook Cloud",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "ReceivedAmount": 531000,
+      "ReferenceDate": "2026-08-11T00:00:00Z",
+      "ReferenceNo": "N7595193",
+      "References": [
+        {
+          "AllocatedAmount": 531000,
+          "Name": "p5lqjq6tq7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00100",
+          "TotalAmount": 531000
+        }
+      ],
+      "Remarks": "Payment for STC/2026/0829 to Stockbook Cloud",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00721",
+      "PaidAmount": 8657487,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Sundaram Steelware",
+      "PartyName": "Sundaram Steelware",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "ReceivedAmount": 8657487,
+      "ReferenceDate": "2026-08-11T00:00:00Z",
+      "ReferenceNo": "N1670071",
+      "References": [
+        {
+          "AllocatedAmount": 8657487,
+          "Name": "p5m4vd8s1m",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00104",
+          "TotalAmount": 8657487
+        }
+      ],
+      "Remarks": "Payment for SND/2026/0807 to Sundaram Steelware",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00722",
+      "PaidAmount": 5801711,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-015",
+      "PartyName": "CUST-015",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "ReceivedAmount": 5801711,
+      "ReferenceDate": "2026-08-12T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0117",
+      "References": [
+        {
+          "AllocatedAmount": 5801711,
+          "Name": "p5n4be5tod",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00848",
+          "TotalAmount": 5801711
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-015",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00723",
+      "PaidAmount": 2578292,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-013",
+      "PartyName": "CUST-013",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "ReceivedAmount": 2578292,
+      "ReferenceDate": "2026-08-12T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0118",
+      "References": [
+        {
+          "AllocatedAmount": 2578292,
+          "Name": "p5pqc8lo87",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00870",
+          "TotalAmount": 2578292
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-013",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00724",
+      "PaidAmount": 983579,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "ReceivedAmount": 983579,
+      "ReferenceDate": "2026-08-12T00:00:00Z",
+      "ReferenceNo": "UTR700558029",
+      "References": [
+        {
+          "AllocatedAmount": 983579,
+          "Name": "p5q612kvud",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00837",
+          "TotalAmount": 983579
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00725",
+      "PaidAmount": 478451,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "BlueNet Broadband",
+      "PartyName": "BlueNet Broadband",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "ReceivedAmount": 478451,
+      "ReferenceDate": "2026-08-12T00:00:00Z",
+      "ReferenceNo": "N0316814",
+      "References": [
+        {
+          "AllocatedAmount": 478451,
+          "Name": "p5rhu4o5b3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00102",
+          "TotalAmount": 478451
+        }
+      ],
+      "Remarks": "Payment for BLN/2026/0817 to BlueNet Broadband",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00726",
+      "PaidAmount": 7553051,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "TechKart Supplies",
+      "PartyName": "TechKart Supplies",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "ReceivedAmount": 7553051,
+      "ReferenceDate": "2026-08-12T00:00:00Z",
+      "ReferenceNo": "N9944837",
+      "References": [
+        {
+          "AllocatedAmount": 7553051,
+          "Name": "p5sfkb6i49",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00098",
+          "TotalAmount": 7553051
+        }
+      ],
+      "Remarks": "Payment for TCH/2026/0820 to TechKart Supplies",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00727",
+      "PaidAmount": 8277632,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 8277632,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0127",
+      "References": [
+        {
+          "AllocatedAmount": 8277632,
+          "Name": "p5tsemktts",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00844",
+          "TotalAmount": 8277632
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00728",
+      "PaidAmount": 3984951,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-003",
+      "PartyName": "CUST-003",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 3984951,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0128",
+      "References": [
+        {
+          "AllocatedAmount": 3984951,
+          "Name": "p5ut1rgl4n",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00876",
+          "TotalAmount": 3984951
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-003",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00729",
+      "PaidAmount": 6241800,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-019",
+      "PartyName": "CUST-019",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 6241800,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0129",
+      "References": [
+        {
+          "AllocatedAmount": 6241800,
+          "Name": "p5v9qj4j90",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00850",
+          "TotalAmount": 6241800
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-019",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00730",
+      "PaidAmount": 2260635,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-035",
+      "PartyName": "CUST-035",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 2260635,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0133",
+      "References": [
+        {
+          "AllocatedAmount": 2260635,
+          "Name": "p60pf8cjr2",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00890",
+          "TotalAmount": 2260635
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-035",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00731",
+      "PaidAmount": 1699237,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 1699237,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "UTR850940411",
+      "References": [
+        {
+          "AllocatedAmount": 1699237,
+          "Name": "p61cnvi5ve",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00879",
+          "TotalAmount": 1699237
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00732",
+      "PaidAmount": 2476702,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 2476702,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "UTR409503335",
+      "References": [
+        {
+          "AllocatedAmount": 2476702,
+          "Name": "p63nng88kl",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00895",
+          "TotalAmount": 2476702
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00733",
+      "PaidAmount": 6613369,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-022",
+      "PartyName": "CUST-022",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 6613369,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "UTR541782196",
+      "References": [
+        {
+          "AllocatedAmount": 6613369,
+          "Name": "p645ujpvsi",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00888",
+          "TotalAmount": 6613369
+        }
+      ],
+      "Remarks": "Receipt from CUST-022",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00734",
+      "PaidAmount": 409787,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Swift Couriers",
+      "PartyName": "Swift Couriers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-13T00:00:00Z",
+      "ReceivedAmount": 409787,
+      "ReferenceDate": "2026-08-13T00:00:00Z",
+      "ReferenceNo": "N2438524",
+      "References": [
+        {
+          "AllocatedAmount": 409787,
+          "Name": "p65f62cffe",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00099",
+          "TotalAmount": 409787
+        }
+      ],
+      "Remarks": "Payment for SWF/2026/0813 to Swift Couriers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00735",
+      "PaidAmount": 6671266,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-035",
+      "PartyName": "CUST-035",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 6671266,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0138",
+      "References": [
+        {
+          "AllocatedAmount": 6671266,
+          "Name": "p66mog7km9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00829",
+          "TotalAmount": 6671266
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-035",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00736",
+      "PaidAmount": 3224754,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-038",
+      "PartyName": "CUST-038",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 3224754,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0139",
+      "References": [
+        {
+          "AllocatedAmount": 3224754,
+          "Name": "p67144cvah",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00899",
+          "TotalAmount": 3224754
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-038",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00737",
+      "PaidAmount": 5136488,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-005",
+      "PartyName": "CUST-005",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 5136488,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "UTR683715595",
+      "References": [
+        {
+          "AllocatedAmount": 5136488,
+          "Name": "p694ius4gr",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00855",
+          "TotalAmount": 5136488
+        }
+      ],
+      "Remarks": "Receipt from CUST-005",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00738",
+      "PaidAmount": 6140909,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-019",
+      "PartyName": "CUST-019",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 6140909,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "UTR036811271",
+      "References": [
+        {
+          "AllocatedAmount": 6140909,
+          "Name": "p6ah9fk062",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00892",
+          "TotalAmount": 6140909
+        }
+      ],
+      "Remarks": "Receipt from CUST-019",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00739",
+      "PaidAmount": 4815253,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-015",
+      "PartyName": "CUST-015",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 4815253,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "UTR741494838",
+      "References": [
+        {
+          "AllocatedAmount": 4815253,
+          "Name": "p6brhius2n",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00875",
+          "TotalAmount": 4815253
+        }
+      ],
+      "Remarks": "Receipt from CUST-015",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00740",
+      "PaidAmount": 2076454,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-033",
+      "PartyName": "CUST-033",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "ReceivedAmount": 2076454,
+      "ReferenceDate": "2026-08-14T00:00:00Z",
+      "ReferenceNo": "UTR252972185",
+      "References": [
+        {
+          "AllocatedAmount": 2076454,
+          "Name": "p6ctgbpam9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00859",
+          "TotalAmount": 2076454
+        }
+      ],
+      "Remarks": "Receipt from CUST-033",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00741",
+      "PaidAmount": 1724756,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-032",
+      "PartyName": "CUST-032",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "ReceivedAmount": 1724756,
+      "ReferenceDate": "2026-08-15T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0148",
+      "References": [
+        {
+          "AllocatedAmount": 1724756,
+          "Name": "p6ddur0d9q",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00832",
+          "TotalAmount": 1724756
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-032",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00742",
+      "PaidAmount": 1521081,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-009",
+      "PartyName": "CUST-009",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "ReceivedAmount": 1521081,
+      "ReferenceDate": "2026-08-15T00:00:00Z",
+      "ReferenceNo": "UTR796270843",
+      "References": [
+        {
+          "AllocatedAmount": 1521081,
+          "Name": "p6egtfi325",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00915",
+          "TotalAmount": 1521081
+        }
+      ],
+      "Remarks": "Receipt from CUST-009",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00743",
+      "PaidAmount": 4476634,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "ReceivedAmount": 4476634,
+      "ReferenceDate": "2026-08-15T00:00:00Z",
+      "ReferenceNo": "UTR062858818",
+      "References": [
+        {
+          "AllocatedAmount": 4476634,
+          "Name": "p6fbu8623h",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00845",
+          "TotalAmount": 4476634
+        }
+      ],
+      "Remarks": "Receipt from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00744",
+      "PaidAmount": 7303238,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-030",
+      "PartyName": "CUST-030",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "ReceivedAmount": 7303238,
+      "ReferenceDate": "2026-08-15T00:00:00Z",
+      "ReferenceNo": "UTR762198385",
+      "References": [
+        {
+          "AllocatedAmount": 7303238,
+          "Name": "p6h4okps07",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00873",
+          "TotalAmount": 7303238
+        }
+      ],
+      "Remarks": "Receipt from CUST-030",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00745",
+      "PaidAmount": 2443104,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "City Power Co",
+      "PartyName": "City Power Co",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "ReceivedAmount": 2443104,
+      "ReferenceDate": "2026-08-15T00:00:00Z",
+      "ReferenceNo": "N2951824",
+      "References": [
+        {
+          "AllocatedAmount": 2443104,
+          "Name": "p6irjf0u0g",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00108",
+          "TotalAmount": 2443104
+        }
+      ],
+      "Remarks": "Payment for CTY/2026/0816 to City Power Co",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00746",
+      "PaidAmount": 379788,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 379788,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0156",
+      "References": [
+        {
+          "AllocatedAmount": 379788,
+          "Name": "p6jtalu54a",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00840",
+          "TotalAmount": 379788
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00747",
+      "PaidAmount": 2617834,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 2617834,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0160",
+      "References": [
+        {
+          "AllocatedAmount": 2617834,
+          "Name": "p6k5nkgd13",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00861",
+          "TotalAmount": 2617834
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00748",
+      "PaidAmount": 4430000,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 4430000,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "UTR758499118",
+      "References": [
+        {
+          "AllocatedAmount": 4430000,
+          "Name": "p6ll4qibnq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00902",
+          "TotalAmount": 4430000
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00749",
+      "PaidAmount": 6443998,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-013",
+      "PartyName": "CUST-013",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 6443998,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "UTR864862240",
+      "References": [
+        {
+          "AllocatedAmount": 6443998,
+          "Name": "p6mh4llog0",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00843",
+          "TotalAmount": 6443998
+        }
+      ],
+      "Remarks": "Receipt from CUST-013",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00750",
+      "PaidAmount": 3523497,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-033",
+      "PartyName": "CUST-033",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 3523497,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "UTR476928865",
+      "References": [
+        {
+          "AllocatedAmount": 3523497,
+          "Name": "p6ngedtunf",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00909",
+          "TotalAmount": 3523497
+        }
+      ],
+      "Remarks": "Receipt from CUST-033",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00751",
+      "PaidAmount": 4006351,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 4006351,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "UTR832806614",
+      "References": [
+        {
+          "AllocatedAmount": 4006351,
+          "Name": "p6o57flna6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00839",
+          "TotalAmount": 4006351
+        }
+      ],
+      "Remarks": "Receipt from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00752",
+      "PaidAmount": 8657487,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Sundaram Steelware",
+      "PartyName": "Sundaram Steelware",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "ReceivedAmount": 8657487,
+      "ReferenceDate": "2026-08-16T00:00:00Z",
+      "ReferenceNo": "N7447674",
+      "References": [],
+      "Remarks": "Payment for SND/2026/0807",
+      "UnallocatedAmount": 8657487
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00753",
+      "PaidAmount": 628575,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 628575,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0173",
+      "References": [
+        {
+          "AllocatedAmount": 628575,
+          "Name": "p6qnpm8199",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00856",
+          "TotalAmount": 628575
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00754",
+      "PaidAmount": 1891019,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-034",
+      "PartyName": "CUST-034",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 1891019,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0175",
+      "References": [
+        {
+          "AllocatedAmount": 1891019,
+          "Name": "p6ref80pcs",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00863",
+          "TotalAmount": 1891019
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-034",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00755",
+      "PaidAmount": 5444492,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-003",
+      "PartyName": "CUST-003",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 5444492,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0178",
+      "References": [
+        {
+          "AllocatedAmount": 5444492,
+          "Name": "p6sccrfgl5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00838",
+          "TotalAmount": 5444492
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-003",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00756",
+      "PaidAmount": 4232240,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-036",
+      "PartyName": "CUST-036",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 4232240,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0179",
+      "References": [
+        {
+          "AllocatedAmount": 4232240,
+          "Name": "p6t9q1vamu",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00894",
+          "TotalAmount": 4232240
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-036",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00757",
+      "PaidAmount": 2389814,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-030",
+      "PartyName": "CUST-030",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 2389814,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "UTR683551413",
+      "References": [
+        {
+          "AllocatedAmount": 2389814,
+          "Name": "p6uju4ece9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00919",
+          "TotalAmount": 2389814
+        }
+      ],
+      "Remarks": "Receipt from CUST-030",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00758",
+      "PaidAmount": 5420228,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-035",
+      "PartyName": "CUST-035",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 5420228,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "UTR705833390",
+      "References": [
+        {
+          "AllocatedAmount": 5420228,
+          "Name": "p6vkhc4358",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00874",
+          "TotalAmount": 5420228
+        }
+      ],
+      "Remarks": "Receipt from CUST-035",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00759",
+      "PaidAmount": 8264252,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-019",
+      "PartyName": "CUST-019",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 8264252,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "UTR120141735",
+      "References": [
+        {
+          "AllocatedAmount": 8264252,
+          "Name": "p70hm81hcl",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00929",
+          "TotalAmount": 8264252
+        }
+      ],
+      "Remarks": "Receipt from CUST-019",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00760",
+      "PaidAmount": 17700000,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Omkar Estates",
+      "PartyName": "Omkar Estates",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-17T00:00:00Z",
+      "ReceivedAmount": 17700000,
+      "ReferenceDate": "2026-08-17T00:00:00Z",
+      "ReferenceNo": "N3413082",
+      "References": [
+        {
+          "AllocatedAmount": 17700000,
+          "Name": "p71seoil97",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00097",
+          "TotalAmount": 17700000
+        }
+      ],
+      "Remarks": "Payment for OMK/2026/0819 to Omkar Estates",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00761",
+      "PaidAmount": 7118623,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 7118623,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0185",
+      "References": [
+        {
+          "AllocatedAmount": 7118623,
+          "Name": "p721jsmgid",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00905",
+          "TotalAmount": 7118623
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00762",
+      "PaidAmount": 6375194,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 6375194,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0186",
+      "References": [
+        {
+          "AllocatedAmount": 6375194,
+          "Name": "p738qc8u8k",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00868",
+          "TotalAmount": 6375194
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00763",
+      "PaidAmount": 778496,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 778496,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0189",
+      "References": [
+        {
+          "AllocatedAmount": 778496,
+          "Name": "p74dp01mju",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00900",
+          "TotalAmount": 778496
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00764",
+      "PaidAmount": 4779569,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 4779569,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR445394246",
+      "References": [
+        {
+          "AllocatedAmount": 4779569,
+          "Name": "p75rhjtc6l",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00896",
+          "TotalAmount": 4779569
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00765",
+      "PaidAmount": 5622484,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-022",
+      "PartyName": "CUST-022",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 5622484,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR889956870",
+      "References": [
+        {
+          "AllocatedAmount": 5622484,
+          "Name": "p76s616oli",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00872",
+          "TotalAmount": 5622484
+        }
+      ],
+      "Remarks": "Receipt from CUST-022",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00766",
+      "PaidAmount": 4283385,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 4283385,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR111160271",
+      "References": [
+        {
+          "AllocatedAmount": 4283385,
+          "Name": "p777n5h4kd",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00927",
+          "TotalAmount": 4283385
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00767",
+      "PaidAmount": 7617504,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-036",
+      "PartyName": "CUST-036",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 7617504,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR432168284",
+      "References": [
+        {
+          "AllocatedAmount": 7617504,
+          "Name": "p78a25464c",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00931",
+          "TotalAmount": 7617504
+        }
+      ],
+      "Remarks": "Receipt from CUST-036",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00768",
+      "PaidAmount": 8320616,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 8320616,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR923514677",
+      "References": [
+        {
+          "AllocatedAmount": 8320616,
+          "Name": "p79s8j4u92",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00923",
+          "TotalAmount": 8320616
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00769",
+      "PaidAmount": 3961767,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-18T00:00:00Z",
+      "ReceivedAmount": 3961767,
+      "ReferenceDate": "2026-08-18T00:00:00Z",
+      "ReferenceNo": "UTR959534499",
+      "References": [
+        {
+          "AllocatedAmount": 3961767,
+          "Name": "p7aaaksek4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00935",
+          "TotalAmount": 3961767
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00770",
+      "PaidAmount": 4112824,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-034",
+      "PartyName": "CUST-034",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 4112824,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0201",
+      "References": [
+        {
+          "AllocatedAmount": 4112824,
+          "Name": "p7bg50f5lc",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00920",
+          "TotalAmount": 4112824
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-034",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00771",
+      "PaidAmount": 1543548,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 1543548,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0204",
+      "References": [
+        {
+          "AllocatedAmount": 1543548,
+          "Name": "p7c57e2pg4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00893",
+          "TotalAmount": 1543548
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00772",
+      "PaidAmount": 8200163,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-013",
+      "PartyName": "CUST-013",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 8200163,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0207",
+      "References": [
+        {
+          "AllocatedAmount": 8200163,
+          "Name": "p7dbeivkg5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00882",
+          "TotalAmount": 8200163
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-013",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00773",
+      "PaidAmount": 7761904,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-032",
+      "PartyName": "CUST-032",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 7761904,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0208",
+      "References": [
+        {
+          "AllocatedAmount": 7761904,
+          "Name": "p7eq28v3mh",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00910",
+          "TotalAmount": 7761904
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-032",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00774",
+      "PaidAmount": 1122907,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 1122907,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0209",
+      "References": [
+        {
+          "AllocatedAmount": 1122907,
+          "Name": "p7f3cftccl",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00877",
+          "TotalAmount": 1122907
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00775",
+      "PaidAmount": 8845951,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-023",
+      "PartyName": "CUST-023",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 8845951,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "UTR234978214",
+      "References": [
+        {
+          "AllocatedAmount": 8845951,
+          "Name": "p7gbg9kb87",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00914",
+          "TotalAmount": 8845951
+        }
+      ],
+      "Remarks": "Receipt from CUST-023",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00776",
+      "PaidAmount": 7650462,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 7650462,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "UTR750568034",
+      "References": [
+        {
+          "AllocatedAmount": 7650462,
+          "Name": "p7h677224l",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00867",
+          "TotalAmount": 7650462
+        }
+      ],
+      "Remarks": "Receipt from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00777",
+      "PaidAmount": 1644287,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-038",
+      "PartyName": "CUST-038",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 1644287,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "UTR145393832",
+      "References": [
+        {
+          "AllocatedAmount": 1644287,
+          "Name": "p7iqiedia2",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00857",
+          "TotalAmount": 1644287
+        }
+      ],
+      "Remarks": "Receipt from CUST-038",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00778",
+      "PaidAmount": 1125939,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-039",
+      "PartyName": "CUST-039",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 1125939,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "UTR231123784",
+      "References": [
+        {
+          "AllocatedAmount": 1125939,
+          "Name": "p7jldstaia",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00898",
+          "TotalAmount": 1125939
+        }
+      ],
+      "Remarks": "Receipt from CUST-039",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00779",
+      "PaidAmount": 6880585,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-036",
+      "PartyName": "CUST-036",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-19T00:00:00Z",
+      "ReceivedAmount": 6880585,
+      "ReferenceDate": "2026-08-19T00:00:00Z",
+      "ReferenceNo": "UTR351774094",
+      "References": [
+        {
+          "AllocatedAmount": 6880585,
+          "Name": "p7kfpal5lt",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00903",
+          "TotalAmount": 6880585
+        }
+      ],
+      "Remarks": "Receipt from CUST-036",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00780",
+      "PaidAmount": 455317,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-20T00:00:00Z",
+      "ReceivedAmount": 455317,
+      "ReferenceDate": "2026-08-20T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0217",
+      "References": [
+        {
+          "AllocatedAmount": 455317,
+          "Name": "p7lt9vljl7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00924",
+          "TotalAmount": 455317
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00781",
+      "PaidAmount": 1379744,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-028",
+      "PartyName": "CUST-028",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-20T00:00:00Z",
+      "ReceivedAmount": 1379744,
+      "ReferenceDate": "2026-08-20T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0223",
+      "References": [
+        {
+          "AllocatedAmount": 1379744,
+          "Name": "p7mnomqg2g",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00880",
+          "TotalAmount": 1379744
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-028",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00782",
+      "PaidAmount": 3149310,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-20T00:00:00Z",
+      "ReceivedAmount": 3149310,
+      "ReferenceDate": "2026-08-20T00:00:00Z",
+      "ReferenceNo": "UTR834931593",
+      "References": [
+        {
+          "AllocatedAmount": 3149310,
+          "Name": "p7nvjjr7fa",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00866",
+          "TotalAmount": 3149310
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00783",
+      "PaidAmount": 245501,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "QuickFix Repairs",
+      "PartyName": "QuickFix Repairs",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-20T00:00:00Z",
+      "ReceivedAmount": 245501,
+      "ReferenceDate": "2026-08-20T00:00:00Z",
+      "ReferenceNo": "N8482252",
+      "References": [
+        {
+          "AllocatedAmount": 245501,
+          "Name": "p7oihvpr36",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00101",
+          "TotalAmount": 245501
+        }
+      ],
+      "Remarks": "Payment for QCK/2026/0842 to QuickFix Repairs",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00784",
+      "PaidAmount": 7772987,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-038",
+      "PartyName": "CUST-038",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 7772987,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0232",
+      "References": [
+        {
+          "AllocatedAmount": 7772987,
+          "Name": "p7pq3vrd5f",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00946",
+          "TotalAmount": 7772987
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-038",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00785",
+      "PaidAmount": 4898898,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-038",
+      "PartyName": "CUST-038",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 4898898,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR259135975",
+      "References": [
+        {
+          "AllocatedAmount": 4898898,
+          "Name": "p7q96d62rr",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00897",
+          "TotalAmount": 4898898
+        }
+      ],
+      "Remarks": "Receipt from CUST-038",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00786",
+      "PaidAmount": 1884632,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 1884632,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR485619324",
+      "References": [
+        {
+          "AllocatedAmount": 1884632,
+          "Name": "p7rvk3054m",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00871",
+          "TotalAmount": 1884632
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00787",
+      "PaidAmount": 6341944,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-030",
+      "PartyName": "CUST-030",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 6341944,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR033746680",
+      "References": [
+        {
+          "AllocatedAmount": 6341944,
+          "Name": "p7sb3mhiof",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00886",
+          "TotalAmount": 6341944
+        }
+      ],
+      "Remarks": "Receipt from CUST-030",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00788",
+      "PaidAmount": 4716185,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 4716185,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR786624230",
+      "References": [
+        {
+          "AllocatedAmount": 4716185,
+          "Name": "p7tsqhaib5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00945",
+          "TotalAmount": 4716185
+        }
+      ],
+      "Remarks": "Receipt from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00789",
+      "PaidAmount": 892870,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-035",
+      "PartyName": "CUST-035",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 892870,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR855689993",
+      "References": [
+        {
+          "AllocatedAmount": 892870,
+          "Name": "p7u335g5hi",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00908",
+          "TotalAmount": 892870
+        }
+      ],
+      "Remarks": "Receipt from CUST-035",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00790",
+      "PaidAmount": 4486673,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 4486673,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR368486697",
+      "References": [
+        {
+          "AllocatedAmount": 4486673,
+          "Name": "p7vj7ap7c9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00904",
+          "TotalAmount": 4486673
+        }
+      ],
+      "Remarks": "Receipt from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00791",
+      "PaidAmount": 6945406,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-002",
+      "PartyName": "CUST-002",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-21T00:00:00Z",
+      "ReceivedAmount": 6945406,
+      "ReferenceDate": "2026-08-21T00:00:00Z",
+      "ReferenceNo": "UTR845578034",
+      "References": [
+        {
+          "AllocatedAmount": 6945406,
+          "Name": "p80d7rkrkv",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00869",
+          "TotalAmount": 6945406
+        }
+      ],
+      "Remarks": "Receipt from CUST-002",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00792",
+      "PaidAmount": 5758274,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-027",
+      "PartyName": "CUST-027",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-22T00:00:00Z",
+      "ReceivedAmount": 5758274,
+      "ReferenceDate": "2026-08-22T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0241",
+      "References": [
+        {
+          "AllocatedAmount": 5758274,
+          "Name": "p81qiuubqu",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00891",
+          "TotalAmount": 5758274
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-027",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00793",
+      "PaidAmount": 1410204,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-023",
+      "PartyName": "CUST-023",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-22T00:00:00Z",
+      "ReceivedAmount": 1410204,
+      "ReferenceDate": "2026-08-22T00:00:00Z",
+      "ReferenceNo": "UTR294973521",
+      "References": [
+        {
+          "AllocatedAmount": 1410204,
+          "Name": "p823ien4nq",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00941",
+          "TotalAmount": 1410204
+        }
+      ],
+      "Remarks": "Receipt from CUST-023",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00794",
+      "PaidAmount": 2686320,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-034",
+      "PartyName": "CUST-034",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-22T00:00:00Z",
+      "ReceivedAmount": 2686320,
+      "ReferenceDate": "2026-08-22T00:00:00Z",
+      "ReferenceNo": "UTR242932982",
+      "References": [
+        {
+          "AllocatedAmount": 2686320,
+          "Name": "p83dmilcin",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00884",
+          "TotalAmount": 2686320
+        }
+      ],
+      "Remarks": "Receipt from CUST-034",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00795",
+      "PaidAmount": 5723745,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-027",
+      "PartyName": "CUST-027",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-22T00:00:00Z",
+      "ReceivedAmount": 5723745,
+      "ReferenceDate": "2026-08-22T00:00:00Z",
+      "ReferenceNo": "UTR407645453",
+      "References": [
+        {
+          "AllocatedAmount": 5723745,
+          "Name": "p84abifd6i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00885",
+          "TotalAmount": 5723745
+        }
+      ],
+      "Remarks": "Receipt from CUST-027",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00796",
+      "PaidAmount": 7027931,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-009",
+      "PartyName": "CUST-009",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-22T00:00:00Z",
+      "ReceivedAmount": 7027931,
+      "ReferenceDate": "2026-08-22T00:00:00Z",
+      "ReferenceNo": "UTR350668737",
+      "References": [
+        {
+          "AllocatedAmount": 7027931,
+          "Name": "p85t8klf3l",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00947",
+          "TotalAmount": 7027931
+        }
+      ],
+      "Remarks": "Receipt from CUST-009",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00797",
+      "PaidAmount": 216498,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "ReceivedAmount": 216498,
+      "ReferenceDate": "2026-08-23T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0254",
+      "References": [
+        {
+          "AllocatedAmount": 216498,
+          "Name": "p86b6j4glb",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00938",
+          "TotalAmount": 216498
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00798",
+      "PaidAmount": 7019566,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "ReceivedAmount": 7019566,
+      "ReferenceDate": "2026-08-23T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0255",
+      "References": [
+        {
+          "AllocatedAmount": 7019566,
+          "Name": "p87hj15n7i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00901",
+          "TotalAmount": 7019566
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00799",
+      "PaidAmount": 4820860,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-038",
+      "PartyName": "CUST-038",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "ReceivedAmount": 4820860,
+      "ReferenceDate": "2026-08-23T00:00:00Z",
+      "ReferenceNo": "UTR066368426",
+      "References": [
+        {
+          "AllocatedAmount": 4820860,
+          "Name": "p888ch99k4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00959",
+          "TotalAmount": 4820860
+        }
+      ],
+      "Remarks": "Receipt from CUST-038",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00800",
+      "PaidAmount": 9479034,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Deccan Textile Mills",
+      "PartyName": "Deccan Textile Mills",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "ReceivedAmount": 9479034,
+      "ReferenceDate": "2026-08-23T00:00:00Z",
+      "ReferenceNo": "N5874291",
+      "References": [
+        {
+          "AllocatedAmount": 9479034,
+          "Name": "p892mrs183",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00105",
+          "TotalAmount": 9479034
+        }
+      ],
+      "Remarks": "Payment for DCC/2026/0809 to Deccan Textile Mills",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00801",
+      "PaidAmount": 2978407,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Bharat Polymers Udyog",
+      "PartyName": "Bharat Polymers Udyog",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "ReceivedAmount": 2978407,
+      "ReferenceDate": "2026-08-23T00:00:00Z",
+      "ReferenceNo": "N4147321",
+      "References": [
+        {
+          "AllocatedAmount": 2978407,
+          "Name": "p8apvuaoh0",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00109",
+          "TotalAmount": 2978407
+        }
+      ],
+      "Remarks": "Payment for BHR/2026/0835 to Bharat Polymers Udyog",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00802",
+      "PaidAmount": 644406,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-031",
+      "PartyName": "CUST-031",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 644406,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0262",
+      "References": [
+        {
+          "AllocatedAmount": 644406,
+          "Name": "p8b2733e3h",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00878",
+          "TotalAmount": 644406
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-031",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00803",
+      "PaidAmount": 6017013,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-006",
+      "PartyName": "CUST-006",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 6017013,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0264",
+      "References": [
+        {
+          "AllocatedAmount": 6017013,
+          "Name": "p8c2uko95v",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00942",
+          "TotalAmount": 6017013
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-006",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00804",
+      "PaidAmount": 6201846,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-010",
+      "PartyName": "CUST-010",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 6201846,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "UTR967154200",
+      "References": [
+        {
+          "AllocatedAmount": 6201846,
+          "Name": "p8d5aqg32i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00937",
+          "TotalAmount": 6201846
+        }
+      ],
+      "Remarks": "Receipt from CUST-010",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00805",
+      "PaidAmount": 483277,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 483277,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "UTR089608359",
+      "References": [
+        {
+          "AllocatedAmount": 483277,
+          "Name": "p8e9vtbvtm",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00970",
+          "TotalAmount": 483277
+        }
+      ],
+      "Remarks": "Receipt from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00806",
+      "PaidAmount": 314959,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Swift Couriers",
+      "PartyName": "Swift Couriers",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 314959,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "N8232800",
+      "References": [
+        {
+          "AllocatedAmount": 314959,
+          "Name": "p8fkb7utck",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00106",
+          "TotalAmount": 314959
+        }
+      ],
+      "Remarks": "Payment for SWF/2026/0814 to Swift Couriers",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00807",
+      "PaidAmount": 245502,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "QuickFix Repairs",
+      "PartyName": "QuickFix Repairs",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "ReceivedAmount": 245502,
+      "ReferenceDate": "2026-08-24T00:00:00Z",
+      "ReferenceNo": "N9254050",
+      "References": [
+        {
+          "AllocatedAmount": 245502,
+          "Name": "p8gf6hirlk",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00112",
+          "TotalAmount": 245502
+        }
+      ],
+      "Remarks": "Payment for QCK/2026/0843 to QuickFix Repairs",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00808",
+      "PaidAmount": 6953293,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 6953293,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0279",
+      "References": [
+        {
+          "AllocatedAmount": 6953293,
+          "Name": "p8hgj2epkh",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00906",
+          "TotalAmount": 6953293
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00809",
+      "PaidAmount": 469386,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 469386,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0284",
+      "References": [
+        {
+          "AllocatedAmount": 469386,
+          "Name": "p8ifjk9641",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00933",
+          "TotalAmount": 469386
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00810",
+      "PaidAmount": 2145104,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 2145104,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "UTR199714122",
+      "References": [
+        {
+          "AllocatedAmount": 2145104,
+          "Name": "p8j4du75bf",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00883",
+          "TotalAmount": 2145104
+        }
+      ],
+      "Remarks": "Receipt from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00811",
+      "PaidAmount": 2706735,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 2706735,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "UTR819221744",
+      "References": [
+        {
+          "AllocatedAmount": 2706735,
+          "Name": "p8kb51t6s9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00976",
+          "TotalAmount": 2706735
+        }
+      ],
+      "Remarks": "Receipt from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00812",
+      "PaidAmount": 2887364,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-031",
+      "PartyName": "CUST-031",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 2887364,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "UTR168891658",
+      "References": [
+        {
+          "AllocatedAmount": 2887364,
+          "Name": "p8laoe26eh",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00907",
+          "TotalAmount": 2887364
+        }
+      ],
+      "Remarks": "Receipt from CUST-031",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00813",
+      "PaidAmount": 6678704,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 6678704,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "UTR405892990",
+      "References": [
+        {
+          "AllocatedAmount": 6678704,
+          "Name": "p8mojcdsis",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00911",
+          "TotalAmount": 6678704
+        }
+      ],
+      "Remarks": "Receipt from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00814",
+      "PaidAmount": 359442,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 359442,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "UTR261654513",
+      "References": [
+        {
+          "AllocatedAmount": 359442,
+          "Name": "p8nrducvd4",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00889",
+          "TotalAmount": 359442
+        }
+      ],
+      "Remarks": "Receipt from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00815",
+      "PaidAmount": 1255432,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Kaveri Packaging Works",
+      "PartyName": "Kaveri Packaging Works",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "ReceivedAmount": 1255432,
+      "ReferenceDate": "2026-08-25T00:00:00Z",
+      "ReferenceNo": "N8827935",
+      "References": [
+        {
+          "AllocatedAmount": 1255432,
+          "Name": "p8o0jjhfgo",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00103",
+          "TotalAmount": 1255432
+        }
+      ],
+      "Remarks": "Payment for KVR/2026/0828 to Kaveri Packaging Works",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00816",
+      "PaidAmount": 6831155,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-032",
+      "PartyName": "CUST-032",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-26T00:00:00Z",
+      "ReceivedAmount": 6831155,
+      "ReferenceDate": "2026-08-26T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0296",
+      "References": [
+        {
+          "AllocatedAmount": 6831155,
+          "Name": "p8pcqrp357",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00951",
+          "TotalAmount": 6831155
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-032",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00817",
+      "PaidAmount": 6894251,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-040",
+      "PartyName": "CUST-040",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-26T00:00:00Z",
+      "ReceivedAmount": 6894251,
+      "ReferenceDate": "2026-08-26T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0304",
+      "References": [
+        {
+          "AllocatedAmount": 6894251,
+          "Name": "p8qdpae493",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00948",
+          "TotalAmount": 6894251
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-040",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00818",
+      "PaidAmount": 854283,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-011",
+      "PartyName": "CUST-011",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-26T00:00:00Z",
+      "ReceivedAmount": 854283,
+      "ReferenceDate": "2026-08-26T00:00:00Z",
+      "ReferenceNo": "UTR133548325",
+      "References": [
+        {
+          "AllocatedAmount": 854283,
+          "Name": "p8r7t1ejqv",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00964",
+          "TotalAmount": 854283
+        }
+      ],
+      "Remarks": "Receipt from CUST-011",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00819",
+      "PaidAmount": 3907624,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-010",
+      "PartyName": "CUST-010",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-26T00:00:00Z",
+      "ReceivedAmount": 3907624,
+      "ReferenceDate": "2026-08-26T00:00:00Z",
+      "ReferenceNo": "UTR316101386",
+      "References": [
+        {
+          "AllocatedAmount": 3907624,
+          "Name": "p8sdn9g3j3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00925",
+          "TotalAmount": 3907624
+        }
+      ],
+      "Remarks": "Receipt from CUST-010",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00820",
+      "PaidAmount": 7316795,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-019",
+      "PartyName": "CUST-019",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-26T00:00:00Z",
+      "ReceivedAmount": 7316795,
+      "ReferenceDate": "2026-08-26T00:00:00Z",
+      "ReferenceNo": "UTR372066850",
+      "References": [
+        {
+          "AllocatedAmount": 7316795,
+          "Name": "p8t52qas55",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00992",
+          "TotalAmount": 7316795
+        }
+      ],
+      "Remarks": "Receipt from CUST-019",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00821",
+      "PaidAmount": 493830,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-003",
+      "PartyName": "CUST-003",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-27T00:00:00Z",
+      "ReceivedAmount": 493830,
+      "ReferenceDate": "2026-08-27T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0316",
+      "References": [
+        {
+          "AllocatedAmount": 493830,
+          "Name": "p8u9rs8boa",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00994",
+          "TotalAmount": 493830
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-003",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00822",
+      "PaidAmount": 4265622,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-27T00:00:00Z",
+      "ReceivedAmount": 4265622,
+      "ReferenceDate": "2026-08-27T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0319",
+      "References": [
+        {
+          "AllocatedAmount": 4265622,
+          "Name": "p8v2qsfmr7",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00986",
+          "TotalAmount": 4265622
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00823",
+      "PaidAmount": 4899529,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-024",
+      "PartyName": "CUST-024",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-27T00:00:00Z",
+      "ReceivedAmount": 4899529,
+      "ReferenceDate": "2026-08-27T00:00:00Z",
+      "ReferenceNo": "UTR137140059",
+      "References": [
+        {
+          "AllocatedAmount": 4899529,
+          "Name": "p90d9ipjht",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00956",
+          "TotalAmount": 4899529
+        }
+      ],
+      "Remarks": "Receipt from CUST-024",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00824",
+      "PaidAmount": 687070,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-028",
+      "PartyName": "CUST-028",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-27T00:00:00Z",
+      "ReceivedAmount": 687070,
+      "ReferenceDate": "2026-08-27T00:00:00Z",
+      "ReferenceNo": "UTR638083131",
+      "References": [
+        {
+          "AllocatedAmount": 687070,
+          "Name": "p91r7lrai8",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00999",
+          "TotalAmount": 687070
+        }
+      ],
+      "Remarks": "Receipt from CUST-028",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00825",
+      "PaidAmount": 3623722,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-035",
+      "PartyName": "CUST-035",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-27T00:00:00Z",
+      "ReceivedAmount": 3623722,
+      "ReferenceDate": "2026-08-27T00:00:00Z",
+      "ReferenceNo": "UTR641297165",
+      "References": [
+        {
+          "AllocatedAmount": 3623722,
+          "Name": "p929qvun9m",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00912",
+          "TotalAmount": 3623722
+        }
+      ],
+      "Remarks": "Receipt from CUST-035",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00826",
+      "PaidAmount": 906091,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-028",
+      "PartyName": "CUST-028",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 906091,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0327",
+      "References": [
+        {
+          "AllocatedAmount": 906091,
+          "Name": "p93aru4btj",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00913",
+          "TotalAmount": 906091
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-028",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00827",
+      "PaidAmount": 6104915,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 6104915,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0329",
+      "References": [
+        {
+          "AllocatedAmount": 6104915,
+          "Name": "p944sl4iku",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00965",
+          "TotalAmount": 6104915
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00828",
+      "PaidAmount": 6413029,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-009",
+      "PartyName": "CUST-009",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 6413029,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0332",
+      "References": [
+        {
+          "AllocatedAmount": 6413029,
+          "Name": "p95ulp4kth",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00969",
+          "TotalAmount": 6413029
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-009",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00829",
+      "PaidAmount": 4383335,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 4383335,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "UTR451825522",
+      "References": [
+        {
+          "AllocatedAmount": 4383335,
+          "Name": "p9667b1r65",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00932",
+          "TotalAmount": 4383335
+        }
+      ],
+      "Remarks": "Receipt from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00830",
+      "PaidAmount": 1428438,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-025",
+      "PartyName": "CUST-025",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 1428438,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "UTR127527201",
+      "References": [
+        {
+          "AllocatedAmount": 1428438,
+          "Name": "p97k7m00e1",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00943",
+          "TotalAmount": 1428438
+        }
+      ],
+      "Remarks": "Receipt from CUST-025",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00831",
+      "PaidAmount": 4814008,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-017",
+      "PartyName": "CUST-017",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "ReceivedAmount": 4814008,
+      "ReferenceDate": "2026-08-28T00:00:00Z",
+      "ReferenceNo": "UTR046398466",
+      "References": [
+        {
+          "AllocatedAmount": 4814008,
+          "Name": "p989s947ms",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00917",
+          "TotalAmount": 4814008
+        }
+      ],
+      "Remarks": "Receipt from CUST-017",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00832",
+      "PaidAmount": 4701202,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 4701202,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0341",
+      "References": [
+        {
+          "AllocatedAmount": 4701202,
+          "Name": "p995pkhck5",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00998",
+          "TotalAmount": 4701202
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00833",
+      "PaidAmount": 1904530,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-040",
+      "PartyName": "CUST-040",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 1904530,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0342",
+      "References": [
+        {
+          "AllocatedAmount": 1904530,
+          "Name": "p9b3vkdpcm",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00916",
+          "TotalAmount": 1904530
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-040",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00834",
+      "PaidAmount": 1693885,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-008",
+      "PartyName": "CUST-008",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 1693885,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "UTR894756743",
+      "References": [
+        {
+          "AllocatedAmount": 1693885,
+          "Name": "p9c1evin2i",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00961",
+          "TotalAmount": 1693885
+        }
+      ],
+      "Remarks": "Receipt from CUST-008",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00835",
+      "PaidAmount": 366326,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-034",
+      "PartyName": "CUST-034",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 366326,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "UTR801273708",
+      "References": [
+        {
+          "AllocatedAmount": 366326,
+          "Name": "p9d1ahbd11",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00952",
+          "TotalAmount": 366326
+        }
+      ],
+      "Remarks": "Receipt from CUST-034",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00836",
+      "PaidAmount": 2827175,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-007",
+      "PartyName": "CUST-007",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 2827175,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "UTR251014033",
+      "References": [
+        {
+          "AllocatedAmount": 2827175,
+          "Name": "p9e4k5mcco",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00944",
+          "TotalAmount": 2827175
+        }
+      ],
+      "Remarks": "Receipt from CUST-007",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00837",
+      "PaidAmount": 3204032,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-014",
+      "PartyName": "CUST-014",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 3204032,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "UTR058441168",
+      "References": [
+        {
+          "AllocatedAmount": 3204032,
+          "Name": "p9febnmnrp",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00928",
+          "TotalAmount": 3204032
+        }
+      ],
+      "Remarks": "Receipt from CUST-014",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00838",
+      "PaidAmount": 8025983,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-018",
+      "PartyName": "CUST-018",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 8025983,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "UTR079451524",
+      "References": [
+        {
+          "AllocatedAmount": 8025983,
+          "Name": "p9gr0g1vgr",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-01002",
+          "TotalAmount": 8025983
+        }
+      ],
+      "Remarks": "Receipt from CUST-018",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00839",
+      "PaidAmount": 6292408,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Bharat Polymers Udyog",
+      "PartyName": "Bharat Polymers Udyog",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "ReceivedAmount": 6292408,
+      "ReferenceDate": "2026-08-29T00:00:00Z",
+      "ReferenceNo": "N0593473",
+      "References": [
+        {
+          "AllocatedAmount": 6292408,
+          "Name": "p9h1olvs3a",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00107",
+          "TotalAmount": 6292408
+        }
+      ],
+      "Remarks": "Payment for BHR/2026/0834 to Bharat Polymers Udyog",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00840",
+      "PaidAmount": 2715861,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-021",
+      "PartyName": "CUST-021",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 2715861,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0353",
+      "References": [
+        {
+          "AllocatedAmount": 2715861,
+          "Name": "p9isoip09o",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00921",
+          "TotalAmount": 2715861
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-021",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00841",
+      "PaidAmount": 5127256,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-001",
+      "PartyName": "CUST-001",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 5127256,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0358",
+      "References": [
+        {
+          "AllocatedAmount": 5127256,
+          "Name": "p9jmk4r479",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00975",
+          "TotalAmount": 5127256
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-001",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00842",
+      "PaidAmount": 8072628,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-031",
+      "PartyName": "CUST-031",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 8072628,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0363",
+      "References": [
+        {
+          "AllocatedAmount": 8072628,
+          "Name": "p9lmgtta89",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00978",
+          "TotalAmount": 8072628
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-031",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00843",
+      "PaidAmount": 6089221,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-020",
+      "PartyName": "CUST-020",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 6089221,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0365",
+      "References": [
+        {
+          "AllocatedAmount": 6089221,
+          "Name": "p9mg48b442",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00971",
+          "TotalAmount": 6089221
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-020",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00844",
+      "PaidAmount": 5149521,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-005",
+      "PartyName": "CUST-005",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 5149521,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "UTR064087920",
+      "References": [
+        {
+          "AllocatedAmount": 5149521,
+          "Name": "p9ng41c7k6",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00934",
+          "TotalAmount": 5149521
+        }
+      ],
+      "Remarks": "Receipt from CUST-005",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00845",
+      "PaidAmount": 7557832,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-032",
+      "PartyName": "CUST-032",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 7557832,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "UTR262803612",
+      "References": [
+        {
+          "AllocatedAmount": 7557832,
+          "Name": "p9os157in1",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00989",
+          "TotalAmount": 7557832
+        }
+      ],
+      "Remarks": "Receipt from CUST-032",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00846",
+      "PaidAmount": 9134013,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 9134013,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "UTR648087760",
+      "References": [
+        {
+          "AllocatedAmount": 9134013,
+          "Name": "p9p4m8f4bm",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00918",
+          "TotalAmount": 9134013
+        }
+      ],
+      "Remarks": "Receipt from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00847",
+      "PaidAmount": 467540,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Vaani Telecom Services",
+      "PartyName": "Vaani Telecom Services",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 467540,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "N5567986",
+      "References": [
+        {
+          "AllocatedAmount": 467540,
+          "Name": "p9q6ku8bn2",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00110",
+          "TotalAmount": 467540
+        }
+      ],
+      "Remarks": "Payment for VNT/2026/0827 to Vaani Telecom Services",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00848",
+      "PaidAmount": 2270799,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "RoadKing Logistics",
+      "PartyName": "RoadKing Logistics",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "ReceivedAmount": 2270799,
+      "ReferenceDate": "2026-08-30T00:00:00Z",
+      "ReferenceNo": "N0896408",
+      "References": [
+        {
+          "AllocatedAmount": 2270799,
+          "Name": "p9r2mnntm9",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00115",
+          "TotalAmount": 2270799
+        }
+      ],
+      "Remarks": "Payment for RDK/2026/0811 to RoadKing Logistics",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00849",
+      "PaidAmount": 7694685,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-029",
+      "PartyName": "CUST-029",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "ReceivedAmount": 7694685,
+      "ReferenceDate": "2026-08-31T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0372",
+      "References": [
+        {
+          "AllocatedAmount": 7694685,
+          "Name": "p9sj3lkunk",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00922",
+          "TotalAmount": 7694685
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-029",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00850",
+      "PaidAmount": 5702551,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "Payment Gateway Clearing - STPL",
+      "Party": "CUST-027",
+      "PartyName": "CUST-027",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "ReceivedAmount": 5702551,
+      "ReferenceDate": "2026-08-31T00:00:00Z",
+      "ReferenceNo": "EVT-sharma-2026-08-0375",
+      "References": [
+        {
+          "AllocatedAmount": 5702551,
+          "Name": "p9t969ukqd",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00991",
+          "TotalAmount": 5702551
+        }
+      ],
+      "Remarks": "Gateway collection from CUST-027",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00851",
+      "PaidAmount": 6254194,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-039",
+      "PartyName": "CUST-039",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "ReceivedAmount": 6254194,
+      "ReferenceDate": "2026-08-31T00:00:00Z",
+      "ReferenceNo": "UTR032104014",
+      "References": [
+        {
+          "AllocatedAmount": 6254194,
+          "Name": "p9uhk2vf6k",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00930",
+          "TotalAmount": 6254194
+        }
+      ],
+      "Remarks": "Receipt from CUST-039",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00852",
+      "PaidAmount": 3485089,
+      "PaidFrom": "Debtors - STPL",
+      "PaidTo": "HDFC Current 0001 - STPL",
+      "Party": "CUST-012",
+      "PartyName": "CUST-012",
+      "PartyType": "Customer",
+      "PaymentType": "Receive",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "ReceivedAmount": 3485089,
+      "ReferenceDate": "2026-08-31T00:00:00Z",
+      "ReferenceNo": "UTR732884614",
+      "References": [
+        {
+          "AllocatedAmount": 3485089,
+          "Name": "p9ve5l01u3",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Sales Invoice",
+          "ReferenceName": "SINV-26-00990",
+          "TotalAmount": 3485089
+        }
+      ],
+      "Remarks": "Receipt from CUST-012",
+      "UnallocatedAmount": 0
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Docstatus": 1,
+      "Name": "ACC-PAY-2026-00853",
+      "PaidAmount": 636558,
+      "PaidFrom": "HDFC Current 0001 - STPL",
+      "PaidTo": "Creditors - STPL",
+      "Party": "Kaveri Packaging Works",
+      "PartyName": "Kaveri Packaging Works",
+      "PartyType": "Supplier",
+      "PaymentType": "Pay",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "ReceivedAmount": 636558,
+      "ReferenceDate": "2026-08-31T00:00:00Z",
+      "ReferenceNo": "N1686192",
+      "References": [
+        {
+          "AllocatedAmount": 636558,
+          "Name": "pa0roo89r1",
+          "OutstandingAmount": 0,
+          "ReferenceDoctype": "Purchase Invoice",
+          "ReferenceName": "PINV-26-00118",
+          "TotalAmount": 636558
+        }
+      ],
+      "Remarks": "Payment for KVR/2026/0830 to Kaveri Packaging Works",
+      "UnallocatedAmount": 0
+    }
+  ],
+  "tool": "list_payments"
+}

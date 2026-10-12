@@ -1,0 +1,76 @@
+{
+  "args": {
+    "amount_band_pct": 20,
+    "before_month": "2026-09",
+    "company": "mehta",
+    "lookback_months": 4,
+    "min_occurrences": 3
+  },
+  "result": [
+    {
+      "median_amount": 3239116,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-07"
+      ],
+      "supplier": "Cleanspace Facility Services",
+      "typical_day": 28
+    },
+    {
+      "median_amount": 1602339,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "supplier": "FibreLink Networks",
+      "typical_day": 5
+    },
+    {
+      "median_amount": 4720000,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "supplier": "Ledgerline Advisors",
+      "typical_day": 25
+    },
+    {
+      "median_amount": 25960000,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "supplier": "Lotus Business Parks",
+      "typical_day": 1
+    },
+    {
+      "median_amount": 4000962,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-07",
+        "2026-08"
+      ],
+      "supplier": "Sahyadri Power Distribution",
+      "typical_day": 8
+    },
+    {
+      "median_amount": 2124000,
+      "months_seen": [
+        "2026-05",
+        "2026-06",
+        "2026-08"
+      ],
+      "supplier": "SecureMail Suite",
+      "typical_day": 3
+    }
+  ],
+  "tool": "list_recurring_suppliers"
+}

@@ -1,0 +1,6898 @@
+{
+  "args": {
+    "company": "sharma",
+    "from": "2026-09-01",
+    "to": "2026-09-30"
+  },
+  "result": [
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5739762,
+      "Items": [
+        {
+          "Amount": 5466440,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa2e1g78dh"
+        }
+      ],
+      "Name": "SINV-26-01024",
+      "NetTotal": 5466440,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa2cl1r1q0",
+          "Rate": 0.0,
+          "TaxAmount": 136661
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa2nkirp0p",
+          "Rate": 0.0,
+          "TaxAmount": 136661
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 909770,
+      "Items": [
+        {
+          "Amount": 866448,
+          "Description": "Goods sold to CUST-012 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa460n76bo"
+        }
+      ],
+      "Name": "SINV-26-01025",
+      "NetTotal": 866448,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa4vh63lb4",
+          "Rate": 0.0,
+          "TaxAmount": 21661
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa4dkd9hlg",
+          "Rate": 0.0,
+          "TaxAmount": 21661
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5305441,
+      "Items": [
+        {
+          "Amount": 5052801,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa5tlev7h0"
+        }
+      ],
+      "Name": "SINV-26-01026",
+      "NetTotal": 5052801,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa5ph3s178",
+          "Rate": 0.0,
+          "TaxAmount": 126320
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa5trugva9",
+          "Rate": 0.0,
+          "TaxAmount": 126320
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-002",
+      "CustomerName": "CUST-002",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4668004,
+      "Items": [
+        {
+          "Amount": 4445718,
+          "Description": "Goods sold to CUST-002 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa6qeqbgml"
+        }
+      ],
+      "Name": "SINV-26-01027",
+      "NetTotal": 4445718,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-002",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa62sdj2ij",
+          "Rate": 0.0,
+          "TaxAmount": 111143
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa6lgv7fr5",
+          "Rate": 0.0,
+          "TaxAmount": 111143
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1242499,
+      "Items": [
+        {
+          "Amount": 1183333,
+          "Description": "Goods sold to CUST-008 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa8ai336a0"
+        }
+      ],
+      "Name": "SINV-26-01028",
+      "NetTotal": 1183333,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa8m4arnnd",
+          "Rate": 0.0,
+          "TaxAmount": 29583
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa8rvlu60o",
+          "Rate": 0.0,
+          "TaxAmount": 29583
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-004",
+      "CustomerName": "CUST-004",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6862832,
+      "Items": [
+        {
+          "Amount": 5815960,
+          "Description": "Goods sold to CUST-004 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pa9fd7svhi"
+        }
+      ],
+      "Name": "SINV-26-01029",
+      "NetTotal": 5815960,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-01T00:00:00Z",
+      "Remarks": "Sale to CUST-004",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pa9ojr8nld",
+          "Rate": 0.0,
+          "TaxAmount": 523436
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pa9vnchgmi",
+          "Rate": 0.0,
+          "TaxAmount": 523436
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-021",
+      "CustomerName": "CUST-021",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1869340,
+      "Items": [
+        {
+          "Amount": 1584186,
+          "Description": "Goods sold to CUST-021 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paa4u9njjj"
+        }
+      ],
+      "Name": "SINV-26-01030",
+      "NetTotal": 1584186,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-02T00:00:00Z",
+      "Remarks": "Sale to CUST-021",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "paa8o5r773",
+          "Rate": 0.0,
+          "TaxAmount": 142577
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "paaj85se6c",
+          "Rate": 0.0,
+          "TaxAmount": 142577
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5122080,
+      "Items": [
+        {
+          "Amount": 4340746,
+          "Description": "Goods sold to CUST-040 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pacj2hpjur"
+        }
+      ],
+      "Name": "SINV-26-01031",
+      "NetTotal": 4340746,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-02T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pacqpjuikm",
+          "Rate": 0.0,
+          "TaxAmount": 390667
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pact1j6k9k",
+          "Rate": 0.0,
+          "TaxAmount": 390667
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-020",
+      "CustomerName": "CUST-020",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7700160,
+      "Items": [
+        {
+          "Amount": 6525560,
+          "Description": "Goods sold to CUST-020 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paddh8csd5"
+        }
+      ],
+      "Name": "SINV-26-01032",
+      "NetTotal": 6525560,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-02T00:00:00Z",
+      "Remarks": "Sale to CUST-020",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pad7tk2oeb",
+          "Rate": 0.0,
+          "TaxAmount": 587300
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pade3ua845",
+          "Rate": 0.0,
+          "TaxAmount": 587300
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-002",
+      "CustomerName": "CUST-002",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8173350,
+      "Items": [
+        {
+          "Amount": 6926568,
+          "Description": "Goods sold to CUST-002 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pafdk7q3jd"
+        }
+      ],
+      "Name": "SINV-26-01033",
+      "NetTotal": 6926568,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-02T00:00:00Z",
+      "Remarks": "Sale to CUST-002",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "paf02gn28p",
+          "Rate": 0.0,
+          "TaxAmount": 623391
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pafnh2n0ie",
+          "Rate": 0.0,
+          "TaxAmount": 623391
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3369031,
+      "Items": [
+        {
+          "Amount": 3208601,
+          "Description": "Goods sold to CUST-018 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pagq4jtamu"
+        }
+      ],
+      "Name": "SINV-26-01034",
+      "NetTotal": 3208601,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-02T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "paga23us05",
+          "Rate": 0.0,
+          "TaxAmount": 80215
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pagv9i9241",
+          "Rate": 0.0,
+          "TaxAmount": 80215
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3290391,
+      "Items": [
+        {
+          "Amount": 2788467,
+          "Description": "Goods sold to CUST-030 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pahuglccf7"
+        }
+      ],
+      "Name": "SINV-26-01035",
+      "NetTotal": 2788467,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-03T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pahbu1i7bk",
+          "Rate": 0.0,
+          "TaxAmount": 250962
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pah78ffq6g",
+          "Rate": 0.0,
+          "TaxAmount": 250962
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-038",
+      "CustomerName": "CUST-038",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7782650,
+      "Items": [
+        {
+          "Amount": 6595466,
+          "Description": "Goods sold to CUST-038 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pajqf9of0g"
+        }
+      ],
+      "Name": "SINV-26-01036",
+      "NetTotal": 6595466,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-03T00:00:00Z",
+      "Remarks": "Sale to CUST-038",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pajk6je27f",
+          "Rate": 0.0,
+          "TaxAmount": 593592
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "paj3tb6nld",
+          "Rate": 0.0,
+          "TaxAmount": 593592
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3499210,
+      "Items": [
+        {
+          "Amount": 3332580,
+          "Description": "Goods sold to CUST-030 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pakhbuguni"
+        }
+      ],
+      "Name": "SINV-26-01037",
+      "NetTotal": 3332580,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-03T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pak8gotsnr",
+          "Rate": 0.0,
+          "TaxAmount": 83315
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pak0q1q650",
+          "Rate": 0.0,
+          "TaxAmount": 83315
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3966463,
+      "Items": [
+        {
+          "Amount": 3361409,
+          "Description": "Goods sold to CUST-016 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pal8u2ptbo"
+        }
+      ],
+      "Name": "SINV-26-01038",
+      "NetTotal": 3361409,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-03T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pala84adfo",
+          "Rate": 0.0,
+          "TaxAmount": 302527
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "palsi84dgo",
+          "Rate": 0.0,
+          "TaxAmount": 302527
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-004",
+      "CustomerName": "CUST-004",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 934903,
+      "Items": [
+        {
+          "Amount": 890383,
+          "Description": "Goods sold to CUST-004 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "panlbmuuv6"
+        }
+      ],
+      "Name": "SINV-26-01039",
+      "NetTotal": 890383,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-03T00:00:00Z",
+      "Remarks": "Sale to CUST-004",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "panusrrca7",
+          "Rate": 0.0,
+          "TaxAmount": 22260
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pan0lmntq6",
+          "Rate": 0.0,
+          "TaxAmount": 22260
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-039",
+      "CustomerName": "CUST-039",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 530339,
+      "Items": [
+        {
+          "Amount": 505085,
+          "Description": "Goods sold to CUST-039 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paomqv2kbd"
+        }
+      ],
+      "Name": "SINV-26-01040",
+      "NetTotal": 505085,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-039",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pao1il2io7",
+          "Rate": 0.0,
+          "TaxAmount": 12627
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "paofcns0pq",
+          "Rate": 0.0,
+          "TaxAmount": 12627
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4291488,
+      "Items": [
+        {
+          "Amount": 4087132,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paqohapflv"
+        }
+      ],
+      "Name": "SINV-26-01041",
+      "NetTotal": 4087132,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "paq5bhpmil",
+          "Rate": 0.0,
+          "TaxAmount": 102178
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "paqq4jc026",
+          "Rate": 0.0,
+          "TaxAmount": 102178
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-013",
+      "CustomerName": "CUST-013",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1271935,
+      "Items": [
+        {
+          "Amount": 1211367,
+          "Description": "Goods sold to CUST-013 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paru7ee1en"
+        }
+      ],
+      "Name": "SINV-26-01042",
+      "NetTotal": 1211367,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-013",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "par7nc0cgi",
+          "Rate": 0.0,
+          "TaxAmount": 30284
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "par9eh9jhl",
+          "Rate": 0.0,
+          "TaxAmount": 30284
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2725175,
+      "Items": [
+        {
+          "Amount": 2595405,
+          "Description": "Goods sold to CUST-006 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pat5aklie0"
+        }
+      ],
+      "Name": "SINV-26-01043",
+      "NetTotal": 2595405,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "patjndgr2h",
+          "Rate": 0.0,
+          "TaxAmount": 64885
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pat589f742",
+          "Rate": 0.0,
+          "TaxAmount": 64885
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7291551,
+      "Items": [
+        {
+          "Amount": 6944335,
+          "Description": "Goods sold to CUST-037 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "paug77q8gr"
+        }
+      ],
+      "Name": "SINV-26-01044",
+      "NetTotal": 6944335,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pau0k3a2b1",
+          "Rate": 0.0,
+          "TaxAmount": 173608
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pauscldcnm",
+          "Rate": 0.0,
+          "TaxAmount": 173608
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3830556,
+      "Items": [
+        {
+          "Amount": 3246234,
+          "Description": "Goods sold to CUST-030 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pav0515f27"
+        }
+      ],
+      "Name": "SINV-26-01045",
+      "NetTotal": 3246234,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pavfvc8vv1",
+          "Rate": 0.0,
+          "TaxAmount": 292161
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pav2fp3fjf",
+          "Rate": 0.0,
+          "TaxAmount": 292161
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-026",
+      "CustomerName": "CUST-026",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6432091,
+      "Items": [
+        {
+          "Amount": 5450925,
+          "Description": "Goods sold to CUST-026 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb1vejb6tp"
+        }
+      ],
+      "Name": "SINV-26-01046",
+      "NetTotal": 5450925,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-026",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb1mag0rcp",
+          "Rate": 0.0,
+          "TaxAmount": 490583
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb12cdsh0q",
+          "Rate": 0.0,
+          "TaxAmount": 490583
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3556672,
+      "Items": [
+        {
+          "Amount": 3014128,
+          "Description": "Goods sold to CUST-017 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb2ancdd3b"
+        }
+      ],
+      "Name": "SINV-26-01047",
+      "NetTotal": 3014128,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb20lih3v7",
+          "Rate": 0.0,
+          "TaxAmount": 271272
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb2q6u6eui",
+          "Rate": 0.0,
+          "TaxAmount": 271272
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-021",
+      "CustomerName": "CUST-021",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6349325,
+      "Items": [
+        {
+          "Amount": 6046977,
+          "Description": "Goods sold to CUST-021 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb3fentb63"
+        }
+      ],
+      "Name": "SINV-26-01048",
+      "NetTotal": 6046977,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-021",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb34ild2hm",
+          "Rate": 0.0,
+          "TaxAmount": 151174
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb3g5f9t9l",
+          "Rate": 0.0,
+          "TaxAmount": 151174
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-003",
+      "CustomerName": "CUST-003",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6025817,
+      "Items": [
+        {
+          "Amount": 5738873,
+          "Description": "Goods sold to CUST-003 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb5c2d3s9h"
+        }
+      ],
+      "Name": "SINV-26-01049",
+      "NetTotal": 5738873,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-04T00:00:00Z",
+      "Remarks": "Sale to CUST-003",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb50jd1hjg",
+          "Rate": 0.0,
+          "TaxAmount": 143472
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb5l144ket",
+          "Rate": 0.0,
+          "TaxAmount": 143472
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-036",
+      "CustomerName": "CUST-036",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3352859,
+      "Items": [
+        {
+          "Amount": 3193199,
+          "Description": "Goods sold to CUST-036 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb60jmko7f"
+        }
+      ],
+      "Name": "SINV-26-01050",
+      "NetTotal": 3193199,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-036",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb6i5c9mu4",
+          "Rate": 0.0,
+          "TaxAmount": 79830
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb63fm0rc0",
+          "Rate": 0.0,
+          "TaxAmount": 79830
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 545824,
+      "Items": [
+        {
+          "Amount": 519832,
+          "Description": "Goods sold to CUST-001 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb82a9asul"
+        }
+      ],
+      "Name": "SINV-26-01051",
+      "NetTotal": 519832,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb8p4ijdkd",
+          "Rate": 0.0,
+          "TaxAmount": 12996
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb8mgps8r9",
+          "Rate": 0.0,
+          "TaxAmount": 12996
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-036",
+      "CustomerName": "CUST-036",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7723974,
+      "Items": [
+        {
+          "Amount": 6545740,
+          "Description": "Goods sold to CUST-036 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pb9fo9e068"
+        }
+      ],
+      "Name": "SINV-26-01052",
+      "NetTotal": 6545740,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-036",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pb9mfhn7n1",
+          "Rate": 0.0,
+          "TaxAmount": 589117
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pb9r68dlem",
+          "Rate": 0.0,
+          "TaxAmount": 589117
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-029",
+      "CustomerName": "CUST-029",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6036942,
+      "Items": [
+        {
+          "Amount": 5749468,
+          "Description": "Goods sold to CUST-029 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbaaaod7ng"
+        }
+      ],
+      "Name": "SINV-26-01053",
+      "NetTotal": 5749468,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-029",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbam9c35ii",
+          "Rate": 0.0,
+          "TaxAmount": 143737
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pba5146oao",
+          "Rate": 0.0,
+          "TaxAmount": 143737
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-026",
+      "CustomerName": "CUST-026",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 782328,
+      "Items": [
+        {
+          "Amount": 662990,
+          "Description": "Goods sold to CUST-026 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbcs8qkd08"
+        }
+      ],
+      "Name": "SINV-26-01054",
+      "NetTotal": 662990,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-026",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbcve78tc2",
+          "Rate": 0.0,
+          "TaxAmount": 59669
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbclc1q6tj",
+          "Rate": 0.0,
+          "TaxAmount": 59669
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-023",
+      "CustomerName": "CUST-023",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6985203,
+      "Items": [
+        {
+          "Amount": 6652575,
+          "Description": "Goods sold to CUST-023 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbd4l53iji"
+        }
+      ],
+      "Name": "SINV-26-01055",
+      "NetTotal": 6652575,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-05T00:00:00Z",
+      "Remarks": "Sale to CUST-023",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbdio3gu98",
+          "Rate": 0.0,
+          "TaxAmount": 166314
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbdi4sktgk",
+          "Rate": 0.0,
+          "TaxAmount": 166314
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-010",
+      "CustomerName": "CUST-010",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7840130,
+      "Items": [
+        {
+          "Amount": 7466790,
+          "Description": "Goods sold to CUST-010 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbfmos4t9g"
+        }
+      ],
+      "Name": "SINV-26-01056",
+      "NetTotal": 7466790,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-06T00:00:00Z",
+      "Remarks": "Sale to CUST-010",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbfjc78u0t",
+          "Rate": 0.0,
+          "TaxAmount": 186670
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbfdab9dsr",
+          "Rate": 0.0,
+          "TaxAmount": 186670
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1271997,
+      "Items": [
+        {
+          "Amount": 1077963,
+          "Description": "Goods sold to CUST-037 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbgpflamqp"
+        }
+      ],
+      "Name": "SINV-26-01057",
+      "NetTotal": 1077963,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-06T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbgji7qhsm",
+          "Rate": 0.0,
+          "TaxAmount": 97017
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbgirebf9v",
+          "Rate": 0.0,
+          "TaxAmount": 97017
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1342690,
+      "Items": [
+        {
+          "Amount": 1278752,
+          "Description": "Goods sold to CUST-008 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbh7lmsn05"
+        }
+      ],
+      "Name": "SINV-26-01058",
+      "NetTotal": 1278752,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-06T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbhhtjbmbu",
+          "Rate": 0.0,
+          "TaxAmount": 31969
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbh6eci244",
+          "Rate": 0.0,
+          "TaxAmount": 31969
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5043066,
+      "Items": [
+        {
+          "Amount": 4802920,
+          "Description": "Goods sold to CUST-037 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbj1hidm44"
+        }
+      ],
+      "Name": "SINV-26-01059",
+      "NetTotal": 4802920,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-06T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbjuh0nkg7",
+          "Rate": 0.0,
+          "TaxAmount": 120073
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbj2nc6jd7",
+          "Rate": 0.0,
+          "TaxAmount": 120073
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-019",
+      "CustomerName": "CUST-019",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2296437,
+      "Items": [
+        {
+          "Amount": 1946133,
+          "Description": "Goods sold to CUST-019 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbka4kau4e"
+        }
+      ],
+      "Name": "SINV-26-01060",
+      "NetTotal": 1946133,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-06T00:00:00Z",
+      "Remarks": "Sale to CUST-019",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbko8ur9ar",
+          "Rate": 0.0,
+          "TaxAmount": 175152
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbkj9euns0",
+          "Rate": 0.0,
+          "TaxAmount": 175152
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-014",
+      "CustomerName": "CUST-014",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2316222,
+      "Items": [
+        {
+          "Amount": 2205926,
+          "Description": "Goods sold to CUST-014 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pblhucok8r"
+        }
+      ],
+      "Name": "SINV-26-01061",
+      "NetTotal": 2205926,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-07T00:00:00Z",
+      "Remarks": "Sale to CUST-014",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbleleogd3",
+          "Rate": 0.0,
+          "TaxAmount": 55148
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pblikq29dn",
+          "Rate": 0.0,
+          "TaxAmount": 55148
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3855365,
+      "Items": [
+        {
+          "Amount": 3671777,
+          "Description": "Goods sold to CUST-012 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbn6m8l42b"
+        }
+      ],
+      "Name": "SINV-26-01062",
+      "NetTotal": 3671777,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-07T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbnskcloqk",
+          "Rate": 0.0,
+          "TaxAmount": 91794
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbn98ncvjr",
+          "Rate": 0.0,
+          "TaxAmount": 91794
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2391820,
+      "Items": [
+        {
+          "Amount": 2026966,
+          "Description": "Goods sold to CUST-016 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbo9ceegs3"
+        }
+      ],
+      "Name": "SINV-26-01063",
+      "NetTotal": 2026966,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-07T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbo3ric74g",
+          "Rate": 0.0,
+          "TaxAmount": 182427
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbobmpffdu",
+          "Rate": 0.0,
+          "TaxAmount": 182427
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5753680,
+      "Items": [
+        {
+          "Amount": 5479696,
+          "Description": "Goods sold to CUST-017 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbq279f7sn"
+        }
+      ],
+      "Name": "SINV-26-01064",
+      "NetTotal": 5479696,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-07T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbqu2a4ap0",
+          "Rate": 0.0,
+          "TaxAmount": 136992
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbqlvufqht",
+          "Rate": 0.0,
+          "TaxAmount": 136992
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6634214,
+      "Items": [
+        {
+          "Amount": 5622216,
+          "Description": "Goods sold to CUST-005 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbrmc6vm8u"
+        }
+      ],
+      "Name": "SINV-26-01065",
+      "NetTotal": 5622216,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-07T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbrvpl5ese",
+          "Rate": 0.0,
+          "TaxAmount": 505999
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbr6sit68e",
+          "Rate": 0.0,
+          "TaxAmount": 505999
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-024",
+      "CustomerName": "CUST-024",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1775359,
+      "Items": [
+        {
+          "Amount": 1690819,
+          "Description": "Goods sold to CUST-024 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbs1b8rhak"
+        }
+      ],
+      "Name": "SINV-26-01066",
+      "NetTotal": 1690819,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-024",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbs6ir6fui",
+          "Rate": 0.0,
+          "TaxAmount": 42270
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbspqbtqap",
+          "Rate": 0.0,
+          "TaxAmount": 42270
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4546668,
+      "Items": [
+        {
+          "Amount": 4330160,
+          "Description": "Goods sold to CUST-040 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbu2mp9eh0"
+        }
+      ],
+      "Name": "SINV-26-01067",
+      "NetTotal": 4330160,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbuurpndrv",
+          "Rate": 0.0,
+          "TaxAmount": 108254
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbuakdd3aa",
+          "Rate": 0.0,
+          "TaxAmount": 108254
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-007",
+      "CustomerName": "CUST-007",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 831550,
+      "Items": [
+        {
+          "Amount": 704704,
+          "Description": "Goods sold to CUST-007 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pbvbnjiclk"
+        }
+      ],
+      "Name": "SINV-26-01068",
+      "NetTotal": 704704,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-007",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pbve92me3d",
+          "Rate": 0.0,
+          "TaxAmount": 63423
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pbvkrh0kip",
+          "Rate": 0.0,
+          "TaxAmount": 63423
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-033",
+      "CustomerName": "CUST-033",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8874140,
+      "Items": [
+        {
+          "Amount": 7520458,
+          "Description": "Goods sold to CUST-033 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc1ghrfhfu"
+        }
+      ],
+      "Name": "SINV-26-01069",
+      "NetTotal": 7520458,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-033",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc10m52es9",
+          "Rate": 0.0,
+          "TaxAmount": 676841
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc12akctf4",
+          "Rate": 0.0,
+          "TaxAmount": 676841
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-035",
+      "CustomerName": "CUST-035",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1416753,
+      "Items": [
+        {
+          "Amount": 1349289,
+          "Description": "Goods sold to CUST-035 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc2dk0f7bm"
+        }
+      ],
+      "Name": "SINV-26-01070",
+      "NetTotal": 1349289,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-035",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc23o7acfv",
+          "Rate": 0.0,
+          "TaxAmount": 33732
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc2vrla64k",
+          "Rate": 0.0,
+          "TaxAmount": 33732
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-010",
+      "CustomerName": "CUST-010",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3796599,
+      "Items": [
+        {
+          "Amount": 3615809,
+          "Description": "Goods sold to CUST-010 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc4go01jeo"
+        }
+      ],
+      "Name": "SINV-26-01071",
+      "NetTotal": 3615809,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-010",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc4iqfd9u0",
+          "Rate": 0.0,
+          "TaxAmount": 90395
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc4fj1jbf7",
+          "Rate": 0.0,
+          "TaxAmount": 90395
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-028",
+      "CustomerName": "CUST-028",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6781647,
+      "Items": [
+        {
+          "Amount": 6458711,
+          "Description": "Goods sold to CUST-028 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc5q3uc5hv"
+        }
+      ],
+      "Name": "SINV-26-01072",
+      "NetTotal": 6458711,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-028",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc5maeuq43",
+          "Rate": 0.0,
+          "TaxAmount": 161468
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc5qb4ha6r",
+          "Rate": 0.0,
+          "TaxAmount": 161468
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1837452,
+      "Items": [
+        {
+          "Amount": 1557162,
+          "Description": "Goods sold to CUST-016 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc76fv62p4"
+        }
+      ],
+      "Name": "SINV-26-01073",
+      "NetTotal": 1557162,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-08T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc7ar1r70a",
+          "Rate": 0.0,
+          "TaxAmount": 140145
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc78faaml5",
+          "Rate": 0.0,
+          "TaxAmount": 140145
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-013",
+      "CustomerName": "CUST-013",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 664932,
+      "Items": [
+        {
+          "Amount": 633268,
+          "Description": "Goods sold to CUST-013 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc8l3971g5"
+        }
+      ],
+      "Name": "SINV-26-01074",
+      "NetTotal": 633268,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-09T00:00:00Z",
+      "Remarks": "Sale to CUST-013",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc8gq725qd",
+          "Rate": 0.0,
+          "TaxAmount": 15832
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc84jqj2nb",
+          "Rate": 0.0,
+          "TaxAmount": 15832
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4603391,
+      "Items": [
+        {
+          "Amount": 3901179,
+          "Description": "Goods sold to CUST-006 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pc99o4llov"
+        }
+      ],
+      "Name": "SINV-26-01075",
+      "NetTotal": 3901179,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-09T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pc9i1f346v",
+          "Rate": 0.0,
+          "TaxAmount": 351106
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pc9t4h6q0q",
+          "Rate": 0.0,
+          "TaxAmount": 351106
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-035",
+      "CustomerName": "CUST-035",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5127991,
+      "Items": [
+        {
+          "Amount": 4345755,
+          "Description": "Goods sold to CUST-035 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcbmrat7i2"
+        }
+      ],
+      "Name": "SINV-26-01076",
+      "NetTotal": 4345755,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-09T00:00:00Z",
+      "Remarks": "Sale to CUST-035",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcb55vi3v3",
+          "Rate": 0.0,
+          "TaxAmount": 391118
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcbrtha54c",
+          "Rate": 0.0,
+          "TaxAmount": 391118
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5314234,
+      "Items": [
+        {
+          "Amount": 4503588,
+          "Description": "Goods sold to CUST-040 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pccg9mrui9"
+        }
+      ],
+      "Name": "SINV-26-01077",
+      "NetTotal": 4503588,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-09T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pccelugdhi",
+          "Rate": 0.0,
+          "TaxAmount": 405323
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pccjdjd0or",
+          "Rate": 0.0,
+          "TaxAmount": 405323
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-007",
+      "CustomerName": "CUST-007",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8934827,
+      "Items": [
+        {
+          "Amount": 7571887,
+          "Description": "Goods sold to CUST-007 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pceifr5tnv"
+        }
+      ],
+      "Name": "SINV-26-01078",
+      "NetTotal": 7571887,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-007",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pce6vq7gfh",
+          "Rate": 0.0,
+          "TaxAmount": 681470
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pce8evvf4l",
+          "Rate": 0.0,
+          "TaxAmount": 681470
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3785817,
+      "Items": [
+        {
+          "Amount": 3208319,
+          "Description": "Goods sold to CUST-009 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcfph9b36g"
+        }
+      ],
+      "Name": "SINV-26-01079",
+      "NetTotal": 3208319,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcftcmul76",
+          "Rate": 0.0,
+          "TaxAmount": 288749
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcfvnshdqq",
+          "Rate": 0.0,
+          "TaxAmount": 288749
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-031",
+      "CustomerName": "CUST-031",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3767796,
+      "Items": [
+        {
+          "Amount": 3193048,
+          "Description": "Goods sold to CUST-031 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pch15r7nva"
+        }
+      ],
+      "Name": "SINV-26-01080",
+      "NetTotal": 3193048,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-031",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pchi1k5dgg",
+          "Rate": 0.0,
+          "TaxAmount": 287374
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pchgg4agr0",
+          "Rate": 0.0,
+          "TaxAmount": 287374
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3993347,
+      "Items": [
+        {
+          "Amount": 3803187,
+          "Description": "Goods sold to CUST-008 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcika2cqec"
+        }
+      ],
+      "Name": "SINV-26-01081",
+      "NetTotal": 3803187,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcijvssnjp",
+          "Rate": 0.0,
+          "TaxAmount": 95080
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pciurbjh5e",
+          "Rate": 0.0,
+          "TaxAmount": 95080
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6915710,
+      "Items": [
+        {
+          "Amount": 5860772,
+          "Description": "Goods sold to CUST-005 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcjns989md"
+        }
+      ],
+      "Name": "SINV-26-01082",
+      "NetTotal": 5860772,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcj8ou4932",
+          "Rate": 0.0,
+          "TaxAmount": 527469
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcj88u1d06",
+          "Rate": 0.0,
+          "TaxAmount": 527469
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-031",
+      "CustomerName": "CUST-031",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 888188,
+      "Items": [
+        {
+          "Amount": 845894,
+          "Description": "Goods sold to CUST-031 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcl3u2hfeo"
+        }
+      ],
+      "Name": "SINV-26-01083",
+      "NetTotal": 845894,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-031",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcls1ofcej",
+          "Rate": 0.0,
+          "TaxAmount": 21147
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pclcdbpml1",
+          "Rate": 0.0,
+          "TaxAmount": 21147
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-025",
+      "CustomerName": "CUST-025",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3147359,
+      "Items": [
+        {
+          "Amount": 2667253,
+          "Description": "Goods sold to CUST-025 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcmn613i5r"
+        }
+      ],
+      "Name": "SINV-26-01084",
+      "NetTotal": 2667253,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-025",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcmveim9sh",
+          "Rate": 0.0,
+          "TaxAmount": 240053
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcm6hopbg6",
+          "Rate": 0.0,
+          "TaxAmount": 240053
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-026",
+      "CustomerName": "CUST-026",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 9004309,
+      "Items": [
+        {
+          "Amount": 7630771,
+          "Description": "Goods sold to CUST-026 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcodrikopj"
+        }
+      ],
+      "Name": "SINV-26-01085",
+      "NetTotal": 7630771,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-026",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pco1qrvcjk",
+          "Rate": 0.0,
+          "TaxAmount": 686769
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pco1etsbnk",
+          "Rate": 0.0,
+          "TaxAmount": 686769
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2955278,
+      "Items": [
+        {
+          "Amount": 2814550,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcptrhug67"
+        }
+      ],
+      "Name": "SINV-26-01086",
+      "NetTotal": 2814550,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcp1k6ep80",
+          "Rate": 0.0,
+          "TaxAmount": 70364
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcpscr9oee",
+          "Rate": 0.0,
+          "TaxAmount": 70364
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5108394,
+      "Items": [
+        {
+          "Amount": 4865138,
+          "Description": "Goods sold to CUST-030 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcqbvo1i43"
+        }
+      ],
+      "Name": "SINV-26-01087",
+      "NetTotal": 4865138,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcqqefj8di",
+          "Rate": 0.0,
+          "TaxAmount": 121628
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcqc2p2eo1",
+          "Rate": 0.0,
+          "TaxAmount": 121628
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7943288,
+      "Items": [
+        {
+          "Amount": 7565036,
+          "Description": "Goods sold to CUST-006 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcslkdgspo"
+        }
+      ],
+      "Name": "SINV-26-01088",
+      "NetTotal": 7565036,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-10T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcse7v10eg",
+          "Rate": 0.0,
+          "TaxAmount": 189126
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcseg93fan",
+          "Rate": 0.0,
+          "TaxAmount": 189126
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-015",
+      "CustomerName": "CUST-015",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6919624,
+      "Items": [
+        {
+          "Amount": 6590118,
+          "Description": "Goods sold to CUST-015 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pctus9veet"
+        }
+      ],
+      "Name": "SINV-26-01089",
+      "NetTotal": 6590118,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-015",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pct8gf5f6l",
+          "Rate": 0.0,
+          "TaxAmount": 164753
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pctcrv3oir",
+          "Rate": 0.0,
+          "TaxAmount": 164753
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4561871,
+      "Items": [
+        {
+          "Amount": 3865993,
+          "Description": "Goods sold to CUST-017 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pcvjneosor"
+        }
+      ],
+      "Name": "SINV-26-01090",
+      "NetTotal": 3865993,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pcvb8qv6ug",
+          "Rate": 0.0,
+          "TaxAmount": 347939
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pcvt264u1s",
+          "Rate": 0.0,
+          "TaxAmount": 347939
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4594333,
+      "Items": [
+        {
+          "Amount": 4375555,
+          "Description": "Goods sold to CUST-017 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd06rcdvoc"
+        }
+      ],
+      "Name": "SINV-26-01091",
+      "NetTotal": 4375555,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd0hl60a5q",
+          "Rate": 0.0,
+          "TaxAmount": 109389
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd01vseaaj",
+          "Rate": 0.0,
+          "TaxAmount": 109389
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4815291,
+      "Items": [
+        {
+          "Amount": 4585991,
+          "Description": "Goods sold to CUST-008 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd1meqfp0m"
+        }
+      ],
+      "Name": "SINV-26-01092",
+      "NetTotal": 4585991,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd1crimt7h",
+          "Rate": 0.0,
+          "TaxAmount": 114650
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd1qh1na3i",
+          "Rate": 0.0,
+          "TaxAmount": 114650
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8619377,
+      "Items": [
+        {
+          "Amount": 7304557,
+          "Description": "Goods sold to CUST-011 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd304va6bp"
+        }
+      ],
+      "Name": "SINV-26-01093",
+      "NetTotal": 7304557,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd39e09jli",
+          "Rate": 0.0,
+          "TaxAmount": 657410
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd3j9d32l5",
+          "Rate": 0.0,
+          "TaxAmount": 657410
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8057008,
+      "Items": [
+        {
+          "Amount": 7673340,
+          "Description": "Goods sold to CUST-001 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd4b2r4v9m"
+        }
+      ],
+      "Name": "SINV-26-01094",
+      "NetTotal": 7673340,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-11T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd4tkk79cr",
+          "Rate": 0.0,
+          "TaxAmount": 191834
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd4cbreb38",
+          "Rate": 0.0,
+          "TaxAmount": 191834
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7604756,
+      "Items": [
+        {
+          "Amount": 6444708,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd59oojapk"
+        }
+      ],
+      "Name": "SINV-26-01095",
+      "NetTotal": 6444708,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-12T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd5jfompmf",
+          "Rate": 0.0,
+          "TaxAmount": 580024
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd58uco9bo",
+          "Rate": 0.0,
+          "TaxAmount": 580024
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 698450,
+      "Items": [
+        {
+          "Amount": 591906,
+          "Description": "Goods sold to CUST-012 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd7iggerrf"
+        }
+      ],
+      "Name": "SINV-26-01096",
+      "NetTotal": 591906,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-12T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd73rl4ueb",
+          "Rate": 0.0,
+          "TaxAmount": 53272
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd7toe5oi3",
+          "Rate": 0.0,
+          "TaxAmount": 53272
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-039",
+      "CustomerName": "CUST-039",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4600799,
+      "Items": [
+        {
+          "Amount": 3898983,
+          "Description": "Goods sold to CUST-039 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd8gq3maav"
+        }
+      ],
+      "Name": "SINV-26-01097",
+      "NetTotal": 3898983,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-12T00:00:00Z",
+      "Remarks": "Sale to CUST-039",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd88e99o3a",
+          "Rate": 0.0,
+          "TaxAmount": 350908
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd8t8urtju",
+          "Rate": 0.0,
+          "TaxAmount": 350908
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3732740,
+      "Items": [
+        {
+          "Amount": 3554990,
+          "Description": "Goods sold to CUST-037 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pd9dgdjf3s"
+        }
+      ],
+      "Name": "SINV-26-01098",
+      "NetTotal": 3554990,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-12T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pd96900ecf",
+          "Rate": 0.0,
+          "TaxAmount": 88875
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pd9lhhc9hm",
+          "Rate": 0.0,
+          "TaxAmount": 88875
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2746118,
+      "Items": [
+        {
+          "Amount": 2327218,
+          "Description": "Goods sold to CUST-037 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdbhgungpu"
+        }
+      ],
+      "Name": "SINV-26-01099",
+      "NetTotal": 2327218,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-12T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdbk5grrmg",
+          "Rate": 0.0,
+          "TaxAmount": 209450
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdbgmqbhd4",
+          "Rate": 0.0,
+          "TaxAmount": 209450
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-027",
+      "CustomerName": "CUST-027",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7310533,
+      "Items": [
+        {
+          "Amount": 6962413,
+          "Description": "Goods sold to CUST-027 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdcbcg9lfn"
+        }
+      ],
+      "Name": "SINV-26-01100",
+      "NetTotal": 6962413,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-13T00:00:00Z",
+      "Remarks": "Sale to CUST-027",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdc6vhno22",
+          "Rate": 0.0,
+          "TaxAmount": 174060
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdc2h61tlr",
+          "Rate": 0.0,
+          "TaxAmount": 174060
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-027",
+      "CustomerName": "CUST-027",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1273123,
+      "Items": [
+        {
+          "Amount": 1212499,
+          "Description": "Goods sold to CUST-027 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pde2cug4gp"
+        }
+      ],
+      "Name": "SINV-26-01101",
+      "NetTotal": 1212499,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-13T00:00:00Z",
+      "Remarks": "Sale to CUST-027",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pderhtqi52",
+          "Rate": 0.0,
+          "TaxAmount": 30312
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdeo3ddo9e",
+          "Rate": 0.0,
+          "TaxAmount": 30312
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8175272,
+      "Items": [
+        {
+          "Amount": 7785974,
+          "Description": "Goods sold to CUST-011 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdfmdh0of5"
+        }
+      ],
+      "Name": "SINV-26-01102",
+      "NetTotal": 7785974,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-13T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdfkvnhd4j",
+          "Rate": 0.0,
+          "TaxAmount": 194649
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdfshqurno",
+          "Rate": 0.0,
+          "TaxAmount": 194649
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-014",
+      "CustomerName": "CUST-014",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1994744,
+      "Items": [
+        {
+          "Amount": 1899756,
+          "Description": "Goods sold to CUST-014 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdgi3q6i39"
+        }
+      ],
+      "Name": "SINV-26-01103",
+      "NetTotal": 1899756,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-13T00:00:00Z",
+      "Remarks": "Sale to CUST-014",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdgk2oiisq",
+          "Rate": 0.0,
+          "TaxAmount": 47494
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdgna509ng",
+          "Rate": 0.0,
+          "TaxAmount": 47494
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4045762,
+      "Items": [
+        {
+          "Amount": 3428612,
+          "Description": "Goods sold to CUST-040 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdi7oootjs"
+        }
+      ],
+      "Name": "SINV-26-01104",
+      "NetTotal": 3428612,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdiqqh5o80",
+          "Rate": 0.0,
+          "TaxAmount": 308575
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdiqqcodt9",
+          "Rate": 0.0,
+          "TaxAmount": 308575
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3559057,
+      "Items": [
+        {
+          "Amount": 3389579,
+          "Description": "Goods sold to CUST-012 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdj79b7ce4"
+        }
+      ],
+      "Name": "SINV-26-01105",
+      "NetTotal": 3389579,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdjpg8h22i",
+          "Rate": 0.0,
+          "TaxAmount": 84739
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdj6q4in2q",
+          "Rate": 0.0,
+          "TaxAmount": 84739
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-019",
+      "CustomerName": "CUST-019",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4667544,
+      "Items": [
+        {
+          "Amount": 3955546,
+          "Description": "Goods sold to CUST-019 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdlcouakn6"
+        }
+      ],
+      "Name": "SINV-26-01106",
+      "NetTotal": 3955546,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-019",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdltnuot67",
+          "Rate": 0.0,
+          "TaxAmount": 355999
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdletsr8k9",
+          "Rate": 0.0,
+          "TaxAmount": 355999
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3808109,
+      "Items": [
+        {
+          "Amount": 3227211,
+          "Description": "Goods sold to CUST-016 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdm7a3hccl"
+        }
+      ],
+      "Name": "SINV-26-01107",
+      "NetTotal": 3227211,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdmf37ioam",
+          "Rate": 0.0,
+          "TaxAmount": 290449
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdmculu5eo",
+          "Rate": 0.0,
+          "TaxAmount": 290449
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 918856,
+      "Items": [
+        {
+          "Amount": 778692,
+          "Description": "Goods sold to CUST-006 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdnvev5iou"
+        }
+      ],
+      "Name": "SINV-26-01108",
+      "NetTotal": 778692,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdnb45c5rv",
+          "Rate": 0.0,
+          "TaxAmount": 70082
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdnb7h93ub",
+          "Rate": 0.0,
+          "TaxAmount": 70082
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6500441,
+      "Items": [
+        {
+          "Amount": 6190897,
+          "Description": "Goods sold to CUST-016 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdp7ppsglh"
+        }
+      ],
+      "Name": "SINV-26-01109",
+      "NetTotal": 6190897,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdp2sj816k",
+          "Rate": 0.0,
+          "TaxAmount": 154772
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdpai6jogj",
+          "Rate": 0.0,
+          "TaxAmount": 154772
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8270907,
+      "Items": [
+        {
+          "Amount": 7877055,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdqob49vd8"
+        }
+      ],
+      "Name": "SINV-26-01110",
+      "NetTotal": 7877055,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-14T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdqk6of1er",
+          "Rate": 0.0,
+          "TaxAmount": 196926
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdqpm7gihm",
+          "Rate": 0.0,
+          "TaxAmount": 196926
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6090181,
+      "Items": [
+        {
+          "Amount": 5161171,
+          "Description": "Goods sold to CUST-009 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdrlqj204q"
+        }
+      ],
+      "Name": "SINV-26-01111",
+      "NetTotal": 5161171,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-15T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdr94ivkph",
+          "Rate": 0.0,
+          "TaxAmount": 464505
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdrpihsop5",
+          "Rate": 0.0,
+          "TaxAmount": 464505
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1744478,
+      "Items": [
+        {
+          "Amount": 1478372,
+          "Description": "Goods sold to CUST-008 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdtisl80df"
+        }
+      ],
+      "Name": "SINV-26-01112",
+      "NetTotal": 1478372,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-15T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pdtukutf9a",
+          "Rate": 0.0,
+          "TaxAmount": 133053
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pdtm9pqbd1",
+          "Rate": 0.0,
+          "TaxAmount": 133053
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3905818,
+      "Items": [
+        {
+          "Amount": 3310016,
+          "Description": "Goods sold to CUST-037 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pdus7iu0n6"
+        }
+      ],
+      "Name": "SINV-26-01113",
+      "NetTotal": 3310016,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pduv4t0ojn",
+          "Rate": 0.0,
+          "TaxAmount": 297901
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pduu5b25lp",
+          "Rate": 0.0,
+          "TaxAmount": 297901
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8795132,
+      "Items": [
+        {
+          "Amount": 7453502,
+          "Description": "Goods sold to CUST-011 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe0ooghgh4"
+        }
+      ],
+      "Name": "SINV-26-01114",
+      "NetTotal": 7453502,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe0iuu7cp1",
+          "Rate": 0.0,
+          "TaxAmount": 670815
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe00ktanhi",
+          "Rate": 0.0,
+          "TaxAmount": 670815
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1879220,
+      "Items": [
+        {
+          "Amount": 1789734,
+          "Description": "Goods sold to CUST-012 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe1mj090vj"
+        }
+      ],
+      "Name": "SINV-26-01115",
+      "NetTotal": 1789734,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe1tl219f8",
+          "Rate": 0.0,
+          "TaxAmount": 44743
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe14jrd7ak",
+          "Rate": 0.0,
+          "TaxAmount": 44743
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-031",
+      "CustomerName": "CUST-031",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7800570,
+      "Items": [
+        {
+          "Amount": 6610652,
+          "Description": "Goods sold to CUST-031 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe2abbk89a"
+        }
+      ],
+      "Name": "SINV-26-01116",
+      "NetTotal": 6610652,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-031",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe2nkgl35o",
+          "Rate": 0.0,
+          "TaxAmount": 594959
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe20f4f5uh",
+          "Rate": 0.0,
+          "TaxAmount": 594959
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-021",
+      "CustomerName": "CUST-021",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1844575,
+      "Items": [
+        {
+          "Amount": 1563199,
+          "Description": "Goods sold to CUST-021 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe408r6lfn"
+        }
+      ],
+      "Name": "SINV-26-01117",
+      "NetTotal": 1563199,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-021",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe4da90kj2",
+          "Rate": 0.0,
+          "TaxAmount": 140688
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe4tt157ut",
+          "Rate": 0.0,
+          "TaxAmount": 140688
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4611480,
+      "Items": [
+        {
+          "Amount": 3908034,
+          "Description": "Goods sold to CUST-040 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe51qvnd76"
+        }
+      ],
+      "Name": "SINV-26-01118",
+      "NetTotal": 3908034,
+      "OutstandingAmount": 4611480,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe58eajrm7",
+          "Rate": 0.0,
+          "TaxAmount": 351723
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe5n414ecr",
+          "Rate": 0.0,
+          "TaxAmount": 351723
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-035",
+      "CustomerName": "CUST-035",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1995332,
+      "Items": [
+        {
+          "Amount": 1900316,
+          "Description": "Goods sold to CUST-035 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe6krv8dkd"
+        }
+      ],
+      "Name": "SINV-26-01119",
+      "NetTotal": 1900316,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-035",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe6l42b9lk",
+          "Rate": 0.0,
+          "TaxAmount": 47508
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe6oi5bglk",
+          "Rate": 0.0,
+          "TaxAmount": 47508
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-024",
+      "CustomerName": "CUST-024",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6182673,
+      "Items": [
+        {
+          "Amount": 5239553,
+          "Description": "Goods sold to CUST-024 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe8pqm7gjq"
+        }
+      ],
+      "Name": "SINV-26-01120",
+      "NetTotal": 5239553,
+      "OutstandingAmount": 6182673,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-024",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe8k7qtijd",
+          "Rate": 0.0,
+          "TaxAmount": 471560
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe8trctj5q",
+          "Rate": 0.0,
+          "TaxAmount": 471560
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 546744,
+      "Items": [
+        {
+          "Amount": 463342,
+          "Description": "Goods sold to CUST-001 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pe9p4krqoo"
+        }
+      ],
+      "Name": "SINV-26-01121",
+      "NetTotal": 463342,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pe9nfl15ii",
+          "Rate": 0.0,
+          "TaxAmount": 41701
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pe9cgi7qop",
+          "Rate": 0.0,
+          "TaxAmount": 41701
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-038",
+      "CustomerName": "CUST-038",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6939467,
+      "Items": [
+        {
+          "Amount": 6609017,
+          "Description": "Goods sold to CUST-038 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pebda8utbn"
+        }
+      ],
+      "Name": "SINV-26-01122",
+      "NetTotal": 6609017,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-16T00:00:00Z",
+      "Remarks": "Sale to CUST-038",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pebojklkc9",
+          "Rate": 0.0,
+          "TaxAmount": 165225
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "peb48gofej",
+          "Rate": 0.0,
+          "TaxAmount": 165225
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-023",
+      "CustomerName": "CUST-023",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1451688,
+      "Items": [
+        {
+          "Amount": 1230244,
+          "Description": "Goods sold to CUST-023 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pechdk0t9v"
+        }
+      ],
+      "Name": "SINV-26-01123",
+      "NetTotal": 1230244,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-17T00:00:00Z",
+      "Remarks": "Sale to CUST-023",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pecui3sm31",
+          "Rate": 0.0,
+          "TaxAmount": 110722
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pec4peola8",
+          "Rate": 0.0,
+          "TaxAmount": 110722
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-002",
+      "CustomerName": "CUST-002",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5291955,
+      "Items": [
+        {
+          "Amount": 5039957,
+          "Description": "Goods sold to CUST-002 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "ped9f10b14"
+        }
+      ],
+      "Name": "SINV-26-01124",
+      "NetTotal": 5039957,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-17T00:00:00Z",
+      "Remarks": "Sale to CUST-002",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "ped8t1av6e",
+          "Rate": 0.0,
+          "TaxAmount": 125999
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "ped3qm401r",
+          "Rate": 0.0,
+          "TaxAmount": 125999
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2982604,
+      "Items": [
+        {
+          "Amount": 2840576,
+          "Description": "Goods sold to CUST-011 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pef5j0ikqe"
+        }
+      ],
+      "Name": "SINV-26-01125",
+      "NetTotal": 2840576,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-17T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pefps4gi28",
+          "Rate": 0.0,
+          "TaxAmount": 71014
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pef1pponpi",
+          "Rate": 0.0,
+          "TaxAmount": 71014
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-033",
+      "CustomerName": "CUST-033",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6866329,
+      "Items": [
+        {
+          "Amount": 5818923,
+          "Description": "Goods sold to CUST-033 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pegbgnjtt0"
+        }
+      ],
+      "Name": "SINV-26-01126",
+      "NetTotal": 5818923,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-033",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pegnep4ep8",
+          "Rate": 0.0,
+          "TaxAmount": 523703
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pegbppi8jc",
+          "Rate": 0.0,
+          "TaxAmount": 523703
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6151974,
+      "Items": [
+        {
+          "Amount": 5859022,
+          "Description": "Goods sold to CUST-009 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "peh3i4i9mt"
+        }
+      ],
+      "Name": "SINV-26-01127",
+      "NetTotal": 5859022,
+      "OutstandingAmount": 6151974,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pehu317mn8",
+          "Rate": 0.0,
+          "TaxAmount": 146476
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pehoq068rj",
+          "Rate": 0.0,
+          "TaxAmount": 146476
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-036",
+      "CustomerName": "CUST-036",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7969784,
+      "Items": [
+        {
+          "Amount": 6754054,
+          "Description": "Goods sold to CUST-036 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pejtrslafp"
+        }
+      ],
+      "Name": "SINV-26-01128",
+      "NetTotal": 6754054,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-036",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pejq23it6p",
+          "Rate": 0.0,
+          "TaxAmount": 607865
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pejg7pqpfg",
+          "Rate": 0.0,
+          "TaxAmount": 607865
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-015",
+      "CustomerName": "CUST-015",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3930624,
+      "Items": [
+        {
+          "Amount": 3331038,
+          "Description": "Goods sold to CUST-015 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "peknefu91v"
+        }
+      ],
+      "Name": "SINV-26-01129",
+      "NetTotal": 3331038,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-015",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pekukc1i4c",
+          "Rate": 0.0,
+          "TaxAmount": 299793
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pekooevngm",
+          "Rate": 0.0,
+          "TaxAmount": 299793
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-033",
+      "CustomerName": "CUST-033",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8614331,
+      "Items": [
+        {
+          "Amount": 7300281,
+          "Description": "Goods sold to CUST-033 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pell4t47mn"
+        }
+      ],
+      "Name": "SINV-26-01130",
+      "NetTotal": 7300281,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-033",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pel2e84vg9",
+          "Rate": 0.0,
+          "TaxAmount": 657025
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pelqkqh9p0",
+          "Rate": 0.0,
+          "TaxAmount": 657025
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-029",
+      "CustomerName": "CUST-029",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 930566,
+      "Items": [
+        {
+          "Amount": 886254,
+          "Description": "Goods sold to CUST-029 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "penfva4k5s"
+        }
+      ],
+      "Name": "SINV-26-01131",
+      "NetTotal": 886254,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-029",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "penog75aj3",
+          "Rate": 0.0,
+          "TaxAmount": 22156
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "penm8ni2q2",
+          "Rate": 0.0,
+          "TaxAmount": 22156
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-026",
+      "CustomerName": "CUST-026",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6155530,
+      "Items": [
+        {
+          "Amount": 5216550,
+          "Description": "Goods sold to CUST-026 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "peovs470j7"
+        }
+      ],
+      "Name": "SINV-26-01132",
+      "NetTotal": 5216550,
+      "OutstandingAmount": 6155530,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-026",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "peotjq7d3c",
+          "Rate": 0.0,
+          "TaxAmount": 469490
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "peog6fadt0",
+          "Rate": 0.0,
+          "TaxAmount": 469490
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-029",
+      "CustomerName": "CUST-029",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1203524,
+      "Items": [
+        {
+          "Amount": 1019936,
+          "Description": "Goods sold to CUST-029 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "peql9mtheo"
+        }
+      ],
+      "Name": "SINV-26-01133",
+      "NetTotal": 1019936,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-18T00:00:00Z",
+      "Remarks": "Sale to CUST-029",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "peq2eikv1h",
+          "Rate": 0.0,
+          "TaxAmount": 91794
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "peqfegh2c9",
+          "Rate": 0.0,
+          "TaxAmount": 91794
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-015",
+      "CustomerName": "CUST-015",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7513616,
+      "Items": [
+        {
+          "Amount": 6367472,
+          "Description": "Goods sold to CUST-015 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "perijei2bs"
+        }
+      ],
+      "Name": "SINV-26-01134",
+      "NetTotal": 6367472,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-015",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "perubr9r8q",
+          "Rate": 0.0,
+          "TaxAmount": 573072
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "per6odnobp",
+          "Rate": 0.0,
+          "TaxAmount": 573072
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-032",
+      "CustomerName": "CUST-032",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 369933,
+      "Items": [
+        {
+          "Amount": 352317,
+          "Description": "Goods sold to CUST-032 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pesnab70ks"
+        }
+      ],
+      "Name": "SINV-26-01135",
+      "NetTotal": 352317,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-032",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pes7bm6sn2",
+          "Rate": 0.0,
+          "TaxAmount": 8808
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pesdcfp8q6",
+          "Rate": 0.0,
+          "TaxAmount": 8808
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-015",
+      "CustomerName": "CUST-015",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1880368,
+      "Items": [
+        {
+          "Amount": 1790826,
+          "Description": "Goods sold to CUST-015 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "peunq1kjf1"
+        }
+      ],
+      "Name": "SINV-26-01136",
+      "NetTotal": 1790826,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-015",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "peugv4bhl6",
+          "Rate": 0.0,
+          "TaxAmount": 44771
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "peuu55mlad",
+          "Rate": 0.0,
+          "TaxAmount": 44771
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5167405,
+      "Items": [
+        {
+          "Amount": 4921339,
+          "Description": "Goods sold to CUST-005 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pevk1up50g"
+        }
+      ],
+      "Name": "SINV-26-01137",
+      "NetTotal": 4921339,
+      "OutstandingAmount": 5167405,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pevqmhbhnh",
+          "Rate": 0.0,
+          "TaxAmount": 123033
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pevbq9u5cm",
+          "Rate": 0.0,
+          "TaxAmount": 123033
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7233823,
+      "Items": [
+        {
+          "Amount": 6130359,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf0k3n593r"
+        }
+      ],
+      "Name": "SINV-26-01138",
+      "NetTotal": 6130359,
+      "OutstandingAmount": 7233823,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf069aj0cq",
+          "Rate": 0.0,
+          "TaxAmount": 551732
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf04skl8q1",
+          "Rate": 0.0,
+          "TaxAmount": 551732
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-032",
+      "CustomerName": "CUST-032",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7616735,
+      "Items": [
+        {
+          "Amount": 6454861,
+          "Description": "Goods sold to CUST-032 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf2aiotid6"
+        }
+      ],
+      "Name": "SINV-26-01139",
+      "NetTotal": 6454861,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-032",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf2ckf3an7",
+          "Rate": 0.0,
+          "TaxAmount": 580937
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf25tc0ure",
+          "Rate": 0.0,
+          "TaxAmount": 580937
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-039",
+      "CustomerName": "CUST-039",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7980932,
+      "Items": [
+        {
+          "Amount": 7600888,
+          "Description": "Goods sold to CUST-039 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf3p4qlsjp"
+        }
+      ],
+      "Name": "SINV-26-01140",
+      "NetTotal": 7600888,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-039",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf3f0oahjr",
+          "Rate": 0.0,
+          "TaxAmount": 190022
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf3iacvivn",
+          "Rate": 0.0,
+          "TaxAmount": 190022
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8800192,
+      "Items": [
+        {
+          "Amount": 7457790,
+          "Description": "Goods sold to CUST-016 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf5dvec9ek"
+        }
+      ],
+      "Name": "SINV-26-01141",
+      "NetTotal": 7457790,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-19T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf5o5e9fur",
+          "Rate": 0.0,
+          "TaxAmount": 671201
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf51dcgnhn",
+          "Rate": 0.0,
+          "TaxAmount": 671201
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-035",
+      "CustomerName": "CUST-035",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1531075,
+      "Items": [
+        {
+          "Amount": 1297521,
+          "Description": "Goods sold to CUST-035 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf6net821j"
+        }
+      ],
+      "Name": "SINV-26-01142",
+      "NetTotal": 1297521,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-035",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf6h5h7n7t",
+          "Rate": 0.0,
+          "TaxAmount": 116777
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf62r1chuc",
+          "Rate": 0.0,
+          "TaxAmount": 116777
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5354462,
+      "Items": [
+        {
+          "Amount": 4537680,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf76mb6rlm"
+        }
+      ],
+      "Name": "SINV-26-01143",
+      "NetTotal": 4537680,
+      "OutstandingAmount": 5354462,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf7nndehdb",
+          "Rate": 0.0,
+          "TaxAmount": 408391
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf7nlv0uvc",
+          "Rate": 0.0,
+          "TaxAmount": 408391
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1619896,
+      "Items": [
+        {
+          "Amount": 1542758,
+          "Description": "Goods sold to CUST-016 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pf9ke1ok8k"
+        }
+      ],
+      "Name": "SINV-26-01144",
+      "NetTotal": 1542758,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pf9lni6dqa",
+          "Rate": 0.0,
+          "TaxAmount": 38569
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pf96o448js",
+          "Rate": 0.0,
+          "TaxAmount": 38569
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-037",
+      "CustomerName": "CUST-037",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4893589,
+      "Items": [
+        {
+          "Amount": 4660561,
+          "Description": "Goods sold to CUST-037 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfacjmf847"
+        }
+      ],
+      "Name": "SINV-26-01145",
+      "NetTotal": 4660561,
+      "OutstandingAmount": 4893589,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-037",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfad58jstg",
+          "Rate": 0.0,
+          "TaxAmount": 116514
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfapodrgke",
+          "Rate": 0.0,
+          "TaxAmount": 116514
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 446599,
+      "Items": [
+        {
+          "Amount": 378473,
+          "Description": "Goods sold to CUST-030 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfb89f05m7"
+        }
+      ],
+      "Name": "SINV-26-01146",
+      "NetTotal": 378473,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfbivkbqsq",
+          "Rate": 0.0,
+          "TaxAmount": 34063
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfblqurp3s",
+          "Rate": 0.0,
+          "TaxAmount": 34063
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-026",
+      "CustomerName": "CUST-026",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 707834,
+      "Items": [
+        {
+          "Amount": 674128,
+          "Description": "Goods sold to CUST-026 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfd3e7dq12"
+        }
+      ],
+      "Name": "SINV-26-01147",
+      "NetTotal": 674128,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-026",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfdtfeamml",
+          "Rate": 0.0,
+          "TaxAmount": 16853
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfd369lt2i",
+          "Rate": 0.0,
+          "TaxAmount": 16853
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-007",
+      "CustomerName": "CUST-007",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2521485,
+      "Items": [
+        {
+          "Amount": 2401415,
+          "Description": "Goods sold to CUST-007 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfel99v4m5"
+        }
+      ],
+      "Name": "SINV-26-01148",
+      "NetTotal": 2401415,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-007",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfed4qkt4n",
+          "Rate": 0.0,
+          "TaxAmount": 60035
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfe4i7vrm1",
+          "Rate": 0.0,
+          "TaxAmount": 60035
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-027",
+      "CustomerName": "CUST-027",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2568291,
+      "Items": [
+        {
+          "Amount": 2445991,
+          "Description": "Goods sold to CUST-027 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pffiluamhs"
+        }
+      ],
+      "Name": "SINV-26-01149",
+      "NetTotal": 2445991,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-20T00:00:00Z",
+      "Remarks": "Sale to CUST-027",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pffpqbh5e6",
+          "Rate": 0.0,
+          "TaxAmount": 61150
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pffasq8c2o",
+          "Rate": 0.0,
+          "TaxAmount": 61150
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-029",
+      "CustomerName": "CUST-029",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1124422,
+      "Items": [
+        {
+          "Amount": 1070878,
+          "Description": "Goods sold to CUST-029 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfh2ksdt4t"
+        }
+      ],
+      "Name": "SINV-26-01150",
+      "NetTotal": 1070878,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-029",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfhbcjnfa2",
+          "Rate": 0.0,
+          "TaxAmount": 26772
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfhg70h4ee",
+          "Rate": 0.0,
+          "TaxAmount": 26772
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-013",
+      "CustomerName": "CUST-013",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6752916,
+      "Items": [
+        {
+          "Amount": 5722810,
+          "Description": "Goods sold to CUST-013 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfij5e6vh3"
+        }
+      ],
+      "Name": "SINV-26-01151",
+      "NetTotal": 5722810,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-013",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfijmqr6cg",
+          "Rate": 0.0,
+          "TaxAmount": 515053
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfiv0m9bng",
+          "Rate": 0.0,
+          "TaxAmount": 515053
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-025",
+      "CustomerName": "CUST-025",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6640838,
+      "Items": [
+        {
+          "Amount": 5627828,
+          "Description": "Goods sold to CUST-025 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfjrue4ft6"
+        }
+      ],
+      "Name": "SINV-26-01152",
+      "NetTotal": 5627828,
+      "OutstandingAmount": 6640838,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-025",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfjsur8fci",
+          "Rate": 0.0,
+          "TaxAmount": 506505
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfjsv8goad",
+          "Rate": 0.0,
+          "TaxAmount": 506505
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3855574,
+      "Items": [
+        {
+          "Amount": 3267436,
+          "Description": "Goods sold to CUST-009 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pflga6hbg1"
+        }
+      ],
+      "Name": "SINV-26-01153",
+      "NetTotal": 3267436,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pflifvct97",
+          "Rate": 0.0,
+          "TaxAmount": 294069
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pflqqmlu1n",
+          "Rate": 0.0,
+          "TaxAmount": 294069
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-008",
+      "CustomerName": "CUST-008",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4932361,
+      "Items": [
+        {
+          "Amount": 4697487,
+          "Description": "Goods sold to CUST-008 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfm7hnq75o"
+        }
+      ],
+      "Name": "SINV-26-01154",
+      "NetTotal": 4697487,
+      "OutstandingAmount": 4932361,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-008",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfni2kgbq2",
+          "Rate": 0.0,
+          "TaxAmount": 117437
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfnsradt70",
+          "Rate": 0.0,
+          "TaxAmount": 117437
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 552305,
+      "Items": [
+        {
+          "Amount": 468055,
+          "Description": "Goods sold to CUST-006 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfoder1t1b"
+        }
+      ],
+      "Name": "SINV-26-01155",
+      "NetTotal": 468055,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-21T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfoal2274j",
+          "Rate": 0.0,
+          "TaxAmount": 42125
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfoho3v92c",
+          "Rate": 0.0,
+          "TaxAmount": 42125
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-034",
+      "CustomerName": "CUST-034",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 718928,
+      "Items": [
+        {
+          "Amount": 684694,
+          "Description": "Goods sold to CUST-034 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfpc08r3f1"
+        }
+      ],
+      "Name": "SINV-26-01156",
+      "NetTotal": 684694,
+      "OutstandingAmount": 718928,
+      "PostingDate": "2026-09-22T00:00:00Z",
+      "Remarks": "Sale to CUST-034",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfpikcp6o6",
+          "Rate": 0.0,
+          "TaxAmount": 17117
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfpck9j9ct",
+          "Rate": 0.0,
+          "TaxAmount": 17117
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8311047,
+      "Items": [
+        {
+          "Amount": 7043261,
+          "Description": "Goods sold to CUST-009 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfrua07inf"
+        }
+      ],
+      "Name": "SINV-26-01157",
+      "NetTotal": 7043261,
+      "OutstandingAmount": 8311047,
+      "PostingDate": "2026-09-22T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfre9sotif",
+          "Rate": 0.0,
+          "TaxAmount": 633893
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfrq2oqmeb",
+          "Rate": 0.0,
+          "TaxAmount": 633893
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5471114,
+      "Items": [
+        {
+          "Amount": 5210584,
+          "Description": "Goods sold to CUST-018 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfsbl2jd5v"
+        }
+      ],
+      "Name": "SINV-26-01158",
+      "NetTotal": 5210584,
+      "OutstandingAmount": 5471114,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfsh0kpu6d",
+          "Rate": 0.0,
+          "TaxAmount": 130265
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfs0nsbj8q",
+          "Rate": 0.0,
+          "TaxAmount": 130265
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6913016,
+      "Items": [
+        {
+          "Amount": 6583824,
+          "Description": "Goods sold to CUST-018 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pftjrdvqph"
+        }
+      ],
+      "Name": "SINV-26-01159",
+      "NetTotal": 6583824,
+      "OutstandingAmount": 6913016,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pft0njohr6",
+          "Rate": 0.0,
+          "TaxAmount": 164596
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pftmi5fpui",
+          "Rate": 0.0,
+          "TaxAmount": 164596
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-040",
+      "CustomerName": "CUST-040",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8497978,
+      "Items": [
+        {
+          "Amount": 7201676,
+          "Description": "Goods sold to CUST-040 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pfv008s91n"
+        }
+      ],
+      "Name": "SINV-26-01160",
+      "NetTotal": 7201676,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-040",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pfvbqdhs15",
+          "Rate": 0.0,
+          "TaxAmount": 648151
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pfvbt6u5tt",
+          "Rate": 0.0,
+          "TaxAmount": 648151
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1298182,
+      "Items": [
+        {
+          "Amount": 1100154,
+          "Description": "Goods sold to CUST-005 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg0j8iudml"
+        }
+      ],
+      "Name": "SINV-26-01161",
+      "NetTotal": 1100154,
+      "OutstandingAmount": 1298182,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg03s06adb",
+          "Rate": 0.0,
+          "TaxAmount": 99014
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg0g00qa8h",
+          "Rate": 0.0,
+          "TaxAmount": 99014
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-029",
+      "CustomerName": "CUST-029",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2159818,
+      "Items": [
+        {
+          "Amount": 2056970,
+          "Description": "Goods sold to CUST-029 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg1tgff4v0"
+        }
+      ],
+      "Name": "SINV-26-01162",
+      "NetTotal": 2056970,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-029",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg1478v55t",
+          "Rate": 0.0,
+          "TaxAmount": 51424
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg1bhcphrf",
+          "Rate": 0.0,
+          "TaxAmount": 51424
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-016",
+      "CustomerName": "CUST-016",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3808440,
+      "Items": [
+        {
+          "Amount": 3627086,
+          "Description": "Goods sold to CUST-016 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg3sefrg8p"
+        }
+      ],
+      "Name": "SINV-26-01163",
+      "NetTotal": 3627086,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-016",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg3p2j0u44",
+          "Rate": 0.0,
+          "TaxAmount": 90677
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg3hfkslck",
+          "Rate": 0.0,
+          "TaxAmount": 90677
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 427392,
+      "Items": [
+        {
+          "Amount": 362196,
+          "Description": "Goods sold to CUST-017 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg4crdh2jv"
+        }
+      ],
+      "Name": "SINV-26-01164",
+      "NetTotal": 362196,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-23T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg4sfnjbjs",
+          "Rate": 0.0,
+          "TaxAmount": 32598
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg4f407bl2",
+          "Rate": 0.0,
+          "TaxAmount": 32598
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-002",
+      "CustomerName": "CUST-002",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3538412,
+      "Items": [
+        {
+          "Amount": 2998654,
+          "Description": "Goods sold to CUST-002 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg5s2qg2ql"
+        }
+      ],
+      "Name": "SINV-26-01165",
+      "NetTotal": 2998654,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-24T00:00:00Z",
+      "Remarks": "Sale to CUST-002",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg5m26c2et",
+          "Rate": 0.0,
+          "TaxAmount": 269879
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg5btjip8g",
+          "Rate": 0.0,
+          "TaxAmount": 269879
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-030",
+      "CustomerName": "CUST-030",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4828846,
+      "Items": [
+        {
+          "Amount": 4598900,
+          "Description": "Goods sold to CUST-030 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg7r6ttt8k"
+        }
+      ],
+      "Name": "SINV-26-01166",
+      "NetTotal": 4598900,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-24T00:00:00Z",
+      "Remarks": "Sale to CUST-030",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg7kjlipv1",
+          "Rate": 0.0,
+          "TaxAmount": 114973
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg763kvpda",
+          "Rate": 0.0,
+          "TaxAmount": 114973
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 649749,
+      "Items": [
+        {
+          "Amount": 550635,
+          "Description": "Goods sold to CUST-011 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pg8vi6onlv"
+        }
+      ],
+      "Name": "SINV-26-01167",
+      "NetTotal": 550635,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pg8e3lr4ap",
+          "Rate": 0.0,
+          "TaxAmount": 49557
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pg81jucrus",
+          "Rate": 0.0,
+          "TaxAmount": 49557
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-032",
+      "CustomerName": "CUST-032",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 547661,
+      "Items": [
+        {
+          "Amount": 521581,
+          "Description": "Goods sold to CUST-032 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgao8ol8v6"
+        }
+      ],
+      "Name": "SINV-26-01168",
+      "NetTotal": 521581,
+      "OutstandingAmount": 547661,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-032",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgal6rk8q7",
+          "Rate": 0.0,
+          "TaxAmount": 13040
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgastga01p",
+          "Rate": 0.0,
+          "TaxAmount": 13040
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-035",
+      "CustomerName": "CUST-035",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8318171,
+      "Items": [
+        {
+          "Amount": 7049297,
+          "Description": "Goods sold to CUST-035 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgbrivi4rd"
+        }
+      ],
+      "Name": "SINV-26-01169",
+      "NetTotal": 7049297,
+      "OutstandingAmount": 8318171,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-035",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgb09bpjde",
+          "Rate": 0.0,
+          "TaxAmount": 634437
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgbqftc6e4",
+          "Rate": 0.0,
+          "TaxAmount": 634437
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-011",
+      "CustomerName": "CUST-011",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 7346033,
+      "Items": [
+        {
+          "Amount": 6996221,
+          "Description": "Goods sold to CUST-011 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgcrtrj5qv"
+        }
+      ],
+      "Name": "SINV-26-01170",
+      "NetTotal": 6996221,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-011",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgctq2cd2q",
+          "Rate": 0.0,
+          "TaxAmount": 174906
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgclujctsd",
+          "Rate": 0.0,
+          "TaxAmount": 174906
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-017",
+      "CustomerName": "CUST-017",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1461738,
+      "Items": [
+        {
+          "Amount": 1392132,
+          "Description": "Goods sold to CUST-017 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgegopp4s2"
+        }
+      ],
+      "Name": "SINV-26-01171",
+      "NetTotal": 1392132,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-017",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pge7u2b4pn",
+          "Rate": 0.0,
+          "TaxAmount": 34803
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgea643clv",
+          "Rate": 0.0,
+          "TaxAmount": 34803
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-031",
+      "CustomerName": "CUST-031",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 836517,
+      "Items": [
+        {
+          "Amount": 708913,
+          "Description": "Goods sold to CUST-031 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgftc8tqep"
+        }
+      ],
+      "Name": "SINV-26-01172",
+      "NetTotal": 708913,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-25T00:00:00Z",
+      "Remarks": "Sale to CUST-031",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgf9qdnd3h",
+          "Rate": 0.0,
+          "TaxAmount": 63802
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgfe728q1p",
+          "Rate": 0.0,
+          "TaxAmount": 63802
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3085687,
+      "Items": [
+        {
+          "Amount": 2614989,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pghq6chlne"
+        }
+      ],
+      "Name": "SINV-26-01173",
+      "NetTotal": 2614989,
+      "OutstandingAmount": 3085687,
+      "PostingDate": "2026-09-26T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pghbla6ajd",
+          "Rate": 0.0,
+          "TaxAmount": 235349
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pghfdm0339",
+          "Rate": 0.0,
+          "TaxAmount": 235349
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-023",
+      "CustomerName": "CUST-023",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 2318805,
+      "Items": [
+        {
+          "Amount": 2208385,
+          "Description": "Goods sold to CUST-023 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgiqgbnf0k"
+        }
+      ],
+      "Name": "SINV-26-01174",
+      "NetTotal": 2208385,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-09-26T00:00:00Z",
+      "Remarks": "Sale to CUST-023",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgih1boubq",
+          "Rate": 0.0,
+          "TaxAmount": 55210
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgifsp9qe3",
+          "Rate": 0.0,
+          "TaxAmount": 55210
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-025",
+      "CustomerName": "CUST-025",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4467669,
+      "Items": [
+        {
+          "Amount": 3786161,
+          "Description": "Goods sold to CUST-025 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgj5edgkub"
+        }
+      ],
+      "Name": "SINV-26-01175",
+      "NetTotal": 3786161,
+      "OutstandingAmount": 4467669,
+      "PostingDate": "2026-09-26T00:00:00Z",
+      "Remarks": "Sale to CUST-025",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgj16sebcl",
+          "Rate": 0.0,
+          "TaxAmount": 340754
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgj307n4qi",
+          "Rate": 0.0,
+          "TaxAmount": 340754
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-003",
+      "CustomerName": "CUST-003",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6838114,
+      "Items": [
+        {
+          "Amount": 5795012,
+          "Description": "Goods sold to CUST-003 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pglgfrssoc"
+        }
+      ],
+      "Name": "SINV-26-01176",
+      "NetTotal": 5795012,
+      "OutstandingAmount": 6838114,
+      "PostingDate": "2026-09-27T00:00:00Z",
+      "Remarks": "Sale to CUST-003",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgl9pvbnms",
+          "Rate": 0.0,
+          "TaxAmount": 521551
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgl5sfknbm",
+          "Rate": 0.0,
+          "TaxAmount": 521551
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-020",
+      "CustomerName": "CUST-020",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 595814,
+      "Items": [
+        {
+          "Amount": 567442,
+          "Description": "Goods sold to CUST-020 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgm148lhcs"
+        }
+      ],
+      "Name": "SINV-26-01177",
+      "NetTotal": 567442,
+      "OutstandingAmount": 595814,
+      "PostingDate": "2026-09-27T00:00:00Z",
+      "Remarks": "Sale to CUST-020",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgmjcrucrg",
+          "Rate": 0.0,
+          "TaxAmount": 14186
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgma51paq5",
+          "Rate": 0.0,
+          "TaxAmount": 14186
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-020",
+      "CustomerName": "CUST-020",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 600869,
+      "Items": [
+        {
+          "Amount": 572257,
+          "Description": "Goods sold to CUST-020 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgn0a86v7t"
+        }
+      ],
+      "Name": "SINV-26-01178",
+      "NetTotal": 572257,
+      "OutstandingAmount": 600869,
+      "PostingDate": "2026-09-28T00:00:00Z",
+      "Remarks": "Sale to CUST-020",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgnbrbencp",
+          "Rate": 0.0,
+          "TaxAmount": 14306
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgn4kh1nj9",
+          "Rate": 0.0,
+          "TaxAmount": 14306
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-039",
+      "CustomerName": "CUST-039",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6148326,
+      "Items": [
+        {
+          "Amount": 5210446,
+          "Description": "Goods sold to CUST-039 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgpg4unkol"
+        }
+      ],
+      "Name": "SINV-26-01179",
+      "NetTotal": 5210446,
+      "OutstandingAmount": 6148326,
+      "PostingDate": "2026-09-28T00:00:00Z",
+      "Remarks": "Sale to CUST-039",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgp16d93rn",
+          "Rate": 0.0,
+          "TaxAmount": 468940
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgpbfhrj3g",
+          "Rate": 0.0,
+          "TaxAmount": 468940
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5313544,
+      "Items": [
+        {
+          "Amount": 4503004,
+          "Description": "Goods sold to CUST-001 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgq0ob2dvr"
+        }
+      ],
+      "Name": "SINV-26-01180",
+      "NetTotal": 4503004,
+      "OutstandingAmount": 5313544,
+      "PostingDate": "2026-09-29T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgq92hou38",
+          "Rate": 0.0,
+          "TaxAmount": 405270
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgqje770nk",
+          "Rate": 0.0,
+          "TaxAmount": 405270
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-023",
+      "CustomerName": "CUST-023",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 1601418,
+      "Items": [
+        {
+          "Amount": 1357134,
+          "Description": "Goods sold to CUST-023 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgsecsavnu"
+        }
+      ],
+      "Name": "SINV-26-01181",
+      "NetTotal": 1357134,
+      "OutstandingAmount": 1601418,
+      "PostingDate": "2026-09-29T00:00:00Z",
+      "Remarks": "Sale to CUST-023",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgsjqf61pg",
+          "Rate": 0.0,
+          "TaxAmount": 122142
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgstdc58d3",
+          "Rate": 0.0,
+          "TaxAmount": 122142
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-033",
+      "CustomerName": "CUST-033",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4381122,
+      "Items": [
+        {
+          "Amount": 3712816,
+          "Description": "Goods sold to CUST-033 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pgtmhnoejl"
+        }
+      ],
+      "Name": "SINV-26-01182",
+      "NetTotal": 3712816,
+      "OutstandingAmount": 4381122,
+      "PostingDate": "2026-09-29T00:00:00Z",
+      "Remarks": "Sale to CUST-033",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgtotl3hkg",
+          "Rate": 0.0,
+          "TaxAmount": 334153
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgta9k3vbn",
+          "Rate": 0.0,
+          "TaxAmount": 334153
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-013",
+      "CustomerName": "CUST-013",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 3868892,
+      "Items": [
+        {
+          "Amount": 3278722,
+          "Description": "Goods sold to CUST-013 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "pguf86n0ue"
+        }
+      ],
+      "Name": "SINV-26-01183",
+      "NetTotal": 3278722,
+      "OutstandingAmount": 3868892,
+      "PostingDate": "2026-09-29T00:00:00Z",
+      "Remarks": "Sale to CUST-013",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "pgur4o5m25",
+          "Rate": 0.0,
+          "TaxAmount": 295085
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "pgu34glmo5",
+          "Rate": 0.0,
+          "TaxAmount": 295085
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-009",
+      "CustomerName": "CUST-009",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 8133941,
+      "Items": [
+        {
+          "Amount": 7746611,
+          "Description": "Goods sold to CUST-009 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "ph0824qt9a"
+        }
+      ],
+      "Name": "SINV-26-01184",
+      "NetTotal": 7746611,
+      "OutstandingAmount": 8133941,
+      "PostingDate": "2026-09-30T00:00:00Z",
+      "Remarks": "Sale to CUST-009",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "ph0ohkme9k",
+          "Rate": 0.0,
+          "TaxAmount": 193665
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "ph0p2rcqdm",
+          "Rate": 0.0,
+          "TaxAmount": 193665
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-019",
+      "CustomerName": "CUST-019",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 5289700,
+      "Items": [
+        {
+          "Amount": 5037810,
+          "Description": "Goods sold to CUST-019 at 5% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "ph1el2kkq0"
+        }
+      ],
+      "Name": "SINV-26-01185",
+      "NetTotal": 5037810,
+      "OutstandingAmount": 5289700,
+      "PostingDate": "2026-09-30T00:00:00Z",
+      "Remarks": "Sale to CUST-019",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "ph1fslputa",
+          "Rate": 0.0,
+          "TaxAmount": 125945
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "ph1nfnk7ha",
+          "Rate": 0.0,
+          "TaxAmount": 125945
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-033",
+      "CustomerName": "CUST-033",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 6124887,
+      "Items": [
+        {
+          "Amount": 5190583,
+          "Description": "Goods sold to CUST-033 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "ph24og6g7o"
+        }
+      ],
+      "Name": "SINV-26-01186",
+      "NetTotal": 5190583,
+      "OutstandingAmount": 6124887,
+      "PostingDate": "2026-09-30T00:00:00Z",
+      "Remarks": "Sale to CUST-033",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "ph2u7jgsvj",
+          "Rate": 0.0,
+          "TaxAmount": 467152
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "ph2tfv03td",
+          "Rate": 0.0,
+          "TaxAmount": 467152
+        }
+      ]
+    },
+    {
+      "Company": "Sharma Traders Pvt Ltd",
+      "Customer": "CUST-021",
+      "CustomerName": "CUST-021",
+      "DebitTo": "Debtors - STPL",
+      "Docstatus": 1,
+      "GrandTotal": 4896157,
+      "Items": [
+        {
+          "Amount": 4149285,
+          "Description": "Goods sold to CUST-021 at 18% GST",
+          "IncomeAccount": "Sales - STPL",
+          "ItemCode": "Trading Goods",
+          "Name": "ph4qsl9lpo"
+        }
+      ],
+      "Name": "SINV-26-01187",
+      "NetTotal": 4149285,
+      "OutstandingAmount": 4896157,
+      "PostingDate": "2026-09-30T00:00:00Z",
+      "Remarks": "Sale to CUST-021",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "ph40rss5ue",
+          "Rate": 0.0,
+          "TaxAmount": 373436
+        },
+        {
+          "AccountHead": "Output Tax SGST - STPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "ph4226cg0m",
+          "Rate": 0.0,
+          "TaxAmount": 373436
+        }
+      ]
+    }
+  ],
+  "tool": "list_sales_invoices"
+}

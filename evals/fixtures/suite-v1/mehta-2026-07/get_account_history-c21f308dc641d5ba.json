@@ -1,0 +1,35 @@
+{
+  "args": {
+    "account": "Salaries - MTSPL",
+    "company": "mehta",
+    "months": 4,
+    "through": "2026-07"
+  },
+  "result": [
+    {
+      "credit": 0,
+      "debit": 240000000,
+      "month": "2026-04",
+      "net": 240000000
+    },
+    {
+      "credit": 0,
+      "debit": 240000000,
+      "month": "2026-05",
+      "net": 240000000
+    },
+    {
+      "credit": 0,
+      "debit": 240000000,
+      "month": "2026-06",
+      "net": 240000000
+    },
+    {
+      "credit": 0,
+      "debit": 240000000,
+      "month": "2026-07",
+      "net": 240000000
+    }
+  ],
+  "tool": "get_account_history"
+}

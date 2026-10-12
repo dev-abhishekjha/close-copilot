@@ -1,0 +1,2557 @@
+{
+  "args": {
+    "company": "sharma",
+    "from": "2026-05-02",
+    "to": "2026-06-30"
+  },
+  "result": [
+    {
+      "amount_paise": 1051732,
+      "balance_paise": 259373162,
+      "company_id": "sharma",
+      "narration": "UPI/UTR623950280/CUST-018",
+      "ref": "UTR623950280",
+      "source_file": "",
+      "txn_date": "2026-05-02T00:00:00Z",
+      "txn_id": "BNK-20260502-001"
+    },
+    {
+      "amount_paise": 4574397,
+      "balance_paise": 263947559,
+      "company_id": "sharma",
+      "narration": "UPI/UTR087464568/CUST-029",
+      "ref": "UTR087464568",
+      "source_file": "",
+      "txn_date": "2026-05-03T00:00:00Z",
+      "txn_id": "BNK-20260503-001"
+    },
+    {
+      "amount_paise": 3524348,
+      "balance_paise": 267471907,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-018",
+      "ref": "UTR126460245",
+      "source_file": "",
+      "txn_date": "2026-05-04T00:00:00Z",
+      "txn_id": "BNK-20260504-001"
+    },
+    {
+      "amount_paise": 3759247,
+      "balance_paise": 271231154,
+      "company_id": "sharma",
+      "narration": "UPI/UTR636499634/CUST-020",
+      "ref": "UTR636499634",
+      "source_file": "",
+      "txn_date": "2026-05-05T00:00:00Z",
+      "txn_id": "BNK-20260505-001"
+    },
+    {
+      "amount_paise": 9487771,
+      "balance_paise": 280718925,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0505 BATCH 2497",
+      "ref": "PGS2497",
+      "source_file": "",
+      "txn_date": "2026-05-05T00:00:00Z",
+      "txn_id": "BNK-20260505-002"
+    },
+    {
+      "amount_paise": 2449956,
+      "balance_paise": 283168881,
+      "company_id": "sharma",
+      "narration": "UPI/UTR192724308/CUST-019",
+      "ref": "UTR192724308",
+      "source_file": "",
+      "txn_date": "2026-05-06T00:00:00Z",
+      "txn_id": "BNK-20260506-001"
+    },
+    {
+      "amount_paise": 6560503,
+      "balance_paise": 289729384,
+      "company_id": "sharma",
+      "narration": "UPI/UTR075832474/CUST-024",
+      "ref": "UTR075832474",
+      "source_file": "",
+      "txn_date": "2026-05-06T00:00:00Z",
+      "txn_id": "BNK-20260506-002"
+    },
+    {
+      "amount_paise": -118000,
+      "balance_paise": 289611384,
+      "company_id": "sharma",
+      "narration": "SMS/ACCT CHARGES INCL GST",
+      "source_file": "",
+      "txn_date": "2026-05-07T00:00:00Z",
+      "txn_id": "BNK-20260507-001"
+    },
+    {
+      "amount_paise": 6094724,
+      "balance_paise": 295706108,
+      "company_id": "sharma",
+      "narration": "UPI/UTR115450624/CUST-009",
+      "ref": "UTR115450624",
+      "source_file": "",
+      "txn_date": "2026-05-08T00:00:00Z",
+      "txn_id": "BNK-20260508-001"
+    },
+    {
+      "amount_paise": 1707748,
+      "balance_paise": 297413856,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-004",
+      "ref": "UTR801769115",
+      "source_file": "",
+      "txn_date": "2026-05-08T00:00:00Z",
+      "txn_id": "BNK-20260508-002"
+    },
+    {
+      "amount_paise": 227027,
+      "balance_paise": 297640883,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-024",
+      "ref": "UTR916471259",
+      "source_file": "",
+      "txn_date": "2026-05-09T00:00:00Z",
+      "txn_id": "BNK-20260509-001"
+    },
+    {
+      "amount_paise": 4081328,
+      "balance_paise": 301722211,
+      "company_id": "sharma",
+      "narration": "UPI/UTR123365210/CUST-001",
+      "ref": "UTR123365210",
+      "source_file": "",
+      "txn_date": "2026-05-10T00:00:00Z",
+      "txn_id": "BNK-20260510-001"
+    },
+    {
+      "amount_paise": 9113525,
+      "balance_paise": 310835736,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-031",
+      "ref": "UTR103716783",
+      "source_file": "",
+      "txn_date": "2026-05-11T00:00:00Z",
+      "txn_id": "BNK-20260511-001"
+    },
+    {
+      "amount_paise": 5895305,
+      "balance_paise": 316731041,
+      "company_id": "sharma",
+      "narration": "UPI/UTR748108974/CUST-035",
+      "ref": "UTR748108974",
+      "source_file": "",
+      "txn_date": "2026-05-11T00:00:00Z",
+      "txn_id": "BNK-20260511-002"
+    },
+    {
+      "amount_paise": 1562040,
+      "balance_paise": 318293081,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-035",
+      "ref": "UTR546904475",
+      "source_file": "",
+      "txn_date": "2026-05-11T00:00:00Z",
+      "txn_id": "BNK-20260511-003"
+    },
+    {
+      "amount_paise": 5725911,
+      "balance_paise": 324018992,
+      "company_id": "sharma",
+      "narration": "UPI/UTR429865870/CUST-027",
+      "ref": "UTR429865870",
+      "source_file": "",
+      "txn_date": "2026-05-11T00:00:00Z",
+      "txn_id": "BNK-20260511-004"
+    },
+    {
+      "amount_paise": 4792718,
+      "balance_paise": 328811710,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR425099353",
+      "source_file": "",
+      "txn_date": "2026-05-11T00:00:00Z",
+      "txn_id": "BNK-20260511-005"
+    },
+    {
+      "amount_paise": 5510754,
+      "balance_paise": 334322464,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-032",
+      "ref": "UTR863099795",
+      "source_file": "",
+      "txn_date": "2026-05-12T00:00:00Z",
+      "txn_id": "BNK-20260512-001"
+    },
+    {
+      "amount_paise": 36049298,
+      "balance_paise": 370371762,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0512 BATCH 8530",
+      "ref": "PGS8530",
+      "source_file": "",
+      "txn_date": "2026-05-12T00:00:00Z",
+      "txn_id": "BNK-20260512-002"
+    },
+    {
+      "amount_paise": -2075652,
+      "balance_paise": 368296110,
+      "company_id": "sharma",
+      "narration": "NEFT-ROADKING LOGISTICS",
+      "ref": "N9288415",
+      "source_file": "",
+      "txn_date": "2026-05-12T00:00:00Z",
+      "txn_id": "BNK-20260512-003"
+    },
+    {
+      "amount_paise": 1449626,
+      "balance_paise": 369745736,
+      "company_id": "sharma",
+      "narration": "UPI/UTR230666514/CUST-024",
+      "ref": "UTR230666514",
+      "source_file": "",
+      "txn_date": "2026-05-13T00:00:00Z",
+      "txn_id": "BNK-20260513-001"
+    },
+    {
+      "amount_paise": 3588477,
+      "balance_paise": 373334213,
+      "company_id": "sharma",
+      "narration": "UPI/UTR878879534/CUST-015",
+      "ref": "UTR878879534",
+      "source_file": "",
+      "txn_date": "2026-05-13T00:00:00Z",
+      "txn_id": "BNK-20260513-002"
+    },
+    {
+      "amount_paise": 7883303,
+      "balance_paise": 381217516,
+      "company_id": "sharma",
+      "narration": "UPI/UTR486264916/CUST-006",
+      "ref": "UTR486264916",
+      "source_file": "",
+      "txn_date": "2026-05-13T00:00:00Z",
+      "txn_id": "BNK-20260513-003"
+    },
+    {
+      "amount_paise": 557748,
+      "balance_paise": 381775264,
+      "company_id": "sharma",
+      "narration": "UPI/UTR766737136/CUST-037",
+      "ref": "UTR766737136",
+      "source_file": "",
+      "txn_date": "2026-05-13T00:00:00Z",
+      "txn_id": "BNK-20260513-004"
+    },
+    {
+      "amount_paise": 2066362,
+      "balance_paise": 383841626,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR716549077",
+      "source_file": "",
+      "txn_date": "2026-05-14T00:00:00Z",
+      "txn_id": "BNK-20260514-001"
+    },
+    {
+      "amount_paise": 7038140,
+      "balance_paise": 390879766,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-031",
+      "ref": "UTR295638559",
+      "source_file": "",
+      "txn_date": "2026-05-14T00:00:00Z",
+      "txn_id": "BNK-20260514-002"
+    },
+    {
+      "amount_paise": 4757459,
+      "balance_paise": 395637225,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR967751297",
+      "source_file": "",
+      "txn_date": "2026-05-14T00:00:00Z",
+      "txn_id": "BNK-20260514-003"
+    },
+    {
+      "amount_paise": 6224074,
+      "balance_paise": 401861299,
+      "company_id": "sharma",
+      "narration": "UPI/UTR034205994/CUST-020",
+      "ref": "UTR034205994",
+      "source_file": "",
+      "txn_date": "2026-05-14T00:00:00Z",
+      "txn_id": "BNK-20260514-004"
+    },
+    {
+      "amount_paise": -148347,
+      "balance_paise": 401712952,
+      "company_id": "sharma",
+      "narration": "NEFT-QUICKFIX REPAIRS",
+      "ref": "N5149464",
+      "source_file": "",
+      "txn_date": "2026-05-14T00:00:00Z",
+      "txn_id": "BNK-20260514-005"
+    },
+    {
+      "amount_paise": 2940662,
+      "balance_paise": 404653614,
+      "company_id": "sharma",
+      "narration": "UPI/UTR345843584/CUST-006",
+      "ref": "UTR345843584",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-001"
+    },
+    {
+      "amount_paise": 6131478,
+      "balance_paise": 410785092,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-014",
+      "ref": "UTR401166351",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-002"
+    },
+    {
+      "amount_paise": 6510499,
+      "balance_paise": 417295591,
+      "company_id": "sharma",
+      "narration": "UPI/UTR663080070/CUST-015",
+      "ref": "UTR663080070",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-003"
+    },
+    {
+      "amount_paise": 9330196,
+      "balance_paise": 426625787,
+      "company_id": "sharma",
+      "narration": "UPI/UTR234195600/CUST-011",
+      "ref": "UTR234195600",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-004"
+    },
+    {
+      "amount_paise": 4166900,
+      "balance_paise": 430792687,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-028",
+      "ref": "UTR474917571",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-005"
+    },
+    {
+      "amount_paise": 5489268,
+      "balance_paise": 436281955,
+      "company_id": "sharma",
+      "narration": "UPI/UTR921487510/CUST-036",
+      "ref": "UTR921487510",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-006"
+    },
+    {
+      "amount_paise": 8162432,
+      "balance_paise": 444444387,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-007",
+      "ref": "UTR497893449",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-007"
+    },
+    {
+      "amount_paise": -420970,
+      "balance_paise": 444023417,
+      "company_id": "sharma",
+      "narration": "NEFT-BLUENET BROADBAND",
+      "ref": "N4742729",
+      "source_file": "",
+      "txn_date": "2026-05-15T00:00:00Z",
+      "txn_id": "BNK-20260515-008"
+    },
+    {
+      "amount_paise": 6083990,
+      "balance_paise": 450107407,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-037",
+      "ref": "UTR875952349",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-001"
+    },
+    {
+      "amount_paise": 3259909,
+      "balance_paise": 453367316,
+      "company_id": "sharma",
+      "narration": "UPI/UTR145766438/CUST-040",
+      "ref": "UTR145766438",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-002"
+    },
+    {
+      "amount_paise": 2281387,
+      "balance_paise": 455648703,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-033",
+      "ref": "UTR550269747",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-003"
+    },
+    {
+      "amount_paise": 2744946,
+      "balance_paise": 458393649,
+      "company_id": "sharma",
+      "narration": "UPI/UTR107518402/CUST-040",
+      "ref": "UTR107518402",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-004"
+    },
+    {
+      "amount_paise": 5714072,
+      "balance_paise": 464107721,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-037",
+      "ref": "UTR905301689",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-005"
+    },
+    {
+      "amount_paise": 2390741,
+      "balance_paise": 466498462,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-021",
+      "ref": "UTR253128675",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-006"
+    },
+    {
+      "amount_paise": 5712402,
+      "balance_paise": 472210864,
+      "company_id": "sharma",
+      "narration": "UPI/UTR373981190/CUST-014",
+      "ref": "UTR373981190",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-007"
+    },
+    {
+      "amount_paise": -394590,
+      "balance_paise": 471816274,
+      "company_id": "sharma",
+      "narration": "NEFT-SWIFT COURIERS",
+      "ref": "N4288855",
+      "source_file": "",
+      "txn_date": "2026-05-16T00:00:00Z",
+      "txn_id": "BNK-20260516-008"
+    },
+    {
+      "amount_paise": 5211946,
+      "balance_paise": 477028220,
+      "company_id": "sharma",
+      "narration": "UPI/UTR701187656/CUST-010",
+      "ref": "UTR701187656",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-001"
+    },
+    {
+      "amount_paise": 8291514,
+      "balance_paise": 485319734,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-011",
+      "ref": "UTR452678661",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-002"
+    },
+    {
+      "amount_paise": 4181897,
+      "balance_paise": 489501631,
+      "company_id": "sharma",
+      "narration": "UPI/UTR670085932/CUST-022",
+      "ref": "UTR670085932",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-003"
+    },
+    {
+      "amount_paise": 8195229,
+      "balance_paise": 497696860,
+      "company_id": "sharma",
+      "narration": "UPI/UTR878255226/CUST-027",
+      "ref": "UTR878255226",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-004"
+    },
+    {
+      "amount_paise": 3660273,
+      "balance_paise": 501357133,
+      "company_id": "sharma",
+      "narration": "UPI/UTR973056824/CUST-019",
+      "ref": "UTR973056824",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-005"
+    },
+    {
+      "amount_paise": 4806467,
+      "balance_paise": 506163600,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-037",
+      "ref": "UTR253296739",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-006"
+    },
+    {
+      "amount_paise": 8371840,
+      "balance_paise": 514535440,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-008",
+      "ref": "UTR682260591",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-007"
+    },
+    {
+      "amount_paise": 8193856,
+      "balance_paise": 522729296,
+      "company_id": "sharma",
+      "narration": "UPI/UTR912080060/CUST-005",
+      "ref": "UTR912080060",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-008"
+    },
+    {
+      "amount_paise": 1880520,
+      "balance_paise": 524609816,
+      "company_id": "sharma",
+      "narration": "UPI/UTR839825678/CUST-018",
+      "ref": "UTR839825678",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-009"
+    },
+    {
+      "amount_paise": -10398208,
+      "balance_paise": 514211608,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N0498340",
+      "source_file": "",
+      "txn_date": "2026-05-17T00:00:00Z",
+      "txn_id": "BNK-20260517-010"
+    },
+    {
+      "amount_paise": 482061,
+      "balance_paise": 514693669,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-025",
+      "ref": "UTR974411127",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-001"
+    },
+    {
+      "amount_paise": 2744850,
+      "balance_paise": 517438519,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-023",
+      "ref": "UTR627448149",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-002"
+    },
+    {
+      "amount_paise": 396376,
+      "balance_paise": 517834895,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-008",
+      "ref": "UTR465773837",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-003"
+    },
+    {
+      "amount_paise": 1796900,
+      "balance_paise": 519631795,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-039",
+      "ref": "UTR890656107",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-004"
+    },
+    {
+      "amount_paise": 2474776,
+      "balance_paise": 522106571,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-005",
+      "ref": "UTR547131057",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-005"
+    },
+    {
+      "amount_paise": -332694,
+      "balance_paise": 521773877,
+      "company_id": "sharma",
+      "narration": "NEFT-VAANI TELECOM SERVICES",
+      "ref": "N5964625",
+      "source_file": "",
+      "txn_date": "2026-05-18T00:00:00Z",
+      "txn_id": "BNK-20260518-006"
+    },
+    {
+      "amount_paise": 3629107,
+      "balance_paise": 525402984,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR325767147",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-001"
+    },
+    {
+      "amount_paise": 1983769,
+      "balance_paise": 527386753,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-008",
+      "ref": "UTR101148935",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-002"
+    },
+    {
+      "amount_paise": 3719728,
+      "balance_paise": 531106481,
+      "company_id": "sharma",
+      "narration": "UPI/UTR524406404/CUST-012",
+      "ref": "UTR524406404",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-003"
+    },
+    {
+      "amount_paise": 3488629,
+      "balance_paise": 534595110,
+      "company_id": "sharma",
+      "narration": "UPI/UTR873886316/CUST-039",
+      "ref": "UTR873886316",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-004"
+    },
+    {
+      "amount_paise": 267149,
+      "balance_paise": 534862259,
+      "company_id": "sharma",
+      "narration": "UPI/UTR109430708/CUST-038",
+      "ref": "UTR109430708",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-005"
+    },
+    {
+      "amount_paise": 34343620,
+      "balance_paise": 569205879,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0519 BATCH 7208",
+      "ref": "PGS7208",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-006"
+    },
+    {
+      "amount_paise": -17700000,
+      "balance_paise": 551505879,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-MAY-OMKAR ESTATES",
+      "ref": "N9244807",
+      "source_file": "",
+      "txn_date": "2026-05-19T00:00:00Z",
+      "txn_id": "BNK-20260519-007"
+    },
+    {
+      "amount_paise": 8173170,
+      "balance_paise": 559679049,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-013",
+      "ref": "UTR238440397",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-001"
+    },
+    {
+      "amount_paise": 6150145,
+      "balance_paise": 565829194,
+      "company_id": "sharma",
+      "narration": "UPI/UTR539750260/CUST-032",
+      "ref": "UTR539750260",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-002"
+    },
+    {
+      "amount_paise": 2911126,
+      "balance_paise": 568740320,
+      "company_id": "sharma",
+      "narration": "UPI/UTR626776940/CUST-027",
+      "ref": "UTR626776940",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-003"
+    },
+    {
+      "amount_paise": 1775266,
+      "balance_paise": 570515586,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-022",
+      "ref": "UTR657467523",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-004"
+    },
+    {
+      "amount_paise": -4491573,
+      "balance_paise": 566024013,
+      "company_id": "sharma",
+      "narration": "NEFT-KAVERI PACKAGING WORKS",
+      "ref": "N6908141",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-005"
+    },
+    {
+      "amount_paise": -1316643,
+      "balance_paise": 564707370,
+      "company_id": "sharma",
+      "narration": "NEFT-BHARAT POLYMERS UDYOG",
+      "ref": "N2565086",
+      "source_file": "",
+      "txn_date": "2026-05-20T00:00:00Z",
+      "txn_id": "BNK-20260520-006"
+    },
+    {
+      "amount_paise": 5051226,
+      "balance_paise": 569758596,
+      "company_id": "sharma",
+      "narration": "UPI/UTR977369702/CUST-037",
+      "ref": "UTR977369702",
+      "source_file": "",
+      "txn_date": "2026-05-21T00:00:00Z",
+      "txn_id": "BNK-20260521-001"
+    },
+    {
+      "amount_paise": 8115291,
+      "balance_paise": 577873887,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-025",
+      "ref": "UTR254494991",
+      "source_file": "",
+      "txn_date": "2026-05-21T00:00:00Z",
+      "txn_id": "BNK-20260521-002"
+    },
+    {
+      "amount_paise": 6420665,
+      "balance_paise": 584294552,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-005",
+      "ref": "UTR134990745",
+      "source_file": "",
+      "txn_date": "2026-05-21T00:00:00Z",
+      "txn_id": "BNK-20260521-003"
+    },
+    {
+      "amount_paise": -10030000,
+      "balance_paise": 574264552,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-MAY-LAKEVIEW WAREHOUSING LLP",
+      "ref": "N0109532",
+      "source_file": "",
+      "txn_date": "2026-05-21T00:00:00Z",
+      "txn_id": "BNK-20260521-004"
+    },
+    {
+      "amount_paise": -531000,
+      "balance_paise": 573733552,
+      "company_id": "sharma",
+      "narration": "NEFT-STOCKBOOK CLOUD",
+      "ref": "N7252982",
+      "source_file": "",
+      "txn_date": "2026-05-21T00:00:00Z",
+      "txn_id": "BNK-20260521-005"
+    },
+    {
+      "amount_paise": 8302679,
+      "balance_paise": 582036231,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-040",
+      "ref": "UTR178823505",
+      "source_file": "",
+      "txn_date": "2026-05-22T00:00:00Z",
+      "txn_id": "BNK-20260522-001"
+    },
+    {
+      "amount_paise": 5643509,
+      "balance_paise": 587679740,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-012",
+      "ref": "UTR055755105",
+      "source_file": "",
+      "txn_date": "2026-05-22T00:00:00Z",
+      "txn_id": "BNK-20260522-002"
+    },
+    {
+      "amount_paise": 3514488,
+      "balance_paise": 591194228,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-034",
+      "ref": "UTR401861981",
+      "source_file": "",
+      "txn_date": "2026-05-22T00:00:00Z",
+      "txn_id": "BNK-20260522-003"
+    },
+    {
+      "amount_paise": -380865,
+      "balance_paise": 590813363,
+      "company_id": "sharma",
+      "narration": "NEFT-SWIFT COURIERS",
+      "ref": "N1888452",
+      "source_file": "",
+      "txn_date": "2026-05-22T00:00:00Z",
+      "txn_id": "BNK-20260522-004"
+    },
+    {
+      "amount_paise": 7648615,
+      "balance_paise": 598461978,
+      "company_id": "sharma",
+      "narration": "UPI/UTR737864278/CUST-006",
+      "ref": "UTR737864278",
+      "source_file": "",
+      "txn_date": "2026-05-23T00:00:00Z",
+      "txn_id": "BNK-20260523-001"
+    },
+    {
+      "amount_paise": 4548373,
+      "balance_paise": 603010351,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-009",
+      "ref": "UTR014638525",
+      "source_file": "",
+      "txn_date": "2026-05-23T00:00:00Z",
+      "txn_id": "BNK-20260523-002"
+    },
+    {
+      "amount_paise": 1504741,
+      "balance_paise": 604515092,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-024",
+      "ref": "UTR226264945",
+      "source_file": "",
+      "txn_date": "2026-05-23T00:00:00Z",
+      "txn_id": "BNK-20260523-003"
+    },
+    {
+      "amount_paise": 8606265,
+      "balance_paise": 613121357,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-013",
+      "ref": "UTR900092587",
+      "source_file": "",
+      "txn_date": "2026-05-23T00:00:00Z",
+      "txn_id": "BNK-20260523-004"
+    },
+    {
+      "amount_paise": 7036343,
+      "balance_paise": 620157700,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-029",
+      "ref": "UTR695639895",
+      "source_file": "",
+      "txn_date": "2026-05-23T00:00:00Z",
+      "txn_id": "BNK-20260523-005"
+    },
+    {
+      "amount_paise": 7794234,
+      "balance_paise": 627951934,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-040",
+      "ref": "UTR578505679",
+      "source_file": "",
+      "txn_date": "2026-05-24T00:00:00Z",
+      "txn_id": "BNK-20260524-001"
+    },
+    {
+      "amount_paise": 1162722,
+      "balance_paise": 629114656,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-019",
+      "ref": "UTR486774937",
+      "source_file": "",
+      "txn_date": "2026-05-24T00:00:00Z",
+      "txn_id": "BNK-20260524-002"
+    },
+    {
+      "amount_paise": -11304272,
+      "balance_paise": 617810384,
+      "company_id": "sharma",
+      "narration": "NEFT-DECCAN TEXTILE MILLS",
+      "ref": "N8050245",
+      "source_file": "",
+      "txn_date": "2026-05-24T00:00:00Z",
+      "txn_id": "BNK-20260524-003"
+    },
+    {
+      "amount_paise": -2235652,
+      "balance_paise": 615574732,
+      "company_id": "sharma",
+      "narration": "NEFT-CITY POWER CO",
+      "ref": "N4807766",
+      "source_file": "",
+      "txn_date": "2026-05-25T00:00:00Z",
+      "txn_id": "BNK-20260525-001"
+    },
+    {
+      "amount_paise": 3881521,
+      "balance_paise": 619456253,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-004",
+      "ref": "UTR980027921",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-001"
+    },
+    {
+      "amount_paise": 292722,
+      "balance_paise": 619748975,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-029",
+      "ref": "UTR688382647",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-002"
+    },
+    {
+      "amount_paise": 2294068,
+      "balance_paise": 622043043,
+      "company_id": "sharma",
+      "narration": "UPI/UTR665741346/CUST-017",
+      "ref": "UTR665741346",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-003"
+    },
+    {
+      "amount_paise": 1539566,
+      "balance_paise": 623582609,
+      "company_id": "sharma",
+      "narration": "UPI/UTR892816108/CUST-037",
+      "ref": "UTR892816108",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-004"
+    },
+    {
+      "amount_paise": 4377454,
+      "balance_paise": 627960063,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-039",
+      "ref": "UTR868125569",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-005"
+    },
+    {
+      "amount_paise": 3384352,
+      "balance_paise": 631344415,
+      "company_id": "sharma",
+      "narration": "UPI/UTR553137566/CUST-009",
+      "ref": "UTR553137566",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-006"
+    },
+    {
+      "amount_paise": 55518916,
+      "balance_paise": 686863331,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0526 BATCH 2884",
+      "ref": "PGS2884",
+      "source_file": "",
+      "txn_date": "2026-05-26T00:00:00Z",
+      "txn_id": "BNK-20260526-007"
+    },
+    {
+      "amount_paise": 3985625,
+      "balance_paise": 690848956,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-036",
+      "ref": "UTR843557685",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-001"
+    },
+    {
+      "amount_paise": 2804771,
+      "balance_paise": 693653727,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-008",
+      "ref": "UTR532585131",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-002"
+    },
+    {
+      "amount_paise": 7938171,
+      "balance_paise": 701591898,
+      "company_id": "sharma",
+      "narration": "UPI/UTR715661540/CUST-001",
+      "ref": "UTR715661540",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-003"
+    },
+    {
+      "amount_paise": 5106700,
+      "balance_paise": 706698598,
+      "company_id": "sharma",
+      "narration": "UPI/UTR404671872/CUST-007",
+      "ref": "UTR404671872",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-004"
+    },
+    {
+      "amount_paise": 2960800,
+      "balance_paise": 709659398,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-025",
+      "ref": "UTR901910461",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-005"
+    },
+    {
+      "amount_paise": 8361080,
+      "balance_paise": 718020478,
+      "company_id": "sharma",
+      "narration": "UPI/UTR490633078/CUST-013",
+      "ref": "UTR490633078",
+      "source_file": "",
+      "txn_date": "2026-05-27T00:00:00Z",
+      "txn_id": "BNK-20260527-006"
+    },
+    {
+      "amount_paise": 6998489,
+      "balance_paise": 725018967,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-028",
+      "ref": "UTR747061205",
+      "source_file": "",
+      "txn_date": "2026-05-28T00:00:00Z",
+      "txn_id": "BNK-20260528-001"
+    },
+    {
+      "amount_paise": 5003546,
+      "balance_paise": 730022513,
+      "company_id": "sharma",
+      "narration": "UPI/UTR561964230/CUST-018",
+      "ref": "UTR561964230",
+      "source_file": "",
+      "txn_date": "2026-05-28T00:00:00Z",
+      "txn_id": "BNK-20260528-002"
+    },
+    {
+      "amount_paise": 1404592,
+      "balance_paise": 731427105,
+      "company_id": "sharma",
+      "narration": "UPI/UTR246503370/CUST-025",
+      "ref": "UTR246503370",
+      "source_file": "",
+      "txn_date": "2026-05-28T00:00:00Z",
+      "txn_id": "BNK-20260528-003"
+    },
+    {
+      "amount_paise": 2942489,
+      "balance_paise": 734369594,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR523539299",
+      "source_file": "",
+      "txn_date": "2026-05-28T00:00:00Z",
+      "txn_id": "BNK-20260528-004"
+    },
+    {
+      "amount_paise": 9195752,
+      "balance_paise": 743565346,
+      "company_id": "sharma",
+      "narration": "UPI/UTR355859170/CUST-008",
+      "ref": "UTR355859170",
+      "source_file": "",
+      "txn_date": "2026-05-29T00:00:00Z",
+      "txn_id": "BNK-20260529-001"
+    },
+    {
+      "amount_paise": -60000000,
+      "balance_paise": 683565346,
+      "company_id": "sharma",
+      "narration": "SALARY BATCH MAY 2026",
+      "ref": "SAL100143",
+      "source_file": "",
+      "txn_date": "2026-05-29T00:00:00Z",
+      "txn_id": "BNK-20260529-002"
+    },
+    {
+      "amount_paise": 6355223,
+      "balance_paise": 689920569,
+      "company_id": "sharma",
+      "narration": "UPI/UTR001634812/CUST-026",
+      "ref": "UTR001634812",
+      "source_file": "",
+      "txn_date": "2026-05-30T00:00:00Z",
+      "txn_id": "BNK-20260530-001"
+    },
+    {
+      "amount_paise": 3949621,
+      "balance_paise": 693870190,
+      "company_id": "sharma",
+      "narration": "UPI/UTR876647336/CUST-028",
+      "ref": "UTR876647336",
+      "source_file": "",
+      "txn_date": "2026-05-30T00:00:00Z",
+      "txn_id": "BNK-20260530-002"
+    },
+    {
+      "amount_paise": 6051340,
+      "balance_paise": 699921530,
+      "company_id": "sharma",
+      "narration": "UPI/UTR803839112/CUST-001",
+      "ref": "UTR803839112",
+      "source_file": "",
+      "txn_date": "2026-05-30T00:00:00Z",
+      "txn_id": "BNK-20260530-003"
+    },
+    {
+      "amount_paise": 7475681,
+      "balance_paise": 707397211,
+      "company_id": "sharma",
+      "narration": "UPI/UTR563917900/CUST-038",
+      "ref": "UTR563917900",
+      "source_file": "",
+      "txn_date": "2026-05-31T00:00:00Z",
+      "txn_id": "BNK-20260531-001"
+    },
+    {
+      "amount_paise": 2012795,
+      "balance_paise": 709410006,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-018",
+      "ref": "UTR380307161",
+      "source_file": "",
+      "txn_date": "2026-05-31T00:00:00Z",
+      "txn_id": "BNK-20260531-002"
+    },
+    {
+      "amount_paise": -8765433,
+      "balance_paise": 700644573,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N4797497",
+      "source_file": "",
+      "txn_date": "2026-05-31T00:00:00Z",
+      "txn_id": "BNK-20260531-003"
+    },
+    {
+      "amount_paise": 7429354,
+      "balance_paise": 257429354,
+      "company_id": "sharma",
+      "narration": "UPI/UTR113489940/CUST-014",
+      "ref": "UTR113489940",
+      "source_file": "",
+      "txn_date": "2026-06-01T00:00:00Z",
+      "txn_id": "BNK-20260601-001"
+    },
+    {
+      "amount_paise": 8392705,
+      "balance_paise": 265822059,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR663880455",
+      "source_file": "",
+      "txn_date": "2026-06-02T00:00:00Z",
+      "txn_id": "BNK-20260602-001"
+    },
+    {
+      "amount_paise": 5688002,
+      "balance_paise": 271510061,
+      "company_id": "sharma",
+      "narration": "UPI/UTR642581966/CUST-037",
+      "ref": "UTR642581966",
+      "source_file": "",
+      "txn_date": "2026-06-04T00:00:00Z",
+      "txn_id": "BNK-20260604-001"
+    },
+    {
+      "amount_paise": 2434799,
+      "balance_paise": 273944860,
+      "company_id": "sharma",
+      "narration": "UPI/UTR233256864/CUST-030",
+      "ref": "UTR233256864",
+      "source_file": "",
+      "txn_date": "2026-06-05T00:00:00Z",
+      "txn_id": "BNK-20260605-001"
+    },
+    {
+      "amount_paise": 1780081,
+      "balance_paise": 275724941,
+      "company_id": "sharma",
+      "narration": "UPI/UTR454357156/CUST-008",
+      "ref": "UTR454357156",
+      "source_file": "",
+      "txn_date": "2026-06-07T00:00:00Z",
+      "txn_id": "BNK-20260607-001"
+    },
+    {
+      "amount_paise": 5341018,
+      "balance_paise": 281065959,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-026",
+      "ref": "UTR145585905",
+      "source_file": "",
+      "txn_date": "2026-06-07T00:00:00Z",
+      "txn_id": "BNK-20260607-002"
+    },
+    {
+      "amount_paise": 3009668,
+      "balance_paise": 284075627,
+      "company_id": "sharma",
+      "narration": "UPI/UTR869798794/CUST-005",
+      "ref": "UTR869798794",
+      "source_file": "",
+      "txn_date": "2026-06-07T00:00:00Z",
+      "txn_id": "BNK-20260607-003"
+    },
+    {
+      "amount_paise": 6772154,
+      "balance_paise": 290847781,
+      "company_id": "sharma",
+      "narration": "UPI/UTR716346704/CUST-035",
+      "ref": "UTR716346704",
+      "source_file": "",
+      "txn_date": "2026-06-07T00:00:00Z",
+      "txn_id": "BNK-20260607-004"
+    },
+    {
+      "amount_paise": 4383008,
+      "balance_paise": 295230789,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-026",
+      "ref": "UTR061680659",
+      "source_file": "",
+      "txn_date": "2026-06-08T00:00:00Z",
+      "txn_id": "BNK-20260608-001"
+    },
+    {
+      "amount_paise": 881654,
+      "balance_paise": 296112443,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-015",
+      "ref": "UTR864793497",
+      "source_file": "",
+      "txn_date": "2026-06-08T00:00:00Z",
+      "txn_id": "BNK-20260608-002"
+    },
+    {
+      "amount_paise": 8995502,
+      "balance_paise": 305107945,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-029",
+      "ref": "UTR363011729",
+      "source_file": "",
+      "txn_date": "2026-06-08T00:00:00Z",
+      "txn_id": "BNK-20260608-003"
+    },
+    {
+      "amount_paise": 7670291,
+      "balance_paise": 312778236,
+      "company_id": "sharma",
+      "narration": "UPI/UTR535360518/CUST-002",
+      "ref": "UTR535360518",
+      "source_file": "",
+      "txn_date": "2026-06-09T00:00:00Z",
+      "txn_id": "BNK-20260609-001"
+    },
+    {
+      "amount_paise": 27729410,
+      "balance_paise": 340507646,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0609 BATCH 5478",
+      "ref": "PGS5478",
+      "source_file": "",
+      "txn_date": "2026-06-09T00:00:00Z",
+      "txn_id": "BNK-20260609-002"
+    },
+    {
+      "amount_paise": 4837544,
+      "balance_paise": 345345190,
+      "company_id": "sharma",
+      "narration": "UPI/UTR564905516/CUST-022",
+      "ref": "UTR564905516",
+      "source_file": "",
+      "txn_date": "2026-06-10T00:00:00Z",
+      "txn_id": "BNK-20260610-001"
+    },
+    {
+      "amount_paise": 5003818,
+      "balance_paise": 350349008,
+      "company_id": "sharma",
+      "narration": "UPI/UTR778247766/CUST-033",
+      "ref": "UTR778247766",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-001"
+    },
+    {
+      "amount_paise": 7695189,
+      "balance_paise": 358044197,
+      "company_id": "sharma",
+      "narration": "UPI/UTR063264224/CUST-022",
+      "ref": "UTR063264224",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-002"
+    },
+    {
+      "amount_paise": 8246546,
+      "balance_paise": 366290743,
+      "company_id": "sharma",
+      "narration": "UPI/UTR806921432/CUST-007",
+      "ref": "UTR806921432",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-003"
+    },
+    {
+      "amount_paise": 3397483,
+      "balance_paise": 369688226,
+      "company_id": "sharma",
+      "narration": "UPI/UTR417614896/CUST-025",
+      "ref": "UTR417614896",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-004"
+    },
+    {
+      "amount_paise": 6879796,
+      "balance_paise": 376568022,
+      "company_id": "sharma",
+      "narration": "UPI/UTR145032264/CUST-004",
+      "ref": "UTR145032264",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-005"
+    },
+    {
+      "amount_paise": 4974927,
+      "balance_paise": 381542949,
+      "company_id": "sharma",
+      "narration": "UPI/UTR285017592/CUST-022",
+      "ref": "UTR285017592",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-006"
+    },
+    {
+      "amount_paise": -531000,
+      "balance_paise": 381011949,
+      "company_id": "sharma",
+      "narration": "NEFT-STOCKBOOK CLOUD",
+      "ref": "N5461469",
+      "source_file": "",
+      "txn_date": "2026-06-11T00:00:00Z",
+      "txn_id": "BNK-20260611-007"
+    },
+    {
+      "amount_paise": 4918923,
+      "balance_paise": 385930872,
+      "company_id": "sharma",
+      "narration": "UPI/UTR536844684/CUST-040",
+      "ref": "UTR536844684",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-001"
+    },
+    {
+      "amount_paise": 8938486,
+      "balance_paise": 394869358,
+      "company_id": "sharma",
+      "narration": "UPI/UTR405189940/CUST-007",
+      "ref": "UTR405189940",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-002"
+    },
+    {
+      "amount_paise": 6641903,
+      "balance_paise": 401511261,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-036",
+      "ref": "UTR824545261",
+      "source_file": "",
+      "txn_date": "2026-06-12T00:00:00Z",
+      "txn_id": "BNK-20260612-003"
+    },
+    {
+      "amount_paise": 6766006,
+      "balance_paise": 408277267,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-014",
+      "ref": "UTR423088529",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-001"
+    },
+    {
+      "amount_paise": 499752,
+      "balance_paise": 408777019,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR228440333",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-002"
+    },
+    {
+      "amount_paise": 8201581,
+      "balance_paise": 416978600,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-016",
+      "ref": "UTR627494043",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-003"
+    },
+    {
+      "amount_paise": -17700000,
+      "balance_paise": 399278600,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-JUN-OMKAR ESTATES",
+      "ref": "N8325901",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-004"
+    },
+    {
+      "amount_paise": -9448408,
+      "balance_paise": 389830192,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N2763849",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-005"
+    },
+    {
+      "amount_paise": -118000,
+      "balance_paise": 389712192,
+      "company_id": "sharma",
+      "narration": "SMS/ACCT CHARGES INCL GST",
+      "source_file": "",
+      "txn_date": "2026-06-13T00:00:00Z",
+      "txn_id": "BNK-20260613-006"
+    },
+    {
+      "amount_paise": 1151723,
+      "balance_paise": 390863915,
+      "company_id": "sharma",
+      "narration": "UPI/UTR094469590/CUST-034",
+      "ref": "UTR094469590",
+      "source_file": "",
+      "txn_date": "2026-06-14T00:00:00Z",
+      "txn_id": "BNK-20260614-001"
+    },
+    {
+      "amount_paise": 3369959,
+      "balance_paise": 394233874,
+      "company_id": "sharma",
+      "narration": "UPI/UTR438578332/CUST-020",
+      "ref": "UTR438578332",
+      "source_file": "",
+      "txn_date": "2026-06-14T00:00:00Z",
+      "txn_id": "BNK-20260614-002"
+    },
+    {
+      "amount_paise": 4092704,
+      "balance_paise": 398326578,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-002",
+      "ref": "UTR406998197",
+      "source_file": "",
+      "txn_date": "2026-06-14T00:00:00Z",
+      "txn_id": "BNK-20260614-003"
+    },
+    {
+      "amount_paise": 3036176,
+      "balance_paise": 401362754,
+      "company_id": "sharma",
+      "narration": "UPI/UTR882533406/CUST-016",
+      "ref": "UTR882533406",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-001"
+    },
+    {
+      "amount_paise": 1756591,
+      "balance_paise": 403119345,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-009",
+      "ref": "UTR988233015",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-002"
+    },
+    {
+      "amount_paise": 2004491,
+      "balance_paise": 405123836,
+      "company_id": "sharma",
+      "narration": "UPI/UTR628907546/CUST-004",
+      "ref": "UTR628907546",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-003"
+    },
+    {
+      "amount_paise": 5704382,
+      "balance_paise": 410828218,
+      "company_id": "sharma",
+      "narration": "UPI/UTR694053722/CUST-006",
+      "ref": "UTR694053722",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-004"
+    },
+    {
+      "amount_paise": 2653419,
+      "balance_paise": 413481637,
+      "company_id": "sharma",
+      "narration": "UPI/UTR849497552/CUST-035",
+      "ref": "UTR849497552",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-005"
+    },
+    {
+      "amount_paise": 2863912,
+      "balance_paise": 416345549,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-025",
+      "ref": "UTR126400287",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-006"
+    },
+    {
+      "amount_paise": 6989741,
+      "balance_paise": 423335290,
+      "company_id": "sharma",
+      "narration": "UPI/UTR302865138/CUST-003",
+      "ref": "UTR302865138",
+      "source_file": "",
+      "txn_date": "2026-06-15T00:00:00Z",
+      "txn_id": "BNK-20260615-007"
+    },
+    {
+      "amount_paise": 1510914,
+      "balance_paise": 424846204,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-015",
+      "ref": "UTR534517203",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-001"
+    },
+    {
+      "amount_paise": 1735887,
+      "balance_paise": 426582091,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-011",
+      "ref": "UTR805540805",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-002"
+    },
+    {
+      "amount_paise": 4501505,
+      "balance_paise": 431083596,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-001",
+      "ref": "UTR130255587",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-003"
+    },
+    {
+      "amount_paise": 2426387,
+      "balance_paise": 433509983,
+      "company_id": "sharma",
+      "narration": "UPI/UTR661146480/CUST-038",
+      "ref": "UTR661146480",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-004"
+    },
+    {
+      "amount_paise": 47052210,
+      "balance_paise": 480562193,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0616 BATCH 7481",
+      "ref": "PGS7481",
+      "source_file": "",
+      "txn_date": "2026-06-16T00:00:00Z",
+      "txn_id": "BNK-20260616-005"
+    },
+    {
+      "amount_paise": 7498241,
+      "balance_paise": 488060434,
+      "company_id": "sharma",
+      "narration": "UPI/UTR998920652/CUST-022",
+      "ref": "UTR998920652",
+      "source_file": "",
+      "txn_date": "2026-06-17T00:00:00Z",
+      "txn_id": "BNK-20260617-001"
+    },
+    {
+      "amount_paise": 3028091,
+      "balance_paise": 491088525,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-019",
+      "ref": "UTR081581683",
+      "source_file": "",
+      "txn_date": "2026-06-17T00:00:00Z",
+      "txn_id": "BNK-20260617-002"
+    },
+    {
+      "amount_paise": -1978928,
+      "balance_paise": 489109597,
+      "company_id": "sharma",
+      "narration": "NEFT-KAVERI PACKAGING WORKS",
+      "ref": "N7589536",
+      "source_file": "",
+      "txn_date": "2026-06-17T00:00:00Z",
+      "txn_id": "BNK-20260617-003"
+    },
+    {
+      "amount_paise": 487591,
+      "balance_paise": 489597188,
+      "company_id": "sharma",
+      "narration": "UPI/UTR730691720/CUST-027",
+      "ref": "UTR730691720",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-001"
+    },
+    {
+      "amount_paise": 3757931,
+      "balance_paise": 493355119,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-008",
+      "ref": "UTR613138053",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-002"
+    },
+    {
+      "amount_paise": 2125084,
+      "balance_paise": 495480203,
+      "company_id": "sharma",
+      "narration": "UPI/UTR297325254/CUST-022",
+      "ref": "UTR297325254",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-003"
+    },
+    {
+      "amount_paise": 3300079,
+      "balance_paise": 498780282,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-002",
+      "ref": "UTR369369089",
+      "source_file": "",
+      "txn_date": "2026-06-18T00:00:00Z",
+      "txn_id": "BNK-20260618-004"
+    },
+    {
+      "amount_paise": 4254470,
+      "balance_paise": 503034752,
+      "company_id": "sharma",
+      "narration": "UPI/UTR821290286/CUST-002",
+      "ref": "UTR821290286",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-001"
+    },
+    {
+      "amount_paise": 1900265,
+      "balance_paise": 504935017,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-030",
+      "ref": "UTR248392495",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-002"
+    },
+    {
+      "amount_paise": 5350734,
+      "balance_paise": 510285751,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-037",
+      "ref": "UTR669497169",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-003"
+    },
+    {
+      "amount_paise": 5688150,
+      "balance_paise": 515973901,
+      "company_id": "sharma",
+      "narration": "UPI/UTR106098186/CUST-039",
+      "ref": "UTR106098186",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-004"
+    },
+    {
+      "amount_paise": 2550636,
+      "balance_paise": 518524537,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-017",
+      "ref": "UTR808933533",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-005"
+    },
+    {
+      "amount_paise": 4473735,
+      "balance_paise": 522998272,
+      "company_id": "sharma",
+      "narration": "UPI/UTR907552048/CUST-027",
+      "ref": "UTR907552048",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-006"
+    },
+    {
+      "amount_paise": 3435732,
+      "balance_paise": 526434004,
+      "company_id": "sharma",
+      "narration": "UPI/UTR629011966/CUST-006",
+      "ref": "UTR629011966",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-007"
+    },
+    {
+      "amount_paise": -10030000,
+      "balance_paise": 516404004,
+      "company_id": "sharma",
+      "narration": "NEFT-RENT-JUN-LAKEVIEW WAREHOUSING LLP",
+      "ref": "N5322150",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-008"
+    },
+    {
+      "amount_paise": -1537158,
+      "balance_paise": 514866846,
+      "company_id": "sharma",
+      "narration": "NEFT-BHARAT POLYMERS UDYOG",
+      "ref": "N0444435",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-009"
+    },
+    {
+      "amount_paise": -332982,
+      "balance_paise": 514533864,
+      "company_id": "sharma",
+      "narration": "NEFT-QUICKFIX REPAIRS",
+      "ref": "N3041235",
+      "source_file": "",
+      "txn_date": "2026-06-19T00:00:00Z",
+      "txn_id": "BNK-20260619-010"
+    },
+    {
+      "amount_paise": 2274101,
+      "balance_paise": 516807965,
+      "company_id": "sharma",
+      "narration": "UPI/UTR511436046/CUST-038",
+      "ref": "UTR511436046",
+      "source_file": "",
+      "txn_date": "2026-06-20T00:00:00Z",
+      "txn_id": "BNK-20260620-001"
+    },
+    {
+      "amount_paise": 276238,
+      "balance_paise": 517084203,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-021",
+      "ref": "UTR929827185",
+      "source_file": "",
+      "txn_date": "2026-06-20T00:00:00Z",
+      "txn_id": "BNK-20260620-002"
+    },
+    {
+      "amount_paise": 6761129,
+      "balance_paise": 523845332,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-014",
+      "ref": "UTR301139395",
+      "source_file": "",
+      "txn_date": "2026-06-20T00:00:00Z",
+      "txn_id": "BNK-20260620-003"
+    },
+    {
+      "amount_paise": 5296530,
+      "balance_paise": 529141862,
+      "company_id": "sharma",
+      "narration": "UPI/UTR571275236/CUST-032",
+      "ref": "UTR571275236",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-001"
+    },
+    {
+      "amount_paise": 6811703,
+      "balance_paise": 535953565,
+      "company_id": "sharma",
+      "narration": "UPI/UTR000745182/CUST-039",
+      "ref": "UTR000745182",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-002"
+    },
+    {
+      "amount_paise": 6302526,
+      "balance_paise": 542256091,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-005",
+      "ref": "UTR856699709",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-003"
+    },
+    {
+      "amount_paise": -437794,
+      "balance_paise": 541818297,
+      "company_id": "sharma",
+      "narration": "NEFT-BLUENET BROADBAND",
+      "ref": "N0809017",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-004"
+    },
+    {
+      "amount_paise": -3059858,
+      "balance_paise": 538758439,
+      "company_id": "sharma",
+      "narration": "NEFT-ROADKING LOGISTICS",
+      "ref": "N1741516",
+      "source_file": "",
+      "txn_date": "2026-06-21T00:00:00Z",
+      "txn_id": "BNK-20260621-005"
+    },
+    {
+      "amount_paise": 4519522,
+      "balance_paise": 543277961,
+      "company_id": "sharma",
+      "narration": "UPI/UTR439817352/CUST-016",
+      "ref": "UTR439817352",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-001"
+    },
+    {
+      "amount_paise": 5817902,
+      "balance_paise": 549095863,
+      "company_id": "sharma",
+      "narration": "UPI/UTR781651456/CUST-010",
+      "ref": "UTR781651456",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-002"
+    },
+    {
+      "amount_paise": 914626,
+      "balance_paise": 550010489,
+      "company_id": "sharma",
+      "narration": "UPI/UTR201864686/CUST-008",
+      "ref": "UTR201864686",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-003"
+    },
+    {
+      "amount_paise": 3690230,
+      "balance_paise": 553700719,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-035",
+      "ref": "UTR024340309",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-004"
+    },
+    {
+      "amount_paise": 4261232,
+      "balance_paise": 557961951,
+      "company_id": "sharma",
+      "narration": "UPI/UTR623885186/CUST-025",
+      "ref": "UTR623885186",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-005"
+    },
+    {
+      "amount_paise": 8112117,
+      "balance_paise": 566074068,
+      "company_id": "sharma",
+      "narration": "UPI/UTR811546928/CUST-031",
+      "ref": "UTR811546928",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-006"
+    },
+    {
+      "amount_paise": 926827,
+      "balance_paise": 567000895,
+      "company_id": "sharma",
+      "narration": "UPI/UTR596725570/CUST-020",
+      "ref": "UTR596725570",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-007"
+    },
+    {
+      "amount_paise": 6486983,
+      "balance_paise": 573487878,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-039",
+      "ref": "UTR093547853",
+      "source_file": "",
+      "txn_date": "2026-06-22T00:00:00Z",
+      "txn_id": "BNK-20260622-008"
+    },
+    {
+      "amount_paise": 4075607,
+      "balance_paise": 577563485,
+      "company_id": "sharma",
+      "narration": "UPI/UTR318774642/CUST-039",
+      "ref": "UTR318774642",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-001"
+    },
+    {
+      "amount_paise": 8376808,
+      "balance_paise": 585940293,
+      "company_id": "sharma",
+      "narration": "UPI/UTR915298474/CUST-021",
+      "ref": "UTR915298474",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-002"
+    },
+    {
+      "amount_paise": 2276149,
+      "balance_paise": 588216442,
+      "company_id": "sharma",
+      "narration": "UPI/UTR171519898/CUST-037",
+      "ref": "UTR171519898",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-003"
+    },
+    {
+      "amount_paise": 99183702,
+      "balance_paise": 687400144,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0623 BATCH 7277",
+      "ref": "PGS7277",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-004"
+    },
+    {
+      "amount_paise": -2468340,
+      "balance_paise": 684931804,
+      "company_id": "sharma",
+      "narration": "NEFT-CITY POWER CO",
+      "ref": "N1262291",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-005"
+    },
+    {
+      "amount_paise": -366797,
+      "balance_paise": 684565007,
+      "company_id": "sharma",
+      "narration": "NEFT-VAANI TELECOM SERVICES",
+      "ref": "N6151837",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-006"
+    },
+    {
+      "amount_paise": -6587272,
+      "balance_paise": 677977735,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N6843149",
+      "source_file": "",
+      "txn_date": "2026-06-23T00:00:00Z",
+      "txn_id": "BNK-20260623-007"
+    },
+    {
+      "amount_paise": 8586094,
+      "balance_paise": 686563829,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-009",
+      "ref": "UTR850181149",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-001"
+    },
+    {
+      "amount_paise": 9349704,
+      "balance_paise": 695913533,
+      "company_id": "sharma",
+      "narration": "UPI/UTR673626366/CUST-021",
+      "ref": "UTR673626366",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-002"
+    },
+    {
+      "amount_paise": 7445488,
+      "balance_paise": 703359021,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-032",
+      "ref": "UTR492719625",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-003"
+    },
+    {
+      "amount_paise": 820908,
+      "balance_paise": 704179929,
+      "company_id": "sharma",
+      "narration": "UPI/UTR797818852/CUST-010",
+      "ref": "UTR797818852",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-004"
+    },
+    {
+      "amount_paise": 7252805,
+      "balance_paise": 711432734,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-034",
+      "ref": "UTR938401937",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-005"
+    },
+    {
+      "amount_paise": 8219775,
+      "balance_paise": 719652509,
+      "company_id": "sharma",
+      "narration": "UPI/UTR017093660/CUST-009",
+      "ref": "UTR017093660",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-006"
+    },
+    {
+      "amount_paise": 4606423,
+      "balance_paise": 724258932,
+      "company_id": "sharma",
+      "narration": "UPI/UTR941591480/CUST-009",
+      "ref": "UTR941591480",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-007"
+    },
+    {
+      "amount_paise": 4367913,
+      "balance_paise": 728626845,
+      "company_id": "sharma",
+      "narration": "UPI/UTR252168098/CUST-039",
+      "ref": "UTR252168098",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-008"
+    },
+    {
+      "amount_paise": 3086663,
+      "balance_paise": 731713508,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-023",
+      "ref": "UTR543735299",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-009"
+    },
+    {
+      "amount_paise": -2823593,
+      "balance_paise": 728889915,
+      "company_id": "sharma",
+      "narration": "NEFT-KAVERI PACKAGING WORKS",
+      "ref": "N9736633",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-010"
+    },
+    {
+      "amount_paise": -208114,
+      "balance_paise": 728681801,
+      "company_id": "sharma",
+      "narration": "NEFT-QUICKFIX REPAIRS",
+      "ref": "N1730942",
+      "source_file": "",
+      "txn_date": "2026-06-24T00:00:00Z",
+      "txn_id": "BNK-20260624-011"
+    },
+    {
+      "amount_paise": 6398310,
+      "balance_paise": 735080111,
+      "company_id": "sharma",
+      "narration": "UPI/UTR665382228/CUST-033",
+      "ref": "UTR665382228",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-001"
+    },
+    {
+      "amount_paise": 7974091,
+      "balance_paise": 743054202,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-001",
+      "ref": "UTR572818133",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-002"
+    },
+    {
+      "amount_paise": 5041356,
+      "balance_paise": 748095558,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-040",
+      "ref": "UTR197608675",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-003"
+    },
+    {
+      "amount_paise": 1097978,
+      "balance_paise": 749193536,
+      "company_id": "sharma",
+      "narration": "UPI/UTR944125754/CUST-038",
+      "ref": "UTR944125754",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-004"
+    },
+    {
+      "amount_paise": 5180149,
+      "balance_paise": 754373685,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-034",
+      "ref": "UTR642457549",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-005"
+    },
+    {
+      "amount_paise": 1046812,
+      "balance_paise": 755420497,
+      "company_id": "sharma",
+      "narration": "UPI/UTR362015966/CUST-010",
+      "ref": "UTR362015966",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-006"
+    },
+    {
+      "amount_paise": 7228626,
+      "balance_paise": 762649123,
+      "company_id": "sharma",
+      "narration": "UPI/UTR276494270/CUST-019",
+      "ref": "UTR276494270",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-007"
+    },
+    {
+      "amount_paise": 4860288,
+      "balance_paise": 767509411,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-016",
+      "ref": "UTR759972161",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-008"
+    },
+    {
+      "amount_paise": 6902277,
+      "balance_paise": 774411688,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-038",
+      "ref": "UTR128922959",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-009"
+    },
+    {
+      "amount_paise": -11880744,
+      "balance_paise": 762530944,
+      "company_id": "sharma",
+      "narration": "NEFT-DECCAN TEXTILE MILLS",
+      "ref": "N9835855",
+      "source_file": "",
+      "txn_date": "2026-06-25T00:00:00Z",
+      "txn_id": "BNK-20260625-010"
+    },
+    {
+      "amount_paise": 3367752,
+      "balance_paise": 765898696,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-031",
+      "ref": "UTR864447495",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-001"
+    },
+    {
+      "amount_paise": 8162704,
+      "balance_paise": 774061400,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-023",
+      "ref": "UTR373646467",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-002"
+    },
+    {
+      "amount_paise": 4491208,
+      "balance_paise": 778552608,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-009",
+      "ref": "UTR477997895",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-003"
+    },
+    {
+      "amount_paise": 4062426,
+      "balance_paise": 782615034,
+      "company_id": "sharma",
+      "narration": "UPI/UTR950370438/CUST-009",
+      "ref": "UTR950370438",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-004"
+    },
+    {
+      "amount_paise": 1120790,
+      "balance_paise": 783735824,
+      "company_id": "sharma",
+      "narration": "UPI/UTR051756244/CUST-004",
+      "ref": "UTR051756244",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-005"
+    },
+    {
+      "amount_paise": 7885801,
+      "balance_paise": 791621625,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-004",
+      "ref": "UTR210750551",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-006"
+    },
+    {
+      "amount_paise": 1561751,
+      "balance_paise": 793183376,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-039",
+      "ref": "UTR542573589",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-007"
+    },
+    {
+      "amount_paise": 6239916,
+      "balance_paise": 799423292,
+      "company_id": "sharma",
+      "narration": "UPI/UTR453667292/CUST-032",
+      "ref": "UTR453667292",
+      "source_file": "",
+      "txn_date": "2026-06-26T00:00:00Z",
+      "txn_id": "BNK-20260626-008"
+    },
+    {
+      "amount_paise": 586769,
+      "balance_paise": 800010061,
+      "company_id": "sharma",
+      "narration": "UPI/UTR091048266/CUST-038",
+      "ref": "UTR091048266",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-001"
+    },
+    {
+      "amount_paise": 4082709,
+      "balance_paise": 804092770,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-006",
+      "ref": "UTR545844765",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-002"
+    },
+    {
+      "amount_paise": 8394395,
+      "balance_paise": 812487165,
+      "company_id": "sharma",
+      "narration": "UPI/UTR277298010/CUST-012",
+      "ref": "UTR277298010",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-003"
+    },
+    {
+      "amount_paise": 6183859,
+      "balance_paise": 818671024,
+      "company_id": "sharma",
+      "narration": "UPI/UTR910507178/CUST-035",
+      "ref": "UTR910507178",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-004"
+    },
+    {
+      "amount_paise": 7833563,
+      "balance_paise": 826504587,
+      "company_id": "sharma",
+      "narration": "UPI/UTR065508050/CUST-038",
+      "ref": "UTR065508050",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-005"
+    },
+    {
+      "amount_paise": 5575209,
+      "balance_paise": 832079796,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-023",
+      "ref": "UTR272652033",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-006"
+    },
+    {
+      "amount_paise": -4139323,
+      "balance_paise": 827940473,
+      "company_id": "sharma",
+      "narration": "NEFT-SUNDARAM STEELWARE",
+      "ref": "N5553370",
+      "source_file": "",
+      "txn_date": "2026-06-27T00:00:00Z",
+      "txn_id": "BNK-20260627-007"
+    },
+    {
+      "amount_paise": 2039568,
+      "balance_paise": 829980041,
+      "company_id": "sharma",
+      "narration": "UPI/UTR178125188/CUST-001",
+      "ref": "UTR178125188",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-001"
+    },
+    {
+      "amount_paise": 2658137,
+      "balance_paise": 832638178,
+      "company_id": "sharma",
+      "narration": "UPI/UTR251787290/CUST-007",
+      "ref": "UTR251787290",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-002"
+    },
+    {
+      "amount_paise": 889325,
+      "balance_paise": 833527503,
+      "company_id": "sharma",
+      "narration": "UPI/UTR594782116/CUST-005",
+      "ref": "UTR594782116",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-003"
+    },
+    {
+      "amount_paise": 5897847,
+      "balance_paise": 839425350,
+      "company_id": "sharma",
+      "narration": "UPI/UTR007561126/CUST-029",
+      "ref": "UTR007561126",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-004"
+    },
+    {
+      "amount_paise": 5148804,
+      "balance_paise": 844574154,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-039",
+      "ref": "UTR818377701",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-005"
+    },
+    {
+      "amount_paise": 960615,
+      "balance_paise": 845534769,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-011",
+      "ref": "UTR039640229",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-006"
+    },
+    {
+      "amount_paise": 7984453,
+      "balance_paise": 853519222,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-010",
+      "ref": "UTR076914967",
+      "source_file": "",
+      "txn_date": "2026-06-28T00:00:00Z",
+      "txn_id": "BNK-20260628-007"
+    },
+    {
+      "amount_paise": 4012949,
+      "balance_paise": 857532171,
+      "company_id": "sharma",
+      "narration": "UPI/UTR831061482/CUST-039",
+      "ref": "UTR831061482",
+      "source_file": "",
+      "txn_date": "2026-06-29T00:00:00Z",
+      "txn_id": "BNK-20260629-001"
+    },
+    {
+      "amount_paise": 6053940,
+      "balance_paise": 863586111,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-003",
+      "ref": "UTR109370367",
+      "source_file": "",
+      "txn_date": "2026-06-29T00:00:00Z",
+      "txn_id": "BNK-20260629-002"
+    },
+    {
+      "amount_paise": -10712147,
+      "balance_paise": 852873964,
+      "company_id": "sharma",
+      "narration": "NEFT-DECCAN TEXTILE MILLS",
+      "ref": "N2431302",
+      "source_file": "",
+      "txn_date": "2026-06-29T00:00:00Z",
+      "txn_id": "BNK-20260629-003"
+    },
+    {
+      "amount_paise": 7585123,
+      "balance_paise": 860459087,
+      "company_id": "sharma",
+      "narration": "UPI/UTR776086732/CUST-018",
+      "ref": "UTR776086732",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-001"
+    },
+    {
+      "amount_paise": 5570864,
+      "balance_paise": 866029951,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-001",
+      "ref": "UTR877310539",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-002"
+    },
+    {
+      "amount_paise": 3934294,
+      "balance_paise": 869964245,
+      "company_id": "sharma",
+      "narration": "NEFT-CUST-038",
+      "ref": "UTR642485867",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-003"
+    },
+    {
+      "amount_paise": 1795500,
+      "balance_paise": 871759745,
+      "company_id": "sharma",
+      "narration": "INT CREDIT",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-004"
+    },
+    {
+      "amount_paise": 102110181,
+      "balance_paise": 973869926,
+      "company_id": "sharma",
+      "narration": "PG SETTL 0630 BATCH 9515",
+      "ref": "PGS9515",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-005"
+    },
+    {
+      "amount_paise": -7385727,
+      "balance_paise": 966484199,
+      "company_id": "sharma",
+      "narration": "NEFT-TECHKART SUPPLIES",
+      "ref": "N6793277",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-006"
+    },
+    {
+      "amount_paise": -60000000,
+      "balance_paise": 906484199,
+      "company_id": "sharma",
+      "narration": "SALARY BATCH JUN 2026",
+      "ref": "SAL431953",
+      "source_file": "",
+      "txn_date": "2026-06-30T00:00:00Z",
+      "txn_id": "BNK-20260630-007"
+    }
+  ],
+  "tool": "list_bank_lines"
+}

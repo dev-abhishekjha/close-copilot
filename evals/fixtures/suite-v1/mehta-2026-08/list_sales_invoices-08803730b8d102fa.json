@@ -1,0 +1,934 @@
+{
+  "args": {
+    "company": "mehta",
+    "from": "2026-08-01",
+    "to": "2026-08-31"
+  },
+  "result": [
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-007",
+      "CustomerName": "CUST-007",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 50049755,
+      "Items": [
+        {
+          "Amount": 42415047,
+          "Description": "Goods sold to CUST-007 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6gde09mv8"
+        }
+      ],
+      "Name": "SINV-26-01314",
+      "NetTotal": 42415047,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-01T00:00:00Z",
+      "Remarks": "Sale to CUST-007",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6g7qeo8u3",
+          "Rate": 0.0,
+          "TaxAmount": 3817354
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6g2b4l8u4",
+          "Rate": 0.0,
+          "TaxAmount": 3817354
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 15456559,
+      "Items": [
+        {
+          "Amount": 13098779,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6itessh9d"
+        }
+      ],
+      "Name": "SINV-26-01315",
+      "NetTotal": 13098779,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-02T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6ipe5i73e",
+          "Rate": 0.0,
+          "TaxAmount": 1178890
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6is4enp24",
+          "Rate": 0.0,
+          "TaxAmount": 1178890
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-024",
+      "CustomerName": "CUST-024",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 33893551,
+      "Items": [
+        {
+          "Amount": 28723349,
+          "Description": "Goods sold to CUST-024 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6jp9e2alu"
+        }
+      ],
+      "Name": "SINV-26-01316",
+      "NetTotal": 28723349,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-03T00:00:00Z",
+      "Remarks": "Sale to CUST-024",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6jhf6e235",
+          "Rate": 0.0,
+          "TaxAmount": 2585101
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6j62q6mbo",
+          "Rate": 0.0,
+          "TaxAmount": 2585101
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 17097639,
+      "Items": [
+        {
+          "Amount": 14489525,
+          "Description": "Goods sold to CUST-005 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6lr5gn9p6"
+        }
+      ],
+      "Name": "SINV-26-01317",
+      "NetTotal": 14489525,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-03T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6loc5eifd",
+          "Rate": 0.0,
+          "TaxAmount": 1304057
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6ldj5a91e",
+          "Rate": 0.0,
+          "TaxAmount": 1304057
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-007",
+      "CustomerName": "CUST-007",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 43005587,
+      "Items": [
+        {
+          "Amount": 36445413,
+          "Description": "Goods sold to CUST-007 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6m4n8tvl7"
+        }
+      ],
+      "Name": "SINV-26-01318",
+      "NetTotal": 36445413,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-04T00:00:00Z",
+      "Remarks": "Sale to CUST-007",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6m6g85spt",
+          "Rate": 0.0,
+          "TaxAmount": 3280087
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6mv7ap2sh",
+          "Rate": 0.0,
+          "TaxAmount": 3280087
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-006",
+      "CustomerName": "CUST-006",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 58721053,
+      "Items": [
+        {
+          "Amount": 49763605,
+          "Description": "Goods sold to CUST-006 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6n4l9uvt3"
+        }
+      ],
+      "Name": "SINV-26-01319",
+      "NetTotal": 49763605,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-04T00:00:00Z",
+      "Remarks": "Sale to CUST-006",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6nh7oh2h7",
+          "Rate": 0.0,
+          "TaxAmount": 4478724
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6ns1tfecv",
+          "Rate": 0.0,
+          "TaxAmount": 4478724
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-005",
+      "CustomerName": "CUST-005",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 46391125,
+      "Items": [
+        {
+          "Amount": 39314513,
+          "Description": "Goods sold to CUST-005 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6ppqejgcq"
+        }
+      ],
+      "Name": "SINV-26-01320",
+      "NetTotal": 39314513,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-07T00:00:00Z",
+      "Remarks": "Sale to CUST-005",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6ptrcb282",
+          "Rate": 0.0,
+          "TaxAmount": 3538306
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6p3biobo3",
+          "Rate": 0.0,
+          "TaxAmount": 3538306
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 29686972,
+      "Items": [
+        {
+          "Amount": 25158450,
+          "Description": "Goods sold to CUST-012 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6qv2ejlvn"
+        }
+      ],
+      "Name": "SINV-26-01321",
+      "NetTotal": 25158450,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6q5u7elus",
+          "Rate": 0.0,
+          "TaxAmount": 2264261
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6q1jn0vhb",
+          "Rate": 0.0,
+          "TaxAmount": 2264261
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-022",
+      "CustomerName": "CUST-022",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 55114642,
+      "Items": [
+        {
+          "Amount": 46707324,
+          "Description": "Goods sold to CUST-022 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6rjte3cgt"
+        }
+      ],
+      "Name": "SINV-26-01322",
+      "NetTotal": 46707324,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "Remarks": "Sale to CUST-022",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6rm2keo3c",
+          "Rate": 0.0,
+          "TaxAmount": 4203659
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6rilkag2q",
+          "Rate": 0.0,
+          "TaxAmount": 4203659
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-024",
+      "CustomerName": "CUST-024",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 45064805,
+      "Items": [
+        {
+          "Amount": 38190513,
+          "Description": "Goods sold to CUST-024 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6t81df0i9"
+        }
+      ],
+      "Name": "SINV-26-01323",
+      "NetTotal": 38190513,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "Remarks": "Sale to CUST-024",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6t5umb6fa",
+          "Rate": 0.0,
+          "TaxAmount": 3437146
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6tfc0p5gn",
+          "Rate": 0.0,
+          "TaxAmount": 3437146
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-003",
+      "CustomerName": "CUST-003",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 14865252,
+      "Items": [
+        {
+          "Amount": 12597672,
+          "Description": "Goods sold to CUST-003 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q6ut7rttv2"
+        }
+      ],
+      "Name": "SINV-26-01324",
+      "NetTotal": 12597672,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-10T00:00:00Z",
+      "Remarks": "Sale to CUST-003",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q6ubvq65g8",
+          "Rate": 0.0,
+          "TaxAmount": 1133790
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q6u3gf65rd",
+          "Rate": 0.0,
+          "TaxAmount": 1133790
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-010",
+      "CustomerName": "CUST-010",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 38810716,
+      "Items": [
+        {
+          "Amount": 32890438,
+          "Description": "Goods sold to CUST-010 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q706jqtb4l"
+        }
+      ],
+      "Name": "SINV-26-01325",
+      "NetTotal": 32890438,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-12T00:00:00Z",
+      "Remarks": "Sale to CUST-010",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q70r0t9ara",
+          "Rate": 0.0,
+          "TaxAmount": 2960139
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q70l66dvjd",
+          "Rate": 0.0,
+          "TaxAmount": 2960139
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-021",
+      "CustomerName": "CUST-021",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 29173524,
+      "Items": [
+        {
+          "Amount": 24723326,
+          "Description": "Goods sold to CUST-021 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q71cqsgdmt"
+        }
+      ],
+      "Name": "SINV-26-01326",
+      "NetTotal": 24723326,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "Remarks": "Sale to CUST-021",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q71vf8g8ua",
+          "Rate": 0.0,
+          "TaxAmount": 2225099
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q71bp0k44c",
+          "Rate": 0.0,
+          "TaxAmount": 2225099
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 35677183,
+      "Items": [
+        {
+          "Amount": 30234901,
+          "Description": "Goods sold to CUST-001 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q72ji9f631"
+        }
+      ],
+      "Name": "SINV-26-01327",
+      "NetTotal": 30234901,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-16T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q72na2tj0f",
+          "Rate": 0.0,
+          "TaxAmount": 2721141
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q72217kb34",
+          "Rate": 0.0,
+          "TaxAmount": 2721141
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-002",
+      "CustomerName": "CUST-002",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 53120258,
+      "Items": [
+        {
+          "Amount": 45017168,
+          "Description": "Goods sold to CUST-002 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q74acauil3"
+        }
+      ],
+      "Name": "SINV-26-01328",
+      "NetTotal": 45017168,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "Remarks": "Sale to CUST-002",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q74qt68j0v",
+          "Rate": 0.0,
+          "TaxAmount": 4051545
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q748h839q9",
+          "Rate": 0.0,
+          "TaxAmount": 4051545
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-004",
+      "CustomerName": "CUST-004",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 26225564,
+      "Items": [
+        {
+          "Amount": 22225054,
+          "Description": "Goods sold to CUST-004 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q75djrqlfc"
+        }
+      ],
+      "Name": "SINV-26-01329",
+      "NetTotal": 22225054,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-23T00:00:00Z",
+      "Remarks": "Sale to CUST-004",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q75gs1fipg",
+          "Rate": 0.0,
+          "TaxAmount": 2000255
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q759lufoi3",
+          "Rate": 0.0,
+          "TaxAmount": 2000255
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-020",
+      "CustomerName": "CUST-020",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 6362730,
+      "Items": [
+        {
+          "Amount": 5392144,
+          "Description": "Goods sold to CUST-020 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q76djvo6du"
+        }
+      ],
+      "Name": "SINV-26-01330",
+      "NetTotal": 5392144,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "Remarks": "Sale to CUST-020",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q76mafrmp2",
+          "Rate": 0.0,
+          "TaxAmount": 485293
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7643vr71e",
+          "Rate": 0.0,
+          "TaxAmount": 485293
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-010",
+      "CustomerName": "CUST-010",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 13749286,
+      "Items": [
+        {
+          "Amount": 11651938,
+          "Description": "Goods sold to CUST-010 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q78bkqc8kf"
+        }
+      ],
+      "Name": "SINV-26-01331",
+      "NetTotal": 11651938,
+      "OutstandingAmount": 0,
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "Remarks": "Sale to CUST-010",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q785p9r2l5",
+          "Rate": 0.0,
+          "TaxAmount": 1048674
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q789hb6ipu",
+          "Rate": 0.0,
+          "TaxAmount": 1048674
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-001",
+      "CustomerName": "CUST-001",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 33303532,
+      "Items": [
+        {
+          "Amount": 28223332,
+          "Description": "Goods sold to CUST-001 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q79dbdqgdl"
+        }
+      ],
+      "Name": "SINV-26-01332",
+      "NetTotal": 28223332,
+      "OutstandingAmount": 33303532,
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "Remarks": "Sale to CUST-001",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q79p3nis9c",
+          "Rate": 0.0,
+          "TaxAmount": 2540100
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q797ifog5f",
+          "Rate": 0.0,
+          "TaxAmount": 2540100
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-012",
+      "CustomerName": "CUST-012",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 55623720,
+      "Items": [
+        {
+          "Amount": 47138746,
+          "Description": "Goods sold to CUST-012 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q7b018evcq"
+        }
+      ],
+      "Name": "SINV-26-01333",
+      "NetTotal": 47138746,
+      "OutstandingAmount": 55623720,
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "Remarks": "Sale to CUST-012",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7bv3tfrqj",
+          "Rate": 0.0,
+          "TaxAmount": 4242487
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7bfj2fbab",
+          "Rate": 0.0,
+          "TaxAmount": 4242487
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-015",
+      "CustomerName": "CUST-015",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 16704098,
+      "Items": [
+        {
+          "Amount": 14156016,
+          "Description": "Goods sold to CUST-015 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q7ck7uup6j"
+        }
+      ],
+      "Name": "SINV-26-01334",
+      "NetTotal": 14156016,
+      "OutstandingAmount": 16704098,
+      "PostingDate": "2026-08-30T00:00:00Z",
+      "Remarks": "Sale to CUST-015",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7cgkr7jhh",
+          "Rate": 0.0,
+          "TaxAmount": 1274041
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7ctkb4p5e",
+          "Rate": 0.0,
+          "TaxAmount": 1274041
+        }
+      ]
+    },
+    {
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "Customer": "CUST-018",
+      "CustomerName": "CUST-018",
+      "DebitTo": "Debtors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 14797204,
+      "Items": [
+        {
+          "Amount": 12540004,
+          "Description": "Goods sold to CUST-018 at 18% GST",
+          "IncomeAccount": "Sales - MTSPL",
+          "ItemCode": "Trading Goods",
+          "Name": "q7dk9iqu4c"
+        }
+      ],
+      "Name": "SINV-26-01335",
+      "NetTotal": 12540004,
+      "OutstandingAmount": 14797204,
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "Remarks": "Sale to CUST-018",
+      "Taxes": [
+        {
+          "AccountHead": "Output Tax CGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7dr6k18i9",
+          "Rate": 0.0,
+          "TaxAmount": 1128600
+        },
+        {
+          "AccountHead": "Output Tax SGST - MTSPL",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7die4b152",
+          "Rate": 0.0,
+          "TaxAmount": 1128600
+        }
+      ]
+    }
+  ],
+  "tool": "list_sales_invoices"
+}

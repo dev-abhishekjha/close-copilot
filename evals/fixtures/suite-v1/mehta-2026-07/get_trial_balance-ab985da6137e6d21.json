@@ -1,0 +1,219 @@
+{
+  "args": {
+    "company": "mehta",
+    "from": "2026-04-01",
+    "to": "2026-07-31"
+  },
+  "result": {
+    "company": "Mehta Tech Services Pvt Ltd",
+    "from_date": "2026-04-01T00:00:00Z",
+    "rows": [
+      {
+        "account": "Debtors - MTSPL",
+        "account_name": "Debtors",
+        "closing": 876184254,
+        "credit": 3112384154,
+        "debit": 3988568408,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "ICICI Current 0002 - MTSPL",
+        "account_name": "ICICI Current 0002",
+        "closing": 1525804284,
+        "credit": 1387827061,
+        "debit": 2913631345,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax CGST - MTSPL",
+        "account_name": "Input Tax CGST",
+        "closing": 27744239,
+        "credit": 0,
+        "debit": 27744239,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax IGST - MTSPL",
+        "account_name": "Input Tax IGST",
+        "closing": 34837598,
+        "credit": 0,
+        "debit": 34837598,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Input Tax SGST - MTSPL",
+        "account_name": "Input Tax SGST",
+        "closing": 27744239,
+        "credit": 0,
+        "debit": 27744239,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Office Equipment - MTSPL",
+        "account_name": "Office Equipment",
+        "closing": 8254500,
+        "credit": 0,
+        "debit": 8254500,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Payment Gateway Clearing - MTSPL",
+        "account_name": "Payment Gateway Clearing",
+        "closing": 201508309,
+        "credit": 0,
+        "debit": 201508309,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Prepaid Expenses - MTSPL",
+        "account_name": "Prepaid Expenses",
+        "closing": 20800000,
+        "credit": 15200000,
+        "debit": 36000000,
+        "opening": 0,
+        "root_type": "Asset"
+      },
+      {
+        "account": "Creditors - MTSPL",
+        "account_name": "Creditors",
+        "closing": -189176506,
+        "credit": 616472567,
+        "debit": 427296061,
+        "opening": 0,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Output Tax CGST - MTSPL",
+        "account_name": "Output Tax CGST",
+        "closing": -304212841,
+        "credit": 304212841,
+        "debit": 0,
+        "opening": 0,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Output Tax SGST - MTSPL",
+        "account_name": "Output Tax SGST",
+        "closing": -304212841,
+        "credit": 304212841,
+        "debit": 0,
+        "opening": 0,
+        "root_type": "Liability"
+      },
+      {
+        "account": "Interest Income - MTSPL",
+        "account_name": "Interest Income",
+        "closing": -2755500,
+        "credit": 2755500,
+        "debit": 0,
+        "opening": 0,
+        "root_type": "Income"
+      },
+      {
+        "account": "Sales - MTSPL",
+        "account_name": "Sales",
+        "closing": -3380142726,
+        "credit": 3380142726,
+        "debit": 0,
+        "opening": 0,
+        "root_type": "Income"
+      },
+      {
+        "account": "Bank Charges - MTSPL",
+        "account_name": "Bank Charges",
+        "closing": 450000,
+        "credit": 0,
+        "debit": 450000,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Cost of Goods Sold - MTSPL",
+        "account_name": "Cost of Goods Sold",
+        "closing": 85600072,
+        "credit": 0,
+        "debit": 85600072,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Electricity - MTSPL",
+        "account_name": "Electricity",
+        "closing": 14469330,
+        "credit": 0,
+        "debit": 14469330,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Professional Charges - MTSPL",
+        "account_name": "Professional Charges",
+        "closing": 185519370,
+        "credit": 0,
+        "debit": 185519370,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Rent - MTSPL",
+        "account_name": "Rent",
+        "closing": 88000000,
+        "credit": 0,
+        "debit": 88000000,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Repairs and Maintenance - MTSPL",
+        "account_name": "Repairs and Maintenance",
+        "closing": 8046700,
+        "credit": 0,
+        "debit": 8046700,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Salaries - MTSPL",
+        "account_name": "Salaries",
+        "closing": 960000000,
+        "credit": 0,
+        "debit": 960000000,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Software Subscriptions - MTSPL",
+        "account_name": "Software Subscriptions",
+        "closing": 107231124,
+        "credit": 0,
+        "debit": 107231124,
+        "opening": 0,
+        "root_type": "Expense"
+      },
+      {
+        "account": "Telephone and Internet - MTSPL",
+        "account_name": "Telephone and Internet",
+        "closing": 8306395,
+        "credit": 0,
+        "debit": 8306395,
+        "opening": 0,
+        "root_type": "Expense"
+      }
+    ],
+    "to_date": "2026-07-31T00:00:00Z",
+    "totals": {
+      "closing": 0,
+      "credit": 9123207690,
+      "debit": 9123207690,
+      "opening": 0
+    }
+  },
+  "tool": "get_trial_balance"
+}

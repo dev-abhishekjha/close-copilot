@@ -1,0 +1,2982 @@
+{
+  "args": {
+    "company": "mehta",
+    "from": "2026-06-01",
+    "to": "2026-08-31"
+  },
+  "result": [
+    {
+      "BillDate": "2026-06-01T00:00:00Z",
+      "BillNo": "LTS/2026/0609",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 25960000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 22000000,
+          "Description": "Rent for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Rent - MTSPL",
+          "ItemCode": "Rent Service",
+          "Name": "q0kflrcsos"
+        }
+      ],
+      "Name": "PINV-26-00191",
+      "NetTotal": 22000000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-01T00:00:00Z",
+      "Remarks": "Bill LTS/2026/0609 from Lotus Business Parks",
+      "Supplier": "Lotus Business Parks",
+      "SupplierGSTIN": "27XKYCL8632Z1ZI",
+      "SupplierName": "Lotus Business Parks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q0ksbihi0s",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q0kn43vbb7",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-02T00:00:00Z",
+      "BillNo": "HST/2026/0617",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 15321728,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 12984515,
+          "Description": "Monthly subscription for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q0m436dgbj"
+        }
+      ],
+      "Name": "PINV-26-00192",
+      "NetTotal": 12984515,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-02T00:00:00Z",
+      "Remarks": "Bill HST/2026/0617 from Hostmesa Cloud",
+      "Supplier": "Hostmesa Cloud",
+      "SupplierGSTIN": "29INHCH3487Z1Z5",
+      "SupplierName": "Hostmesa Cloud",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q0m0dqum79",
+          "Rate": 0.0,
+          "TaxAmount": 2337213
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-03T00:00:00Z",
+      "BillNo": "SCR/2026/0614",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2124000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1800000,
+          "Description": "Monthly subscription for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q0ofgkrfjb"
+        }
+      ],
+      "Name": "PINV-26-00193",
+      "NetTotal": 1800000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-03T00:00:00Z",
+      "Remarks": "Bill SCR/2026/0614 from SecureMail Suite",
+      "Supplier": "SecureMail Suite",
+      "SupplierGSTIN": "27AAYCS5824B1Z0",
+      "SupplierName": "SecureMail Suite",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q0od8um2bi",
+          "Rate": 0.0,
+          "TaxAmount": 162000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q0ombcvm55",
+          "Rate": 0.0,
+          "TaxAmount": 162000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-04T00:00:00Z",
+      "BillNo": "ORB/2026/0610",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1804988,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1529651,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q0pr2hd5fo"
+        }
+      ],
+      "Name": "PINV-26-00194",
+      "NetTotal": 1529651,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-04T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0610 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q0phbv4pig",
+          "Rate": 0.0,
+          "TaxAmount": 275337
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-04T00:00:00Z",
+      "BillNo": "BLP/2026/0648",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 13072833,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 11078672,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q0rpkmqfef"
+        }
+      ],
+      "Name": "PINV-26-00195",
+      "NetTotal": 11078672,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-04T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0648 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q0rtl8m10f",
+          "Rate": 0.0,
+          "TaxAmount": 1994161
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-05T00:00:00Z",
+      "BillNo": "FBR/2026/0653",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1722437,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1459693,
+          "Description": "FibreLink Networks charges for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q0s4c61d96"
+        }
+      ],
+      "Name": "PINV-26-00196",
+      "NetTotal": 1459693,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-05T00:00:00Z",
+      "Remarks": "Bill FBR/2026/0653 from FibreLink Networks",
+      "Supplier": "FibreLink Networks",
+      "SupplierGSTIN": "27OIDCF5719X1ZS",
+      "SupplierName": "FibreLink Networks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q0sr30rap7",
+          "Rate": 0.0,
+          "TaxAmount": 131372
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q0slcjbd85",
+          "Rate": 0.0,
+          "TaxAmount": 131372
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-08T00:00:00Z",
+      "BillNo": "SHY/2026/0655",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 3297797,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 3297797,
+          "Description": "Sahyadri Power Distribution charges for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Electricity - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q0u25ide06"
+        }
+      ],
+      "Name": "PINV-26-00197",
+      "NetTotal": 3297797,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-08T00:00:00Z",
+      "Remarks": "Bill SHY/2026/0655 from Sahyadri Power Distribution",
+      "Supplier": "Sahyadri Power Distribution",
+      "SupplierGSTIN": "",
+      "SupplierName": "Sahyadri Power Distribution",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-06-10T00:00:00Z",
+      "BillNo": "PPR/2026/0651",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 228157,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 203711,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q10udm6o2f"
+        }
+      ],
+      "Name": "PINV-26-00198",
+      "NetTotal": 203711,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-10T00:00:00Z",
+      "Remarks": "Bill PPR/2026/0651 from Paperline Stationers",
+      "Supplier": "Paperline Stationers",
+      "SupplierGSTIN": "27LZXCP2448A1ZI",
+      "SupplierName": "Paperline Stationers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q10n4erghv",
+          "Rate": 0.0,
+          "TaxAmount": 12223
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q10csg9nr6",
+          "Rate": 0.0,
+          "TaxAmount": 12223
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-12T00:00:00Z",
+      "BillNo": "TLN/2026/0655",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 14723442,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 12477494,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q11jlj6ifj"
+        }
+      ],
+      "Name": "PINV-26-00199",
+      "NetTotal": 12477494,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-12T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0655 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q119226bpv",
+          "Rate": 0.0,
+          "TaxAmount": 1122974
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q11ckaqine",
+          "Rate": 0.0,
+          "TaxAmount": 1122974
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-14T00:00:00Z",
+      "BillNo": "KNK/2026/0601",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1009298,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 855337,
+          "Description": "Konkan Mobile Services charges for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q136tcgrtv"
+        }
+      ],
+      "Name": "PINV-26-00200",
+      "NetTotal": 855337,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "Remarks": "Bill KNK/2026/0601 from Konkan Mobile Services",
+      "Supplier": "Konkan Mobile Services",
+      "SupplierGSTIN": "29FVGCK8149O1ZB",
+      "SupplierName": "Konkan Mobile Services",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q13kk088mf",
+          "Rate": 0.0,
+          "TaxAmount": 153961
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-14T00:00:00Z",
+      "BillNo": "TFF/2026/0634",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1103481,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1103481,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q142npfn3e"
+        }
+      ],
+      "Name": "PINV-26-00201",
+      "NetTotal": 1103481,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-14T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0634 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-06-15T00:00:00Z",
+      "BillNo": "SWF/2026/0626",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2251219,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 2144019,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q16jem9ko5"
+        }
+      ],
+      "Name": "PINV-26-00202",
+      "NetTotal": 2144019,
+      "OutstandingAmount": 2251219,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-15T00:00:00Z",
+      "Remarks": "Bill SWF/2026/0626 from Swiftmove Cabs",
+      "Supplier": "Swiftmove Cabs",
+      "SupplierGSTIN": "27YNPCS2657O1Z2",
+      "SupplierName": "Swiftmove Cabs",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q16k912sis",
+          "Rate": 0.0,
+          "TaxAmount": 53600
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q167pa1u6e",
+          "Rate": 0.0,
+          "TaxAmount": 53600
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-22T00:00:00Z",
+      "BillNo": "NXC/2026/0618",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 6632640,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 5620882,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q17us3vti1"
+        }
+      ],
+      "Name": "PINV-26-00203",
+      "NetTotal": 5620882,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-22T00:00:00Z",
+      "Remarks": "Bill NXC/2026/0618 from Nexa Computers",
+      "Supplier": "Nexa Computers",
+      "SupplierGSTIN": "27FAECN7802K1Z3",
+      "SupplierName": "Nexa Computers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q17cnsc05k",
+          "Rate": 0.0,
+          "TaxAmount": 505879
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q17mcv5koq",
+          "Rate": 0.0,
+          "TaxAmount": 505879
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-24T00:00:00Z",
+      "BillNo": "ORB/2026/0611",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2292335,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1942657,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q19r4o6bgq"
+        }
+      ],
+      "Name": "PINV-26-00204",
+      "NetTotal": 1942657,
+      "OutstandingAmount": 2292335,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-24T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0611 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q1909hpk9q",
+          "Rate": 0.0,
+          "TaxAmount": 349678
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-25T00:00:00Z",
+      "BillNo": "LDG/2026/0634",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4720000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4000000,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q1as7fdkci"
+        }
+      ],
+      "Name": "PINV-26-00205",
+      "NetTotal": 4000000,
+      "OutstandingAmount": 4720000,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-25T00:00:00Z",
+      "Remarks": "Bill LDG/2026/0634 from Ledgerline Advisors",
+      "Supplier": "Ledgerline Advisors",
+      "SupplierGSTIN": "27EVWCL3042S1Z9",
+      "SupplierName": "Ledgerline Advisors",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q1arg767as",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q1acg7cqnt",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-28T00:00:00Z",
+      "BillNo": "PPR/2026/0652",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 330989,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 295525,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q1cc2o10fi"
+        }
+      ],
+      "Name": "PINV-26-00206",
+      "NetTotal": 295525,
+      "OutstandingAmount": 330989,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-28T00:00:00Z",
+      "Remarks": "Bill PPR/2026/0652 from Paperline Stationers",
+      "Supplier": "Paperline Stationers",
+      "SupplierGSTIN": "27LZXCP2448A1ZI",
+      "SupplierName": "Paperline Stationers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q1c861ijl5",
+          "Rate": 0.0,
+          "TaxAmount": 17732
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q1cg6uj7ll",
+          "Rate": 0.0,
+          "TaxAmount": 17732
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-28T00:00:00Z",
+      "BillNo": "CLN/2026/0621",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2954863,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 2504121,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q1dsq51b20"
+        }
+      ],
+      "Name": "PINV-26-00207",
+      "NetTotal": 2504121,
+      "OutstandingAmount": 2954863,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-28T00:00:00Z",
+      "Remarks": "Bill CLN/2026/0621 from Cleanspace Facility Services",
+      "Supplier": "Cleanspace Facility Services",
+      "SupplierGSTIN": "27DHRCC9732R1Z2",
+      "SupplierName": "Cleanspace Facility Services",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q1dfr4e7ft",
+          "Rate": 0.0,
+          "TaxAmount": 225371
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q1d7rikg9n",
+          "Rate": 0.0,
+          "TaxAmount": 225371
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-06-30T00:00:00Z",
+      "BillNo": "TLN/2026/0656",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 14270414,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 12093572,
+          "Description": "Services for June 2026. Service period: 01-06-2026 to 30-06-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q1fcjijs8j"
+        }
+      ],
+      "Name": "PINV-26-00208",
+      "NetTotal": 12093572,
+      "OutstandingAmount": 14270414,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-06-30T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0656 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q1fhdka7pm",
+          "Rate": 0.0,
+          "TaxAmount": 1088421
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q1fd9q1cfv",
+          "Rate": 0.0,
+          "TaxAmount": 1088421
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-01T00:00:00Z",
+      "BillNo": "LTS/2026/0742",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 25960000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 22000000,
+          "Description": "Rent for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Rent - MTSPL",
+          "ItemCode": "Rent Service",
+          "Name": "q43nvro9m3"
+        }
+      ],
+      "Name": "PINV-26-00209",
+      "NetTotal": 22000000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-01T00:00:00Z",
+      "Remarks": "Bill LTS/2026/0742 from Lotus Business Parks",
+      "Supplier": "Lotus Business Parks",
+      "SupplierGSTIN": "27XKYCL8632Z1ZI",
+      "SupplierName": "Lotus Business Parks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q43i85ea3v",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q43qvd400r",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-01T00:00:00Z",
+      "BillNo": "TLN/2026/0706",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 7544991,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 6394061,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q45sesk4kv"
+        }
+      ],
+      "Name": "PINV-26-00210",
+      "NetTotal": 6394061,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-01T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0706 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q45ua7ct6n",
+          "Rate": 0.0,
+          "TaxAmount": 575465
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q45402t9sj",
+          "Rate": 0.0,
+          "TaxAmount": 575465
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-02T00:00:00Z",
+      "BillNo": "HST/2026/0707",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 13977196,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 11845081,
+          "Description": "Monthly subscription for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q46jaukiia"
+        }
+      ],
+      "Name": "PINV-26-00211",
+      "NetTotal": 11845081,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-02T00:00:00Z",
+      "Remarks": "Bill HST/2026/0707 from Hostmesa Cloud",
+      "Supplier": "Hostmesa Cloud",
+      "SupplierGSTIN": "29INHCH3487Z1Z5",
+      "SupplierName": "Hostmesa Cloud",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q47okhphkb",
+          "Rate": 0.0,
+          "TaxAmount": 2132115
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-02T00:00:00Z",
+      "BillNo": "NXC/2026/0750",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 9495106,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 8046700,
+          "Description": "Laptop, 14-inch business notebook for office use (capital asset)",
+          "ExpenseAccount": "Repairs and Maintenance - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q48oqff963"
+        }
+      ],
+      "Name": "PINV-26-00212",
+      "NetTotal": 8046700,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-02T00:00:00Z",
+      "Remarks": "Bill NXC/2026/0750 from Nexa Computers",
+      "Supplier": "Nexa Computers",
+      "SupplierGSTIN": "27FAECN7802K1Z3",
+      "SupplierName": "Nexa Computers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q48ijqin9u",
+          "Rate": 0.0,
+          "TaxAmount": 724203
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q48t1g81e0",
+          "Rate": 0.0,
+          "TaxAmount": 724203
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-05T00:00:00Z",
+      "BillNo": "FBR/2026/0729",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1502230,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1273076,
+          "Description": "FibreLink Networks charges for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q4atimm7lm"
+        }
+      ],
+      "Name": "PINV-26-00213",
+      "NetTotal": 1273076,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-05T00:00:00Z",
+      "Remarks": "Bill FBR/2026/0729 from FibreLink Networks",
+      "Supplier": "FibreLink Networks",
+      "SupplierGSTIN": "27OIDCF5719X1ZS",
+      "SupplierName": "FibreLink Networks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4a5d3jgg7",
+          "Rate": 0.0,
+          "TaxAmount": 114577
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4ar0g2if8",
+          "Rate": 0.0,
+          "TaxAmount": 114577
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-08T00:00:00Z",
+      "BillNo": "SHY/2026/0739",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4000962,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4000962,
+          "Description": "Sahyadri Power Distribution charges for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Electricity - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q4b7pt8i61"
+        }
+      ],
+      "Name": "PINV-26-00214",
+      "NetTotal": 4000962,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-08T00:00:00Z",
+      "Remarks": "Bill SHY/2026/0739 from Sahyadri Power Distribution",
+      "Supplier": "Sahyadri Power Distribution",
+      "SupplierGSTIN": "",
+      "SupplierName": "Sahyadri Power Distribution",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-07-08T00:00:00Z",
+      "BillNo": "PPR/2026/0739",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 518576,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 463014,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q4d934q0sb"
+        }
+      ],
+      "Name": "PINV-26-00215",
+      "NetTotal": 463014,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-08T00:00:00Z",
+      "Remarks": "Bill PPR/2026/0739 from Paperline Stationers",
+      "Supplier": "Paperline Stationers",
+      "SupplierGSTIN": "27LZXCP2448A1ZI",
+      "SupplierName": "Paperline Stationers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4da7p60ei",
+          "Rate": 0.0,
+          "TaxAmount": 27781
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4d06a3uji",
+          "Rate": 0.0,
+          "TaxAmount": 27781
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-09T00:00:00Z",
+      "BillNo": "PPR/2026/0740",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 371463,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 331663,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q4e92bqsde"
+        }
+      ],
+      "Name": "PINV-26-00216",
+      "NetTotal": 331663,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "Remarks": "Bill PPR/2026/0740 from Paperline Stationers",
+      "Supplier": "Paperline Stationers",
+      "SupplierGSTIN": "27LZXCP2448A1ZI",
+      "SupplierName": "Paperline Stationers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4e9tq54ik",
+          "Rate": 0.0,
+          "TaxAmount": 19900
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4e6khi5os",
+          "Rate": 0.0,
+          "TaxAmount": 19900
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-09T00:00:00Z",
+      "BillNo": "SWF/2026/0736",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 646098,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 615332,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4geea2275"
+        }
+      ],
+      "Name": "PINV-26-00217",
+      "NetTotal": 615332,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "Remarks": "Bill SWF/2026/0736 from Swiftmove Cabs",
+      "Supplier": "Swiftmove Cabs",
+      "SupplierGSTIN": "27YNPCS2657O1Z2",
+      "SupplierName": "Swiftmove Cabs",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4g9gvvlim",
+          "Rate": 0.0,
+          "TaxAmount": 15383
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4gojfjgnt",
+          "Rate": 0.0,
+          "TaxAmount": 15383
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-09T00:00:00Z",
+      "BillNo": "TFF/2026/0737",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 364552,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 364552,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4hb7u8sel"
+        }
+      ],
+      "Name": "PINV-26-00218",
+      "NetTotal": 364552,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-09T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0737 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-07-12T00:00:00Z",
+      "BillNo": "TLN/2026/0707",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 7544991,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 6394061,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4jgbeh141"
+        }
+      ],
+      "Name": "PINV-26-00219",
+      "NetTotal": 6394061,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-12T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0707 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4jrq3q9ga",
+          "Rate": 0.0,
+          "TaxAmount": 575465
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4j2p8q1i8",
+          "Rate": 0.0,
+          "TaxAmount": 575465
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-13T00:00:00Z",
+      "BillNo": "SWF/2026/0737",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 629672,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 599688,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4k2p9qobr"
+        }
+      ],
+      "Name": "PINV-26-00220",
+      "NetTotal": 599688,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-13T00:00:00Z",
+      "Remarks": "Bill SWF/2026/0737 from Swiftmove Cabs",
+      "Supplier": "Swiftmove Cabs",
+      "SupplierGSTIN": "27YNPCS2657O1Z2",
+      "SupplierName": "Swiftmove Cabs",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4kq53ubkl",
+          "Rate": 0.0,
+          "TaxAmount": 14992
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4k56l1qvo",
+          "Rate": 0.0,
+          "TaxAmount": 14992
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-14T00:00:00Z",
+      "BillNo": "KNK/2026/0735",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 762969,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 646584,
+          "Description": "Konkan Mobile Services charges for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q4mmhdud5u"
+        }
+      ],
+      "Name": "PINV-26-00221",
+      "NetTotal": 646584,
+      "OutstandingAmount": 762969,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-14T00:00:00Z",
+      "Remarks": "Bill KNK/2026/0735 from Konkan Mobile Services",
+      "Supplier": "Konkan Mobile Services",
+      "SupplierGSTIN": "29FVGCK8149O1ZB",
+      "SupplierName": "Konkan Mobile Services",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q4mp4d9qc1",
+          "Rate": 0.0,
+          "TaxAmount": 116385
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-16T00:00:00Z",
+      "BillNo": "BLP/2026/0738",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 5973533,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 5062316,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4nek9c0q8"
+        }
+      ],
+      "Name": "PINV-26-00222",
+      "NetTotal": 5062316,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-16T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0738 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q4nob65b9b",
+          "Rate": 0.0,
+          "TaxAmount": 911217
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-17T00:00:00Z",
+      "BillNo": "NXC/2026/0749",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 29382239,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 24900203,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q4pptm3ph8"
+        }
+      ],
+      "Name": "PINV-26-00223",
+      "NetTotal": 24900203,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-17T00:00:00Z",
+      "Remarks": "Bill NXC/2026/0749 from Nexa Computers",
+      "Supplier": "Nexa Computers",
+      "SupplierGSTIN": "27FAECN7802K1Z3",
+      "SupplierName": "Nexa Computers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4p5iqeaal",
+          "Rate": 0.0,
+          "TaxAmount": 2241018
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4p4arrg03",
+          "Rate": 0.0,
+          "TaxAmount": 2241018
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-19T00:00:00Z",
+      "BillNo": "CDF/2026/0716",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 42480000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 36000000,
+          "Description": "Annual subscription renewal, 12 months. Service period: 01-07-2026 to 30-06-2027",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q4q885m8mi"
+        }
+      ],
+      "Name": "PINV-26-00224",
+      "NetTotal": 36000000,
+      "OutstandingAmount": 42480000,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-19T00:00:00Z",
+      "Remarks": "Bill CDF/2026/0716 from Codeforge Licences",
+      "Supplier": "Codeforge Licences",
+      "SupplierGSTIN": "07SBVCC5705E1ZZ",
+      "SupplierName": "Codeforge Licences",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q4quvm5el3",
+          "Rate": 0.0,
+          "TaxAmount": 6480000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-20T00:00:00Z",
+      "BillNo": "BLP/2026/0739",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4977943,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4218596,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4sjnf0imb"
+        }
+      ],
+      "Name": "PINV-26-00225",
+      "NetTotal": 4218596,
+      "OutstandingAmount": 4977943,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-20T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0739 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q4sq1smsr4",
+          "Rate": 0.0,
+          "TaxAmount": 759347
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-22T00:00:00Z",
+      "BillNo": "TLN/2026/0708",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 9294559,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 7876745,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q4uo26ve7r"
+        }
+      ],
+      "Name": "PINV-26-00226",
+      "NetTotal": 7876745,
+      "OutstandingAmount": 9294559,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-22T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0708 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q4uag3fgaq",
+          "Rate": 0.0,
+          "TaxAmount": 708907
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q4uu5u77bg",
+          "Rate": 0.0,
+          "TaxAmount": 708907
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-23T00:00:00Z",
+      "BillNo": "ORB/2026/0757",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1242941,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1053340,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q4vkq7pntg"
+        }
+      ],
+      "Name": "PINV-26-00227",
+      "NetTotal": 1053340,
+      "OutstandingAmount": 1242941,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-23T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0757 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q4vn8ge11r",
+          "Rate": 0.0,
+          "TaxAmount": 189601
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-24T00:00:00Z",
+      "BillNo": "SWF/2026/0738",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 306626,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 292024,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q51sdm8b9h"
+        }
+      ],
+      "Name": "PINV-26-00228",
+      "NetTotal": 292024,
+      "OutstandingAmount": 306626,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-24T00:00:00Z",
+      "Remarks": "Bill SWF/2026/0738 from Swiftmove Cabs",
+      "Supplier": "Swiftmove Cabs",
+      "SupplierGSTIN": "27YNPCS2657O1Z2",
+      "SupplierName": "Swiftmove Cabs",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q51eod3if1",
+          "Rate": 0.0,
+          "TaxAmount": 7301
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q513ilr1b2",
+          "Rate": 0.0,
+          "TaxAmount": 7301
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-25T00:00:00Z",
+      "BillNo": "LDG/2026/0728",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4720000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4000000,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q52knj4bvv"
+        }
+      ],
+      "Name": "PINV-26-00229",
+      "NetTotal": 4000000,
+      "OutstandingAmount": 4720000,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-25T00:00:00Z",
+      "Remarks": "Bill LDG/2026/0728 from Ledgerline Advisors",
+      "Supplier": "Ledgerline Advisors",
+      "SupplierGSTIN": "27EVWCL3042S1Z9",
+      "SupplierName": "Ledgerline Advisors",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q52pesv244",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q52g3k20i2",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-27T00:00:00Z",
+      "BillNo": "TFF/2026/0738",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 253333,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 253333,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q547s5i2p7"
+        }
+      ],
+      "Name": "PINV-26-00230",
+      "NetTotal": 253333,
+      "OutstandingAmount": 253333,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-27T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0738 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-07-27T00:00:00Z",
+      "BillNo": "TFF/2026/0739",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 441789,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 441789,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q55ft96qoh"
+        }
+      ],
+      "Name": "PINV-26-00231",
+      "NetTotal": 441789,
+      "OutstandingAmount": 441789,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-27T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0739 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-07-28T00:00:00Z",
+      "BillNo": "CLN/2026/0716",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 3239116,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 2745014,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q572k1u5gs"
+        }
+      ],
+      "Name": "PINV-26-00232",
+      "NetTotal": 2745014,
+      "OutstandingAmount": 3239116,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-28T00:00:00Z",
+      "Remarks": "Bill CLN/2026/0716 from Cleanspace Facility Services",
+      "Supplier": "Cleanspace Facility Services",
+      "SupplierGSTIN": "27DHRCC9732R1Z2",
+      "SupplierName": "Cleanspace Facility Services",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q572uc2euc",
+          "Rate": 0.0,
+          "TaxAmount": 247051
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q57tc14n8p",
+          "Rate": 0.0,
+          "TaxAmount": 247051
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-29T00:00:00Z",
+      "BillNo": "ORB/2026/0758",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 514655,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 436148,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q58j4u569r"
+        }
+      ],
+      "Name": "PINV-26-00233",
+      "NetTotal": 436148,
+      "OutstandingAmount": 514655,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-29T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0758 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q5847kohjj",
+          "Rate": 0.0,
+          "TaxAmount": 78507
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-29T00:00:00Z",
+      "BillNo": "ORB/2026/0759",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1039024,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 880529,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q5aknormhv"
+        }
+      ],
+      "Name": "PINV-26-00234",
+      "NetTotal": 880529,
+      "OutstandingAmount": 1039024,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-29T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0759 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q5alfd2ibo",
+          "Rate": 0.0,
+          "TaxAmount": 158495
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-07-30T00:00:00Z",
+      "BillNo": "BLP/2026/0740",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 7395803,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 6267630,
+          "Description": "Services for July 2026. Service period: 01-07-2026 to 31-07-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q5bntd9hht"
+        }
+      ],
+      "Name": "PINV-26-00235",
+      "NetTotal": 6267630,
+      "OutstandingAmount": 7395803,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-07-30T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0740 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q5bo8g1tan",
+          "Rate": 0.0,
+          "TaxAmount": 1128173
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-01T00:00:00Z",
+      "BillNo": "LTS/2026/0825",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 25960000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 22000000,
+          "Description": "Rent for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Rent - MTSPL",
+          "ItemCode": "Rent Service",
+          "Name": "q7fuctdsl5"
+        }
+      ],
+      "Name": "PINV-26-00236",
+      "NetTotal": 22000000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-01T00:00:00Z",
+      "Remarks": "Bill LTS/2026/0825 from Lotus Business Parks",
+      "Supplier": "Lotus Business Parks",
+      "SupplierGSTIN": "27XKYCL8632Z1ZI",
+      "SupplierName": "Lotus Business Parks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7fdkpb2na",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7fc4p34hs",
+          "Rate": 0.0,
+          "TaxAmount": 1980000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-02T00:00:00Z",
+      "BillNo": "HST/2026/0857",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 11545319,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 9784169,
+          "Description": "Monthly subscription for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q7gjbkuqq9"
+        }
+      ],
+      "Name": "PINV-26-00237",
+      "NetTotal": 9784169,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-02T00:00:00Z",
+      "Remarks": "Bill HST/2026/0857 from Hostmesa Cloud",
+      "Supplier": "Hostmesa Cloud",
+      "SupplierGSTIN": "29INHCH3487Z1Z5",
+      "SupplierName": "Hostmesa Cloud",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q7ggp0anhm",
+          "Rate": 0.0,
+          "TaxAmount": 1761150
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-03T00:00:00Z",
+      "BillNo": "SCR/2026/0823",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2124000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1800000,
+          "Description": "Monthly subscription for September 2026. Service period: 01-09-2026 to 30-09-2026",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q7iikpmee8"
+        }
+      ],
+      "Name": "PINV-26-00238",
+      "NetTotal": 1800000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-03T00:00:00Z",
+      "Remarks": "Bill SCR/2026/0823 from SecureMail Suite",
+      "Supplier": "SecureMail Suite",
+      "SupplierGSTIN": "27AAYCS5824B1Z0",
+      "SupplierName": "SecureMail Suite",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7ilmm0hts",
+          "Rate": 0.0,
+          "TaxAmount": 162000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7ikd3b0t7",
+          "Rate": 0.0,
+          "TaxAmount": 162000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-04T00:00:00Z",
+      "BillNo": "ORB/2026/0823",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1459956,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1237251,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q7j28nmsiq"
+        }
+      ],
+      "Name": "PINV-26-00239",
+      "NetTotal": 1237251,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-04T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0823 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q7joes1i0u",
+          "Rate": 0.0,
+          "TaxAmount": 222705
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-05T00:00:00Z",
+      "BillNo": "FBR/2026/0804",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1602339,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1357915,
+          "Description": "FibreLink Networks charges for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q7lo45jut2"
+        }
+      ],
+      "Name": "PINV-26-00240",
+      "NetTotal": 1357915,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-05T00:00:00Z",
+      "Remarks": "Bill FBR/2026/0804 from FibreLink Networks",
+      "Supplier": "FibreLink Networks",
+      "SupplierGSTIN": "27OIDCF5719X1ZS",
+      "SupplierName": "FibreLink Networks",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7ljhppmoh",
+          "Rate": 0.0,
+          "TaxAmount": 122212
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7lol7ih45",
+          "Rate": 0.0,
+          "TaxAmount": 122212
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-06T00:00:00Z",
+      "BillNo": "BLP/2026/0831",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 5268508,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4464837,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q7m0k0bv7c"
+        }
+      ],
+      "Name": "PINV-26-00241",
+      "NetTotal": 4464837,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-06T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0831 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q7m2ui1lrr",
+          "Rate": 0.0,
+          "TaxAmount": 803671
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-06T00:00:00Z",
+      "BillNo": "SWF/2026/0847",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1763408,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 1679436,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q7oll5bo99"
+        }
+      ],
+      "Name": "PINV-26-00242",
+      "NetTotal": 1679436,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-06T00:00:00Z",
+      "Remarks": "Bill SWF/2026/0847 from Swiftmove Cabs",
+      "Supplier": "Swiftmove Cabs",
+      "SupplierGSTIN": "27YNPCS2657O1Z2",
+      "SupplierName": "Swiftmove Cabs",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7o0iah75e",
+          "Rate": 0.0,
+          "TaxAmount": 41986
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7o9vpnpib",
+          "Rate": 0.0,
+          "TaxAmount": 41986
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-06T00:00:00Z",
+      "BillNo": "TFF/2026/0807",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 543129,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 543129,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q7q13hqh7b"
+        }
+      ],
+      "Name": "PINV-26-00243",
+      "NetTotal": 543129,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-06T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0807 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-08-08T00:00:00Z",
+      "BillNo": "SHY/2026/0822",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4073306,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4073306,
+          "Description": "Sahyadri Power Distribution charges for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Electricity - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q7rrjat95o"
+        }
+      ],
+      "Name": "PINV-26-00244",
+      "NetTotal": 4073306,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-08T00:00:00Z",
+      "Remarks": "Bill SHY/2026/0822 from Sahyadri Power Distribution",
+      "Supplier": "Sahyadri Power Distribution",
+      "SupplierGSTIN": "",
+      "SupplierName": "Sahyadri Power Distribution",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-08-11T00:00:00Z",
+      "BillNo": "NXC/2026/0853",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 8043611,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 6816619,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q7sb422rs5"
+        }
+      ],
+      "Name": "PINV-26-00245",
+      "NetTotal": 6816619,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "Remarks": "Bill NXC/2026/0853 from Nexa Computers",
+      "Supplier": "Nexa Computers",
+      "SupplierGSTIN": "27FAECN7802K1Z3",
+      "SupplierName": "Nexa Computers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q7shfe5kj8",
+          "Rate": 0.0,
+          "TaxAmount": 613496
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q7svfn42q5",
+          "Rate": 0.0,
+          "TaxAmount": 613496
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-11T00:00:00Z",
+      "BillNo": "TFF/2026/0808",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 543129,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 543129,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q7ul539n2k"
+        }
+      ],
+      "Name": "PINV-26-00246",
+      "NetTotal": 543129,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-11T00:00:00Z",
+      "Remarks": "Bill TFF/2026/0808 from Tiffin Corner Caterers",
+      "Supplier": "Tiffin Corner Caterers",
+      "SupplierGSTIN": "",
+      "SupplierName": "Tiffin Corner Caterers",
+      "Taxes": []
+    },
+    {
+      "BillDate": "2026-08-14T00:00:00Z",
+      "BillNo": "KNK/2026/0819",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 1017000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 861864,
+          "Description": "Konkan Mobile Services charges for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Telephone and Internet - MTSPL",
+          "ItemCode": "Utility Service",
+          "Name": "q7vg0n9ckl"
+        }
+      ],
+      "Name": "PINV-26-00247",
+      "NetTotal": 861864,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-14T00:00:00Z",
+      "Remarks": "Bill KNK/2026/0819 from Konkan Mobile Services",
+      "Supplier": "Konkan Mobile Services",
+      "SupplierGSTIN": "29FVGCK8149O1ZB",
+      "SupplierName": "Konkan Mobile Services",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q7v8hic665",
+          "Rate": 0.0,
+          "TaxAmount": 155136
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-15T00:00:00Z",
+      "BillNo": "CDF/2026/0842",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 42480000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 36000000,
+          "Description": "Annual subscription renewal, 12 months. Service period: 01-08-2026 to 31-07-2027",
+          "ExpenseAccount": "Software Subscriptions - MTSPL",
+          "ItemCode": "Software Subscription",
+          "Name": "q81tljgoou"
+        }
+      ],
+      "Name": "PINV-26-00248",
+      "NetTotal": 36000000,
+      "OutstandingAmount": 42480000,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-15T00:00:00Z",
+      "Remarks": "Bill CDF/2026/0842 from Codeforge Licences",
+      "Supplier": "Codeforge Licences",
+      "SupplierGSTIN": "07SBVCC5705E1ZZ",
+      "SupplierName": "Codeforge Licences",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q81dp4mhfp",
+          "Rate": 0.0,
+          "TaxAmount": 6480000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-20T00:00:00Z",
+      "BillNo": "BLP/2026/0832",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 7486826,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 6344768,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q82lj711p1"
+        }
+      ],
+      "Name": "PINV-26-00249",
+      "NetTotal": 6344768,
+      "OutstandingAmount": 7486826,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-20T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0832 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q8289rhs91",
+          "Rate": 0.0,
+          "TaxAmount": 1142058
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-24T00:00:00Z",
+      "BillNo": "TLN/2026/0831",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 14027199,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 11887457,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q84l77qrkf"
+        }
+      ],
+      "Name": "PINV-26-00250",
+      "NetTotal": 11887457,
+      "OutstandingAmount": 14027199,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-24T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0831 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q84f71tkk6",
+          "Rate": 0.0,
+          "TaxAmount": 1069871
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q84orfgdi5",
+          "Rate": 0.0,
+          "TaxAmount": 1069871
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-25T00:00:00Z",
+      "BillNo": "PPR/2026/0808",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 796729,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 711365,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q85vc0gbv4"
+        }
+      ],
+      "Name": "PINV-26-00251",
+      "NetTotal": 711365,
+      "OutstandingAmount": 796729,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "Remarks": "Bill PPR/2026/0808 from Paperline Stationers",
+      "Supplier": "Paperline Stationers",
+      "SupplierGSTIN": "27LZXCP2448A1ZI",
+      "SupplierName": "Paperline Stationers",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q858lvv1b2",
+          "Rate": 0.0,
+          "TaxAmount": 42682
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q85hltvptk",
+          "Rate": 0.0,
+          "TaxAmount": 42682
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-25T00:00:00Z",
+      "BillNo": "LDG/2026/0825",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 4720000,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4000000,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q879af89vi"
+        }
+      ],
+      "Name": "PINV-26-00252",
+      "NetTotal": 4000000,
+      "OutstandingAmount": 0,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-25T00:00:00Z",
+      "Remarks": "Bill LDG/2026/0825 from Ledgerline Advisors",
+      "Supplier": "Ledgerline Advisors",
+      "SupplierGSTIN": "27EVWCL3042S1Z9",
+      "SupplierName": "Ledgerline Advisors",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q878jerh9o",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q87mtkaaou",
+          "Rate": 0.0,
+          "TaxAmount": 360000
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-28T00:00:00Z",
+      "BillNo": "TLN/2026/0832",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 15224645,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 12902241,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q89u4cgb6s"
+        }
+      ],
+      "Name": "PINV-26-00253",
+      "NetTotal": 12902241,
+      "OutstandingAmount": 15224645,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "Remarks": "Bill TLN/2026/0832 from TalentBridge Staffing",
+      "Supplier": "TalentBridge Staffing",
+      "SupplierGSTIN": "27WPTCT5534F1ZG",
+      "SupplierName": "TalentBridge Staffing",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax CGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "CGST",
+          "GSTTaxType": "cgst",
+          "Name": "q8967k68m6",
+          "Rate": 0.0,
+          "TaxAmount": 1161202
+        },
+        {
+          "AccountHead": "Input Tax SGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "SGST",
+          "GSTTaxType": "sgst",
+          "Name": "q89hcplq78",
+          "Rate": 0.0,
+          "TaxAmount": 1161202
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-28T00:00:00Z",
+      "BillNo": "BLP/2026/0833",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 5199187,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 4406091,
+          "Description": "Services for August 2026. Service period: 01-08-2026 to 31-08-2026",
+          "ExpenseAccount": "Professional Charges - MTSPL",
+          "ItemCode": "Professional Service",
+          "Name": "q8ae94fmg3"
+        }
+      ],
+      "Name": "PINV-26-00254",
+      "NetTotal": 4406091,
+      "OutstandingAmount": 5199187,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-28T00:00:00Z",
+      "Remarks": "Bill BLP/2026/0833 from Bluepeak Consulting",
+      "Supplier": "Bluepeak Consulting",
+      "SupplierGSTIN": "29UZKCB5181Q1ZV",
+      "SupplierName": "Bluepeak Consulting",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q8a0ats26c",
+          "Rate": 0.0,
+          "TaxAmount": 793096
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-29T00:00:00Z",
+      "BillNo": "ORB/2026/0825",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 9747154,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 8260300,
+          "Description": "Laptop, 14-inch business notebook for office use (capital asset)",
+          "ExpenseAccount": "Repairs and Maintenance - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q8c0afcch6"
+        }
+      ],
+      "Name": "PINV-26-00255",
+      "NetTotal": 8260300,
+      "OutstandingAmount": 9747154,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-29T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0825 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q8co6vvf32",
+          "Rate": 0.0,
+          "TaxAmount": 1486854
+        }
+      ]
+    },
+    {
+      "BillDate": "2026-08-31T00:00:00Z",
+      "BillNo": "ORB/2026/0824",
+      "Company": "Mehta Tech Services Pvt Ltd",
+      "CompanyGSTIN": "27KTQCM9505P1Z6",
+      "CreditTo": "Creditors - MTSPL",
+      "Docstatus": 1,
+      "GrandTotal": 2679669,
+      "IsReturn": false,
+      "Items": [
+        {
+          "Amount": 2270906,
+          "Description": "Goods for resale",
+          "ExpenseAccount": "Cost of Goods Sold - MTSPL",
+          "ItemCode": "Goods for Resale",
+          "Name": "q8draheprf"
+        }
+      ],
+      "Name": "PINV-26-00256",
+      "NetTotal": 2270906,
+      "OutstandingAmount": 2679669,
+      "PlaceOfSupply": "27-Maharashtra",
+      "PostingDate": "2026-08-31T00:00:00Z",
+      "Remarks": "Bill ORB/2026/0824 from Orbit Peripherals",
+      "Supplier": "Orbit Peripherals",
+      "SupplierGSTIN": "24BEFCO1927E1ZI",
+      "SupplierName": "Orbit Peripherals",
+      "Taxes": [
+        {
+          "AccountHead": "Input Tax IGST - MTSPL",
+          "AddDeductTax": "Add",
+          "Category": "Total",
+          "ChargeType": "Actual",
+          "Description": "IGST",
+          "GSTTaxType": "igst",
+          "Name": "q8dbiqrg3h",
+          "Rate": 0.0,
+          "TaxAmount": 408763
+        }
+      ]
+    }
+  ],
+  "tool": "list_purchase_invoices"
+}
