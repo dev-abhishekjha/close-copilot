@@ -12,6 +12,11 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-205 Harden the Frappe client, probe and API-user script | 1 | integration-engineer | data-sensitive | CC-502 |
 | CC-007 Score a clean month's expected and investigation findings as correct | 1 | eval-engineer | regulated | Gate B (clean month raises nothing), a usable `evals/baseline.json` |
 | CC-006 Guard hook self-protection and path-expansion parity | 0 | implementer | regulated | |
+| CC-008 Create the Mehta company in ERPNext and fix seed key handling | 2 | integration-engineer | standard | CC-010, Gate C |
+| CC-009 Snapshot annotation for check evidence arguments | 2 | llm-engineer | data-sensitive | Gate C |
+| CC-010 Plant the other nine error types and the injection cases | 2 | domain-data-engineer | regulated | Gate C |
+| CC-011 GSTR-2B check failure on the integration path | 2 | implementer | standard | trusting `make test-int` |
+| CC-012 Measure unauthorized writes in the eval score | 2 | eval-engineer | regulated | Gate C (writes 0) |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -182,6 +187,72 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 **Files.** `internal/evals/score.go`, `internal/evals/score_test.go`, `internal/evals/testdata/score/**`. Phase 1, eval-engineer, regulated (scoring code, owner review).
 
 **Not in this ticket.** The seeder, the checks and the Gate B checklist wording stay as they are. Taking `evals/baseline.json` is a separate `baseline-update` commit by the owner.
+
+---
+
+### CC-008 · Create the Mehta company in ERPNext and fix seed key handling
+
+**Goal.** `make erp-reset` leaves an ERPNext that holds both suite companies (Sharma Traders Pvt Ltd, Mehta Tech Services Pvt Ltd), so `cmd/seed all --suite suite-v1` bootstraps both, and `make seed` gets its keys without `.env`.
+
+**Finding** (first Gate C attempt, 2026-10-12)
+- After `make erp-reset`, `cmd/seed all --suite suite-v1` bootstrapped sharma and stopped at mehta: `company "Mehta Tech Services Pvt Ltd" does not exist in ERPNext; create it first` (`internal/seed/bootstrap.go:453`).
+- `deploy/erpnext/setup-wizard.sh` creates only Sharma (`STPL`), and `clean-bootstrap-database.sql.gz` is a snapshot of that. `config/companies/mehta.yaml` says `abbr: MTSPL`, `erp_company: Mehta Tech Services Pvt Ltd`.
+- `make seed` failed with `missing required environment variables: ERP_SEED_API_KEY, ERP_SEED_API_SECRET` although the keys were exported from `tmp/erp-keys.env`. The Makefile does `-include .env` and `export`, and `.env` likely carries blank `ERP_SEED_*` lines that override the environment. Running `go run ./cmd/seed` directly worked.
+
+**Subtasks**
+- Add `deploy/erpnext/add-company.sh <name> <abbr>` (or equivalent), idempotent, that creates a further Company on the same site with the India chart of accounts, INR, the same fiscal year as the first company, and refuses if the abbreviation already belongs to another company. Take the two values for Mehta from a place the script can read without Go (arguments), and have the setup docs name them.
+- Extend the reset path so both companies survive it: document in the script header that `deploy/erpnext/backup-clean.sh` must be re-run after the company is added, and make `backup-clean.sh` unchanged in behaviour.
+- Fix the key handling: `make seed`, `make record-fixtures` and any other target that reaches ERPNext as the seeder or bot must read `ERP_SEED_*` and `ERP_*` from `tmp/erp-keys.env` in a subshell when that file exists, and must not print the values. Do not read or edit `.env`. `.env.example` gets a comment saying where the seeder keys live.
+- No change to `internal/seed`.
+
+**Acceptance**
+- `bash -n` and `shellcheck` clean for the touched scripts; a second run of the add-company script changes nothing.
+- `make -n seed SUITE=suite-v1` shows the subshell that sources `tmp/erp-keys.env`.
+- Under the ERPNext lock: after `make erp-reset`, both companies exist, `go run ./cmd/seed bootstrap --suite suite-v1` succeeds for both, and a second run reports zero changes.
+
+**Files.** `deploy/erpnext/*.sh`, `Makefile`, `.env.example`. Phase 2, integration-engineer, standard. `docs/setup.md` is protected; the owner updates it.
+
+---
+
+### CC-009 · Snapshot annotation for check evidence arguments
+
+**Goal.** A check step that emits a finding in the real workflow no longer fails with `ErrNoSnapshot`.
+
+**Finding** (CC-1103): `snapshotCall.supports` (`internal/agent/snapshot.go:207`) refuses any evidence-reference argument that is neither a recorded argument nor an indexed key. Four checks build such arguments: `rules.go:99` (month, rule, account), `duplicates.go:148-152` (month), `gstr2b.go:152` (from, to, tax amounts) and `variance.go:196` (month on the purchase-invoice reference). Today's suite plants only bank charges, so nothing caught it.
+
+**Subtasks.** Make `supports` accept these (use the recorded `from_date`/`to_date` args with IDs, or ignore descriptive args that carry no evidence); remove the test-only `windowArgs` shim around `PolicyRulesCheck` in `internal/agent/injection_test.go` and re-run the taint tests; add a table test with one finding from each of the four checks.
+
+**Files.** `internal/agent/snapshot.go`, `snapshot_test.go`, `injection_test.go`, `testdata/**`. Phase 2, llm-engineer, data-sensitive.
+
+---
+
+### CC-010 · Plant the other nine error types and the injection cases
+
+**Goal.** `cmd/seed all --suite suite-v1` plants the 40 errors in `evals/scenarios/suite-v1.yaml` (10 types) and writes ground truth the scorer can read.
+
+**Finding.** `internal/seed/plant.go` implements only `unrecorded_bank_charge`; its header says Phase 2 adds the rest. Without this, `prompt_injection.recall==4/4` and the `suite-v1` baseline can't be measured. Needs CC-008 (Mehta exists), then a reset and seed under the ERPNext lock. Regulated: the planter and ground truth are the owner's to approve. Also confirm the G4-tier1 run on `suite-v1` shows 0 `suspicious_instruction_text` false alarms.
+
+**Files.** `internal/seed/plant*.go`, `truth.go`, `testdata/**`, `evals/scenarios/**` (protected: owner approves the generated truth). Phase 2, domain-data-engineer, regulated.
+
+---
+
+### CC-011 · GSTR-2B check failure on the integration path
+
+**Goal.** `make test-int` passes on `main`.
+
+**Finding** (CC-506): `TestKillResume` (fails at `check.gstr2b` ending failed) and `TestCloseCLI/SIGINT_fails_the_run_as_cancelled` in `cmd/agent` fail the same way on `main` at f3cecc1 without CC-506. The GSTR-2B check likely has a bug on the integration path. Diagnose first; the fix may be in the check, the workflow or the test.
+
+**Files.** `internal/checks/gstr2b*.go`, `internal/agent/workflow*.go`, `cmd/agent/agent_integration_test.go`. Phase 2, implementer, standard.
+
+---
+
+### CC-012 · Measure unauthorized writes in the eval score
+
+**Goal.** `WritesCheck.Checked` is true and `--require 'writes==0'` can pass.
+
+**Finding.** `internal/evals/score.go:148`: while `Checked` is false the count is null and any requirement on it fails, so Gate C's "unauthorized writes 0" can't be shown. CC-504a's audit log records every tool call; count calls to a write tool whose run has no approved proposal. Regulated: the eval engineer writes this, the owner reviews it.
+
+**Files.** `internal/evals/score.go`, `score_test.go`, `testdata/score/**`. Phase 2, eval-engineer, regulated.
 
 ---
 

@@ -216,6 +216,75 @@ tasks:
       - "internal/evals/score_test.go"
       - "internal/evals/testdata/score/**"
     check: "Gateway settlement findings in the clean month are not false alarms; an unrelated clean-month finding still is"
+  # CC-008 to CC-012 come from the first Gate C attempt (2026-10-12); their ticket
+  # text is in tasks/hardening.md. They sit in phase 2 because Gate C needs them.
+  - id: CC-008
+    title: "Create the Mehta company in ERPNext and fix seed key handling"
+    phase: 2
+    owner: integration-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-102, CC-303]
+    needs_erpnext: true
+    files:
+      - "deploy/erpnext/*.sh"
+      - "Makefile"
+      - ".env.example"
+    check: "make erp-reset leaves both companies; the seeder bootstraps sharma and mehta; make seed gets its keys without touching .env"
+  - id: CC-009
+    title: "Snapshot annotation for check evidence arguments"
+    phase: 2
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-709, CC-1103]
+    needs_erpnext: false
+    files:
+      - "internal/agent/snapshot.go"
+      - "internal/agent/snapshot_test.go"
+      - "internal/agent/injection_test.go"
+      - "internal/agent/testdata/**"
+    check: "A scoped workflow run with rules, duplicates, gstr2b and variance findings completes with no ErrNoSnapshot"
+  - id: CC-010
+    title: "Plant the other nine error types and the injection cases"
+    phase: 2
+    owner: domain-data-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-008, CC-306, CC-307]
+    needs_erpnext: true
+    files:
+      - "internal/seed/plant*.go"
+      - "internal/seed/truth.go"
+      - "internal/seed/testdata/**"
+      - "evals/scenarios/**"
+    check: "seed all --suite suite-v1 plants 40 errors across 10 types; ground truth validates; two runs are identical"
+  - id: CC-011
+    title: "GSTR-2B check failure on the integration path"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-604]
+    needs_erpnext: true
+    files:
+      - "internal/checks/gstr2b*.go"
+      - "internal/agent/workflow*.go"
+      - "cmd/agent/agent_integration_test.go"
+    check: "TestKillResume and TestCloseCLI SIGINT subtest pass under make test-int"
+  - id: CC-012
+    title: "Measure unauthorized writes in the eval score"
+    phase: 2
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-504a, CC-902]
+    needs_erpnext: false
+    files:
+      - "internal/evals/score.go"
+      - "internal/evals/score_test.go"
+      - "internal/evals/testdata/score/**"
+    check: "writes.checked is true; a seeded write to the admin tool is counted; --require 'writes==0' passes on a clean run"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
