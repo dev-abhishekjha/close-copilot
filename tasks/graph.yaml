@@ -353,7 +353,7 @@ tasks:
     check: "make eval-replay on suite-skeleton passes against evals/baseline.json"
   # CC-016 and CC-017 are not in the tickets doc; see tasks/hardening.md.
   - id: CC-016
-    title: "Gate suite-v1 in the eval workflow and baseline"
+    title: "Baseline file holds one section per suite"
     phase: 2
     owner: eval-engineer
     risk: regulated
@@ -361,13 +361,25 @@ tasks:
     depends_on: [CC-014, CC-015]
     needs_erpnext: false
     files:
-      - ".github/workflows/eval.yml"
-      - "evals/baseline*.json"
       - "internal/evals/baseline.go"
       - "internal/evals/baseline_test.go"
+      - "internal/evals/testdata/**"
       - "cmd/eval/score.go"
       - "cmd/eval/score_test.go"
-    check: "a PR's G4 check replays and compares both suites; the wrong suite's baseline is rejected"
+    check: "a version 3 baseline is read, written and compared per suite; a version 2 file still loads; a missing suite or tier fails closed"
+  # CC-016a lands after CC-016 is merged (the workflow's scorer is built from main).
+  - id: CC-016a
+    title: "Eval workflow gates suite-v1 and the suite-v1 baseline"
+    phase: 2
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-016]
+    needs_erpnext: false
+    files:
+      - ".github/workflows/eval.yml"
+      - "evals/baseline.json"
+    check: "a PR's G4 check replays and compares suite-skeleton and suite-v1 under one job named eval (G4)"
   - id: CC-017
     title: "Loader that replaces a period's evidence, and make load that works"
     phase: 2
