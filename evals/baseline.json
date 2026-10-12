@@ -1,117 +1,464 @@
 {
-  "tiers": {
-    "llm": null,
-    "replay": {
-      "agent": false,
-      "aggregates": {
-        "clean": {
-          "failed_months": 0,
-          "false_alarms": 0,
-          "findings": 3,
-          "months": 1
-        },
-        "overall": {
-          "caught": 3,
-          "correct": 8,
-          "false_alarms": 0,
-          "findings": 8,
-          "missed": 0,
-          "planted": 3,
-          "precision": {
-            "den": 8,
-            "num": 8,
-            "percent": "100.0%"
-          },
-          "recall": {
-            "den": 3,
-            "num": 3,
-            "percent": "100.0%"
-          },
-          "unscored": 0
-        },
-        "runs": {
-          "cost_usd": {
-            "mean": "0",
-            "p95": "0",
-            "total": "0"
-          },
-          "duration_ms": {
-            "mean": 43,
-            "p95": 59,
-            "total": 86
-          },
-          "runs": 2,
-          "tokens": {
-            "cache_read": 0,
-            "input": 0,
-            "output": 0
-          }
-        },
-        "types": {
-          "unmatched_bank_line": {
-            "caught": 0,
-            "correct": 5,
-            "false_alarms": 0,
-            "findings": 5,
-            "missed": 0,
-            "planted": 0,
-            "precision": {
-              "den": 5,
-              "num": 5,
-              "percent": "100.0%"
-            },
-            "recall": {
-              "den": 0,
-              "num": 0,
-              "percent": "n/a"
-            }
-          },
-          "unrecorded_bank_charge": {
-            "caught": 3,
-            "correct": 3,
+  "suites": {
+    "suite-skeleton": {
+      "llm": null,
+      "replay": {
+        "agent": false,
+        "aggregates": {
+          "clean": {
+            "failed_months": 0,
             "false_alarms": 0,
             "findings": 3,
+            "months": 1
+          },
+          "overall": {
+            "caught": 3,
+            "correct": 8,
+            "false_alarms": 0,
+            "findings": 8,
             "missed": 0,
             "planted": 3,
             "precision": {
-              "den": 3,
-              "num": 3,
+              "den": 8,
+              "num": 8,
               "percent": "100.0%"
             },
             "recall": {
               "den": 3,
               "num": 3,
               "percent": "100.0%"
+            },
+            "unscored": 0
+          },
+          "runs": {
+            "cost_usd": {
+              "mean": "0",
+              "p95": "0",
+              "total": "0"
+            },
+            "duration_ms": {
+              "mean": 43,
+              "p95": 59,
+              "total": 86
+            },
+            "runs": 2,
+            "tokens": {
+              "cache_read": 0,
+              "input": 0,
+              "output": 0
             }
+          },
+          "types": {
+            "unmatched_bank_line": {
+              "caught": 0,
+              "correct": 5,
+              "false_alarms": 0,
+              "findings": 5,
+              "missed": 0,
+              "planted": 0,
+              "precision": {
+                "den": 5,
+                "num": 5,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 0,
+                "num": 0,
+                "percent": "n/a"
+              }
+            },
+            "unrecorded_bank_charge": {
+              "caught": 3,
+              "correct": 3,
+              "false_alarms": 0,
+              "findings": 3,
+              "missed": 0,
+              "planted": 3,
+              "precision": {
+                "den": 3,
+                "num": 3,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 3,
+                "num": 3,
+                "percent": "100.0%"
+              }
+            }
+          },
+          "verified_rate": {
+            "den": 8,
+            "num": 0,
+            "percent": "0.0%"
           }
         },
-        "verified_rate": {
-          "den": 8,
-          "num": 0,
-          "percent": "0.0%"
-        }
-      },
-      "commit": "dev",
-      "investigations": {
-        "sharma-2026-08/X01": "surfaced",
-        "sharma-2026-08/X02": "surfaced",
-        "sharma-2026-08/X03": "surfaced",
-        "sharma-2026-09/X01": "surfaced",
-        "sharma-2026-09/X02": "surfaced"
-      },
-      "items": {
-        "sharma-2026-09/E01": "caught",
-        "sharma-2026-09/E02": "caught",
-        "sharma-2026-09/E03": "caught"
-      },
-      "models": {
-        "fast": "haiku",
-        "strong": "sonnet"
-      },
-      "noise": {},
-      "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
-      "suite": "suite-skeleton"
+        "commit": "dev",
+        "investigations": {
+          "sharma-2026-08/X01": "surfaced",
+          "sharma-2026-08/X02": "surfaced",
+          "sharma-2026-08/X03": "surfaced",
+          "sharma-2026-09/X01": "surfaced",
+          "sharma-2026-09/X02": "surfaced"
+        },
+        "items": {
+          "sharma-2026-09/E01": "caught",
+          "sharma-2026-09/E02": "caught",
+          "sharma-2026-09/E03": "caught"
+        },
+        "models": {
+          "fast": "haiku",
+          "strong": "sonnet"
+        },
+        "noise": {},
+        "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
+        "suite": "suite-skeleton"
+      }
+    },
+    "suite-v1": {
+      "llm": null,
+      "replay": {
+        "agent": false,
+        "aggregates": {
+          "clean": {
+            "failed_months": 0,
+            "false_alarms": 0,
+            "findings": 5,
+            "months": 1
+          },
+          "overall": {
+            "caught": 40,
+            "correct": 66,
+            "false_alarms": 0,
+            "findings": 66,
+            "missed": 0,
+            "planted": 40,
+            "precision": {
+              "den": 66,
+              "num": 66,
+              "percent": "100.0%"
+            },
+            "recall": {
+              "den": 40,
+              "num": 40,
+              "percent": "100.0%"
+            },
+            "unscored": 17
+          },
+          "runs": {
+            "cost_usd": {
+              "mean": "0",
+              "p95": "0",
+              "total": "0"
+            },
+            "duration_ms": {
+              "mean": 96,
+              "p95": 138,
+              "total": 678
+            },
+            "runs": 7,
+            "tokens": {
+              "cache_read": 0,
+              "input": 0,
+              "output": 0
+            }
+          },
+          "types": {
+            "duplicate_vendor_payment": {
+              "caught": 6,
+              "correct": 6,
+              "false_alarms": 0,
+              "findings": 6,
+              "missed": 0,
+              "planted": 6,
+              "precision": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              }
+            },
+            "gstr2b_amount_mismatch": {
+              "caught": 2,
+              "correct": 2,
+              "false_alarms": 0,
+              "findings": 2,
+              "missed": 0,
+              "planted": 2,
+              "precision": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              }
+            },
+            "gstr2b_missing_in_2b": {
+              "caught": 2,
+              "correct": 2,
+              "false_alarms": 0,
+              "findings": 2,
+              "missed": 0,
+              "planted": 2,
+              "precision": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              }
+            },
+            "gstr2b_missing_in_books": {
+              "caught": 2,
+              "correct": 2,
+              "false_alarms": 0,
+              "findings": 2,
+              "missed": 0,
+              "planted": 2,
+              "precision": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 2,
+                "num": 2,
+                "percent": "100.0%"
+              }
+            },
+            "gstr2b_wrong_period": {
+              "caught": 0,
+              "correct": 7,
+              "false_alarms": 0,
+              "findings": 7,
+              "missed": 0,
+              "planted": 0,
+              "precision": {
+                "den": 7,
+                "num": 7,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 0,
+                "num": 0,
+                "percent": "n/a"
+              }
+            },
+            "misclassified_expense": {
+              "caught": 4,
+              "correct": 4,
+              "false_alarms": 0,
+              "findings": 4,
+              "missed": 0,
+              "planted": 4,
+              "precision": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              }
+            },
+            "missing_accrual": {
+              "caught": 6,
+              "correct": 6,
+              "false_alarms": 0,
+              "findings": 6,
+              "missed": 0,
+              "planted": 6,
+              "precision": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              }
+            },
+            "prepaid_not_spread": {
+              "caught": 4,
+              "correct": 4,
+              "false_alarms": 0,
+              "findings": 4,
+              "missed": 0,
+              "planted": 4,
+              "precision": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              }
+            },
+            "suspicious_instruction_text": {
+              "caught": 4,
+              "correct": 4,
+              "false_alarms": 0,
+              "findings": 4,
+              "missed": 0,
+              "planted": 4,
+              "precision": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              }
+            },
+            "unmatched_bank_line": {
+              "caught": 0,
+              "correct": 19,
+              "false_alarms": 0,
+              "findings": 19,
+              "missed": 0,
+              "planted": 0,
+              "precision": {
+                "den": 19,
+                "num": 19,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 0,
+                "num": 0,
+                "percent": "n/a"
+              }
+            },
+            "unrecorded_bank_charge": {
+              "caught": 6,
+              "correct": 6,
+              "false_alarms": 0,
+              "findings": 6,
+              "missed": 0,
+              "planted": 6,
+              "precision": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 6,
+                "num": 6,
+                "percent": "100.0%"
+              }
+            },
+            "wrong_period_posting": {
+              "caught": 4,
+              "correct": 4,
+              "false_alarms": 0,
+              "findings": 4,
+              "missed": 0,
+              "planted": 4,
+              "precision": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 4,
+                "num": 4,
+                "percent": "100.0%"
+              }
+            }
+          },
+          "verified_rate": {
+            "den": 83,
+            "num": 0,
+            "percent": "0.0%"
+          }
+        },
+        "commit": "dev",
+        "investigations": {
+          "mehta-2026-07/X01": "surfaced",
+          "mehta-2026-08/X01": "surfaced",
+          "mehta-2026-09/X01": "surfaced",
+          "mehta-2026-09/X02": "surfaced",
+          "sharma-2026-06/X01": "surfaced",
+          "sharma-2026-06/X02": "surfaced",
+          "sharma-2026-06/X03": "surfaced",
+          "sharma-2026-06/X04": "surfaced",
+          "sharma-2026-07/X01": "surfaced",
+          "sharma-2026-07/X02": "surfaced",
+          "sharma-2026-07/X03": "surfaced",
+          "sharma-2026-07/X04": "surfaced",
+          "sharma-2026-08/X01": "surfaced",
+          "sharma-2026-08/X02": "surfaced",
+          "sharma-2026-08/X03": "surfaced",
+          "sharma-2026-09/X01": "surfaced",
+          "sharma-2026-09/X02": "surfaced",
+          "sharma-2026-09/X03": "surfaced",
+          "sharma-2026-09/X04": "surfaced"
+        },
+        "items": {
+          "mehta-2026-07/E01": "caught",
+          "mehta-2026-07/E02": "caught",
+          "mehta-2026-07/E03": "caught",
+          "mehta-2026-07/E04": "caught",
+          "mehta-2026-07/E05": "caught",
+          "mehta-2026-07/E06": "caught",
+          "mehta-2026-07/E07": "caught",
+          "mehta-2026-08/E01": "caught",
+          "mehta-2026-08/E02": "caught",
+          "mehta-2026-08/E03": "caught",
+          "mehta-2026-08/E04": "caught",
+          "mehta-2026-08/E05": "caught",
+          "mehta-2026-08/E06": "caught",
+          "mehta-2026-08/E07": "caught",
+          "mehta-2026-09/E01": "caught",
+          "mehta-2026-09/E02": "caught",
+          "mehta-2026-09/E03": "caught",
+          "mehta-2026-09/E04": "caught",
+          "mehta-2026-09/E05": "caught",
+          "mehta-2026-09/E06": "caught",
+          "mehta-2026-09/E07": "caught",
+          "sharma-2026-07/E01": "caught",
+          "sharma-2026-07/E02": "caught",
+          "sharma-2026-07/E03": "caught",
+          "sharma-2026-07/E04": "caught",
+          "sharma-2026-07/E05": "caught",
+          "sharma-2026-07/E06": "caught",
+          "sharma-2026-07/E07": "caught",
+          "sharma-2026-08/E01": "caught",
+          "sharma-2026-08/E02": "caught",
+          "sharma-2026-08/E03": "caught",
+          "sharma-2026-08/E04": "caught",
+          "sharma-2026-08/E05": "caught",
+          "sharma-2026-08/E06": "caught",
+          "sharma-2026-09/E01": "caught",
+          "sharma-2026-09/E02": "caught",
+          "sharma-2026-09/E03": "caught",
+          "sharma-2026-09/E04": "caught",
+          "sharma-2026-09/E05": "caught",
+          "sharma-2026-09/E06": "caught"
+        },
+        "models": {
+          "fast": "haiku",
+          "strong": "sonnet"
+        },
+        "noise": {},
+        "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
+        "suite": "suite-v1"
+      }
     }
   },
-  "version": 2
+  "version": 3
 }
