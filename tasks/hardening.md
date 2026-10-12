@@ -21,6 +21,7 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-016 Baseline file holds one section per suite | 2 | eval-engineer | regulated | CC-016a |
 | CC-016a Eval workflow gates suite-v1 and the suite-v1 baseline | 2 | eval-engineer | regulated | a `suite-v1` baseline, Gate C |
 | CC-017 Loader that replaces a period's evidence, and `make load` that works | 2 | implementer | data-sensitive | trustworthy re-records |
+| CC-018 Close the scorer's output-path and duplicate-key gaps | 2 | eval-engineer | regulated | relying on the baseline guard |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -337,6 +338,22 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 **Files.** `cmd/load/**`, `internal/evidence/**`, `internal/store/evidence.go`, `evidence_test.go`, `store_integration_test.go`, `Makefile`, `evals/fixtures/README.md`. Phase 2, implementer, data-sensitive (it deletes evidence rows; the security review checks the delete is scoped to one company and period).
 
 ---
+
+---
+
+### CC-018 · Close the scorer's output-path and duplicate-key gaps
+
+**Goal.** The scorer can't be steered into writing `evals/baseline.json` or anything under `evals/scenarios/`, `evals/golden/` or `gates/`, and a baseline file with a repeated JSON key is refused.
+
+**Findings** (G5 on CC-016, 2026-10-12; both confirmed by a probe test; neither was introduced by CC-016)
+1. **A symlink followed by `..` gets past `CheckOutputPath`** (`internal/evals/baseline.go:222-245` `outputCandidates`, `internal/evals/result.go:191,208` `writeFileAtomic`). `filepath.Abs` cleans `..` as text before `EvalSymlinks` runs, but `os.Rename(tmp, path)` gets the raw path and the OS resolves `l/..` through the real directories. With `out/l -> repo/evals/scenarios/sub`, `WriteBaseline("out/l/../x.json")` passed the check and wrote `repo/evals/scenarios/x.json`; with `out/l2 -> repo/evals/sub2`, `out/l2/../baseline.json` created `repo/evals/baseline.json`. `eval noise --out` is affected the same way, and `MkdirAll(f.Out)` (`cmd/eval/score.go:260`) can create an empty directory under a protected folder. Exploiting it needs control of a CLI flag and a planted symlink.
+2. **Duplicate JSON keys are silently accepted** (`internal/evals/score.go:1074-1090` `readStrict`, used by `LoadBaseline`). The last copy wins; a hand-edited baseline could show a reviewer one section while the gate compares against another.
+
+**Subtasks**
+- Check and write one resolved path: run `EvalSymlinks` on the path as the OS would walk it (not after `filepath.Clean`), or refuse any output path with a `..` component, and use that single path for the check, `Stat`, `LoadBaseline` and the rename. Apply it to `--baseline-out`, `--out` and `noise --out`. Regression tests for `out/l/../x.json` into `evals/scenarios/` and `evals/baseline.json`.
+- Make baseline loading reject a key repeated in one object (walk the tokens with `json.Decoder.Token`). A case in `TestLoadBaselineV3Invalid`.
+
+**Files.** `internal/evals/baseline.go`, `result.go`, `score.go`, their tests, `cmd/eval/score.go`, `score_test.go`. Phase 2, eval-engineer, regulated (the output guard is a protected invariant); security review and the Opus diff review run.
 
 ---
 
