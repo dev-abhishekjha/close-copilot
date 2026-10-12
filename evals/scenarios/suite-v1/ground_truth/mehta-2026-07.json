@@ -63,7 +63,15 @@
       "amount_paise": 112817
     }
   ],
-  "expected": [],
+  "expected": [
+    {
+      "type": "gstr2b_wrong_period",
+      "keys": {
+        "invoice_no_norm": "LTS2026742",
+        "supplier_gstin": "27XKYCL8632Z1ZI"
+      }
+    }
+  ],
   "investigations": [
     {
       "id": "X01",

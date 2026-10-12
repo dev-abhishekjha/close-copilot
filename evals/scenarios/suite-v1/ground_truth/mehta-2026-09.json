@@ -63,15 +63,7 @@
       "amount_paise": 1664798
     }
   ],
-  "expected": [
-    {
-      "type": "gstr2b_wrong_period",
-      "keys": {
-        "invoice_no_norm": "FBR2026804",
-        "supplier_gstin": "27OIDCF5719X1ZS"
-      }
-    }
-  ],
+  "expected": [],
   "investigations": [
     {
       "id": "X01",
