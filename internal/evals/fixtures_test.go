@@ -671,3 +671,33 @@ func TestFixtureSize(t *testing.T) {
 		t.Errorf("evals/fixtures holds %d bytes, over the %d-byte limit", total, limit)
 	}
 }
+
+// TestPrimeMonth: a refused priming call aborts the recording, is never
+// recorded, and Finish writes nothing.
+func TestPrimeMonth(t *testing.T) {
+	env := newFxEnv(t)
+	rec, err := NewRecorder(env.root, env.suite.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(rec.Abort)
+	live := &fakeLive{failOn: ToolTrialBalance}
+	rb := rec.Books(live)
+	rec.UseMonth("sharma", "2026-09")
+	if err := rb.PrimeMonth(t.Context(), "sharma", "2026-09"); !errors.Is(err, errLive) {
+		t.Errorf("PrimeMonth with a refusing server = %v, want the live error", err)
+	}
+	if rec.Err() == nil {
+		t.Error("Err() is nil after a refused priming call")
+	}
+	if err := rb.PrimeMonth(t.Context(), "sharma", "2026-13"); err == nil {
+		t.Error("PrimeMonth accepted a bad month")
+	}
+	_, _, err = rec.Finish(t.Context(), RecordMeta{Suite: env.suite, TruthDir: env.truthDir, Months: env.months, ExtraAllowed: fxExtra})
+	if !errors.Is(err, ErrRecordingAborted) {
+		t.Errorf("Finish = %v, want ErrRecordingAborted", err)
+	}
+	if _, err := os.Stat(filepath.Join(env.root, env.suite.Name)); !os.IsNotExist(err) {
+		t.Errorf("fixtures were written: %v", err)
+	}
+}
