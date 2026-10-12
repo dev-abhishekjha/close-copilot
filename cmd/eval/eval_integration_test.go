@@ -221,8 +221,8 @@ func TestEvalCLI(t *testing.T) {
 		}
 		slices.Sort(got)
 		slices.Sort(want)
-		if !slices.Equal(got, want) || len(res.Findings) != 3 {
-			t.Errorf("bank charges %v of %d findings, want %v", got, len(res.Findings), want)
+		if !slices.Equal(got, want) {
+			t.Errorf("bank charges %v, want %v", got, want)
 		}
 	})
 

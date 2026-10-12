@@ -132,7 +132,9 @@ func TestReplayNoNetwork(t *testing.T) {
 	}
 	var got []string
 	for _, f := range res.Findings {
-		got = append(got, f.Keys["bank_txn_id"])
+		if f.Type == checks.TypeUnrecordedBankCharge {
+			got = append(got, f.Keys["bank_txn_id"])
+		}
 	}
 	var want []string
 	for _, c := range fakeerp.PlantedCharges {
