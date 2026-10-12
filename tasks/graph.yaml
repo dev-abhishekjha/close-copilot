@@ -322,6 +322,21 @@ tasks:
       - "evals/scenarios/suite-skeleton/ground_truth/sharma-2026-08.json"
       - "tasks/cc-013-diagnosis.md"
     check: "suite-v1 replay raises no GSTR-2B false alarms; seed is deterministic"
+  # CC-014 is not in the tickets doc. Found 2026-10-12: the recorded suite-v1
+  # fixtures are 8.9 MB and TestFixtureSize caps evals/fixtures at 5 MB.
+  - id: CC-014
+    title: "Raise the fixture size cap and commit the suite-v1 fixtures"
+    phase: 2
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-905, CC-013]
+    needs_erpnext: false
+    files:
+      - "internal/evals/fixtures_test.go"
+      - "evals/fixtures/README.md"
+      - "evals/fixtures/suite-v1/**"
+    check: "TestFixtureSize passes with the suite-v1 fixtures committed; gitleaks finds nothing in them"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
