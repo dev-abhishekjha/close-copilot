@@ -18,6 +18,8 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-011 GSTR-2B check failure on the integration path | 2 | implementer | standard | trusting `make test-int` |
 | CC-012 Measure unauthorized writes in the eval score | 2 | eval-engineer | regulated | Gate C (writes 0) |
 | CC-013 Diagnose the GSTR-2B false alarms on suite-v1 | 2 | domain-data-engineer | regulated | the `suite-v1` baseline and fixtures commit |
+| CC-016 Gate suite-v1 in the eval workflow and baseline | 2 | eval-engineer | regulated | a `suite-v1` baseline, Gate C |
+| CC-017 Loader that replaces a period's evidence, and `make load` that works | 2 | implementer | data-sensitive | trustworthy re-records |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -280,6 +282,47 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 - `make check` passes.
 
 **Files.** `internal/seed/gstr2b*.go`, `truth*.go`, `testdata/**`, `evals/scenarios/suite-v1/**` (protected: owner approves). Phase 2, domain-data-engineer, regulated, needs the ERPNext lock for any live re-seed.
+
+---
+
+### CC-016 · Gate suite-v1 in the eval workflow and baseline
+
+**Goal.** A pull request's G4 check judges `suite-v1` as well as `suite-skeleton`, so a regression in a Phase 2 detector fails CI.
+
+**Finding** (2026-10-12, after CC-013/014/015). The `suite-v1` fixtures are committed and replay clean (recall 40/40, precision 66/66, 0 clean-month false alarms), but nothing in CI reads them. `.github/workflows/eval.yml:53` sets `SUITE: suite-skeleton` for the whole job, and `workflow_dispatch` has no inputs. `evals/baseline.json` (version 2, tiers `replay` and `llm`) holds one suite: `eval score --compare` stops with "baseline is for suite suite-skeleton, the score for suite-v1" (`internal/evals/baseline.go`). So no `suite-v1` baseline can be taken or enforced today.
+
+**Owner decisions needed before the spec**
+1. Baseline shape: one `baseline.json` that holds several suites (new version 3, a `suites` map), or one file per suite (`evals/baseline.suite-v1.json`). The first keeps one file to review; the second changes no existing consumer.
+2. Whether `suite-skeleton` stays gated once `suite-v1` is (recommended: yes, it is the cheap smoke suite) and whether `suite-v1` runs on every eval-relevant PR or only on dispatch and nightly. Replay is fast (seconds), so every PR is affordable.
+3. The `llm` tier is out of scope. It stays empty, and a dispatch or nightly run keeps failing at "baseline present" for that tier until the owner sets it.
+
+**Subtasks**
+- Baseline loader and `eval score --compare` accept the chosen shape and still reject a baseline for the wrong suite. Tests for both suites and for a missing one.
+- `eval.yml` runs the replay tier for each suite (a matrix or a loop), scored by the scorer built from the base ref.
+- Two pull requests, by the rule in `evals/fixtures/README.md` and the workflow header: first the scorer and baseline-loader change, then the workflow change that uses it (the PR's own scorer is never used to judge it).
+- The `suite-v1` baseline goes in its own `baseline-update` commit from a replay candidate, committed by the owner.
+
+**Files.** `.github/workflows/eval.yml` (protected), `evals/baseline*.json` (protected, baseline-update only), `internal/evals/baseline.go`, `baseline_test.go`, `cmd/eval/score.go`, `score_test.go`. Phase 2, eval-engineer, regulated, human_review.
+
+---
+
+### CC-017 · Loader that replaces a period's evidence, and `make load` that works
+
+**Goal.** `make load SUITE=suite-v1` loads every company-month the suite seeded, and a reload leaves exactly what the files hold.
+
+**Finding** (found re-recording `suite-v1`, 2026-10-12)
+1. `make load` runs `go run ./cmd/load --suite $(SUITE)` (`Makefile:109-115`), but `cmd/load` takes subcommands `bank` and `gstr2b` with `--company` and `--month` (`cmd/load/main.go:30-41`) and no `--suite`. The target fails with "flag provided but not defined: -suite". `docs/mcp.md:23` and `evals/fixtures/README.md` tell people to run it.
+2. `UpsertGSTR2BEntries` (`internal/store/evidence.go:200`) and `UpsertBankLines` (`:52`) only insert or update. A period's rows that the new file lacks stay in Postgres. A `--small` load left 16 sharma 2026-08 GSTR-2B rows behind; a later full load added its own 20 on top, and the recorded fixture held 36. That produced 15 false `gstr2b_missing_in_books` alarms (CC-013 diagnosis, `tasks/cc-013-diagnosis.md`). Stale bank rows likely caused the 22nd false alarm too: it vanished after the evidence tables were cleared.
+
+**Subtasks**
+- Loading a company-month replaces that company-period's rows: delete the period's rows and insert the file's, in one transaction, for both bank lines and GSTR-2B entries. Keep the existing balance check and idempotence.
+- Add `load all --suite <name>`: read the suite file, and load every company-month it lists, bank and GSTR-2B, with the same replace behaviour. Point `make load` at it. Decide in the spec whether the months a check reads past the run month (the previous and next return) come from the suite's seeded range.
+- A test that loads a larger file then a smaller one for the same period and finds only the smaller one's rows; an integration test for the transaction.
+- `evals/fixtures/README.md` (Bootstrap order): say that a re-record needs `make load` (now replacing), that `index.json` also pins each ground-truth file's sha256 so a truth change makes every suite's fixtures stale, and that the committed suites (`suite-skeleton`, `suite-v1`) are re-recorded together when the truth of either changes.
+
+**Files.** `cmd/load/**`, `internal/evidence/**`, `internal/store/evidence.go`, `evidence_test.go`, `store_integration_test.go`, `Makefile`, `evals/fixtures/README.md`. Phase 2, implementer, data-sensitive (it deletes evidence rows; the security review checks the delete is scoped to one company and period).
+
+---
 
 ---
 

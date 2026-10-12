@@ -351,6 +351,40 @@ tasks:
     files:
       - "evals/fixtures/suite-skeleton/**"
     check: "make eval-replay on suite-skeleton passes against evals/baseline.json"
+  # CC-016 and CC-017 are not in the tickets doc; see tasks/hardening.md.
+  - id: CC-016
+    title: "Gate suite-v1 in the eval workflow and baseline"
+    phase: 2
+    owner: eval-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-014, CC-015]
+    needs_erpnext: false
+    files:
+      - ".github/workflows/eval.yml"
+      - "evals/baseline*.json"
+      - "internal/evals/baseline.go"
+      - "internal/evals/baseline_test.go"
+      - "cmd/eval/score.go"
+      - "cmd/eval/score_test.go"
+    check: "a PR's G4 check replays and compares both suites; the wrong suite's baseline is rejected"
+  - id: CC-017
+    title: "Loader that replaces a period's evidence, and make load that works"
+    phase: 2
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-403, CC-014]
+    needs_erpnext: false
+    files:
+      - "cmd/load/**"
+      - "internal/evidence/**"
+      - "internal/store/evidence.go"
+      - "internal/store/evidence_test.go"
+      - "internal/store/store_integration_test.go"
+      - "Makefile"
+      - "evals/fixtures/README.md"
+    check: "A reload of a smaller file leaves only its rows; make load SUITE=suite-v1 loads every seeded month"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
