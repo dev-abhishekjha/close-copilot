@@ -49,8 +49,127 @@ type InvestigationItem struct {
 type GroundTruthOptions struct {
 	PlantedWorld PlantedWorld
 	BankLines    []BankLine // optional: computed from PlantedWorld.BankWorld if nil
-	ERPMap       ERPMap     // optional: used to resolve ERPNext document names
-	GSTR2B       *GSTR2B    // optional: used to populate expected late-filed invoices
+	// ERPMap resolves ERPNext document names; required for every type keyed
+	// on an invoice.
+	ERPMap ERPMap
+	// GSTR2B is the month's return; it fills the expected late-filed
+	// invoices and is required for the gstr2b_* types.
+	GSTR2B *GSTR2B
+	// Suppliers maps a profile supplier id to its ERPNext Supplier name
+	// (BootstrapReport.Suppliers); required for missing_accrual.
+	Suppliers map[string]string
+}
+
+// truthCtx resolves a planted error's keys. Every key must point at a real
+// record (an ERP map name, a bank line or a GSTR-2B invoice); a key that
+// can't be resolved is an error, never dropped.
+type truthCtx struct {
+	opt    GroundTruthOptions
+	bank   map[string]BankLine
+	books  map[string]Event
+	g2bInv map[string]b2bRef
+}
+
+type b2bRef struct{ ctin, inum string }
+
+func (c *truthCtx) invoice(pe PlantedError, ext string) (string, error) {
+	ref, ok := c.opt.ERPMap[ext]
+	if !ok || ref.DocType != DocPurchaseInvoice {
+		return "", fmt.Errorf("planted error %s (%s): ext_id %s is not a Purchase Invoice in the ERP map", pe.ID, pe.Type, ext)
+	}
+	return ref.Name, nil
+}
+
+func (c *truthCtx) inGSTR2B(pe PlantedError, ext string) (b2bRef, error) {
+	if c.opt.GSTR2B == nil {
+		return b2bRef{}, fmt.Errorf("planted error %s (%s): no GSTR-2B to resolve its keys", pe.ID, pe.Type)
+	}
+	ref, ok := c.g2bInv[ext]
+	if !ok {
+		return b2bRef{}, fmt.Errorf("planted error %s (%s): ext_id %s is not in the GSTR-2B", pe.ID, pe.Type, ext)
+	}
+	return ref, nil
+}
+
+func gstr2bKeys(ctin, inum string) map[string]string {
+	return map[string]string{"supplier_gstin": ctin, "invoice_no_norm": NormInvoiceNo(inum)}
+}
+
+// keys builds a planted error's keys per the shared spec's finding types.
+func (c *truthCtx) keys(pe PlantedError, month string) (map[string]string, error) {
+	if len(pe.TouchedExtIDs) == 0 {
+		return nil, fmt.Errorf("planted error %s has no touched ext_ids", pe.ID)
+	}
+	ext := pe.TouchedExtIDs[0]
+	switch pe.Type {
+	case ErrorUnrecordedBankCharge:
+		bl, ok := c.bank[ext]
+		if !ok {
+			return nil, fmt.Errorf("planted error %s ext_id %s not found in bank lines", pe.ID, ext)
+		}
+		return map[string]string{"bank_txn_id": bl.TxnID}, nil
+	case ErrorDuplicateVendorPayment:
+		if len(pe.TouchedExtIDs) < 2 {
+			return nil, fmt.Errorf("planted error %s has no duplicate payment", pe.ID)
+		}
+		if _, ok := c.bank[pe.TouchedExtIDs[1]]; !ok {
+			return nil, fmt.Errorf("planted error %s: duplicate payment %s is not in the bank lines", pe.ID, pe.TouchedExtIDs[1])
+		}
+		name, err := c.invoice(pe, ext)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]string{"invoice": name}, nil
+	case ErrorPrepaidNotSpread, ErrorMisclassifiedExpense, ErrorWrongPeriodPosting, ErrorPromptInjection:
+		name, err := c.invoice(pe, ext)
+		if err != nil {
+			return nil, err
+		}
+		return map[string]string{"invoice": name}, nil
+	case ErrorMissingAccrual:
+		name := c.opt.Suppliers[pe.SupplierID]
+		if pe.SupplierID == "" || name == "" {
+			return nil, fmt.Errorf("planted error %s: supplier %q has no ERPNext name", pe.ID, pe.SupplierID)
+		}
+		return map[string]string{"supplier": name, "month": month}, nil
+	case ErrorGSTR2BMissingIn2B:
+		if _, err := c.invoice(pe, ext); err != nil {
+			return nil, err
+		}
+		if c.opt.GSTR2B == nil {
+			return nil, fmt.Errorf("planted error %s (%s): no GSTR-2B to check", pe.ID, pe.Type)
+		}
+		if _, ok := c.g2bInv[ext]; ok {
+			return nil, fmt.Errorf("planted error %s: ext_id %s is still in the GSTR-2B", pe.ID, ext)
+		}
+		ev, ok := c.books[ext]
+		if !ok || ev.Meta.SupplierGSTIN == "" || ev.InvoiceNo == "" {
+			return nil, fmt.Errorf("planted error %s: ext_id %s is not a registered purchase in the books", pe.ID, ext)
+		}
+		return gstr2bKeys(ev.Meta.SupplierGSTIN, ev.InvoiceNo), nil
+	case ErrorGSTR2BAmountMismatch:
+		if _, err := c.invoice(pe, ext); err != nil {
+			return nil, err
+		}
+		ref, err := c.inGSTR2B(pe, ext)
+		if err != nil {
+			return nil, err
+		}
+		return gstr2bKeys(ref.ctin, ref.inum), nil
+	case ErrorGSTR2BMissingInBooks:
+		if _, ok := c.opt.ERPMap[ext]; ok {
+			return nil, fmt.Errorf("planted error %s: ext_id %s was booked", pe.ID, ext)
+		}
+		if _, ok := c.books[ext]; ok {
+			return nil, fmt.Errorf("planted error %s: ext_id %s is in the books view", pe.ID, ext)
+		}
+		ref, err := c.inGSTR2B(pe, ext)
+		if err != nil {
+			return nil, err
+		}
+		return gstr2bKeys(ref.ctin, ref.inum), nil
+	}
+	return nil, fmt.Errorf("planted error %s: unknown type %q", pe.ID, pe.Type)
 }
 
 // BuildGroundTruth constructs the GroundTruth structure for a planted company-month world.
@@ -74,33 +193,23 @@ func BuildGroundTruth(opt GroundTruthOptions) (GroundTruth, error) {
 		byExt[l.ExtID] = l
 	}
 
+	ctx := &truthCtx{opt: opt, bank: byExt, books: map[string]Event{}, g2bInv: map[string]b2bRef{}}
+	for _, ev := range pw.BooksWorld.Events {
+		ctx.books[ev.ExtID] = ev
+	}
+	if opt.GSTR2B != nil {
+		for _, supp := range opt.GSTR2B.Data.DocData.B2B {
+			for _, inv := range supp.Inv {
+				ctx.g2bInv[inv.ExtID] = b2bRef{ctin: supp.CTIN, inum: inv.Inum}
+			}
+		}
+	}
+
 	planted := make([]PlantedFinding, 0, len(pw.PlantedErrors))
 	for _, pe := range pw.PlantedErrors {
-		keys := make(map[string]string)
-		switch pe.Type {
-		case ErrorUnrecordedBankCharge:
-			if len(pe.TouchedExtIDs) == 0 {
-				return GroundTruth{}, fmt.Errorf("planted error %s has no touched ext_ids", pe.ID)
-			}
-			bl, ok := byExt[pe.TouchedExtIDs[0]]
-			if !ok {
-				return GroundTruth{}, fmt.Errorf("planted error %s ext_id %s not found in bank lines", pe.ID, pe.TouchedExtIDs[0])
-			}
-			keys["bank_txn_id"] = bl.TxnID
-		default:
-			if len(pe.TouchedExtIDs) > 0 {
-				extID := pe.TouchedExtIDs[0]
-				if opt.ERPMap != nil {
-					if ref, ok := opt.ERPMap[extID]; ok {
-						keys["invoice"] = ref.Name
-					}
-				}
-				if _, ok := keys["invoice"]; !ok {
-					if bl, ok := byExt[extID]; ok {
-						keys["bank_txn_id"] = bl.TxnID
-					}
-				}
-			}
+		keys, err := ctx.keys(pe, pw.Month)
+		if err != nil {
+			return GroundTruth{}, fmt.Errorf("build ground truth %s %s: %w", pw.Company, pw.Month, err)
 		}
 
 		planted = append(planted, PlantedFinding{

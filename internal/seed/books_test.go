@@ -1148,3 +1148,38 @@ func TestBooksResultJSON(t *testing.T) {
 		t.Errorf("skipped %v", res.Skipped)
 	}
 }
+
+// TestBooksUnallocatedAdvance posts a vendor payment with no Refs as an
+// advance to the supplier: no references row, the remark names the
+// invoice, and the paid amount is the payment's (CC-010).
+func TestBooksUnallocatedAdvance(t *testing.T) {
+	p, rep, w := sharmaBooks(t, "2026-09")
+	pay := eventsOf(w, EventVendorPayment)[0]
+	adv := pay
+	adv.ExtID = fmt.Sprintf("EVT-sharma-2026-09-%04d", maxEventSequence(w.Events)+1)
+	adv.Refs = nil
+	adv.BankRef = "N0000001"
+	adv.Narration = "Payment for " + pay.InvoiceNo
+	withAdv := w
+	withAdv.Events = append(slices.Clone(w.Events), adv)
+
+	f := newFakeBooks(rep)
+	res := writeBooks(t, f, rep, withAdv, BooksOptions{Suppliers: p.Suppliers})
+	if res.Map[adv.ExtID].DocType != DocPaymentEntry {
+		t.Fatalf("advance mapped to %v", res.Map[adv.ExtID])
+	}
+	d := inserted(t, f)[adv.ExtID]
+	if _, ok := d["references"]; ok {
+		t.Errorf("advance has a references row: %v", d["references"])
+	}
+	if d["remarks"] != "Payment for "+pay.InvoiceNo || d["party"] != rep.Suppliers[pay.Meta.SupplierID] || d["payment_type"] != "Pay" {
+		t.Errorf("advance %v", d)
+	}
+	if mustPaise(t, d["paid_amount"]) != pay.Gross {
+		t.Errorf("paid %v, want %s", d["paid_amount"], pay.Gross.Rupees())
+	}
+	// The one-reference payment is unchanged.
+	if len(rows(inserted(t, f)[pay.ExtID]["references"])) != 1 {
+		t.Error("the original payment lost its reference")
+	}
+}

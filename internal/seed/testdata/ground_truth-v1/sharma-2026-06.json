@@ -1,0 +1,46 @@
+{
+  "scenario": "suite-v1",
+  "company": "sharma",
+  "month": "2026-06",
+  "clean": true,
+  "planted": [],
+  "expected": [
+    {
+      "type": "gstr2b_wrong_period",
+      "keys": {
+        "invoice_no_norm": "RDK2026544",
+        "supplier_gstin": "36VNOCR2477I1ZI"
+      }
+    }
+  ],
+  "investigations": [
+    {
+      "id": "X01",
+      "keys": {
+        "bank_txn_id": "BNK-20260609-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    },
+    {
+      "id": "X02",
+      "keys": {
+        "bank_txn_id": "BNK-20260616-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    },
+    {
+      "id": "X03",
+      "keys": {
+        "bank_txn_id": "BNK-20260623-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    },
+    {
+      "id": "X04",
+      "keys": {
+        "bank_txn_id": "BNK-20260630-003"
+      },
+      "expected_resolution": "gateway_settlement"
+    }
+  ]
+}

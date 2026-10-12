@@ -1,0 +1,76 @@
+{
+  "scenario": "suite-v1",
+  "company": "mehta",
+  "month": "2026-07",
+  "clean": false,
+  "planted": [
+    {
+      "id": "E01",
+      "type": "missing_accrual",
+      "keys": {
+        "month": "2026-07",
+        "supplier": "SecureMail Suite"
+      },
+      "amount_paise": 2124000
+    },
+    {
+      "id": "E02",
+      "type": "unrecorded_bank_charge",
+      "keys": {
+        "bank_txn_id": "BNK-20260707-001"
+      },
+      "amount_paise": 177000
+    },
+    {
+      "id": "E03",
+      "type": "duplicate_vendor_payment",
+      "keys": {
+        "invoice": "PINV-26-00050"
+      },
+      "amount_paise": 1175912
+    },
+    {
+      "id": "E04",
+      "type": "prepaid_not_spread",
+      "keys": {
+        "invoice": "PINV-26-00057"
+      },
+      "amount_paise": 36000000
+    },
+    {
+      "id": "E05",
+      "type": "misclassified_expense",
+      "keys": {
+        "invoice": "PINV-26-00063"
+      },
+      "amount_paise": 7295400
+    },
+    {
+      "id": "E06",
+      "type": "wrong_period_posting",
+      "keys": {
+        "invoice": "PINV-26-00062"
+      },
+      "amount_paise": 2534518
+    },
+    {
+      "id": "E07",
+      "type": "gstr2b_amount_mismatch",
+      "keys": {
+        "invoice_no_norm": "SWF2026711",
+        "supplier_gstin": "27YNPCS2657O1Z2"
+      },
+      "amount_paise": 8370
+    }
+  ],
+  "expected": [],
+  "investigations": [
+    {
+      "id": "X01",
+      "keys": {
+        "bank_txn_id": "BNK-20260728-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    }
+  ]
+}
