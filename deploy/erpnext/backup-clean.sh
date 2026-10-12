@@ -7,7 +7,8 @@
 # (relative to the bench directory inside the backend container). Run it
 # after `go run ./cmd/seed bootstrap` and the bootstrap integration test,
 # while holding tmp/erpnext.lock, so the backup has the masters and no
-# business documents.
+# business documents. Re-run it after deploy/erpnext/add-company.sh adds a
+# company, so the reset restores every company.
 #
 # Usage: deploy/erpnext/backup-clean.sh
 #

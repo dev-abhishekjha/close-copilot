@@ -1,7 +1,13 @@
 # Close Copilot — developer entry points (CC-101).
 # Values in .env (copied from .env.example) are exported to every command.
+# A make variable from .env overrides the environment, even when .env leaves it
+# blank. Keep a non-empty ERP key from the caller's environment (for example a
+# subshell that sourced tmp/erp-keys.env) so it wins over .env (CC-008).
+ERP_KEY_VARS := ERP_SEED_API_KEY ERP_SEED_API_SECRET ERP_API_KEY ERP_API_SECRET
+$(foreach v,$(ERP_KEY_VARS),$(eval _env_$(v) := $($(v))))
 -include .env
 export
+$(foreach v,$(ERP_KEY_VARS),$(if $(_env_$(v)),$(eval $(v) := $(_env_$(v)))))
 
 GO        ?= go
 PKGS      := ./...
@@ -94,6 +100,10 @@ migrate: ## Apply database migrations (CC-401)
 .PHONY: erp-reset
 erp-reset: ## Restore clean bootstrapped database backup in ERPNext (CC-307)
 	docker compose -f $(ERP_COMPOSE) exec -T backend bench --site erp.localhost restore sites/erp.localhost/private/backups/clean-bootstrap-database.sql.gz --db-root-password 123
+
+.PHONY: seed-env-check
+seed-env-check: ## Say whether the ERPNext seeder and bot keys are set (never prints values)
+	@$(foreach v,$(ERP_KEY_VARS),echo "$(v) $(if $($(v)),set,unset)";)
 
 .PHONY: seed
 seed: ## Seed ERPNext and the evidence files for SUITE (CC-307)
