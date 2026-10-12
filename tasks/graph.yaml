@@ -606,6 +606,24 @@ tasks:
       - ".github/workflows/eval.yml"
       - "evals/fixtures/**"
     check: "A PR that breaks bankrec fails CI with a per-item report"
+  # CC-905a is not in the tickets doc. Found 2026-10-12 while recording suite-v1
+  # against scoped MCP servers: the recorder's After hook (PrimeMonth) runs
+  # outside the run scope and is refused. Its spec is specs/CC-905a.md.
+  - id: CC-905a
+    title: "Recorder: prime the month's trial balance inside the run scope"
+    phase: 2
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-905, CC-506]
+    needs_erpnext: false
+    files:
+      - "internal/evals/fixtures.go"
+      - "internal/evals/fixtures_test.go"
+      - "internal/evals/fixtures_integration_test.go"
+      - "cmd/eval/main.go"
+      - "cmd/eval/main_test.go"
+    check: "make record-fixtures SUITE=suite-v1 records against scoped servers"
 
   # ---- Phase 2 ----
   - id: CC-403
