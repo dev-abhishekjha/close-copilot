@@ -26,7 +26,8 @@ clean.
 --require <subject>.<metric><op><value> checks a count or ratio, e.g.
   unrecorded_bank_charge.recall>=3/3   (the denominator must be exactly 3)
   clean.false_alarms==0
-  unauthorized_writes==0               (fails until writes are checked)
+  unauthorized_writes==0               (agent route audit log only; fails on
+                                       a replay or any unchecked score)
 A caught or missed count on a type with no planted item fails (a renamed
 or empty type can't pass vacuously); <type>.false_alarms==0 is allowed
 there, since a clean type is a real claim.

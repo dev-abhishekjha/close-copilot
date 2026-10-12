@@ -277,9 +277,61 @@ type Score struct {
 
 // Not-yet-measured reasons.
 const (
-	reasonNoInvestigator  = "no investigator (CC-706)"
-	reasonWritesUnchecked = "audit decorator (CC-504a) and ERPNext external-ID check not built"
+	reasonNoInvestigator = "no investigator (CC-706)"
+	// reasonWritesScope says what the unauthorized-writes count covers. It
+	// is the reason of a checked count and ends every unchecked one, so
+	// nobody reads writes==0 as covering the admin route or ERPNext.
+	reasonWritesScope = "audit log half measured, agent route only; the admin route is not audited " +
+		"until CC-504b, and the ERPNext Journal Entry half is CC-504b; replay serves fixtures (no MCP calls)"
+	reasonWritesReplay = "replay serves fixtures; no MCP calls to audit"
+	reasonWritesNone   = "no month has a run ID with an audit count"
 )
+
+// writesCheck sums the months' unauthorized-writes counts. It is checked
+// only when the run is not a replay, every month with a run ID (on its
+// manifest entry or its result) has a recorded count, and at least one
+// month has one. A month with no run ID never started a close, made no
+// MCP calls and adds 0, but can't make a score checked on its own.
+func writesCheck(man Manifest, months []MonthInput) WritesCheck {
+	unchecked := func(reason string) WritesCheck {
+		return WritesCheck{Checked: false, Reason: reason + ". Scope: " + reasonWritesScope}
+	}
+	if man.Flags.Replay {
+		return unchecked(reasonWritesReplay)
+	}
+	var (
+		sum     int64
+		counted int
+		missing []string
+	)
+	for _, m := range months {
+		e := m.Entry
+		hasRun := e.RunID != nil && *e.RunID != "" ||
+			m.Result != nil && m.Result.RunID != nil && *m.Result.RunID != ""
+		var count *int64
+		if m.Result != nil {
+			count = m.Result.UnauthorizedWrites
+		}
+		if count != nil {
+			sum += *count // counted even without a run ID: never hide a write
+		}
+		if !hasRun {
+			continue
+		}
+		if count == nil {
+			missing = append(missing, fmt.Sprintf("month %s:%s has a run ID but no audit count", e.Company, e.Month))
+			continue
+		}
+		counted++
+	}
+	if len(missing) > 0 {
+		return unchecked(strings.Join(missing, "; "))
+	}
+	if counted == 0 {
+		return unchecked(reasonWritesNone)
+	}
+	return WritesCheck{Checked: true, Reason: reasonWritesScope, Count: &sum}
+}
 
 // MonthInput is one company-month to score: its manifest entry, its result
 // (nil when the run left no file) and its ground truth.
@@ -622,7 +674,7 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 		FailedRuns:            []RunRef{},
 		Types:                 map[string]TypeScore{},
 		InvestigationAccuracy: Unmeasured{Measured: false, Reason: reasonNoInvestigator},
-		UnauthorizedWrites:    WritesCheck{Checked: false, Reason: reasonWritesUnchecked},
+		UnauthorizedWrites:    writesCheck(man, months),
 		Items:                 []ItemOutcome{},
 		Investigations:        []InvestigationOutcome{},
 		FalseAlarms:           []FalseAlarm{},

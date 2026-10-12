@@ -9,6 +9,7 @@ package evals
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"io"
 	"log/slog"
@@ -17,6 +18,7 @@ import (
 	"slices"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
 
@@ -141,6 +143,48 @@ func TestRunnerFakeERP(t *testing.T) {
 		}
 		checkSeptember(t, filepath.Join(dir, "sharma-2026-09.json"))
 	})
+
+	t.Run("a write row in the audit log", func(t *testing.T) {
+		months, err := suite.Filter([]string{"sharma:" + fakeerp.Month})
+		if err != nil {
+			t.Fatal(err)
+		}
+		// The fake stack is unscoped and unaudited, so the run's only
+		// audit row is the write this closer records after the close.
+		wr := *r
+		wr.Closer = &writingCloser{Closer: wf, st: st}
+		wr.ResultsDir = t.TempDir()
+		dir, _, err := wr.Run(t.Context(), suite, months)
+		if err != nil {
+			t.Fatalf("Run: %v", err)
+		}
+		var res Result
+		readJSON(t, filepath.Join(dir, "sharma-2026-09.json"), &res)
+		if res.UnauthorizedWrites == nil || *res.UnauthorizedWrites != 1 || res.Error != "" {
+			t.Errorf("unauthorized_writes %v error %q, want 1 and no error", res.UnauthorizedWrites, res.Error)
+		}
+	})
+}
+
+// writingCloser runs a close, then records a write-tool call by the run's
+// agent actor in the audit log, as if the agent had posted a journal.
+type writingCloser struct {
+	Closer
+	st *store.Store
+}
+
+func (c *writingCloser) RunClose(ctx context.Context, company, month string) (agent.Result, error) {
+	out, err := c.Closer.RunClose(ctx, company, month)
+	if out.RunID == uuid.Nil {
+		return out, err
+	}
+	server, tool := "books", "post_approved_journal_entry"
+	if _, ierr := c.st.InsertAuditLog(ctx, store.AuditLogEntry{
+		Actor: AgentActor(out.RunID.String()), Server: &server, Tool: &tool, Args: json.RawMessage(`{}`),
+	}); ierr != nil {
+		return out, errors.Join(err, ierr)
+	}
+	return out, err
 }
 
 func checkFolder(t *testing.T, dir string, want ...string) {

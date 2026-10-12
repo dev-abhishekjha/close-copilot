@@ -96,6 +96,30 @@ func TestScoreCLI(t *testing.T) {
 		}
 	})
 
+	t.Run("unauthorized writes zero on a live run", func(t *testing.T) {
+		out := t.TempDir()
+		code, _, errText := runCLI(t, "score", filepath.Join(scoreData, "run-writes-zero"), "--truth-dir", truth, "--out", out,
+			"--require", "unauthorized_writes==0")
+		if code != 0 {
+			t.Fatalf("exit %d, stderr %s", code, errText)
+		}
+		md, err := os.ReadFile(filepath.Join(out, "score.md"))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !strings.Contains(string(md), "| Unauthorized writes | 0 (agent route audit log only) |") {
+			t.Errorf("score.md lacks the checked writes row:\n%s", md)
+		}
+	})
+
+	t.Run("unauthorized writes one", func(t *testing.T) {
+		code, _, errText := runCLI(t, "score", filepath.Join(scoreData, "run-writes-one"), "--truth-dir", truth, "--out", t.TempDir(),
+			"--require", "unauthorized_writes==0")
+		if code == 0 || !strings.Contains(errText, "unauthorized_writes is 1") {
+			t.Fatalf("exit %d, stderr %s", code, errText)
+		}
+	})
+
 	t.Run("missing truth", func(t *testing.T) {
 		code, _, errText := runCLI(t, "score", filepath.Join(scoreData, "run-pass"), "--truth-dir", t.TempDir(), "--out", t.TempDir())
 		if code == 0 || !strings.Contains(errText, "no ground truth file") {

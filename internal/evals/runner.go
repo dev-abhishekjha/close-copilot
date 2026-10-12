@@ -29,6 +29,7 @@ type RunReader interface {
 	ListFindingsByRun(ctx context.Context, runID uuid.UUID) ([]store.Finding, error)
 	ListSteps(ctx context.Context, runID uuid.UUID) ([]store.Step, error)
 	ListLLMCalls(ctx context.Context, stepID uuid.UUID) ([]store.LLMCall, error)
+	ListAuditLogsByActor(ctx context.Context, actor string) ([]store.AuditLogEntry, error)
 }
 
 // ErrRunsFailed is returned when at least one month's run ended failed;
@@ -190,7 +191,8 @@ func (r *Runner) runMonth(ctx context.Context, suiteName string, m SuiteMonth) R
 // exportTimeout bounds the reads of one run's export.
 const exportTimeout = 30 * time.Second
 
-// export fills res from the stored run: its row, findings and model calls.
+// export fills res from the stored run: its row, findings, model calls
+// and, last, its unauthorized-writes count.
 func (r *Runner) export(ctx context.Context, runID uuid.UUID, res *Result) error {
 	run, err := r.Reader.GetCloseRun(ctx, runID)
 	if err != nil {
@@ -241,6 +243,35 @@ func (r *Runner) export(ctx context.Context, runID uuid.UUID, res *Result) error
 		res.Models.Called = append(res.Models.Called, m)
 	}
 	slices.Sort(res.Models.Called)
+	return r.exportWrites(ctx, runID, res)
+}
+
+// exportWrites sets res.UnauthorizedWrites from the run's audit rows. It
+// runs last in export, so an audit error never skips the other totals.
+// It fails closed: the count stays nil unless the audit log was read and
+// holds rows for the run's actor.
+//   - A replay run serves fixtures and makes no MCP calls: nothing to count.
+//   - A query error is returned, so the month reads as failed.
+//   - No rows at all for the actor means the audit isn't reaching this
+//     database (an unaudited stack, or mcp-books writing to another one):
+//     the count stays nil with a warning, and ScoreMonths marks the score
+//     unchecked. Zero rows is not zero writes.
+func (r *Runner) exportWrites(ctx context.Context, runID uuid.UUID, res *Result) error {
+	if r.Flags.Replay {
+		return nil
+	}
+	actor := AgentActor(runID.String())
+	entries, err := r.Reader.ListAuditLogsByActor(ctx, actor)
+	if err != nil {
+		return fmt.Errorf("evals: export run %s audit log: %w", runID, err)
+	}
+	if len(entries) == 0 {
+		r.log().WarnContext(ctx, "eval run has no audit rows; unauthorized writes not measured",
+			"run_id", runID.String(), "actor", actor, "company", res.Company, "month", res.Month)
+		return nil
+	}
+	n := CountUnauthorizedWrites(actor, entries)
+	res.UnauthorizedWrites = &n
 	return nil
 }
 

@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -34,6 +35,12 @@ type fakeRun struct {
 	findings       []store.Finding
 	calls          []store.LLMCall
 	readErr        error
+	// The run's audit rows: by default one read-tool row for its actor.
+	// audit replaces them (another actor's rows included), noAudit returns
+	// none and auditErr fails the query.
+	audit    []store.AuditLogEntry
+	noAudit  bool
+	auditErr error
 }
 
 // fakeStack is a fake Closer and RunReader over planned runs.
@@ -42,7 +49,9 @@ type fakeStack struct {
 	calls  []string
 	runs   map[uuid.UUID]string
 	nextID int
-	cancel context.CancelFunc // cancels the suite after the first close
+	// auditActors are the actors ListAuditLogsByActor was asked for.
+	auditActors []string
+	cancel      context.CancelFunc // cancels the suite after the first close
 }
 
 func newFake(plan map[string]fakeRun) *fakeStack {
@@ -137,6 +146,28 @@ func (f *fakeStack) ListLLMCalls(_ context.Context, stepID uuid.UUID) ([]store.L
 		}
 	}
 	return nil, nil
+}
+
+func (f *fakeStack) ListAuditLogsByActor(_ context.Context, actor string) ([]store.AuditLogEntry, error) {
+	f.auditActors = append(f.auditActors, actor)
+	id, err := uuid.Parse(strings.TrimPrefix(actor, "agent:run/"))
+	if err != nil || !strings.HasPrefix(actor, "agent:run/") {
+		return nil, nil
+	}
+	p, err := f.run(id)
+	if err != nil {
+		return nil, nil
+	}
+	switch {
+	case p.auditErr != nil:
+		return nil, p.auditErr
+	case p.noAudit:
+		return nil, nil
+	case p.audit != nil:
+		return slices.Clone(p.audit), nil
+	}
+	tool, server := "list_bank_lines", "evidence"
+	return []store.AuditLogEntry{{ID: 1, Actor: actor, Server: &server, Tool: &tool, Args: json.RawMessage(`{}`)}}, nil
 }
 
 // clock is a fake clock that ticks 1.5 s on every reading.
@@ -583,3 +614,99 @@ func TestRunnerVerifierCounts(t *testing.T) {
 		t.Errorf("a result without the agent carries verifier counts: %s", b)
 	}
 }
+
+// TestRunnerUnauthorizedWrites checks the export of a run's unauthorized
+// writes from its audit rows, and that every unmeasured case leaves the
+// count null: a replay, no audit rows at all, or a failed audit query.
+func TestRunnerUnauthorizedWrites(t *testing.T) {
+	const otherActor = "agent:run/00000000-0000-4000-8000-000000000099"
+	writeRow := func(actor string) store.AuditLogEntry {
+		tool, server := "post_approved_journal_entry", "books"
+		return store.AuditLogEntry{Actor: actor, Server: &server, Tool: &tool, Args: json.RawMessage(`{}`)}
+	}
+	// The fake's first run ID; RunClose numbers runs from 1.
+	const actor = "agent:run/00000000-0000-4000-8000-000000000001"
+	calls := []store.LLMCall{{Model: "haiku", InputTokens: 10, OutputTokens: 5, CostUSD: "0.5"}}
+	for _, tt := range []struct {
+		name      string
+		plan      fakeRun
+		replay    bool
+		want      *int64 // nil: not measured
+		wantErr   string // in Result.Error; "" for none
+		wantWarn  bool
+		noQuery   bool   // the audit log is never read
+		scoreWant string // a substring of the score's writes reason; "" when checked
+	}{
+		{name: "read-tool rows", plan: fakeRun{}, want: ptr(int64(0))},
+		{name: "a write row", plan: fakeRun{audit: []store.AuditLogEntry{writeRow(actor)}}, want: ptr(int64(1))},
+		{name: "another run's write row", plan: fakeRun{audit: []store.AuditLogEntry{writeRow(otherActor),
+			{Actor: actor, Tool: ptr("list_bank_lines")}}}, want: ptr(int64(0))},
+		{name: "no audit rows", plan: fakeRun{noAudit: true}, wantWarn: true,
+			scoreWant: "month sharma:2026-09 has a run ID but no audit count"},
+		{name: "audit query error", plan: fakeRun{auditErr: errors.New("audit table gone")}, wantErr: "audit table gone",
+			scoreWant: "month sharma:2026-09 has a run ID but no audit count"},
+		{name: "replay", plan: fakeRun{audit: []store.AuditLogEntry{writeRow(actor)}}, replay: true, noQuery: true,
+			scoreWant: "replay serves fixtures; no MCP calls to audit"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			p := tt.plan
+			p.status, p.calls = store.RunPartial, calls
+			f := newFake(map[string]fakeRun{"sharma:2026-09": p})
+			r := newRunner(t, f)
+			r.Flags.Replay = tt.replay
+			var logs bytes.Buffer
+			r.Log = slog.New(slog.NewJSONHandler(&logs, nil))
+			dir, man, _ := r.Run(t.Context(), testSuite, testSuite.Months[:1])
+
+			var res Result
+			readJSON(t, filepath.Join(dir, "sharma-2026-09.json"), &res)
+			switch {
+			case tt.want == nil && res.UnauthorizedWrites != nil:
+				t.Errorf("unauthorized_writes %d, want null", *res.UnauthorizedWrites)
+			case tt.want != nil && (res.UnauthorizedWrites == nil || *res.UnauthorizedWrites != *tt.want):
+				t.Errorf("unauthorized_writes %v, want %d", res.UnauthorizedWrites, *tt.want)
+			}
+			if tt.wantErr == "" && res.Error != "" || !strings.Contains(res.Error, tt.wantErr) {
+				t.Errorf("result error %q, want %q", res.Error, tt.wantErr)
+			}
+			if failed := tt.wantErr != ""; man.Results[0].Failed != failed {
+				t.Errorf("month failed %t, want %t", man.Results[0].Failed, failed)
+			}
+			// The audit read is last: cost and tokens are exported regardless.
+			if res.CostUSD != "0.5" || res.Tokens.Input != 10 {
+				t.Errorf("cost %q tokens %+v: the audit read skipped the totals", res.CostUSD, res.Tokens)
+			}
+			if warned := strings.Contains(logs.String(), `"level":"WARN"`) &&
+				strings.Contains(logs.String(), "no audit rows"); warned != tt.wantWarn {
+				t.Errorf("warning logged %t, want %t: %s", warned, tt.wantWarn, logs.String())
+			}
+			if queried := len(f.auditActors) > 0; queried == tt.noQuery {
+				t.Errorf("audit queried for %v, want queried %t", f.auditActors, !tt.noQuery)
+			}
+			if !tt.noQuery && (len(f.auditActors) != 1 || f.auditActors[0] != actor) {
+				t.Errorf("audit actors %v, want [%s]", f.auditActors, actor)
+			}
+
+			_, months, err := LoadMonths(ScoreOptions{ResultsDir: dir, TruthDir: filepath.Join(scoreTestdata, "truth")})
+			if err != nil {
+				t.Fatal(err)
+			}
+			s, err := ScoreMonths(man, months)
+			if err != nil {
+				t.Fatal(err)
+			}
+			w := s.UnauthorizedWrites
+			if tt.scoreWant == "" {
+				if !w.Checked || w.Count == nil || *w.Count != *tt.want {
+					t.Errorf("score writes %+v, want checked %d", w, *tt.want)
+				}
+				return
+			}
+			if w.Checked || w.Count != nil || !strings.Contains(w.Reason, tt.scoreWant) {
+				t.Errorf("score writes %+v, want unchecked with %q", w, tt.scoreWant)
+			}
+		})
+	}
+}
+
+func ptr[T any](v T) *T { return &v }

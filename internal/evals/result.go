@@ -53,6 +53,13 @@ type Result struct {
 	// follows a reject). Both are 0, and omitted, when the agent was off.
 	VerifierRejects int64 `json:"verifier_rejects,omitempty"`
 	Retries         int64 `json:"retries,omitempty"`
+
+	// UnauthorizedWrites counts the run's write-tool calls in the audit log
+	// under its agent actor (agent route only; see writes.go). It is null
+	// when not measured: a replay run, a run with no audit rows at all, a
+	// failed audit query, or a result file written before CC-012. Null
+	// never reads as 0.
+	UnauthorizedWrites *int64 `json:"unauthorized_writes"`
 }
 
 // Tokens are a run's model token totals.

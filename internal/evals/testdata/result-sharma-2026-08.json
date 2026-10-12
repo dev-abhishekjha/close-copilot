@@ -24,5 +24,6 @@
     "input": 0,
     "output": 0
   },
-  "trace_id": null
+  "trace_id": null,
+  "unauthorized_writes": 0
 }

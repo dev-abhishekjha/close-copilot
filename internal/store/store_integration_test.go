@@ -338,6 +338,58 @@ func TestStoreIntegration_MigrationsAndRoundTrip(t *testing.T) {
 		if len(logs) == 0 || logs[0].ID != auditID {
 			t.Errorf("ListAuditLogs want latest id %d, got %+v", auditID, logs)
 		}
+
+		// ListAuditLogsByActor: only the asked actor's rows, oldest first
+		// (by at, then id), with no limit.
+		runActor := "agent:run/" + uuid.NewString()
+		otherActor := "agent:run/" + uuid.NewString()
+		base := time.Date(2026, 10, 1, 9, 0, 0, 0, time.UTC)
+		inserts := []struct {
+			actor string
+			tool  string
+			at    time.Time
+		}{
+			{runActor, "list_bank_lines", base.Add(2 * time.Minute)},
+			{otherActor, "post_approved_journal_entry", base.Add(1 * time.Minute)},
+			{runActor, "post_approved_journal_entry", base},
+			{runActor, "list_gl_entries", base.Add(2 * time.Minute)}, // same at: id breaks the tie
+			{otherActor, "list_bank_lines", base.Add(3 * time.Minute)},
+		}
+		ids := map[int]int64{}
+		for i, in := range inserts {
+			id, err := st.InsertAuditLog(ctx, store.AuditLogEntry{
+				At: in.at, Actor: in.actor, Server: stringPtr("books"), Tool: stringPtr(in.tool),
+				Args: json.RawMessage(`{}`),
+			})
+			if err != nil {
+				t.Fatalf("InsertAuditLog %d: %v", i, err)
+			}
+			ids[i] = id
+		}
+		byActor, err := st.ListAuditLogsByActor(ctx, runActor)
+		if err != nil {
+			t.Fatalf("ListAuditLogsByActor: %v", err)
+		}
+		wantIDs := []int64{ids[2], ids[0], ids[3]}
+		if len(byActor) != len(wantIDs) {
+			t.Fatalf("ListAuditLogsByActor: want %d rows, got %d: %+v", len(wantIDs), len(byActor), byActor)
+		}
+		for i, e := range byActor {
+			if e.ID != wantIDs[i] || e.Actor != runActor {
+				t.Errorf("ListAuditLogsByActor[%d]: want id %d actor %s, got id %d actor %s",
+					i, wantIDs[i], runActor, e.ID, e.Actor)
+			}
+		}
+		if byActor[0].Tool == nil || *byActor[0].Tool != "post_approved_journal_entry" {
+			t.Errorf("ListAuditLogsByActor[0] tool: got %v", byActor[0].Tool)
+		}
+		none, err := st.ListAuditLogsByActor(ctx, "agent:run/"+uuid.NewString())
+		if err != nil {
+			t.Fatalf("ListAuditLogsByActor (no rows): %v", err)
+		}
+		if len(none) != 0 {
+			t.Errorf("ListAuditLogsByActor (no rows): got %+v", none)
+		}
 	})
 
 	// 5. Test Docs: Vector Embedding and Full-Text Search

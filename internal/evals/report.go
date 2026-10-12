@@ -31,9 +31,13 @@ func RenderReport(s Score) string {
 	w("| Investigation accuracy | %s |\n", unmeasured(s.InvestigationAccuracy.Measured, s.InvestigationAccuracy.Reason, ""))
 	writes := ""
 	if s.UnauthorizedWrites.Count != nil {
-		writes = fmt.Sprint(*s.UnauthorizedWrites.Count)
+		writes = fmt.Sprintf("%d (agent route audit log only)", *s.UnauthorizedWrites.Count)
 	}
 	w("| Unauthorized writes | %s |\n\n", unmeasured(s.UnauthorizedWrites.Checked, s.UnauthorizedWrites.Reason, writes))
+	if s.UnauthorizedWrites.Checked {
+		w("Unauthorized writes cover write-tool calls on the agent route's audit log only; the admin route " +
+			"and the ERPNext Journal Entry check come with CC-504b.\n\n")
+	}
 
 	w("## By finding type\n\n")
 	w("| Type | Planted | Caught | Missed | Recall | Findings | Correct | False alarms | Precision |\n")

@@ -41,7 +41,8 @@ func TestReportContent(t *testing.T) {
 	for _, s := range []string{
 		"# Eval score: suite-test",
 		"| `unrecorded_bank_charge` | 3 | 2 | 1 | 2/3 (66.6%) |",
-		`| Unauthorized writes | not measured: audit decorator \(CC-504a\)`,
+		`| Unauthorized writes | not measured: month sharma:2026-09 has a run ID but no audit count`,
+		`the admin route is not audited until CC-504b, and the ERPNext Journal Entry half is CC-504b`,
 		`| Investigation accuracy | not measured: no investigator \(CC-706\) |`,
 		"## Missed",
 		"- sharma-2026-09/E02 `unrecorded_bank_charge`",
@@ -149,5 +150,21 @@ func TestReportSummary(t *testing.T) {
 	}
 	if got, _ := os.ReadFile(filepath.Join(dir, SummaryFile)); string(got) != md {
 		t.Error("summary.md differs from the render")
+	}
+}
+
+// TestReportWritesChecked checks that a checked count says what it covers.
+func TestReportWritesChecked(t *testing.T) {
+	md := RenderReport(scoreDir(t, "run-writes-zero"))
+	for _, s := range []string{
+		"| Unauthorized writes | 0 (agent route audit log only) |",
+		"the admin route and the ERPNext Journal Entry check come with CC-504b",
+	} {
+		if !strings.Contains(md, s) {
+			t.Errorf("score.md lacks %q:\n%s", s, md)
+		}
+	}
+	if md := RenderReport(scoreDir(t, "run-writes-one")); !strings.Contains(md, "| Unauthorized writes | 1 (agent route audit log only) |") {
+		t.Errorf("score.md lacks the one-write row:\n%s", md)
 	}
 }

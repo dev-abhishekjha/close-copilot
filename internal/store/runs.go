@@ -505,6 +505,28 @@ func (s *Store) ListAuditLogs(ctx context.Context, limit int) ([]AuditLogEntry, 
 	if err != nil {
 		return nil, fmt.Errorf("store: list audit logs: %w", err)
 	}
+	return scanAuditLogs(rows)
+}
+
+// ListAuditLogsByActor returns every audit log entry of one actor, such as
+// "agent:run/<run id>", oldest first (by at, then id). It has no limit:
+// the eval scorer counts all of a run's rows.
+func (s *Store) ListAuditLogsByActor(ctx context.Context, actor string) ([]AuditLogEntry, error) {
+	const query = `
+		SELECT id, at, actor, server, tool, args, result_count, latency_ms, error
+		FROM audit_log
+		WHERE actor = $1
+		ORDER BY at ASC, id ASC;
+	`
+	rows, err := s.pool.Query(ctx, query, actor)
+	if err != nil {
+		return nil, fmt.Errorf("store: list audit logs by actor: %w", err)
+	}
+	return scanAuditLogs(rows)
+}
+
+// scanAuditLogs reads audit log rows and closes them.
+func scanAuditLogs(rows pgx.Rows) ([]AuditLogEntry, error) {
 	defer rows.Close()
 
 	var out []AuditLogEntry

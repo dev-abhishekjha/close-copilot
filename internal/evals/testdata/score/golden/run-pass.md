@@ -19,7 +19,7 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 | Verifier rejects | 0 |
 | Explain retries | 0 |
 | Investigation accuracy | not measured: no investigator \(CC-706\) |
-| Unauthorized writes | not measured: audit decorator \(CC-504a\) and ERPNext external-ID check not built |
+| Unauthorized writes | not measured: month sharma:2026-09 has a run ID but no audit count; month sharma:2026-08 has a run ID but no audit count. Scope: audit log half measured, agent route only; the admin route is not audited until CC-504b, and the ERPNext Journal Entry half is CC-504b; replay serves fixtures \(no MCP calls\) |
 
 ## By finding type
 
