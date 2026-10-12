@@ -80,4 +80,4 @@ never falls through to a live reader (the replay readers hold none).
 - The CI scorer is built from the base ref, so a pull request that changes
   `eval score`'s flags is judged by the old binary: land the flag in one
   pull request and its use in the workflow in the next.
-- `TestFixtureSize` fails if this folder exceeds 5 MB.
+- `TestFixtureSize` fails if this folder exceeds 16 MiB.
