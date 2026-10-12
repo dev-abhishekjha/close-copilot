@@ -4,6 +4,7 @@
 // fixtures and the CI gate). Usage:
 //
 //	eval run --suite suite-v1 [--only sharma:2026-09] [--model-fast X] [--no-llm|--no-agent]
+//	         [--checks bankrec|all]
 //	         [--record | --replay] [--fixtures-dir evals/fixtures]
 //	         [--results-dir results] [--scenarios-dir evals/scenarios] [--config-dir config]
 //	eval score <results-dir> [--truth-dir D] [--out D] [--require EXPR]... [--compare FILE]
@@ -159,6 +160,9 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		ResultsDir: f.ResultsDir,
 		Log:        log,
 	}
+	if f.Checks == checksAll {
+		wf.Checks = agent.DefaultChecks()
+	}
 	var (
 		closer evals.Closer = wf
 		rec    *evals.Recorder
@@ -219,7 +223,7 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		Log:                 log,
 	}
 	log.Info("eval suite starting", "suite", suite.Name, "sha256", suite.SHA256, "months", len(months),
-		"agent", agentOn, "replay", f.Replay, "record", f.Record)
+		"agent", agentOn, "checks", f.Checks, "replay", f.Replay, "record", f.Record)
 	dir, man, err := r.Run(ctx, suite, months)
 	if dir != "" {
 		_, _ = fmt.Fprintf(stdout, "%s\n", filepath.Join(dir, evals.ManifestFile))
