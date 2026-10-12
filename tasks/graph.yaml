@@ -645,6 +645,21 @@ tasks:
       - "internal/evals/runner.go"
       - "internal/evals/runner_test.go"
     check: "go test ./cmd/eval/... ./internal/evals/...; the manifest records the checks that ran"
+  # CC-607a is not in the tickets doc. Found 2026-10-12 at the first all-detector
+  # recording on suite-v1: every month failed in check.variance with "no snapshot
+  # for evidence ref" (books__list_purchase_invoices). Its spec is specs/CC-607a.md.
+  - id: CC-607a
+    title: "Variance cites only purchase invoices it read"
+    phase: 2
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-607, CC-009]
+    needs_erpnext: false
+    files:
+      - "internal/checks/variance.go"
+      - "internal/checks/variance_test.go"
+    check: "A variance finding's invoice evidence is backed by a call the variance step made"
 
   # ---- Phase 2 ----
   - id: CC-403
