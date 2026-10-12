@@ -34,6 +34,9 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"time"
+
+	"github.com/google/uuid"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
 	"github.com/abhishekjha/close-copilot/internal/buildinfo"
@@ -42,6 +45,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/evals"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -179,7 +183,7 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 			defer rec.Abort()
 			rb := rec.Books(books)
 			wf.Books, wf.Evidence = rb, rec.Evidence(evidence)
-			closer = &evals.ScopedCloser{Closer: wf, Scope: rec, After: rb.PrimeMonth}
+			closer = &evals.ScopedCloser{Closer: wf, Scope: rec, After: primeScope(cfg.MCPScopeKey.Reveal(), time.Now, agent.WithRunScope, rb.PrimeMonth)}
 		}
 	}
 
@@ -265,5 +269,34 @@ func manifestConfig(cfg config.Config) evals.ManifestConfig {
 		LLMModelStrong:    cfg.LLMModelStrong,
 		LLMRunTokenCap:    cfg.LLMRunTokenCap,
 		LLMDailyBudgetUSD: strconv.FormatFloat(cfg.LLMDailyBudgetUSD, 'f', -1, 64),
+	}
+}
+
+// primeTTL is how long a priming scope lives: one trial-balance call.
+const primeTTL = 5 * time.Minute
+
+// primeScope wraps a recording's priming call (RecordingBooks.PrimeMonth)
+// so it runs inside a run scope, as the workflow's own calls do (CC-506):
+// a fresh run ID, the company and the window of the month only
+// (mcpkit.Window), valid for primeTTL. withScope puts the signed header on
+// the context (agent.WithRunScope). With an empty key (unscoped test
+// servers) ctx passes through unchanged. A scope that can't be minted is
+// an error, never a skipped call, so the recording aborts.
+func primeScope(key string, now func() time.Time, withScope func(context.Context, string) context.Context,
+	prime func(ctx context.Context, company, month string) error,
+) func(ctx context.Context, company, month string) error {
+	return func(ctx context.Context, companyID, month string) error {
+		if key == "" {
+			return prime(ctx, companyID, month)
+		}
+		sc, err := mcpkit.Window(companyID, "eval-prime-"+uuid.NewString(), month, now().Add(primeTTL))
+		if err != nil {
+			return fmt.Errorf("eval: prime scope: %w", err)
+		}
+		header, err := mcpkit.Mint([]byte(key), sc)
+		if err != nil {
+			return fmt.Errorf("eval: prime scope: %w", err)
+		}
+		return prime(withScope(ctx, header), companyID, month)
 	}
 }
