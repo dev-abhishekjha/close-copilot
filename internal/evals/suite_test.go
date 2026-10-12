@@ -152,3 +152,47 @@ func TestFilter(t *testing.T) {
 		t.Errorf("Filter with a month outside the suite = %v", err)
 	}
 }
+
+func TestSeededMonths(t *testing.T) {
+	body := `suite: seeded
+history_months: ["2026-05", "2026-06"]
+evaluated:
+  - {company: sharma, months: ["2026-08", "2026-07", "2026-06"]}
+  - {company: mehta, months: ["2026-07"]}
+clean_control: {company: sharma, month: "2026-05"}
+`
+	s, err := LoadSuite(writeSuite(t, "seeded", body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tests := []struct {
+		company string
+		want    []string
+	}{
+		{"sharma", []string{"2026-05", "2026-06", "2026-07", "2026-08"}},
+		{"mehta", []string{"2026-05", "2026-06", "2026-07"}},
+		{"nobody", nil},
+	}
+	for _, tt := range tests {
+		t.Run(tt.company, func(t *testing.T) {
+			if got := s.SeededMonths(tt.company); !slices.Equal(got, tt.want) {
+				t.Errorf("SeededMonths(%q) = %v, want %v", tt.company, got, tt.want)
+			}
+		})
+	}
+	if got := s.Companies(); !slices.Equal(got, []string{"sharma", "mehta"}) {
+		t.Errorf("Companies() = %v", got)
+	}
+}
+
+func TestSeededMonthsRealSuiteV1(t *testing.T) {
+	s, err := LoadSuite(filepath.Join(scenariosDir, "suite-v1.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, c := range []string{"sharma", "mehta"} {
+		if got := s.SeededMonths(c); len(got) != 6 {
+			t.Errorf("SeededMonths(%q) = %v, want 6 months", c, got)
+		}
+	}
+}

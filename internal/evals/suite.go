@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 
 	"go.yaml.in/yaml/v3"
@@ -37,6 +38,9 @@ type Suite struct {
 	Path   string       `json:"path"`
 	SHA256 string       `json:"sha256"` // of the file bytes
 	Months []SuiteMonth `json:"months"`
+	// HistoryMonths are the history months the seeder seeds for every
+	// evaluated company, as listed in the file.
+	HistoryMonths []string `json:"-"`
 }
 
 // suiteFile is the scenario file's shape. history_months, errors and small
@@ -141,6 +145,7 @@ func LoadSuite(path string) (Suite, error) {
 			errs = append(errs, fmt.Errorf("history_months[%d]: %w", i, err))
 		}
 	}
+	s.HistoryMonths = append([]string(nil), f.HistoryMonths...)
 	if err := errors.Join(errs...); err != nil {
 		return Suite{}, fmt.Errorf("evals: suite %s: %w", path, err)
 	}
@@ -153,6 +158,45 @@ func validMonth(m string) error {
 		return fmt.Errorf("month: %w", err)
 	}
 	return nil
+}
+
+// Companies lists the companies with evaluated months, in file order.
+func (s Suite) Companies() []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, m := range s.Months {
+		if !m.Control && !seen[m.Company] {
+			seen[m.Company] = true
+			out = append(out, m.Company)
+		}
+	}
+	return out
+}
+
+// SeededMonths are the months the seeder seeds for company: the history
+// months plus the company's evaluated months, sorted, without duplicates. A
+// company with no evaluated month is not seeded and gets none.
+func (s Suite) SeededMonths(company string) []string {
+	set := map[string]bool{}
+	evaluated := false
+	for _, m := range s.Months {
+		if m.Company == company && !m.Control {
+			evaluated = true
+			set[m.Month] = true
+		}
+	}
+	if !evaluated {
+		return nil
+	}
+	for _, m := range s.HistoryMonths {
+		set[m] = true
+	}
+	out := make([]string, 0, len(set))
+	for m := range set {
+		out = append(out, m)
+	}
+	sort.Strings(out)
+	return out
 }
 
 // Filter keeps the months whose key is in only ("company:month"), in suite

@@ -494,3 +494,187 @@ func TestStoreIntegration_MigrationsAndRoundTrip(t *testing.T) {
 func stringPtr(s string) *string {
 	return &s
 }
+
+func seedReplaceCompanies(t *testing.T, st *store.Store) {
+	t.Helper()
+	for _, id := range []string{"repl_a", "repl_b"} {
+		if err := st.UpsertCompany(context.Background(), store.Company{ID: id, ERPCompany: id + " Pvt Ltd", GSTIN: "27AABCT1234A1Z5"}); err != nil {
+			t.Fatalf("UpsertCompany %s: %v", id, err)
+		}
+	}
+}
+
+func replGSTR(company, period, inv string) store.GSTR2BEntry {
+	return store.GSTR2BEntry{
+		CompanyID: company, Period: period, SupplierGSTIN: "27AABCS1429B1ZB",
+		InvoiceNo: inv, InvoiceNoNorm: inv, InvoiceDate: time.Date(2026, 8, 5, 0, 0, 0, 0, time.UTC),
+		TaxablePaise: money.Paise(1000), ITCAvailable: true,
+	}
+}
+
+func replBank(company, txn string, day int, month time.Month) store.BankLine {
+	return store.BankLine{
+		CompanyID: company, TxnID: txn, TxnDate: time.Date(2026, month, day, 0, 0, 0, 0, time.UTC),
+		Narration: "N", AmountPaise: money.Paise(-100), SourceFile: "bank.csv",
+	}
+}
+
+func countGSTR(t *testing.T, st *store.Store, company, period string) int {
+	t.Helper()
+	l, err := st.ListGSTR2BEntries(context.Background(), company, period)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return len(l)
+}
+
+func countBank(t *testing.T, st *store.Store, company string) int {
+	t.Helper()
+	l, err := st.ListBankLines(context.Background(), store.BankLineFilter{CompanyID: company})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return len(l)
+}
+
+func TestReplaceGSTR2BEntries(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	seedReplaceCompanies(t, st)
+
+	three := []store.GSTR2BEntry{replGSTR("repl_a", "2026-08", "1"), replGSTR("repl_a", "2026-08", "2"), replGSTR("repl_a", "2026-08", "3")}
+	two := three[:2]
+	other := []store.GSTR2BEntry{replGSTR("repl_b", "2026-08", "9")}
+	nextPeriod := []store.GSTR2BEntry{replGSTR("repl_a", "2026-09", "7")}
+	for _, c := range []struct {
+		company, period string
+		e               []store.GSTR2BEntry
+	}{{"repl_b", "2026-08", other}, {"repl_a", "2026-09", nextPeriod}, {"repl_a", "2026-08", three}} {
+		if err := st.ReplaceGSTR2BEntries(ctx, c.company, c.period, c.e); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 3 {
+		t.Fatalf("after first load: %d, want 3", n)
+	}
+
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", two); err != nil {
+		t.Fatal(err)
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 2 {
+		t.Errorf("after replace: %d, want 2", n)
+	}
+	if n := countGSTR(t, st, "repl_b", "2026-08"); n != 1 {
+		t.Errorf("other company: %d, want 1", n)
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-09"); n != 1 {
+		t.Errorf("other period: %d, want 1", n)
+	}
+
+	// Idempotent
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", two); err != nil {
+		t.Fatal(err)
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 2 {
+		t.Errorf("after reload: %d, want 2", n)
+	}
+
+	// A mismatched entry errors before deleting
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", []store.GSTR2BEntry{replGSTR("repl_b", "2026-08", "5")}); err == nil {
+		t.Error("entry of another company: want error")
+	}
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", []store.GSTR2BEntry{replGSTR("repl_a", "2026-09", "5")}); err == nil {
+		t.Error("entry of another period: want error")
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 2 {
+		t.Errorf("after rejected replaces: %d, want 2", n)
+	}
+
+	// Atomic: a failing insert (duplicate key) leaves the old rows
+	dup := []store.GSTR2BEntry{replGSTR("repl_a", "2026-08", "8"), replGSTR("repl_a", "2026-08", "8")}
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", dup); err == nil {
+		t.Fatal("duplicate keys: want error")
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 2 {
+		t.Errorf("after failed insert: %d, want the old 2", n)
+	}
+
+	// Empty list clears the period only
+	if err := st.ReplaceGSTR2BEntries(ctx, "repl_a", "2026-08", nil); err != nil {
+		t.Fatal(err)
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-08"); n != 0 {
+		t.Errorf("after empty replace: %d, want 0", n)
+	}
+	if n := countGSTR(t, st, "repl_a", "2026-09"); n != 1 {
+		t.Errorf("other period after empty replace: %d, want 1", n)
+	}
+}
+
+func TestReplaceBankLines(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	seedReplaceCompanies(t, st)
+
+	aug := []store.BankLine{replBank("repl_a", "A1", 1, time.August), replBank("repl_a", "A2", 31, time.August), replBank("repl_a", "A3", 15, time.August)}
+	sep := []store.BankLine{replBank("repl_a", "S1", 1, time.September)}
+	other := []store.BankLine{replBank("repl_b", "B1", 10, time.August)}
+	for _, c := range []struct {
+		company, month string
+		l              []store.BankLine
+	}{{"repl_b", "2026-08", other}, {"repl_a", "2026-09", sep}, {"repl_a", "2026-08", aug}} {
+		if err := st.ReplaceBankLines(ctx, c.company, c.month, c.l); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if n := countBank(t, st, "repl_a"); n != 4 {
+		t.Fatalf("after first load: %d, want 4", n)
+	}
+
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", aug[:2]); err != nil {
+		t.Fatal(err)
+	}
+	if n := countBank(t, st, "repl_a"); n != 3 {
+		t.Errorf("after replace: %d, want 3 (2 Aug + 1 Sep)", n)
+	}
+	if n := countBank(t, st, "repl_b"); n != 1 {
+		t.Errorf("other company: %d, want 1", n)
+	}
+
+	// Idempotent
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", aug[:2]); err != nil {
+		t.Fatal(err)
+	}
+	if n := countBank(t, st, "repl_a"); n != 3 {
+		t.Errorf("after reload: %d, want 3", n)
+	}
+
+	// A line outside the month errors and deletes nothing
+	out := []store.BankLine{replBank("repl_a", "X1", 5, time.August), replBank("repl_a", "X2", 1, time.September)}
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", out); err == nil {
+		t.Error("line outside the month: want error")
+	}
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", []store.BankLine{replBank("repl_b", "X3", 5, time.August)}); err == nil {
+		t.Error("line of another company: want error")
+	}
+	if n := countBank(t, st, "repl_a"); n != 3 {
+		t.Errorf("after rejected replaces: %d, want 3", n)
+	}
+
+	// Atomic: a failing insert (duplicate txn_id) leaves the old rows
+	dup := []store.BankLine{replBank("repl_a", "D1", 3, time.August), replBank("repl_a", "D1", 4, time.August)}
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", dup); err == nil {
+		t.Fatal("duplicate txn ids: want error")
+	}
+	if n := countBank(t, st, "repl_a"); n != 3 {
+		t.Errorf("after failed insert: %d, want 3", n)
+	}
+
+	// Empty list clears the month only
+	if err := st.ReplaceBankLines(ctx, "repl_a", "2026-08", nil); err != nil {
+		t.Fatal(err)
+	}
+	if n := countBank(t, st, "repl_a"); n != 1 {
+		t.Errorf("after empty replace: %d, want 1 (Sep)", n)
+	}
+}

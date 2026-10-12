@@ -111,7 +111,7 @@ seed: ## Seed ERPNext and the evidence files for SUITE (CC-307)
 
 .PHONY: load
 load: ## Load bank and GSTR-2B files into Postgres (CC-402, CC-403)
-	$(GO) run ./cmd/load --suite $(SUITE)
+	$(GO) run ./cmd/load all --suite $(SUITE)
 
 .PHONY: ingest
 ingest: ## Ingest the document corpus (CC-803)

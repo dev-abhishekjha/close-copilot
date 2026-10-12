@@ -37,6 +37,13 @@ on purpose: the same company-month holds different data in different suites.
    `baseline-update` commit, from the candidate a `workflow_dispatch` run of
    the eval workflow uploads (artifact `eval-results`)
 
+`make load` runs `cmd/load all --suite <name>`: it loads every company-month the
+suite seeded, and each load now replaces that month's rows, so rows a smaller
+earlier load left behind no longer linger. `index.json` also pins the sha256 of
+each ground-truth file, so a change to any suite's truth makes that suite's
+fixtures stale; the committed suites (`suite-skeleton`, `suite-v1`) are
+re-recorded when their truth changes.
+
 Locally, after `make up migrate`: `make eval-replay SUITE=suite-skeleton`
 replays without a model and scores the run (against `evals/baseline.json`
 when it exists).
