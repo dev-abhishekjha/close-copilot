@@ -248,7 +248,7 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 ### CC-012 · Measure unauthorized writes in the eval score
 
-**Goal.** `WritesCheck.Checked` is true and `--require 'writes==0'` can pass.
+**Goal.** `WritesCheck.Checked` is true on a live run and `--require 'unauthorized_writes==0'` can pass. Scope (owner decision 2026-10-12): the agent-route audit-log half only; replay stays unchecked; the admin-route and ERPNext Journal Entry halves come with CC-504b.
 
 **Finding.** `internal/evals/score.go:148`: while `Checked` is false the count is null and any requirement on it fails, so Gate C's "unauthorized writes 0" can't be shown. CC-504a's audit log records every tool call; count calls to a write tool whose run has no approved proposal. Regulated: the eval engineer writes this, the owner reviews it.
 
@@ -258,8 +258,10 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 ## Notes for later specs
 
+
 These are requirements on tickets that already exist. When you spec one of them, copy its line into the spec's Notes and acceptance.
 
+- **CC-504b (from the CC-012 spec review):** `/mcp-admin` is never scoped, so its audit actor is `"admin"`, and the admin server has no `EnableAudit` (`cmd/mcp-books/main.go:119-125,147`). CC-504b must call `EnableAudit(adminServer, "books-admin", sink)` and CC-012's writes check must be extended to count admin-route rows inside a run's `[started_at, finished_at]` that have no matching approved proposal (in an eval run there are none, so any row is unauthorized), plus the ERPNext Journal Entry check (external-ID field without a posted proposal). Until then `unauthorized_writes==0` covers the agent route only, and Gate C's "writes 0" is only partly shown.
 - **CC-701, CC-904:** build every HTTP client through `internal/httpx` (`option.WithHTTPClient(httpx.New(...))`, `otlptracehttp.WithHTTPClient(...)`). Read secrets only through CC-104's `config.Secret`.
 - **CC-502:** the books tools validate `fields` and `order_by` against identifier and `asc|desc` allowlists at the tool boundary. CC-205's client check is the second line of defence, not the only one.
 - **CC-1201:** the dev site has `delete_linked_ledger_entries=1`, a CC-102 follow-up the owner approved. That is a compliance-relevant setting. The deploy must set it to 0 and check that it is 0 on every non-dev site.
