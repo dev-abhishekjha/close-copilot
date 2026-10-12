@@ -378,6 +378,7 @@ tasks:
     needs_erpnext: false
     files:
       - ".github/workflows/eval.yml"
+      - "evals/ci/check-eval-workflow.sh"
       - "evals/baseline.json"
     check: "a PR's G4 check replays and compares suite-skeleton and suite-v1 under one job named eval (G4)"
   - id: CC-017
