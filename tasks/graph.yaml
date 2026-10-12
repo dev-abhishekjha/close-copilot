@@ -319,6 +319,7 @@ tasks:
       - "internal/seed/truth*.go"
       - "internal/seed/testdata/**"
       - "evals/scenarios/suite-v1/**"
+      - "evals/scenarios/suite-skeleton/ground_truth/sharma-2026-08.json"
       - "tasks/cc-013-diagnosis.md"
     check: "suite-v1 replay raises no GSTR-2B false alarms; seed is deterministic"
   - id: CC-301
