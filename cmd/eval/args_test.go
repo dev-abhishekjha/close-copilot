@@ -146,6 +146,24 @@ func TestRunArgs(t *testing.T) {
 			t.Errorf("parseArgs(%q) accepted it", args)
 		}
 	}
+	// --checks resolves per suite and lands in the flags.
+	for _, tt := range []struct {
+		args []string
+		want string
+	}{
+		{[]string{"run", "--suite", "suite-skeleton"}, "bankrec"},
+		{[]string{"run", "--suite", "suite-skeleton", "--replay", "--checks", "all"}, "all"},
+		{[]string{"run", "--suite", "suite-v1"}, "all"},
+		{[]string{"run", "--suite", "suite-v1", "--checks", "bankrec"}, "bankrec"},
+	} {
+		c, err := parseArgs(tt.args, &out)
+		if err != nil || c.flags.Checks != tt.want {
+			t.Errorf("%q: checks %q err %v, want %q", tt.args, c.flags.Checks, err, tt.want)
+		}
+	}
+	if _, err := parseArgs([]string{"run", "--suite", "s", "--checks", "some"}, &out); err == nil {
+		t.Error("--checks some accepted")
+	}
 	// The manifest records replay, record and the fixtures dir, and only
 	// for a fixture run.
 	c, _ := parseArgs([]string{"run", "--suite", "s", "--replay", "--no-llm"}, &out)
@@ -201,5 +219,23 @@ func TestRunRefusesFault(t *testing.T) {
 		if err == nil || !strings.Contains(err.Error(), config.EnvCopilotFault) {
 			t.Errorf("run %q with a fault = %v", args, err)
 		}
+	}
+}
+
+func TestChecksFor(t *testing.T) {
+	for _, tt := range []struct{ suite, flag, want string }{
+		{"suite-skeleton", "", "bankrec"},
+		{"suite-v1", "", "all"},
+		{"other", "", "all"},
+		{"suite-skeleton", "all", "all"},
+		{"suite-v1", "bankrec", "bankrec"},
+	} {
+		got, err := checksFor(tt.suite, tt.flag)
+		if err != nil || got != tt.want {
+			t.Errorf("checksFor(%q, %q) = %q, %v; want %q", tt.suite, tt.flag, got, err, tt.want)
+		}
+	}
+	if _, err := checksFor("suite-v1", "nope"); err == nil {
+		t.Error("bad value accepted")
 	}
 }

@@ -96,6 +96,8 @@ type Flags struct {
 	ResultsDir   string   `json:"results_dir"`
 	ScenariosDir string   `json:"scenarios_dir"`
 	ConfigDir    string   `json:"config_dir"`
+	// Checks is the resolved eval run --checks: "bankrec" or "all".
+	Checks string `json:"checks,omitempty"`
 	// Replay and Record are eval run --replay and --record; FixturesDir is
 	// their --fixtures-dir. Omitted for a live run.
 	Replay      bool   `json:"replay,omitempty"`

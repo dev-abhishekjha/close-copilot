@@ -127,3 +127,13 @@ func TestReplayCLI(t *testing.T) {
 		}
 	})
 }
+
+// TestChecksForSkeletonReplay: suite-skeleton replays its committed,
+// bankrec-only fixtures under the default, so Workflow.Checks stays nil.
+func TestChecksForSkeletonReplay(t *testing.T) {
+	var out bytes.Buffer
+	c, err := parseArgs([]string{"run", "--suite", "suite-skeleton", "--replay", "--no-llm"}, &out)
+	if err != nil || c.flags.Checks != "bankrec" {
+		t.Fatalf("checks %q err %v", c.flags.Checks, err)
+	}
+}

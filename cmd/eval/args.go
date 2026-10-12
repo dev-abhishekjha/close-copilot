@@ -142,12 +142,14 @@ func parseRunArgs(args []string, out io.Writer) (command, error) {
 		fs.PrintDefaults()
 	}
 	var only onlyList
+	var checks string
 	c := command{name: cmdRun}
 	fs.StringVar(&c.flags.Suite, "suite", "", "suite name: evals/scenarios/<name>.yaml (required)")
 	fs.Var(&only, "only", "run only these months, company:YYYY-MM (repeatable or comma-separated)")
 	fs.StringVar(&c.flags.ModelFast, "model-fast", "", "override LLM_MODEL_FAST for this run only")
 	fs.BoolVar(&c.flags.NoAgent, "no-agent", false, "run without the explainer and verifier (same as --no-llm)")
 	fs.BoolVar(&c.flags.NoAgent, "no-llm", false, "run without the explainer and verifier: no model call (Tier 1)")
+	fs.StringVar(&checks, "checks", "", "detectors to run: bankrec or all (default all; bankrec for suite-skeleton)")
 	fs.BoolVar(&c.flags.Record, "record", false, "live run that records every tool response under --fixtures-dir (needs ERPNext; never in CI)")
 	fs.BoolVar(&c.flags.Replay, "replay", false, "serve recorded tool responses from --fixtures-dir: no ERPNext, no MCP")
 	fs.StringVar(&c.flags.FixturesDir, "fixtures-dir", evals.DefaultFixturesDir, "fixtures folder for --record and --replay")
@@ -175,6 +177,35 @@ func parseRunArgs(args []string, out io.Writer) (command, error) {
 	if !c.flags.Record && !c.flags.Replay {
 		c.flags.FixturesDir = "" // a live run reads no fixtures
 	}
+	resolved, err := checksFor(c.flags.Suite, checks)
+	if err != nil {
+		return command{}, err
+	}
+	c.flags.Checks = resolved
 	c.flags.Only = []string(only)
 	return c, nil
+}
+
+// Values of eval run --checks.
+const (
+	checksBankrec = "bankrec"
+	checksAll     = "all"
+	// bankrecOnlySuite is the one suite whose recorded fixtures cover bank
+	// reconciliation only, so it defaults to --checks bankrec.
+	bankrecOnlySuite = "suite-skeleton"
+)
+
+// checksFor resolves --checks: an explicit value wins; empty means
+// bankrec for suite-skeleton and all for every other suite.
+func checksFor(suite, flagValue string) (string, error) {
+	switch flagValue {
+	case checksBankrec, checksAll:
+		return flagValue, nil
+	case "":
+		if suite == bankrecOnlySuite {
+			return checksBankrec, nil
+		}
+		return checksAll, nil
+	}
+	return "", fmt.Errorf("eval run: --checks %.40q: want bankrec or all", flagValue)
 }

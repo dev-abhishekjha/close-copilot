@@ -710,3 +710,20 @@ func TestRunnerUnauthorizedWrites(t *testing.T) {
 }
 
 func ptr[T any](v T) *T { return &v }
+
+func TestManifestFlagsChecks(t *testing.T) {
+	b, err := json.Marshal(Manifest{Flags: Flags{Checks: "all"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var back Manifest
+	if err := json.Unmarshal(b, &back); err != nil {
+		t.Fatal(err)
+	}
+	if back.Flags.Checks != "all" || !strings.Contains(string(b), `"checks":"all"`) {
+		t.Errorf("flags.checks did not round-trip: %s", b)
+	}
+	if b, _ := json.Marshal(Manifest{}); strings.Contains(string(b), `"checks"`) {
+		t.Errorf("empty checks is not omitted: %s", b)
+	}
+}
