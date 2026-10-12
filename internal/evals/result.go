@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"time"
 
@@ -174,10 +175,24 @@ func writeJSON(path string, v any) error {
 	return writeFileAtomic(path, data)
 }
 
+// hasDotDot reports whether path, as given and before any cleaning, has a
+// ".." component (split on '/' and on the OS separator). A name that only
+// contains dots, such as "a..b" or "...", is not one.
+func hasDotDot(path string) bool {
+	comps := strings.FieldsFunc(path, func(r rune) bool { return r == '/' || r == filepath.Separator })
+	return slices.Contains(comps, "..")
+}
+
 // writeFileAtomic writes data to a temp file in path's directory, syncs it
 // and renames it over path, so a reader sees the old file or the whole new
-// one, never a part. The file keeps CreateTemp's 0600 mode.
+// one, never a part. The file keeps CreateTemp's 0600 mode. A path with a
+// ".." component is refused before anything is created: the OS walks
+// "link/.." through the link's real target, so a checked path could land
+// somewhere else (a backstop for callers that forgot CheckOutputPath).
 func writeFileAtomic(path string, data []byte) (err error) {
+	if hasDotDot(path) {
+		return fmt.Errorf("%w: refusing to write %s: a path with a .. component is not allowed", ErrProtectedOutput, path)
+	}
 	dir := filepath.Dir(path)
 	tmp, err := os.CreateTemp(dir, "."+filepath.Base(path)+".tmp-*")
 	if err != nil {

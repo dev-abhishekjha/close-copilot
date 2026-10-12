@@ -198,8 +198,11 @@ func IsProtectedBaseline(path string) bool {
 // under, evals/scenarios/, evals/golden/ or gates/. It compares path
 // components case-insensitively, as given, cleaned to an absolute path,
 // and with symlinks followed (through the longest existing ancestor, so
-// a not-yet-created file under a symlinked folder is caught). flag names
-// the option in the error. An unresolvable path is refused.
+// a not-yet-created file under a symlinked folder is caught). A path with
+// a ".." component as given is refused too (ErrProtectedOutput), since
+// cleaning it as text can disagree with the OS walking it through a
+// symlink. flag names the option in the error. An unresolvable path is
+// refused.
 func CheckOutputPath(flag, path string) error {
 	cands := outputCandidates(path)
 	if len(cands) == 0 {
@@ -212,6 +215,11 @@ func CheckOutputPath(flag, path string) error {
 		if under, ok := protectedDir(p); ok {
 			return fmt.Errorf("%w: refusing %s %s (resolves under %s)", ErrProtectedOutput, flag, path, under)
 		}
+	}
+	// Abs cleans "link/.." as text, but the OS walks it through the link's
+	// real target, so the candidates above can't vouch for such a path.
+	if hasDotDot(path) {
+		return fmt.Errorf("%w: refusing %s %s: a path with a .. component is not allowed", ErrProtectedOutput, flag, path)
 	}
 	return nil
 }

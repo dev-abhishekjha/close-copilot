@@ -1069,12 +1069,67 @@ func LoadScore(path string) (Score, error) {
 	return s, nil
 }
 
-// readStrict decodes a JSON file into v, rejecting unknown fields and
-// trailing data.
+// checkDuplicateKeys walks the first JSON value in data and returns an
+// error naming the first key repeated within one object, at any depth
+// (keys compared exactly, after unescaping; the same key in two different
+// objects is fine). It walks iteratively, so deep nesting can't exhaust
+// the stack. Malformed JSON is left to the typed decode, which reports it.
+func checkDuplicateKeys(data []byte) error {
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.UseNumber()
+	type frame struct {
+		seen map[string]struct{} // nil for an array
+		key  bool                // the object expects a key or '}' next
+	}
+	var stack []*frame
+	for {
+		tok, err := dec.Token()
+		if err != nil {
+			return nil
+		}
+		if n := len(stack); n > 0 && stack[n-1].key {
+			top := stack[n-1]
+			if tok == json.Delim('}') {
+				stack = stack[:n-1]
+			} else {
+				k, _ := tok.(string)
+				if _, dup := top.seen[k]; dup {
+					return fmt.Errorf("duplicate key %q", k)
+				}
+				top.seen[k] = struct{}{}
+				top.key = false
+			}
+		} else {
+			// A value, or an array's ']'. In an object, a key comes next.
+			if n > 0 && stack[n-1].seen != nil {
+				stack[n-1].key = true
+			}
+			switch tok {
+			case json.Delim('{'):
+				stack = append(stack, &frame{seen: map[string]struct{}{}, key: true})
+			case json.Delim('['):
+				stack = append(stack, &frame{})
+			case json.Delim(']'):
+				stack = stack[:n-1]
+			}
+		}
+		if len(stack) == 0 {
+			return nil
+		}
+	}
+}
+
+// readStrict decodes a JSON file into v, rejecting a key repeated within
+// one object, unknown fields and trailing data.
 func readStrict(path string, v any) error {
 	data, err := os.ReadFile(filepath.Clean(path))
 	if err != nil {
 		return fmt.Errorf("evals: read %s: %w", path, err)
+	}
+	// A repeated key would let the last copy win silently, so a reviewer
+	// could read one section while the gate compares another.
+	if err := checkDuplicateKeys(data); err != nil {
+		return fmt.Errorf("evals: decode %s: %w", path, err)
 	}
 	dec := json.NewDecoder(bytes.NewReader(data))
 	dec.DisallowUnknownFields()
