@@ -125,11 +125,12 @@ func (s *Snapshots) record(ctx context.Context, server, tool string, args map[st
 // Annotate sets EvidenceRef.Artifact on every evidence ref of findings to
 // the snapshot that supports it. Every ref must carry a company argument.
 // A ref is supported by a recorded call of the same server and tool when
-// the call's company equals the ref's, each other ref arg either equals the
-// call's argument of that name or, as with bankrec's txn_id and
-// voucher_no, names a record present in the call's result; and every one
-// of the ref's IDs is a record in the result. The first such call, in recording order,
-// wins.
+// the call's company equals the ref's, each other ref arg is satisfied by
+// the call under the rules of snapshotCall.supports (an equal recorded
+// argument, an identifier present in the result, a month or date range the
+// call's window covers, or a named descriptive arg), and every one of the
+// ref's IDs is a record in the result. The first such call, in recording
+// order, wins.
 //
 // It fails closed: if any ref has no supporting snapshot, it returns an
 // error wrapping ErrNoSnapshot and leaves findings unchanged.
@@ -202,8 +203,48 @@ func refArgs(raw json.RawMessage) (map[string]string, error) {
 	return out, nil
 }
 
+// descriptiveArgs names, per tool, the ref args that describe a finding but
+// select no evidence: the rule that fired, a service period parsed from an
+// item description, and the GST amounts and ITC flag the check computed
+// from the records. They are not compared with the call, because no call
+// records them; the records they come from must still be named by the
+// ref's IDs and be present in the snapshot. The verifier grounds amounts
+// in the snapshot's records (verify.go reads the stored snapshot, never
+// the ref's args), so no amount here is something the verifier relies on.
+//
+// The list is fixed and per tool: an arg name not listed here, not
+// recorded by the call, not a window arg (month, from, to) and not an
+// identifier indexed from the result is unknown, and fails the match.
+var descriptiveArgs = map[string]map[string]bool{
+	// rules.go (rule, service_period_start) and gstr2b.go's books side.
+	toolListPurchaseInvoices: {
+		"rule": true, "service_period_start": true,
+		"books_tax_paise": true, "igst_paise": true, "cgst_paise": true, "sgst_paise": true,
+	},
+	// gstr2b.go's 2B side.
+	toolListGSTR2BEntries: {
+		"gstr2b_tax_paise": true, "igst_paise": true, "cgst_paise": true, "sgst_paise": true,
+		"itc_available": true,
+	},
+}
+
 // supports reports whether the call's snapshot holds the evidence for a
-// ref with these canonical args and IDs.
+// ref with these canonical args and IDs. Each ref arg is satisfied by the
+// first rule that applies to its name, and a rule that applies decides:
+//
+//  1. The call recorded an argument of that name: the values are equal
+//     (company always lands here, so a ref never matches another
+//     company's call).
+//  2. The result indexes an identifier field of that name (txn_id,
+//     voucher_no, account, ...): the value is present in the result.
+//  3. month (YYYY-MM): the call's period equals it, or the call's
+//     from_date..to_date window covers the whole month.
+//  4. from and to (YYYY-MM-DD, both required): the call's from_date..to_date
+//     window covers from..to.
+//  5. The name is in descriptiveArgs for the call's tool: ignored.
+//
+// Anything else is unknown and fails. Every ID must be a record in the
+// result.
 func (c snapshotCall) supports(args map[string]string, ids []string) bool {
 	for k, v := range args {
 		if cv, ok := c.args[k]; ok {
@@ -212,12 +253,26 @@ func (c snapshotCall) supports(args map[string]string, ids []string) bool {
 			}
 			continue
 		}
-		vals, ok := c.keys[k]
-		if !ok {
-			return false
+		if vals, ok := c.keys[k]; ok {
+			s, ok := canonString(v)
+			if !ok || !vals[s] {
+				return false
+			}
+			continue
 		}
-		var s string
-		if err := json.Unmarshal([]byte(v), &s); err != nil || !vals[s] {
+		switch {
+		case k == "month":
+			if !c.coversMonth(v) {
+				return false
+			}
+		case k == "from" || k == "to":
+			from, okF := args["from"]
+			to, okT := args["to"]
+			if !okF || !okT || !c.coversRange(from, to) {
+				return false
+			}
+		case descriptiveArgs[c.tool][k]:
+		default:
 			return false
 		}
 	}
@@ -227,6 +282,74 @@ func (c snapshotCall) supports(args map[string]string, ids []string) bool {
 		}
 	}
 	return true
+}
+
+// canonString decodes a canonical JSON string value.
+func canonString(v string) (string, bool) {
+	var s string
+	if err := json.Unmarshal([]byte(v), &s); err != nil {
+		return "", false
+	}
+	return s, true
+}
+
+// canonDate decodes a canonical JSON YYYY-MM-DD string.
+func canonDate(v string) (time.Time, bool) {
+	s, ok := canonString(v)
+	if !ok {
+		return time.Time{}, false
+	}
+	t, err := time.Parse(wireDate, s)
+	if err != nil {
+		return time.Time{}, false
+	}
+	return t, true
+}
+
+// window is the call's recorded from_date..to_date, when it has both.
+func (c snapshotCall) window() (time.Time, time.Time, bool) {
+	fv, okF := c.args["from_date"]
+	tv, okT := c.args["to_date"]
+	if !okF || !okT {
+		return time.Time{}, time.Time{}, false
+	}
+	from, okF := canonDate(fv)
+	to, okT := canonDate(tv)
+	if !okF || !okT || to.Before(from) {
+		return time.Time{}, time.Time{}, false
+	}
+	return from, to, true
+}
+
+// coversMonth reports whether the call holds the whole month named by the
+// canonical JSON value v: a period-scoped call (list_gstr2b_entries) for
+// that period, or a date-range call whose window contains the month.
+func (c snapshotCall) coversMonth(v string) bool {
+	if p, ok := c.args["period"]; ok {
+		return p == v
+	}
+	m, ok := canonString(v)
+	if !ok {
+		return false
+	}
+	first, last, err := monthRange(m)
+	if err != nil {
+		return false
+	}
+	from, to, ok := c.window()
+	return ok && !first.Before(from) && !last.After(to)
+}
+
+// coversRange reports whether the call's window contains the ref's
+// from..to (canonical JSON dates).
+func (c snapshotCall) coversRange(fromV, toV string) bool {
+	rf, okF := canonDate(fromV)
+	rt, okT := canonDate(toV)
+	if !okF || !okT || rt.Before(rf) {
+		return false
+	}
+	from, to, ok := c.window()
+	return ok && !rf.Before(from) && !rt.After(to)
 }
 
 // resultIndex holds the identifiers found in one tool result.
@@ -325,6 +448,11 @@ func (b *snapshotBooks) PurchaseInvoices(ctx context.Context, company string, fr
 		idx.add("invoice", p.Name, false)
 		idx.add("supplier", p.Supplier, false)
 		idx.add("bill_no", p.BillNo, false)
+		// The item expense accounts: rules.go names the account a policy
+		// rule fired on.
+		for _, it := range p.Items {
+			idx.add("account", it.ExpenseAccount, false)
+		}
 	}
 	if err := b.snap.record(ctx, ServerBooks, toolListPurchaseInvoices, rangeArgMap(company, from, to), pis, idx); err != nil {
 		return nil, err

@@ -129,38 +129,6 @@ func (e *injEvidence) BankLines(ctx context.Context, c string, from, to time.Tim
 	return ls, nil
 }
 
-// windowArgs runs a check and rewrites its evidence args to the month
-// window the snapshot readers record. PolicyRulesCheck's refs carry
-// month, rule and account arguments that no snapshot call holds, so
-// Snapshots.Annotate refuses them inside the workflow (a gap outside this
-// ticket's files, reported with CC-1103); the detection and the keys are
-// the real check's.
-type windowArgs struct{ inner checks.Check }
-
-func (c windowArgs) Name() string { return c.inner.Name() }
-
-func (c windowArgs) Run(ctx context.Context, in checks.Inputs) ([]store.Finding, error) {
-	fs, err := c.inner.Run(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	from, to, err := monthRange(in.Month)
-	if err != nil {
-		return nil, err
-	}
-	args, err := json.Marshal(map[string]string{"company": in.Company, "from_date": argDate(from), "to_date": argDate(to)})
-	if err != nil {
-		return nil, err
-	}
-	for i := range fs {
-		fs[i].Evidence = slices.Clone(fs[i].Evidence)
-		for j := range fs[i].Evidence {
-			fs[i].Evidence[j].Args = args
-		}
-	}
-	return fs, nil
-}
-
 // (1) Each shape is detected by the check, in a remark and in a narration.
 func TestInjectionDetectedByCheck(t *testing.T) {
 	for _, sh := range injShapes {
@@ -342,7 +310,7 @@ func TestInjectionTaintsRecords(t *testing.T) {
 			r, inv, tools := newInvestigateRig(t)
 			r.wf.Books = &injBooks{remark: sh.text, journal: true}
 			r.wf.Evidence = &injEvidence{text: sh.text, txns: []string{injCharge, injCredit}}
-			r.wf.Checks = []checks.Check{&checks.BankRecCheck{}, windowArgs{&checks.PolicyRulesCheck{}}, &checks.SuspiciousTextCheck{}, glVariance{}}
+			r.wf.Checks = []checks.Check{&checks.BankRecCheck{}, &checks.PolicyRulesCheck{}, &checks.SuspiciousTextCheck{}, glVariance{}}
 			res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
 			if err != nil {
 				t.Fatalf("RunClose: %v", err)
