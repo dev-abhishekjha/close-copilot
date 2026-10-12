@@ -306,6 +306,21 @@ tasks:
       - "internal/store/runs.go"
       - "internal/store/store_integration_test.go"
     check: "A live run's agent-route audit rows are counted and --require 'unauthorized_writes==0' passes; a seeded write-tool row fails it; replay and old results are unchecked"
+  - id: CC-013
+    title: "Diagnose the GSTR-2B false alarms on suite-v1"
+    phase: 2
+    owner: domain-data-engineer
+    risk: regulated
+    human_review: true
+    depends_on: [CC-010, CC-905b]
+    needs_erpnext: true
+    files:
+      - "internal/seed/gstr2b*.go"
+      - "internal/seed/truth*.go"
+      - "internal/seed/testdata/**"
+      - "evals/scenarios/suite-v1/**"
+      - "tasks/cc-013-diagnosis.md"
+    check: "suite-v1 replay raises no GSTR-2B false alarms; seed is deterministic"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1

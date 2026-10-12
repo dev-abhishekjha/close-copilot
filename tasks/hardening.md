@@ -17,6 +17,7 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-010 Plant the other nine error types and the injection cases | 2 | domain-data-engineer | regulated | Gate C |
 | CC-011 GSTR-2B check failure on the integration path | 2 | implementer | standard | trusting `make test-int` |
 | CC-012 Measure unauthorized writes in the eval score | 2 | eval-engineer | regulated | Gate C (writes 0) |
+| CC-013 Diagnose the GSTR-2B false alarms on suite-v1 | 2 | domain-data-engineer | regulated | the `suite-v1` baseline and fixtures commit |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -253,6 +254,32 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 **Finding.** `internal/evals/score.go:148`: while `Checked` is false the count is null and any requirement on it fails, so Gate C's "unauthorized writes 0" can't be shown. CC-504a's audit log records every tool call; count calls to a write tool whose run has no approved proposal. Regulated: the eval engineer writes this, the owner reviews it.
 
 **Files.** `internal/evals/score.go`, `score_test.go`, `testdata/score/**`. Phase 2, eval-engineer, regulated.
+
+---
+
+### CC-013 · Diagnose the GSTR-2B false alarms on suite-v1
+
+**Goal.** A replay of `suite-v1` raises no GSTR-2B finding the ground truth doesn't list, so `precision` can be baselined. Today, `make eval-replay SUITE=suite-v1` (results `results/suite-v1/20261012T111528Z`, fixtures still untracked) gives recall 40/40 but precision 59/81 (72.8%) and 22 false alarms.
+
+**Finding.** 21 of the 22 are GSTR-2B findings with two separate causes. Diagnose each before changing anything; the fix may be in the seeder, the truth builder or the check.
+1. **`gstr2b_wrong_period`: 6 false alarms, all one month off.** The check (`internal/checks/gstr2b.go:213-226`) raises it in the invoice's books month M, when the invoice is missing from M's 2B but is in M-1's or M+1's. The ground truth lists it as an `expected` item in the month whose 2B holds the late invoice, which is M+1. Every false alarm has its truth entry one month later: mehta 07 `LTS2026742` (truth in 08), mehta 08 `FBR2026804` (09), sharma 06 `VNT2026631` (07, and it is the one `clean_month` false alarm), sharma 07 `SWF2026735` (08), sharma 08 `SWF2026813` and `SWF2026815` (09). Decide which side is right: file the truth under the books month, or change what the check reports. Truth is protected; the owner approves any change to it.
+2. **`gstr2b_missing_in_books`: 15 false alarms, all sharma 2026-08.** The fixture's August 2B has 36 entries; the purchase invoices the check read (window 2026-07-01 to 2026-09-30) hold 24 invoices dated August, and 15 of the 2B entries have no matching invoice in that window (for example `BHR/2026/0819`, `OMK/2026/0808`, `VNT/2026/0840`). None is in the truth; only `LDG2026804` is planted. Candidate causes, in order of cost to check: (a) ERPNext held the `--small` August books (CC-304's tests posted them; see the seeder-open-risks memory) when the fixtures were recorded, while the 2B was built from the full world; (b) the seeder skipped posting some invoices the 2B writer still emitted; (c) the key differs (`evidence.NormInvoiceNo`, bill date against posting date). Compare the world's August purchases, the ERPNext Purchase Invoices and the 2B file before choosing.
+
+**Not in this ticket.** One more false alarm, `unrecorded_bank_charge` for `BNK-20260904-001` in sharma 2026-09, is a bank-rec finding and needs its own look. The re-record, the replay, the `suite-v1` fixtures and `evals/baseline.json` are a follow-up: fixtures and baseline go in together, and the baseline in its own `baseline-update` commit.
+
+**Subtasks**
+- Write up the cause of each of the two symptoms with the evidence (counts, keys, the fixture or ERPNext rows that show it) in the spec's Notes or `tasks/`.
+- Fix the cause in the seeder or truth builder, with a unit test that fails on today's behaviour. If the fix belongs in `internal/checks`, stop and split a standard implementer ticket.
+- Regenerate `evals/scenarios/suite-v1/ground_truth/**` only if the owner approves the change.
+- Replay the existing fixtures with `make eval-replay SUITE=suite-v1` and report the counts; recording against ERPNext is the follow-up.
+
+**Acceptance**
+- Each symptom has a stated cause backed by data, not inference.
+- After the fix, a re-seed plus replay shows 0 `gstr2b_wrong_period` false alarms and 0 `gstr2b_missing_in_books` false alarms beyond planted items, or the ticket lists what remains and why.
+- `seed` stays deterministic: two runs give byte-identical output and truth.
+- `make check` passes.
+
+**Files.** `internal/seed/gstr2b*.go`, `truth*.go`, `testdata/**`, `evals/scenarios/suite-v1/**` (protected: owner approves). Phase 2, domain-data-engineer, regulated, needs the ERPNext lock for any live re-seed.
 
 ---
 
