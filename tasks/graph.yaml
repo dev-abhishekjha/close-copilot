@@ -256,12 +256,6 @@ tasks:
     files:
       - "internal/seed/plant*.go"
       - "internal/seed/truth.go"
-      - "internal/seed/truth_test.go"
-      - "internal/seed/books.go"
-      - "internal/seed/books_test.go"
-      - "cmd/seed/main_test.go"
-      - "cmd/seed/main.go"
-      - "evals/schema/**"
       - "internal/seed/testdata/**"
       - "evals/scenarios/**"
     check: "seed all --suite suite-v1 plants 40 errors across 10 types; ground truth validates; two runs are identical"
