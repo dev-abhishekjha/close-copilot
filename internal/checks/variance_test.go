@@ -24,6 +24,9 @@ type varianceBooks struct {
 	tbErr   error
 	glErr   error
 	histErr error
+	pi      []ledger.PurchaseInvoice
+	piErr   error
+	piCalls int
 }
 
 func (f *varianceBooks) TrialBalance(context.Context, string, time.Time, time.Time) (ledger.TB, error) {
@@ -33,7 +36,8 @@ func (f *varianceBooks) GLEntries(context.Context, string, time.Time, time.Time)
 	return f.gl, f.glErr
 }
 func (f *varianceBooks) PurchaseInvoices(context.Context, string, time.Time, time.Time) ([]ledger.PurchaseInvoice, error) {
-	return nil, nil
+	f.piCalls++
+	return f.pi, f.piErr
 }
 func (f *varianceBooks) SalesInvoices(context.Context, string, time.Time, time.Time) ([]ledger.SalesInvoice, error) {
 	return nil, nil
@@ -205,6 +209,7 @@ func TestVarianceEvidence(t *testing.T) {
 		vrGL("GL-C", acct, 99999999, 0, "Purchase Invoice", "PINV-X", true),
 		vrGL("GL-O", "Other", 99999999, 0, "Purchase Invoice", "PINV-O", false),
 	}
+	b.pi = []ledger.PurchaseInvoice{{Name: "PINV-1"}, {Name: "PINV-2"}, {Name: "PINV-X"}}
 	got, err := (&VarianceCheck{}).Run(context.Background(), vrInputs(b))
 	if err != nil || len(got) != 1 {
 		t.Fatalf("got %v, %v", got, err)
@@ -229,6 +234,43 @@ func TestVarianceEvidence(t *testing.T) {
 	}
 }
 
+func TestVarianceDropsInvoicesNotRead(t *testing.T) {
+	acct := "A"
+	b := vrOne(acct, "Expense", 0, 0, 0, 100000)
+	b.gl = []ledger.GLEntry{
+		vrGL("GL-1", acct, 9000, 0, "Purchase Invoice", "PINV-1", false),
+		vrGL("GL-2", acct, 8000, 0, "Purchase Invoice", "PINV-2", false),
+	}
+	b.pi = []ledger.PurchaseInvoice{{Name: "PINV-2"}}
+	got, err := (&VarianceCheck{}).Run(context.Background(), vrInputs(b))
+	if err != nil || len(got) != 1 || len(got[0].Evidence) != 3 {
+		t.Fatalf("got %+v, %v", got, err)
+	}
+	if ids := got[0].Evidence[2].IDs; !slices.Equal(ids, []string{"PINV-2"}) {
+		t.Errorf("ids = %v", ids)
+	}
+	b.pi = nil
+	got, _ = (&VarianceCheck{}).Run(context.Background(), vrInputs(b))
+	if len(got) != 1 || len(got[0].Evidence) != 2 {
+		t.Errorf("no invoices read: evidence = %+v", got)
+	}
+}
+
+func TestVarianceReadsInvoicesOnlyWhenFlagged(t *testing.T) {
+	b := vrOne("A", "Expense", 10000, 10000, 10000, 10000)
+	if got, err := (&VarianceCheck{}).Run(context.Background(), vrInputs(b)); err != nil || len(got) != 0 || b.piCalls != 0 {
+		t.Errorf("unflagged: got %v, %v, calls %d", got, err, b.piCalls)
+	}
+	b = &varianceBooks{hist: map[string][]ledger.MonthTotal{}}
+	for _, a := range []string{"A", "B"} {
+		b.tb.Rows = append(b.tb.Rows, vrRow(a, ledger.RootTypeExpense))
+		b.hist[a] = vrHist(0, 0, 0, 100000)
+	}
+	if got, err := (&VarianceCheck{}).Run(context.Background(), vrInputs(b)); err != nil || len(got) != 2 || b.piCalls != 1 {
+		t.Errorf("flagged: got %d, %v, calls %d", len(got), err, b.piCalls)
+	}
+}
+
 func TestVarianceNoInvoiceEvidenceWithoutPurchaseVouchers(t *testing.T) {
 	b := vrOne("A", "Expense", 0, 0, 0, 100000)
 	b.gl = []ledger.GLEntry{vrGL("GL-1", "A", 100, 0, "Journal Entry", "JV-1", false)}
@@ -246,6 +288,7 @@ func TestVarianceErrors(t *testing.T) {
 		isErr error
 	}{
 		{"trial balance", func(b *varianceBooks, _ *Inputs) { b.tbErr = boom }, boom},
+		{"purchase invoices", func(b *varianceBooks, _ *Inputs) { b.piErr = boom }, boom},
 		{"gl entries", func(b *varianceBooks, _ *Inputs) { b.glErr = boom }, boom},
 		{"history", func(b *varianceBooks, _ *Inputs) { b.histErr = boom }, boom},
 		{"bad month", func(_ *varianceBooks, in *Inputs) { in.Month = "2026-13" }, nil},
@@ -362,6 +405,7 @@ func TestVarianceFourPrepaidCasesLinked(t *testing.T) {
 		b.tb.Rows = append(b.tb.Rows, vrRow(acct, ledger.RootTypeExpense))
 		b.hist[acct] = vrHist(10000, 10000, 10000, 1210000)
 		b.gl = append(b.gl, vrGL(fmt.Sprintf("GL-%d", i), acct, 121000000, 0, "Purchase Invoice", inv, false))
+		b.pi = append(b.pi, ledger.PurchaseInvoice{Name: inv})
 		prepaids = append(prepaids, vrFinding(TypePrepaidNotSpread, map[string]string{"invoice": inv}))
 	}
 	vs, err := (&VarianceCheck{}).Run(context.Background(), vrInputs(b))

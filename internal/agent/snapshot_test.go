@@ -723,9 +723,9 @@ func TestSnapshotAnnotateGSTR2BPeriod(t *testing.T) {
 }
 
 // A variance on an account posted from purchase invoices cites
-// list_purchase_invoices, which VarianceCheck itself never reads: inside a
-// variance-only step that ref has no snapshot and the step fails closed.
-// Once the step has read the month's invoices, the same ref annotates.
+// list_purchase_invoices. VarianceCheck reads the month's invoices itself, so
+// the ref has a snapshot inside a variance-only step and Annotate succeeds on
+// the first call.
 func TestSnapshotAnnotateVarianceInvoiceRef(t *testing.T) {
 	fs := newFakeArtifactStore()
 	books := &checkBooks{invoiceVoucher: true}
@@ -733,18 +733,13 @@ func TestSnapshotAnnotateVarianceInvoiceRef(t *testing.T) {
 	if len(findings) != 1 || len(findings[0].Evidence) != 3 || findings[0].Evidence[2].Tool != toolListPurchaseInvoices {
 		t.Fatalf("variance findings %+v, want one citing purchase invoices", findings)
 	}
-	if err := snap.Annotate(findings); !errors.Is(err, ErrNoSnapshot) {
-		t.Fatalf("Annotate without a purchase-invoice read: %v, want ErrNoSnapshot", err)
-	}
-	if findings[0].Evidence[0].Artifact != "" {
-		t.Fatal("a failed Annotate changed the finding")
-	}
-	from, to, _ := monthRange(synthMonth)
-	if _, err := SnapshotBooks(books, snap).PurchaseInvoices(context.Background(), synthCompany, from, to); err != nil {
-		t.Fatal(err)
-	}
 	if err := snap.Annotate(findings); err != nil {
-		t.Fatalf("Annotate after the read: %v", err)
+		t.Fatalf("Annotate: %v", err)
+	}
+	for i, ev := range findings[0].Evidence {
+		if ev.Artifact == "" {
+			t.Errorf("evidence %d (%s) has no artifact", i, ev.Tool)
+		}
 	}
 }
 
