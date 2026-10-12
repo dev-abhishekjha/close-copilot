@@ -352,6 +352,171 @@ func TestBaselineOutputGuard(t *testing.T) {
 	}
 }
 
+// dotDotRepo builds the G5 probe from CC-018 in a temp repo and changes
+// into it: out/l -> evals/scenarios/sub, out/l2 -> evals/sub2 and a
+// dangling out/d -> evals/scenarios/new. It returns the root.
+func dotDotRepo(t *testing.T) string {
+	t.Helper()
+	root := t.TempDir()
+	for _, d := range dotDotDirs {
+		if err := os.MkdirAll(filepath.Join(root, d), 0o750); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for link, target := range map[string]string{
+		"out/l":  "evals/scenarios/sub",
+		"out/l2": "evals/sub2",
+		"out/d":  "evals/scenarios/new", // missing: a dangling link
+	} {
+		if err := os.Symlink(filepath.Join(root, target), filepath.Join(root, link)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	t.Chdir(root)
+	return root
+}
+
+// dotDotDirs are the folders dotDotRepo creates; evals/ and gates/ hold
+// nothing else unless something was written there.
+var dotDotDirs = []string{"evals/scenarios/sub", "evals/sub2", "evals/golden", "gates", "tmp", "out/ok", "out/a..b"}
+
+// assertProtectedUntouched fails if anything but dotDotRepo's own folders
+// exists under evals/ or gates/: no file, temp file or MkdirAll leftover.
+func assertProtectedUntouched(t *testing.T, root string) {
+	t.Helper()
+	want := map[string]bool{"evals": true, "evals/scenarios": true, "gates": true}
+	for _, d := range dotDotDirs {
+		want[d] = true
+	}
+	for _, top := range []string{"evals", "gates"} {
+		err := filepath.WalkDir(filepath.Join(root, top), func(p string, _ os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			rel, err := filepath.Rel(root, p)
+			if err != nil {
+				return err
+			}
+			if !want[filepath.ToSlash(rel)] {
+				t.Errorf("written under a protected folder: %s", rel)
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+}
+
+// TestCheckOutputPathDotDotSymlink: a path with a ".." component is
+// refused, so "link/.." can't reach a protected folder by the OS walking
+// it through the link while the check cleaned it as text.
+func TestCheckOutputPathDotDotSymlink(t *testing.T) {
+	b, err := NewBaseline(scoreDir(t, "run-pass"), nil, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := dotDotRepo(t)
+	tests := []struct {
+		path string
+		want error // nil: allowed
+	}{
+		{"out/l/../x.json", ErrProtectedOutput},
+		// Cleans to out/baseline.json: only the .. rule catches it.
+		{"out/l2/../baseline.json", ErrProtectedOutput},
+		{"out/l/..", ErrProtectedOutput},
+		{"out/l/../", ErrProtectedOutput},
+		{"out/l/../new/deeper/x.json", ErrProtectedOutput},
+		{"tmp/../evals/golden/x", ErrProtectedOutput},
+		{"tmp/../out/ok/x.json", ErrProtectedOutput},
+		{"../x.json", ErrProtectedOutput},
+		{"out/ok/..//x.json", ErrProtectedOutput},
+		{root + "/out/l/../x.json", ErrProtectedOutput},
+		{root + "/out/l2/../baseline.json", ErrProtectedOutput},
+		// Still the baseline error when the path itself cleans to it.
+		{"out/../evals/baseline.json", ErrProtectedBaseline},
+		{"out/a..b/x.json", nil},
+		{"out/ok/x.json", nil},
+		{"out/ok/.hidden", nil},
+		{"out/ok/...", nil},
+		{"out/ok/..x/y.json", nil},
+		{"./out/ok/x.json", nil},
+		{root + "/out/ok/x.json", nil},
+	}
+	for _, tt := range tests {
+		err := CheckOutputPath("--out", tt.path)
+		switch {
+		case tt.want == nil && err != nil:
+			t.Errorf("CheckOutputPath(%q) = %v, want nil", tt.path, err)
+		case tt.want != nil && !errors.Is(err, tt.want):
+			t.Errorf("CheckOutputPath(%q) = %v, want %v", tt.path, err, tt.want)
+		case tt.want != nil && (!strings.Contains(err.Error(), "--out") || !strings.Contains(err.Error(), tt.path)):
+			t.Errorf("CheckOutputPath(%q) = %v, want the flag and path named", tt.path, err)
+		}
+	}
+
+	// A dangling link: a write through it is refused or fails, and nothing
+	// appears under evals/scenarios/.
+	for _, p := range []string{"out/d/x.json", "out/d/new/x.json"} {
+		if err := WriteBaseline(p, b); err == nil {
+			t.Errorf("WriteBaseline(%q) through a dangling link succeeded", p)
+		}
+		if err := WriteNoise(p, Noise{Suite: "suite-test", Runs: 2, Spread: map[string]int64{}}); err == nil {
+			t.Errorf("WriteNoise(%q) through a dangling link succeeded", p)
+		}
+	}
+
+	// The allowed paths still write.
+	if err := WriteBaseline("out/a..b/x.json", b); err != nil {
+		t.Errorf("WriteBaseline out/a..b/x.json: %v", err)
+	}
+	if err := WriteNoise("out/ok/x.json", Noise{Suite: "suite-test", Runs: 2, Spread: map[string]int64{}}); err != nil {
+		t.Errorf("WriteNoise out/ok/x.json: %v", err)
+	}
+	assertProtectedUntouched(t, root)
+}
+
+// TestWriteBaselineRefusesDotDotSymlink: the CC-018 probe. Before the fix
+// out/l/../x.json wrote evals/scenarios/x.json and out/l2/../baseline.json
+// created evals/baseline.json.
+func TestWriteBaselineRefusesDotDotSymlink(t *testing.T) {
+	b, err := NewBaseline(scoreDir(t, "run-pass"), nil, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	root := dotDotRepo(t)
+	for _, p := range []string{"out/l/../x.json", "out/l2/../baseline.json", root + "/out/l/../x.json", root + "/out/l2/../baseline.json"} {
+		err := WriteBaseline(p, b)
+		if !errors.Is(err, ErrProtectedOutput) || !strings.Contains(err.Error(), "--baseline-out") {
+			t.Errorf("WriteBaseline(%q) = %v, want ErrProtectedOutput naming --baseline-out", p, err)
+		}
+	}
+	for _, p := range []string{"evals/scenarios/x.json", "evals/baseline.json"} {
+		if _, err := os.Lstat(filepath.Join(root, p)); !os.IsNotExist(err) {
+			t.Errorf("%s exists: %v", p, err)
+		}
+	}
+	assertProtectedUntouched(t, root)
+}
+
+// TestWriteNoiseRefusesDotDotSymlink: the same probe through noise --out.
+func TestWriteNoiseRefusesDotDotSymlink(t *testing.T) {
+	root := dotDotRepo(t)
+	n := Noise{Suite: "suite-test", Runs: 2, Spread: map[string]int64{"verified": 1}}
+	for _, p := range []string{"out/l/../x.json", "out/l2/../baseline.json", root + "/out/l/../x.json", root + "/out/l2/../baseline.json"} {
+		err := WriteNoise(p, n)
+		if !errors.Is(err, ErrProtectedOutput) || !strings.Contains(err.Error(), "noise --out") {
+			t.Errorf("WriteNoise(%q) = %v, want ErrProtectedOutput naming noise --out", p, err)
+		}
+	}
+	for _, p := range []string{"evals/scenarios/x.json", "evals/baseline.json"} {
+		if _, err := os.Lstat(filepath.Join(root, p)); !os.IsNotExist(err) {
+			t.Errorf("%s exists: %v", p, err)
+		}
+	}
+	assertProtectedUntouched(t, root)
+}
+
 // TestBaselineTiers round-trips a replay section, then an llm section, in
 // one file, and checks both survive and that version 1 is rejected.
 func TestBaselineTiers(t *testing.T) {
@@ -609,6 +774,15 @@ func TestLoadBaselineV3Invalid(t *testing.T) {
 	if _, err := LoadBaseline(p); err != nil {
 		t.Fatalf("valid file rejected: %v", err)
 	}
+	// The version 2 duplicate-key cases below differ from this file only by
+	// the repeat.
+	okV2 := filepath.Join(dir, "okv2.json")
+	if err := os.WriteFile(okV2, []byte(`{"version":2,"tiers":{"replay":{"suite":"suite-test","items":{}},"llm":null}}`), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := LoadBaseline(okV2); err != nil {
+		t.Fatalf("valid version 2 file rejected: %v", err)
+	}
 	for name, c := range map[string]struct{ body, want string }{
 		"nosuites":    {`{"version":3}`, "suites"},
 		"nullsuites":  {`{"version":3,"suites":null}`, "suites"},
@@ -624,6 +798,16 @@ func TestLoadBaselineV3Invalid(t *testing.T) {
 		"trailing":    {ok + ` {}`, "trailing"},
 		"version1":    {`{"version":1,"suite":"suite-test","items":{}}`, "version 1"},
 		"version4":    {`{"version":4,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, "version 4"},
+		// A repeated key: the last copy would win silently.
+		"dupsuite": {`{"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null},` +
+			`"suite-test":{"replay":{"suite":"suite-test","items":{"x":{}}},"llm":null}}}`, `duplicate key "suite-test"`},
+		"dupreplay": {`{"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},` +
+			`"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, `duplicate key "replay"`},
+		"dupsuites":  {`{"version":3,"suites":{},"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, `duplicate key "suites"`},
+		"dupversion": {`{"version":3,"version":3,"suites":{"suite-test":{"replay":{"suite":"suite-test","items":{}},"llm":null}}}`, `duplicate key "version"`},
+		"dupv2tiers": {`{"version":2,"tiers":{"replay":{"suite":"suite-test","items":{}},"llm":null},` +
+			`"tiers":{"replay":{"suite":"suite-test","items":{}},"llm":null}}`, `duplicate key "tiers"`},
+		"dupv2replay": {`{"version":2,"tiers":{"replay":{"suite":"suite-test","items":{}},"replay":null,"llm":null}}`, `duplicate key "replay"`},
 	} {
 		p := filepath.Join(dir, name+".json")
 		if err := os.WriteFile(p, []byte(c.body), 0o600); err != nil {

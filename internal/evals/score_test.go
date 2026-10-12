@@ -569,6 +569,89 @@ func TestScoreRoundTrip(t *testing.T) {
 	}
 }
 
+// TestReadStrictDuplicateKey: a key repeated within one object, at any
+// depth, is refused with the key and the file named; the same key in two
+// different objects is fine.
+func TestReadStrictDuplicateKey(t *testing.T) {
+	dir := t.TempDir()
+	write := func(name, body string) string {
+		t.Helper()
+		p := filepath.Join(dir, name)
+		if err := os.WriteFile(p, []byte(body), 0o600); err != nil {
+			t.Fatal(err)
+		}
+		return p
+	}
+	for name, c := range map[string]struct{ body, dup string }{
+		"top":         {`{"a":1,"b":2,"a":3}`, "a"},
+		"nested":      {`{"a":{"b":1,"c":{"d":1,"e":[],"d":2}}}`, "d"},
+		"inarray":     {`{"a":[{"x":1},{"y":1,"z":{},"y":2}]}`, "y"},
+		"toparray":    {`[{"k":1},[{"k":1,"k":1}]]`, "k"},
+		"objectvalue": {`{"a":{"x":1},"a":{"x":1}}`, "a"},
+		"escaped":     {`{"x":1,"x":2}`, "x"},
+		"emptykey":    {`{"":1,"":2}`, ""},
+		"afternested": {`{"a":{"b":{"c":1}},"d":[1,[2,{}]],"a":null}`, "a"},
+	} {
+		p := write(name+".json", c.body)
+		var v any
+		err := readStrict(p, &v)
+		if want := fmt.Sprintf("duplicate key %q", c.dup); err == nil || !strings.Contains(err.Error(), want) || !strings.Contains(err.Error(), p) {
+			t.Errorf("%s = %v, want an error naming %s and %s", name, err, want, p)
+		}
+	}
+	for name, body := range map[string]string{
+		"clean":    `{"a":1,"b":{"c":[1,2,{"d":null}]},"e":"a"}`,
+		"siblings": `{"a":{"x":1},"b":{"x":2},"c":[{"x":1},{"x":2}],"d":{"a":{"a":1}}}`,
+		"case":     `{"a":1,"A":2}`,
+		"empty":    `{"a":{},"b":[],"c":[{},{}]}`,
+		"scalar":   `"a"`,
+	} {
+		p := write(name+".json", body)
+		var v any
+		if err := readStrict(p, &v); err != nil {
+			t.Errorf("%s rejected: %v", name, err)
+		}
+	}
+	// Malformed and trailing data are still reported as before.
+	var v any
+	if err := readStrict(write("bad.json", `{"a":1,`), &v); err == nil || !strings.Contains(err.Error(), "decode") {
+		t.Errorf("malformed = %v", err)
+	}
+	if err := readStrict(write("trail.json", `{"a":1} {"a":1}`), &v); err == nil || !strings.Contains(err.Error(), "trailing") {
+		t.Errorf("trailing = %v", err)
+	}
+
+	// Through LoadScore: a clean score.json loads, a repeated key doesn't.
+	sdir := t.TempDir()
+	if err := WriteScore(sdir, scoreDir(t, "run-pass")); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(filepath.Join(sdir, ScoreJSONFile))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := LoadScore(filepath.Join(sdir, ScoreJSONFile)); err != nil {
+		t.Fatalf("clean score rejected: %v", err)
+	}
+	dupScore := write("score.json", strings.Replace(string(raw), "{", `{"suite":"suite-other",`, 1))
+	if _, err := LoadScore(dupScore); err == nil || !strings.Contains(err.Error(), `duplicate key "suite"`) {
+		t.Errorf("LoadScore with a repeated suite = %v", err)
+	}
+
+	// Through LoadNoise: top level and inside spread.
+	if _, err := LoadNoise(write("noise-ok.json", `{"suite":"suite-test","runs":2,"spread":{"verified":1}}`)); err != nil {
+		t.Fatalf("clean noise rejected: %v", err)
+	}
+	for name, c := range map[string]struct{ body, dup string }{
+		"noise-runs":   {`{"suite":"suite-test","runs":2,"spread":{"verified":1},"runs":5}`, "runs"},
+		"noise-spread": {`{"suite":"suite-test","runs":2,"spread":{"verified":1,"verified":0}}`, "verified"},
+	} {
+		if _, err := LoadNoise(write(name+".json", c.body)); err == nil || !strings.Contains(err.Error(), fmt.Sprintf("duplicate key %q", c.dup)) {
+			t.Errorf("LoadNoise %s = %v", name, err)
+		}
+	}
+}
+
 // TestScoreNoFloatOrGradedImports keeps the scorer independent of the code
 // it grades and free of floating point.
 func TestScoreNoFloatOrGradedImports(t *testing.T) {

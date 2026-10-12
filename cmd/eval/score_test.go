@@ -376,3 +376,87 @@ func TestScoreCLIProtectedOutputs(t *testing.T) {
 		t.Errorf("evals/baseline.json: %v", err)
 	}
 }
+
+// TestScoreCLIDotDotSymlink: the CC-018 probe through the CLI. With
+// out/l -> evals/scenarios/sub and out/l2 -> evals/sub2, a "link/.." in
+// --out, --baseline-out or noise --out is refused before anything is
+// written or any folder is created. Paths are concatenated, not joined:
+// filepath.Join would clean the ".." away before the code saw it.
+func TestScoreCLIDotDotSymlink(t *testing.T) {
+	truth := filepath.Join(scoreData, "truth")
+	run := filepath.Join(scoreData, "run-pass")
+	root := t.TempDir()
+	dirs := []string{"evals/scenarios/sub", "evals/sub2", "evals/golden", "gates", "tmp", "out"}
+	for _, d := range dirs {
+		if err := os.MkdirAll(filepath.Join(root, d), 0o750); err != nil {
+			t.Fatal(err)
+		}
+	}
+	for link, target := range map[string]string{"out/l": "evals/scenarios/sub", "out/l2": "evals/sub2"} {
+		if err := os.Symlink(filepath.Join(root, target), filepath.Join(root, link)); err != nil {
+			t.Fatal(err)
+		}
+	}
+	pricing := filepath.Join(root, "tmp", "pricing.yaml")
+	if err := os.WriteFile(pricing, []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+
+	for _, out := range []string{root + "/out/l/../x", root + "/out/l2/../score", root + "/out/l/../new/deeper"} {
+		code, _, errText := runCLI(t, "score", run, "--truth-dir", truth, "--out", out)
+		if code == 0 || !strings.Contains(errText, "refusing --out") {
+			t.Errorf("score --out %s: exit %d, %s", out, code, errText)
+		}
+	}
+	for _, bo := range []string{root + "/out/l2/../baseline.json", root + "/out/l/../b.json"} {
+		code, _, errText := runCLI(t, "score", run, "--truth-dir", truth, "--out", filepath.Join(root, "tmp", "s"),
+			"--baseline-out", bo, "--pricing", pricing)
+		if code == 0 || !strings.Contains(errText, "refusing --baseline-out") {
+			t.Errorf("score --baseline-out %s: exit %d, %s", bo, code, errText)
+		}
+	}
+
+	a, b := filepath.Join(root, "tmp", "a"), filepath.Join(root, "tmp", "b")
+	for _, d := range []string{a, b} {
+		if code, _, errText := runCLI(t, "score", run, "--truth-dir", truth, "--out", d); code != 0 {
+			t.Fatalf("score --out %s: %s", d, errText)
+		}
+	}
+	for _, out := range []string{root + "/out/l/../n.json", root + "/out/l2/../baseline.json"} {
+		code, _, errText := runCLI(t, "noise", filepath.Join(a, "score.json"), filepath.Join(b, "score.json"), "--out", out)
+		if code == 0 || !strings.Contains(errText, "refusing --out") {
+			t.Errorf("noise --out %s: exit %d, %s", out, code, errText)
+		}
+	}
+
+	// Nothing under evals/ or gates/ but the folders made above: no file,
+	// no temp file, no MkdirAll leftover.
+	want := map[string]bool{"evals": true, "evals/scenarios": true}
+	for _, d := range dirs {
+		want[d] = true
+	}
+	for _, top := range []string{"evals", "gates"} {
+		err := filepath.WalkDir(filepath.Join(root, top), func(p string, _ os.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			rel, err := filepath.Rel(root, p)
+			if err != nil {
+				return err
+			}
+			if !want[filepath.ToSlash(rel)] {
+				t.Errorf("written under a protected folder: %s", rel)
+			}
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Nor where the cleaned paths point (out/x, out/score, out/new).
+	for _, p := range []string{"out/x", "out/score", "out/new", "out/baseline.json", "out/n.json", "out/b.json"} {
+		if _, err := os.Lstat(filepath.Join(root, p)); !os.IsNotExist(err) {
+			t.Errorf("%s exists: %v", p, err)
+		}
+	}
+}
