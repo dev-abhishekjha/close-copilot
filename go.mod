@@ -39,7 +39,10 @@ require (
 	golang.org/x/vuln v1.8.0 // indirect
 )
 
-require golang.org/x/sync v0.23.0
+require (
+	codeberg.org/go-pdf/fpdf v0.12.0
+	golang.org/x/sync v0.23.0
+)
 
 require (
 	dario.cat/mergo v1.0.2 // indirect
