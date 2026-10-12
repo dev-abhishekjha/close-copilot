@@ -32,16 +32,23 @@
 // configuration.
 //
 //	seed plant [--company sharma --month 2026-09] [--suite suite-skeleton] [--small]
-//	           [--config config/companies] [--scenarios evals/scenarios] [--out evals]
+//	           [--config config/companies] [--rules config/rules.yaml]
+//	           [--scenarios evals/scenarios] [--out evals] [--maps data/out]
 //
-// applies planted errors to the world and writes ground truth JSON (CC-306).
+// applies planted errors to the world and writes ground truth JSON (CC-306,
+// CC-010). It splits the suite's error counts across the evaluated months
+// and resolves ERPNext names through <maps>/<suite>/<company>-<month>/
+// erp_map.json and <maps>/<suite>/<company>-bootstrap.json, which seed all
+// writes; without a bootstrap report supplier names are the profile's.
 //
 //	seed all [--suite suite-skeleton] [--small] [--config config/companies]
-//	         [--scenarios evals/scenarios] [--out <dir>] [--expect-no-changes]
+//	         [--rules config/rules.yaml] [--scenarios evals/scenarios] [--out <dir>]
+//	         [--expect-no-changes]
 //
 // rebuilds everything for all companies and months defined in the suite:
-// bootstraps masters, posts books to ERPNext, writes bank.csv and gstr2b.json,
-// and emits ground truth (CC-307).
+// bootstraps masters, posts the planted books to ERPNext month by month,
+// writes bank.csv and gstr2b.json, and emits ground truth for the clean
+// control and the evaluated months (CC-307, CC-010).
 package main
 
 import (
@@ -386,6 +393,68 @@ type plantSummary struct {
 	ErrorsCount int      `json:"errors_count"`
 }
 
+// suiteTargets are the suite's ground-truth months: the clean control,
+// then every evaluated company-month, in the suite file's order.
+func suiteTargets(cfg seed.ScenarioConfig) []seed.CompanyMonth {
+	var out []seed.CompanyMonth
+	if cfg.CleanControl.Company != "" && cfg.CleanControl.Month != "" {
+		out = append(out, seed.CompanyMonth{Company: cfg.CleanControl.Company, Month: cfg.CleanControl.Month})
+	}
+	for _, ev := range cfg.Evaluated {
+		for _, m := range ev.Months {
+			out = append(out, seed.CompanyMonth{Company: ev.Company, Month: m})
+		}
+	}
+	return out
+}
+
+// loadPlantRules reads the rules file; an empty path means rules.yaml next
+// to the profiles directory (config/rules.yaml for config/companies).
+func loadPlantRules(path, configDir string) (seed.PlantRules, error) {
+	if path == "" {
+		path = filepath.Join(filepath.Dir(filepath.Clean(configDir)), "rules.yaml")
+	}
+	r, err := seed.LoadRules(path)
+	if err != nil {
+		return seed.PlantRules{}, err
+	}
+	return seed.PlantRulesFrom(r), nil
+}
+
+// newSuitePlanter loads the named companies' profiles and the rules and
+// returns the suite planter both plant and all use.
+func newSuitePlanter(cfg seed.ScenarioConfig, configDir, rulesPath string, companies []string, small bool) (*seed.SuitePlanter, map[string]seed.Profile, error) {
+	profiles := make(map[string]seed.Profile, len(companies))
+	for _, c := range companies {
+		p, err := loadCompany(configDir, c)
+		if err != nil {
+			return nil, nil, fmt.Errorf("load company %s: %w", c, err)
+		}
+		profiles[c] = p
+	}
+	rules, err := loadPlantRules(rulesPath, configDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	sp := seed.NewSuitePlanter(cfg, profiles, seed.Options{Small: small})
+	sp.UseRules(rules)
+	return sp, profiles, nil
+}
+
+// loadIfExists loads path with load, and returns ok false when the file
+// does not exist.
+func loadIfExists[T any](path string, load func(string) (T, error)) (T, bool, error) {
+	var zero T
+	if _, err := os.Stat(path); errors.Is(err, os.ErrNotExist) {
+		return zero, false, nil
+	}
+	v, err := load(path)
+	if err != nil {
+		return zero, false, err
+	}
+	return v, true, nil
+}
+
 func runPlant(args []string, stdout io.Writer) error {
 	fs := flag.NewFlagSet("seed plant", flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
@@ -394,9 +463,10 @@ func runPlant(args []string, stdout io.Writer) error {
 	suite := fs.String("suite", "suite-skeleton", "eval suite scenario name")
 	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
 	configDir := fs.String("config", "config/companies", "directory of company profiles")
+	rulesPath := fs.String("rules", "", "rules file (default: rules.yaml next to --config)")
 	scenariosDir := fs.String("scenarios", "evals/scenarios", "directory of suite scenario definitions")
 	out := fs.String("out", "evals", "output root directory for ground truth")
-	mapsDir := fs.String("maps", "data/out", "root directory of erp maps")
+	mapsDir := fs.String("maps", "data/out", "root of the erp maps and bootstrap reports seed all wrote")
 	if err := fs.Parse(args); err != nil {
 		return fmt.Errorf("plant: %w", err)
 	}
@@ -414,50 +484,32 @@ func runPlant(args []string, stdout io.Writer) error {
 		}
 	}
 	isSmall := *small || suiteCfg.Small
+	suiteCfg.Small = isSmall
 
-	type targetCM struct {
-		company, month string
-	}
-	var targets []targetCM
+	var targets []seed.CompanyMonth
 	if *company != "" && *month != "" {
-		targets = append(targets, targetCM{*company, *month})
+		targets = append(targets, seed.CompanyMonth{Company: *company, Month: *month})
 	} else {
-		if suiteCfg.CleanControl.Company != "" && suiteCfg.CleanControl.Month != "" {
-			targets = append(targets, targetCM{suiteCfg.CleanControl.Company, suiteCfg.CleanControl.Month})
-		}
-		for _, ev := range suiteCfg.Evaluated {
-			for _, m := range ev.Months {
-				targets = append(targets, targetCM{ev.Company, m})
-			}
-		}
+		targets = suiteTargets(suiteCfg)
 	}
-
 	if len(targets) == 0 {
 		return errors.New("plant: no company-month targets found")
+	}
+	var companies []string
+	for _, tgt := range targets {
+		if !slices.Contains(companies, tgt.Company) {
+			companies = append(companies, tgt.Company)
+		}
+	}
+	sp, profiles, err := newSuitePlanter(suiteCfg, *configDir, *rulesPath, companies, isSmall)
+	if err != nil {
+		return fmt.Errorf("plant: %w", err)
 	}
 
 	var writtenFiles []string
 	totalErrors := 0
-
 	for _, tgt := range targets {
-		p, err := loadCompany(*configDir, tgt.company)
-		if err != nil {
-			return fmt.Errorf("plant load company: %w", err)
-		}
-		start, err := seed.ParseMonth(tgt.month)
-		if err != nil {
-			return fmt.Errorf("plant parse month: %w", err)
-		}
-		prevMonth := start.AddDate(0, -1, 0).Format("2006-01")
-		prev, err := seed.Generate(p, prevMonth, seed.Options{Small: isSmall})
-		if err != nil {
-			return fmt.Errorf("plant prev world: %w", err)
-		}
-		w, err := seed.Generate(p, tgt.month, seed.Options{Small: isSmall})
-		if err != nil {
-			return fmt.Errorf("plant world: %w", err)
-		}
-		pw, err := seed.PlantErrors(w, suiteCfg)
+		pw, err := sp.Plant(tgt.Company, tgt.Month)
 		if err != nil {
 			return fmt.Errorf("plant errors: %w", err)
 		}
@@ -465,15 +517,30 @@ func runPlant(args []string, stdout io.Writer) error {
 		if err != nil {
 			return fmt.Errorf("plant bank lines: %w", err)
 		}
-		g2b, err := seed.BuildGSTR2B(p, tgt.month, []seed.World{prev, pw.BankWorld}, seed.DefaultGSTR2BOptions())
+		g2b, err := sp.GSTR2B(tgt.Company, tgt.Month)
 		if err != nil {
 			return fmt.Errorf("plant gstr2b: %w", err)
 		}
 
-		var erpMap seed.ERPMap
-		mapPath := filepath.Join(*mapsDir, *suite, tgt.company+"-"+tgt.month, seed.ERPMapFile)
-		if m, err := seed.LoadERPMap(mapPath); err == nil {
-			erpMap = m
+		mapDir, err := seed.ERPMapDir(*mapsDir, *suite, tgt.Company, tgt.Month)
+		if err != nil {
+			return fmt.Errorf("plant: %w", err)
+		}
+		erpMap, _, err := loadIfExists(filepath.Join(mapDir, seed.ERPMapFile), seed.LoadERPMap)
+		if err != nil {
+			return fmt.Errorf("plant: %w", err)
+		}
+		repPath, err := seed.BootstrapReportPath(*mapsDir, *suite, tgt.Company)
+		if err != nil {
+			return fmt.Errorf("plant: %w", err)
+		}
+		rep, haveRep, err := loadIfExists(repPath, seed.LoadBootstrapReport)
+		if err != nil {
+			return fmt.Errorf("plant: %w", err)
+		}
+		var repPtr *seed.BootstrapReport
+		if haveRep {
+			repPtr = &rep
 		}
 
 		gt, err := seed.BuildGroundTruth(seed.GroundTruthOptions{
@@ -481,6 +548,7 @@ func runPlant(args []string, stdout io.Writer) error {
 			BankLines:    lines,
 			ERPMap:       erpMap,
 			GSTR2B:       &g2b,
+			Suppliers:    seed.SupplierNames(profiles[tgt.Company], repPtr),
 		})
 		if err != nil {
 			return fmt.Errorf("plant build ground truth: %w", err)
@@ -519,6 +587,7 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 	suite := fs.String("suite", "suite-skeleton", "eval suite scenario name")
 	small := fs.Bool("small", false, "scale invoice counts down for fast runs")
 	configDir := fs.String("config", "config/companies", "directory of company profiles")
+	rulesPath := fs.String("rules", "", "rules file (default: rules.yaml next to --config)")
 	scenariosDir := fs.String("scenarios", "evals/scenarios", "directory of suite scenario definitions")
 	out := fs.String("out", "", "output root directory")
 	expectNoChanges := fs.Bool("expect-no-changes", false, "exit non-zero if any document was created or submitted")
@@ -539,6 +608,7 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 		}
 	}
 	isSmall := *small || suiteCfg.Small
+	suiteCfg.Small = isSmall
 
 	mapsRoot := "data/out"
 	externalRoot := "data/external"
@@ -568,14 +638,19 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 	if err != nil {
 		return fmt.Errorf("all frappe client: %w", err)
 	}
+	sp, profiles, err := newSuitePlanter(suiteCfg, *configDir, *rulesPath, companies, isSmall)
+	if err != nil {
+		return fmt.Errorf("all: %w", err)
+	}
+	targets := make(map[seed.CompanyMonth]bool)
+	for _, tgt := range suiteTargets(suiteCfg) {
+		targets[tgt] = true
+	}
 
 	bootReports := make(map[string]seed.BootstrapReport)
 	totalChanges := 0
 	for _, comp := range companies {
-		p, err := loadCompany(*configDir, comp)
-		if err != nil {
-			return fmt.Errorf("all load company %s: %w", comp, err)
-		}
+		p := profiles[comp]
 		log.Info("bootstrapping", "company", p.ID, "erp_company", p.ERPCompany)
 		rep, err := d.bootstrap(ctx, c, p)
 		if err != nil {
@@ -583,57 +658,24 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 		}
 		totalChanges += rep.Changes()
 		bootReports[comp] = rep
+		repPath, err := seed.BootstrapReportPath(mapsRoot, suiteCfg.Suite, comp)
+		if err != nil {
+			return fmt.Errorf("all bootstrap report path %s: %w", comp, err)
+		}
+		if err := seed.WriteBootstrapReport(repPath, rep); err != nil {
+			return fmt.Errorf("all %s: %w", comp, err)
+		}
 	}
 
 	monthsProcessed := 0
 	for _, comp := range companies {
-		p, err := loadCompany(*configDir, comp)
-		if err != nil {
-			return fmt.Errorf("all load company %s: %w", comp, err)
-		}
+		p := profiles[comp]
 		rep := bootReports[comp]
-
-		monthSet := make(map[string]bool)
-		var months []string
-		addMonth := func(m string) {
-			if m != "" && !monthSet[m] {
-				monthSet[m] = true
-				months = append(months, m)
-			}
-		}
-
-		for _, m := range suiteCfg.HistoryMonths {
-			addMonth(m)
-		}
-		if suiteCfg.CleanControl.Company == comp {
-			addMonth(suiteCfg.CleanControl.Month)
-		}
-		for _, ev := range suiteCfg.Evaluated {
-			if ev.Company == comp {
-				for _, m := range ev.Months {
-					addMonth(m)
-				}
-			}
-		}
-		slices.Sort(months)
-
-		for _, month := range months {
+		// Months in order: a month's GSTR-2B and missing accruals read the
+		// planted months before it.
+		for _, month := range suiteCfg.SeededMonths(comp) {
 			log.Info("processing month", "company", comp, "month", month, "suite", *suite)
-			start, err := seed.ParseMonth(month)
-			if err != nil {
-				return fmt.Errorf("all parse month %s: %w", month, err)
-			}
-			prevMonth := start.AddDate(0, -1, 0).Format("2006-01")
-			prev, err := seed.Generate(p, prevMonth, seed.Options{Small: isSmall})
-			if err != nil {
-				return fmt.Errorf("all generate prev %s: %w", prevMonth, err)
-			}
-			w, err := seed.Generate(p, month, seed.Options{Small: isSmall})
-			if err != nil {
-				return fmt.Errorf("all generate world %s: %w", month, err)
-			}
-
-			pw, err := seed.PlantErrors(w, suiteCfg)
+			pw, err := sp.Plant(comp, month)
 			if err != nil {
 				return fmt.Errorf("all plant errors %s %s: %w", comp, month, err)
 			}
@@ -655,7 +697,7 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 			if err != nil {
 				return fmt.Errorf("all bank lines %s %s: %w", comp, month, err)
 			}
-			g2b, err := seed.BuildGSTR2B(p, month, []seed.World{prev, pw.BankWorld}, seed.DefaultGSTR2BOptions())
+			g2b, err := sp.GSTR2B(comp, month)
 			if err != nil {
 				return fmt.Errorf("all gstr2b %s %s: %w", comp, month, err)
 			}
@@ -666,12 +708,19 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 			if err := seed.WriteGSTR2B(filepath.Join(monthDir, seed.GSTR2BFile), g2b); err != nil {
 				return fmt.Errorf("all write gstr2b %s %s: %w", comp, month, err)
 			}
+			monthsProcessed++
 
+			// Ground truth only for the clean control and the evaluated
+			// months; history months are context for the checks.
+			if !targets[seed.CompanyMonth{Company: comp, Month: month}] {
+				continue
+			}
 			gt, err := seed.BuildGroundTruth(seed.GroundTruthOptions{
 				PlantedWorld: pw,
 				BankLines:    lines,
 				ERPMap:       res.Map,
 				GSTR2B:       &g2b,
+				Suppliers:    seed.SupplierNames(p, &rep),
 			})
 			if err != nil {
 				return fmt.Errorf("all build ground truth %s %s: %w", comp, month, err)
@@ -679,7 +728,6 @@ func runAll(ctx context.Context, cfg config.Config, log *slog.Logger, args []str
 			if _, err := seed.WriteGroundTruth(evalsRoot, gt); err != nil {
 				return fmt.Errorf("all write ground truth %s %s: %w", comp, month, err)
 			}
-			monthsProcessed++
 		}
 	}
 

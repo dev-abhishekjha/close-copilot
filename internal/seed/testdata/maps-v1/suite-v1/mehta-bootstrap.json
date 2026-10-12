@@ -1,0 +1,263 @@
+{
+  "company": "Mehta Tech Services Pvt Ltd",
+  "abbr": "MTSPL",
+  "counts": {
+    "Account": {
+      "created": 20,
+      "updated": 0,
+      "unchanged": 4,
+      "created_names": [
+        "Payment Gateway Clearing - MTSPL",
+        "Gateway Fees - MTSPL",
+        "Bank Charges - MTSPL",
+        "Rent - MTSPL",
+        "Electricity - MTSPL",
+        "Telephone and Internet - MTSPL",
+        "Software Subscriptions - MTSPL",
+        "Prepaid Expenses - MTSPL",
+        "Repairs and Maintenance - MTSPL",
+        "Office Equipment - MTSPL",
+        "Salaries - MTSPL",
+        "Interest Income - MTSPL",
+        "Professional Charges - MTSPL",
+        "ICICI Current 0002 - MTSPL",
+        "Input Tax CGST - MTSPL",
+        "Input Tax SGST - MTSPL",
+        "Input Tax IGST - MTSPL",
+        "Output Tax CGST - MTSPL",
+        "Output Tax SGST - MTSPL",
+        "Output Tax IGST - MTSPL"
+      ]
+    },
+    "Address": {
+      "created": 16,
+      "updated": 0,
+      "unchanged": 0,
+      "created_names": [
+        "Mehta Tech Services Pvt Ltd-Billing",
+        "Lotus Business Parks-Billing",
+        "FibreLink Networks-Billing",
+        "Konkan Mobile Services-Billing",
+        "Hostmesa Cloud-Billing",
+        "Codeforge Licences-Billing",
+        "DesignDeck Software-Billing",
+        "SecureMail Suite-Billing",
+        "Nexa Computers-Billing",
+        "Orbit Peripherals-Billing",
+        "Paperline Stationers-Billing",
+        "TalentBridge Staffing-Billing",
+        "Ledgerline Advisors-Billing",
+        "Bluepeak Consulting-Billing",
+        "Cleanspace Facility Services-Billing",
+        "Swiftmove Cabs-Billing"
+      ]
+    },
+    "Company": {
+      "created": 0,
+      "updated": 1,
+      "unchanged": 0,
+      "updated_names": [
+        "Mehta Tech Services Pvt Ltd"
+      ]
+    },
+    "Custom Field": {
+      "created": 4,
+      "updated": 0,
+      "unchanged": 0,
+      "created_names": [
+        "Sales Invoice-copilot_ext_id",
+        "Purchase Invoice-copilot_ext_id",
+        "Payment Entry-copilot_ext_id",
+        "Journal Entry-copilot_ext_id"
+      ]
+    },
+    "Customer": {
+      "created": 25,
+      "updated": 0,
+      "unchanged": 0,
+      "created_names": [
+        "CUST-001",
+        "CUST-002",
+        "CUST-003",
+        "CUST-004",
+        "CUST-005",
+        "CUST-006",
+        "CUST-007",
+        "CUST-008",
+        "CUST-009",
+        "CUST-010",
+        "CUST-011",
+        "CUST-012",
+        "CUST-013",
+        "CUST-014",
+        "CUST-015",
+        "CUST-016",
+        "CUST-017",
+        "CUST-018",
+        "CUST-019",
+        "CUST-020",
+        "CUST-021",
+        "CUST-022",
+        "CUST-023",
+        "CUST-024",
+        "CUST-025"
+      ]
+    },
+    "GST Settings": {
+      "created": 0,
+      "updated": 1,
+      "unchanged": 0,
+      "updated_names": [
+        "GST Settings"
+      ]
+    },
+    "Item": {
+      "created": 7,
+      "updated": 0,
+      "unchanged": 0,
+      "created_names": [
+        "Trading Goods",
+        "Rent Service",
+        "Utility Service",
+        "Software Subscription",
+        "Goods for Resale",
+        "Professional Service",
+        "Laptop"
+      ]
+    },
+    "Supplier": {
+      "created": 17,
+      "updated": 0,
+      "unchanged": 0,
+      "created_names": [
+        "Lotus Business Parks",
+        "Sahyadri Power Distribution",
+        "FibreLink Networks",
+        "Konkan Mobile Services",
+        "Hostmesa Cloud",
+        "Codeforge Licences",
+        "DesignDeck Software",
+        "SecureMail Suite",
+        "Nexa Computers",
+        "Orbit Peripherals",
+        "Paperline Stationers",
+        "TalentBridge Staffing",
+        "Ledgerline Advisors",
+        "Bluepeak Consulting",
+        "Cleanspace Facility Services",
+        "Swiftmove Cabs",
+        "Tiffin Corner Caterers"
+      ]
+    }
+  },
+  "accounts": {
+    "Bank Charges": "Bank Charges - MTSPL",
+    "Cost of Goods Sold": "Cost of Goods Sold - MTSPL",
+    "Creditors": "Creditors - MTSPL",
+    "Debtors": "Debtors - MTSPL",
+    "Electricity": "Electricity - MTSPL",
+    "Gateway Fees": "Gateway Fees - MTSPL",
+    "ICICI Current 0002": "ICICI Current 0002 - MTSPL",
+    "Interest Income": "Interest Income - MTSPL",
+    "Office Equipment": "Office Equipment - MTSPL",
+    "Payment Gateway Clearing": "Payment Gateway Clearing - MTSPL",
+    "Prepaid Expenses": "Prepaid Expenses - MTSPL",
+    "Professional Charges": "Professional Charges - MTSPL",
+    "Rent": "Rent - MTSPL",
+    "Repairs and Maintenance": "Repairs and Maintenance - MTSPL",
+    "Salaries": "Salaries - MTSPL",
+    "Sales": "Sales - MTSPL",
+    "Software Subscriptions": "Software Subscriptions - MTSPL",
+    "Telephone and Internet": "Telephone and Internet - MTSPL"
+  },
+  "bank_account": "ICICI Current 0002 - MTSPL",
+  "input_gst": {
+    "cgst": "Input Tax CGST - MTSPL",
+    "sgst": "Input Tax SGST - MTSPL",
+    "igst": "Input Tax IGST - MTSPL"
+  },
+  "output_gst": {
+    "cgst": "Output Tax CGST - MTSPL",
+    "sgst": "Output Tax SGST - MTSPL",
+    "igst": "Output Tax IGST - MTSPL"
+  },
+  "ext_id_field": "copilot_ext_id",
+  "company_address": "Mehta Tech Services Pvt Ltd-Billing",
+  "suppliers": {
+    "bluepeak-consulting": "Bluepeak Consulting",
+    "cleanspace-facility": "Cleanspace Facility Services",
+    "codeforge-licences": "Codeforge Licences",
+    "designdeck-software": "DesignDeck Software",
+    "fibrelink-networks": "FibreLink Networks",
+    "hostmesa-cloud": "Hostmesa Cloud",
+    "konkan-mobile": "Konkan Mobile Services",
+    "ledgerline-advisors": "Ledgerline Advisors",
+    "lotus-business-parks": "Lotus Business Parks",
+    "nexa-computers": "Nexa Computers",
+    "orbit-peripherals": "Orbit Peripherals",
+    "paperline-stationers": "Paperline Stationers",
+    "sahyadri-power": "Sahyadri Power Distribution",
+    "securemail-suite": "SecureMail Suite",
+    "swiftmove-cabs": "Swiftmove Cabs",
+    "talentbridge-staffing": "TalentBridge Staffing",
+    "tiffin-corner": "Tiffin Corner Caterers"
+  },
+  "supplier_addresses": {
+    "bluepeak-consulting": "Bluepeak Consulting-Billing",
+    "cleanspace-facility": "Cleanspace Facility Services-Billing",
+    "codeforge-licences": "Codeforge Licences-Billing",
+    "designdeck-software": "DesignDeck Software-Billing",
+    "fibrelink-networks": "FibreLink Networks-Billing",
+    "hostmesa-cloud": "Hostmesa Cloud-Billing",
+    "konkan-mobile": "Konkan Mobile Services-Billing",
+    "ledgerline-advisors": "Ledgerline Advisors-Billing",
+    "lotus-business-parks": "Lotus Business Parks-Billing",
+    "nexa-computers": "Nexa Computers-Billing",
+    "orbit-peripherals": "Orbit Peripherals-Billing",
+    "paperline-stationers": "Paperline Stationers-Billing",
+    "securemail-suite": "SecureMail Suite-Billing",
+    "swiftmove-cabs": "Swiftmove Cabs-Billing",
+    "talentbridge-staffing": "TalentBridge Staffing-Billing"
+  },
+  "customers": [
+    "CUST-001",
+    "CUST-002",
+    "CUST-003",
+    "CUST-004",
+    "CUST-005",
+    "CUST-006",
+    "CUST-007",
+    "CUST-008",
+    "CUST-009",
+    "CUST-010",
+    "CUST-011",
+    "CUST-012",
+    "CUST-013",
+    "CUST-014",
+    "CUST-015",
+    "CUST-016",
+    "CUST-017",
+    "CUST-018",
+    "CUST-019",
+    "CUST-020",
+    "CUST-021",
+    "CUST-022",
+    "CUST-023",
+    "CUST-024",
+    "CUST-025"
+  ],
+  "items": [
+    "Trading Goods",
+    "Rent Service",
+    "Utility Service",
+    "Software Subscription",
+    "Goods for Resale",
+    "Professional Service",
+    "Laptop"
+  ],
+  "item_tax_templates": {
+    "12": "GST 12% - MTSPL",
+    "18": "GST 18% - MTSPL",
+    "5": "GST 5% - MTSPL"
+  }
+}

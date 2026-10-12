@@ -677,3 +677,167 @@ func TestAllIdempotent(t *testing.T) {
 		}
 	}
 }
+
+var (
+	mapsV1  = filepath.Join("..", "..", "internal", "seed", "testdata", "maps-v1")
+	truthV1 = filepath.Join("..", "..", "internal", "seed", "testdata", "ground_truth-v1")
+)
+
+// TestPlantSuiteV1 runs seed plant on suite-v1 with the maps-v1 fixtures:
+// 40 errors over the six evaluated months plus the clean control, the
+// files equal the seed package's fixture ground truth, a single target
+// gives the same file, and two runs are byte-identical.
+func TestPlantSuiteV1(t *testing.T) {
+	plant := func(out string, extra ...string) plantSummary {
+		t.Helper()
+		args := append([]string{"plant", "--suite", "suite-v1", "--small", "--config", configDir,
+			"--scenarios", scenariosDir, "--maps", mapsV1, "--out", out}, extra...)
+		code, stdout, errOut := runSeed(t, args...)
+		if code != 0 {
+			t.Fatalf("plant %v: exit %d, stderr: %s", extra, code, errOut)
+		}
+		var sum plantSummary
+		if err := json.Unmarshal([]byte(stdout), &sum); err != nil {
+			t.Fatalf("summary %q: %v", stdout, err)
+		}
+		return sum
+	}
+	a, b := t.TempDir(), t.TempDir()
+	sum := plant(a)
+	if sum.ErrorsCount != 40 || len(sum.Files) != 7 || sum.Suite != "suite-v1" {
+		t.Errorf("summary %+v, want 40 errors in 7 files", sum)
+	}
+	plant(b)
+	dir := filepath.Join("scenarios", "suite-v1", "ground_truth")
+	entries, err := os.ReadDir(filepath.Join(a, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 7 {
+		t.Errorf("%d ground truth files, want 7", len(entries))
+	}
+	for _, e := range entries {
+		ga, _ := os.ReadFile(filepath.Join(a, dir, e.Name()))      //nolint:gosec // G304: test temp dir
+		gb, _ := os.ReadFile(filepath.Join(b, dir, e.Name()))      //nolint:gosec // G304: test temp dir
+		want, err := os.ReadFile(filepath.Join(truthV1, e.Name())) //nolint:gosec // G304: repo testdata
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !bytes.Equal(ga, gb) || !bytes.Equal(ga, want) {
+			t.Errorf("%s: runs differ or differ from %s", e.Name(), truthV1)
+		}
+	}
+	gt, err := seed.LoadGroundTruth(filepath.Join(a, dir, "sharma-2026-06.json"))
+	if err != nil || !gt.Clean || len(gt.Planted) != 0 {
+		t.Errorf("clean control: %+v, %v", gt, err)
+	}
+
+	one := t.TempDir()
+	if s := plant(one, "--company", "mehta", "--month", "2026-09"); len(s.Files) != 1 {
+		t.Fatalf("single target wrote %v", s.Files)
+	}
+	got, _ := os.ReadFile(filepath.Join(one, dir, "mehta-2026-09.json")) //nolint:gosec // G304: test temp dir
+	full, _ := os.ReadFile(filepath.Join(a, dir, "mehta-2026-09.json"))  //nolint:gosec // G304: test temp dir
+	if !bytes.Equal(got, full) {
+		t.Error("mehta 2026-09 alone differs from the full suite")
+	}
+}
+
+// TestPlantSuiteV1NeedsMaps: without ERP maps an invoice key can't be
+// resolved, and plant fails rather than dropping it.
+func TestPlantSuiteV1NeedsMaps(t *testing.T) {
+	code, stdout, errOut := runSeed(t, "plant", "--suite", "suite-v1", "--small", "--config", configDir,
+		"--scenarios", scenariosDir, "--maps", t.TempDir(), "--out", t.TempDir())
+	if code != 1 || stdout != "" || !strings.Contains(errOut, "ERP map") {
+		t.Errorf("exit %d, stdout %q, stderr %q", code, stdout, errOut)
+	}
+}
+
+// mapAllBooks is a WriteBooks fake that names every book-side event and
+// records the worlds it got.
+func mapAllBooks(got map[string]seed.World) booksFunc {
+	return func(_ context.Context, c *frappe.Client, rep seed.BootstrapReport, w seed.World, _ seed.BooksOptions) (seed.BooksResult, error) {
+		if c == nil {
+			return seed.BooksResult{}, errors.New("nil client")
+		}
+		got[w.Company+" "+w.Month] = w
+		m := seed.ERPMap{}
+		for _, ev := range w.Events {
+			if dt := seed.BookDocType(ev.Kind); dt != "" {
+				m[ev.ExtID] = seed.ERPRef{DocType: dt, Name: dt + " " + ev.ExtID}
+			}
+		}
+		return seed.BooksResult{Company: rep.Company, Month: w.Month, Counts: map[string]*seed.BookCounts{}, Map: m}, nil
+	}
+}
+
+// TestAllSuiteV1 runs seed all on suite-v1 against fakes: every seeded
+// month is posted and has evidence, ground truth is written for the seven
+// target months only, with 40 errors whose GSTR-2B keys are in the written
+// gstr2b.json, and the bootstrap reports sit next to the maps.
+func TestAllSuiteV1(t *testing.T) {
+	var prof seed.Profile
+	posted := map[string]seed.World{}
+	out := t.TempDir()
+	code, stdout, errOut := runAllCmd(t, deps{bootstrap: fakeBootstrap(0, &prof), books: mapAllBooks(posted)},
+		"all", "--suite", "suite-v1", "--small", "--config", configDir, "--scenarios", scenariosDir, "--out", out)
+	if code != 0 {
+		t.Fatalf("exit %d, stderr: %s", code, errOut)
+	}
+	var sum allSummary
+	if err := json.Unmarshal([]byte(stdout), &sum); err != nil || sum.MonthsCount != 12 {
+		t.Errorf("summary %q: %v", stdout, err)
+	}
+	if len(posted) != 12 {
+		t.Errorf("posted %d months, want 12", len(posted))
+	}
+	injected := 0
+	for _, w := range posted {
+		for _, ev := range w.Events {
+			if strings.Contains(ev.Narration, seed.PromptInjectionText) {
+				injected++
+			}
+		}
+	}
+	if injected != 4 {
+		t.Errorf("%d posted remarks carry the injection, want 4", injected)
+	}
+	for _, c := range []string{"sharma", "mehta"} {
+		if _, err := seed.LoadBootstrapReport(filepath.Join(out, "out", "suite-v1", c+"-bootstrap.json")); err != nil {
+			t.Error(err)
+		}
+	}
+	gtDir := filepath.Join(out, "evals", "scenarios", "suite-v1", "ground_truth")
+	entries, err := os.ReadDir(gtDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 7 {
+		t.Errorf("%d ground truth files, want 7", len(entries))
+	}
+	total := 0
+	for _, e := range entries {
+		gt, err := seed.LoadGroundTruth(filepath.Join(gtDir, e.Name()))
+		if err != nil {
+			t.Fatal(err)
+		}
+		total += len(gt.Planted)
+		g2b, err := os.ReadFile(filepath.Join(out, "external", gt.Company, gt.Month, seed.GSTR2BFile)) //nolint:gosec // G304: test temp dir
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, pf := range gt.Planted {
+			if pf.Type == seed.ErrorGSTR2BMissingInBooks || pf.Type == seed.ErrorGSTR2BAmountMismatch {
+				if !bytes.Contains(g2b, []byte(`"ctin": "`+pf.Keys["supplier_gstin"]+`"`)) {
+					t.Errorf("%s %s: supplier %s not in gstr2b.json", e.Name(), pf.ID, pf.Keys["supplier_gstin"])
+				}
+			}
+			if inv := pf.Keys["invoice"]; inv != "" && !strings.HasPrefix(inv, seed.DocPurchaseInvoice+" ") {
+				t.Errorf("%s %s: invoice key %q is not a Purchase Invoice", e.Name(), pf.ID, inv)
+			}
+		}
+	}
+	if total != 40 {
+		t.Errorf("%d planted errors, want 40", total)
+	}
+}

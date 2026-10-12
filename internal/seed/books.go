@@ -846,7 +846,8 @@ func (bw *bookWriter) receipt(ev Event, ref refFunc, paidTo string) (doc, error)
 }
 
 // vendorPayment: a Payment Entry (Pay) from the bank to the supplier,
-// settling the bill in Refs[0].
+// settling the bill in Refs[0]. A payment with no Refs is an unallocated
+// advance to the supplier (Meta.SupplierID): it has no references row.
 func (bw *bookWriter) vendorPayment(ev Event, ref refFunc) (doc, error) {
 	if err := positiveGross(ev); err != nil {
 		return nil, err
@@ -862,11 +863,14 @@ func (bw *bookWriter) vendorPayment(ev Event, ref refFunc) (doc, error) {
 	if err != nil {
 		return nil, err
 	}
+	ev.Party = supplier
+	if len(ev.Refs) == 0 {
+		return bw.payment(ev, "Pay", PartySupplier, bw.rep.BankAccount, creditors), nil
+	}
 	inv, err := reference(ev, ref, DocPurchaseInvoice)
 	if err != nil {
 		return nil, err
 	}
-	ev.Party = supplier
 	d := bw.payment(ev, "Pay", PartySupplier, bw.rep.BankAccount, creditors)
 	d["references"] = []doc{{
 		"reference_doctype": DocPurchaseInvoice,

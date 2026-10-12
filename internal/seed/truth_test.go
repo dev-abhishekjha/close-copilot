@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"regexp"
+	"slices"
 	"testing"
 )
 
@@ -391,5 +393,160 @@ func TestGroundTruthWithGSTR2B(t *testing.T) {
 				t.Errorf("expected finding missing invoice_no_norm key")
 			}
 		}
+	}
+}
+
+// TestGroundTruthSuiteV1 builds suite-v1's ground truth (--small) from the
+// maps-v1 fixtures, checks it against testdata/ground_truth-v1 and the
+// schema, and resolves every key to a real record: an ERP map name, a bank
+// line, a GSTR-2B invoice or a bootstrap supplier. It also validates the
+// committed evals/scenarios/suite-v1/ground_truth files when they exist.
+func TestGroundTruthSuiteV1(t *testing.T) {
+	schemaBytes := loadSchemaBytes(t)
+	cfg := loadSuiteV1(t)
+	cfg.Small = true
+	sp := NewSuitePlanter(cfg, suiteProfiles(t), Options{Small: true})
+	counts := map[string]int{}
+	for _, cm := range suiteTargets(cfg) {
+		v := buildV1Truth(t, sp, cfg, cm)
+		b, err := v.gt.JSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		validateAgainstSchema(t, schemaBytes, b)
+		checkV1Golden(t, filepath.Join(truthV1Dir, cm.Company+"-"+cm.Month+".json"), b)
+		for _, pf := range v.gt.Planted {
+			counts[pf.Type]++
+			checkKeysResolve(t, cm, pf, v)
+		}
+	}
+	for typ, want := range suiteV1Want {
+		if counts[typ] != want {
+			t.Errorf("%s: %d in ground truth, want %d", typ, counts[typ], want)
+		}
+	}
+
+	committed, err := filepath.Glob(filepath.Join("..", "..", "evals", "scenarios", "suite-v1", "ground_truth", "*.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	total := 0
+	for _, path := range committed {
+		b, err := os.ReadFile(path) //nolint:gosec // G304: repo file
+		if err != nil {
+			t.Fatal(err)
+		}
+		validateAgainstSchema(t, schemaBytes, b)
+		gt, err := LoadGroundTruth(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		total += len(gt.Planted)
+		if gt.Clean != (gt.Company == cfg.CleanControl.Company && gt.Month == cfg.CleanControl.Month) {
+			t.Errorf("%s: clean %v", path, gt.Clean)
+		}
+	}
+	if len(committed) > 0 && total != 40 {
+		t.Errorf("committed suite-v1 ground truth plants %d errors, want 40", total)
+	}
+}
+
+// wantKeys are the key names of each finding type (shared spec).
+var wantKeys = map[string][]string{
+	ErrorUnrecordedBankCharge:   {"bank_txn_id"},
+	ErrorDuplicateVendorPayment: {"invoice"},
+	ErrorMissingAccrual:         {"month", "supplier"},
+	ErrorGSTR2BMissingIn2B:      {"invoice_no_norm", "supplier_gstin"},
+	ErrorGSTR2BAmountMismatch:   {"invoice_no_norm", "supplier_gstin"},
+	ErrorGSTR2BMissingInBooks:   {"invoice_no_norm", "supplier_gstin"},
+	ErrorPrepaidNotSpread:       {"invoice"},
+	ErrorMisclassifiedExpense:   {"invoice"},
+	ErrorWrongPeriodPosting:     {"invoice"},
+	ErrorPromptInjection:        {"invoice"},
+}
+
+func checkKeysResolve(t *testing.T, cm CompanyMonth, pf PlantedFinding, v v1Truth) {
+	t.Helper()
+	var names []string
+	for k := range pf.Keys {
+		names = append(names, k)
+	}
+	slices.Sort(names)
+	if !slices.Equal(names, wantKeys[pf.Type]) {
+		t.Errorf("%v %s %s: keys %v, want %v", cm, pf.ID, pf.Type, names, wantKeys[pf.Type])
+	}
+	if pf.Type == ErrorPromptInjection && pf.AmountPaise != 0 {
+		t.Errorf("%v %s: injection amount %d", cm, pf.ID, pf.AmountPaise)
+	}
+	inMap := func(name string) bool {
+		for _, ref := range v.erp {
+			if ref.Name == name && ref.DocType == DocPurchaseInvoice {
+				return true
+			}
+		}
+		return false
+	}
+	in2B := func(ctin, norm string) bool {
+		for _, s := range v.g2b.Data.DocData.B2B {
+			for _, inv := range s.Inv {
+				if s.CTIN == ctin && NormInvoiceNo(inv.Inum) == norm {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	inBooks := func(ctin, norm string) bool {
+		for ext, ref := range v.erp {
+			ev, ok := eventByExt(v.pw.BooksWorld.Events, ext)
+			if ok && ref.DocType == DocPurchaseInvoice && ev.Meta.SupplierGSTIN == ctin && NormInvoiceNo(ev.InvoiceNo) == norm {
+				return true
+			}
+		}
+		return false
+	}
+	k := pf.Keys
+	var ok bool
+	switch pf.Type {
+	case ErrorUnrecordedBankCharge:
+		ok = slices.ContainsFunc(v.lines, func(l BankLine) bool { return l.TxnID == k["bank_txn_id"] })
+	case ErrorMissingAccrual:
+		ok = k["month"] == cm.Month && slices.Contains(mapValues(v.names), k["supplier"])
+	case ErrorGSTR2BMissingIn2B:
+		ok = inBooks(k["supplier_gstin"], k["invoice_no_norm"]) && !in2B(k["supplier_gstin"], k["invoice_no_norm"])
+	case ErrorGSTR2BAmountMismatch:
+		ok = inBooks(k["supplier_gstin"], k["invoice_no_norm"]) && in2B(k["supplier_gstin"], k["invoice_no_norm"])
+	case ErrorGSTR2BMissingInBooks:
+		ok = !inBooks(k["supplier_gstin"], k["invoice_no_norm"]) && in2B(k["supplier_gstin"], k["invoice_no_norm"])
+	default:
+		ok = inMap(k["invoice"])
+	}
+	if !ok {
+		t.Errorf("%v %s %s: keys %v don't resolve", cm, pf.ID, pf.Type, k)
+	}
+}
+
+// TestGroundTruthKeysNeverDropped: a key that can't be resolved is an
+// error, never a silent fallback.
+func TestGroundTruthKeysNeverDropped(t *testing.T) {
+	cfg := loadSuiteV1(t)
+	cfg.Small = true
+	sp := NewSuitePlanter(cfg, suiteProfiles(t), Options{Small: true})
+	v := buildV1Truth(t, sp, cfg, CompanyMonth{"sharma", "2026-09"})
+	g := v.g2b
+	cases := map[string]GroundTruthOptions{
+		"no erp map":   {PlantedWorld: v.pw, ERPMap: nil, GSTR2B: &g, Suppliers: v.names},
+		"no gstr2b":    {PlantedWorld: v.pw, ERPMap: v.erp, Suppliers: v.names},
+		"no suppliers": {PlantedWorld: v.pw, ERPMap: v.erp, GSTR2B: &g},
+	}
+	for name, opt := range cases {
+		if _, err := BuildGroundTruth(opt); err == nil {
+			t.Errorf("%s: no error", name)
+		}
+	}
+	bad := v.pw
+	bad.PlantedErrors = []PlantedError{{ID: "E01", Type: "bogus", TouchedExtIDs: []string{"x"}}}
+	if _, err := BuildGroundTruth(GroundTruthOptions{PlantedWorld: bad}); err == nil {
+		t.Error("unknown type: no error")
 	}
 }

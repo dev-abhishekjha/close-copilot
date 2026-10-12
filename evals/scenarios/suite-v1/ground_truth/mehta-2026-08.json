@@ -1,0 +1,84 @@
+{
+  "scenario": "suite-v1",
+  "company": "mehta",
+  "month": "2026-08",
+  "clean": false,
+  "planted": [
+    {
+      "id": "E01",
+      "type": "missing_accrual",
+      "keys": {
+        "month": "2026-08",
+        "supplier": "Cleanspace Facility Services"
+      },
+      "amount_paise": 3239116
+    },
+    {
+      "id": "E02",
+      "type": "unrecorded_bank_charge",
+      "keys": {
+        "bank_txn_id": "BNK-20260819-003"
+      },
+      "amount_paise": 177000
+    },
+    {
+      "id": "E03",
+      "type": "duplicate_vendor_payment",
+      "keys": {
+        "invoice": "PINV-26-00242"
+      },
+      "amount_paise": 1763408
+    },
+    {
+      "id": "E04",
+      "type": "prepaid_not_spread",
+      "keys": {
+        "invoice": "PINV-26-00248"
+      },
+      "amount_paise": 36000000
+    },
+    {
+      "id": "E05",
+      "type": "misclassified_expense",
+      "keys": {
+        "invoice": "PINV-26-00255"
+      },
+      "amount_paise": 8260300
+    },
+    {
+      "id": "E06",
+      "type": "wrong_period_posting",
+      "keys": {
+        "invoice": "PINV-26-00238"
+      },
+      "amount_paise": 1800000
+    },
+    {
+      "id": "E07",
+      "type": "gstr2b_amount_mismatch",
+      "keys": {
+        "invoice_no_norm": "ORB2026823",
+        "supplier_gstin": "24BEFCO1927E1ZI"
+      },
+      "amount_paise": 22271
+    }
+  ],
+  "expected": [
+    {
+      "type": "gstr2b_wrong_period",
+      "keys": {
+        "invoice_no_norm": "LTS2026742",
+        "supplier_gstin": "27XKYCL8632Z1ZI"
+      }
+    }
+  ],
+  "investigations": [
+    {
+      "id": "X01",
+      "keys": {
+        "bank_txn_id": "BNK-20260811-001"
+      },
+      "expected_resolution": "gateway_settlement"
+    }
+  ]
+}
