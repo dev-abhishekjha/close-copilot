@@ -27,6 +27,7 @@ type BankLoadResult struct {
 	Total      int    `json:"total"`
 	Inserted   int    `json:"inserted"`
 	Updated    int    `json:"updated"`
+	Removed    int    `json:"removed"`
 	Rejected   int    `json:"rejected"`
 	Warning    string `json:"warning,omitempty"`
 }
@@ -193,12 +194,11 @@ func LoadBankStatement(ctx context.Context, st *store.Store, companyID, month st
 		Total:      len(lines),
 	}
 
-	if len(lines) == 0 {
-		return res, nil
-	}
-
 	// Balance continuity check against previous month if available
 	res.Warning = checkBalanceContinuity(ctx, st, companyID, month, lines)
+	if len(lines) == 0 {
+		res.Warning = "bank file holds no rows; the month's existing rows are removed"
+	}
 
 	// Determine how many lines are new vs updates
 	var inserted, updated int
@@ -215,14 +215,47 @@ func LoadBankStatement(ctx context.Context, st *store.Store, companyID, month st
 		}
 	}
 
-	// Upsert all rows in one transaction
-	if err := st.UpsertBankLines(ctx, lines); err != nil {
-		return res, fmt.Errorf("upsert bank lines: %w", err)
+	// Rows the month holds now that the file lacks
+	removed, err := countBankLinesNotIn(ctx, st, companyID, month, lines)
+	if err != nil {
+		return res, err
+	}
+
+	// Replace the month's rows in one transaction
+	if err := st.ReplaceBankLines(ctx, companyID, month, lines); err != nil {
+		return res, fmt.Errorf("replace bank lines: %w", err)
 	}
 
 	res.Inserted = inserted
 	res.Updated = updated
+	res.Removed = removed
 	return res, nil
+}
+
+// countBankLinesNotIn counts the company's stored lines dated in month whose
+// txn_id is not among lines.
+func countBankLinesNotIn(ctx context.Context, st *store.Store, companyID, month string, lines []store.BankLine) (int, error) {
+	start, err := time.Parse("2006-01", month)
+	if err != nil {
+		return 0, fmt.Errorf("invalid month %q: %w", month, err)
+	}
+	start = start.UTC()
+	end := start.AddDate(0, 1, -1)
+	existing, err := st.ListBankLines(ctx, store.BankLineFilter{CompanyID: companyID, FromDate: &start, ToDate: &end})
+	if err != nil {
+		return 0, fmt.Errorf("list existing bank lines: %w", err)
+	}
+	inFile := make(map[string]bool, len(lines))
+	for _, l := range lines {
+		inFile[l.TxnID] = true
+	}
+	removed := 0
+	for _, e := range existing {
+		if !inFile[e.TxnID] {
+			removed++
+		}
+	}
+	return removed, nil
 }
 
 // LoadBankFile reads a bank CSV file from disk and loads it into the database.

@@ -28,7 +28,7 @@ func main() {
 func newRun(stdout io.Writer) cli.RunFunc {
 	return func(ctx context.Context, cfg config.Config, log *slog.Logger, args []string) error {
 		if len(args) == 0 {
-			return errors.New("load: subcommand required (available: bank, gstr2b)")
+			return errors.New("load: subcommand required (available: bank, gstr2b, all)")
 		}
 
 		switch args[0] {
@@ -36,8 +36,10 @@ func newRun(stdout io.Writer) cli.RunFunc {
 			return runBank(ctx, cfg, log, args[1:], stdout)
 		case "gstr2b":
 			return runGSTR2B(ctx, cfg, log, args[1:], stdout)
+		case "all":
+			return runAll(ctx, cfg, log, args[1:], stdout)
 		default:
-			return fmt.Errorf("load: unknown subcommand %q (available: bank, gstr2b)", args[0])
+			return fmt.Errorf("load: unknown subcommand %q (available: bank, gstr2b, all)", args[0])
 		}
 	}
 }
@@ -100,6 +102,7 @@ func runBank(ctx context.Context, cfg config.Config, log *slog.Logger, args []st
 		"total", res.Total,
 		"inserted", res.Inserted,
 		"updated", res.Updated,
+		"removed", res.Removed,
 		"source", res.SourceFile,
 	)
 
@@ -160,12 +163,16 @@ func runGSTR2B(ctx context.Context, cfg config.Config, log *slog.Logger, args []
 		return fmt.Errorf("load gstr2b: %w", err)
 	}
 
+	if res.Warning != "" {
+		log.Warn(res.Warning, "company", *company, "month", *month)
+	}
 	log.Info("loaded gstr2b",
 		"company", res.Company,
 		"month", res.Month,
 		"total", res.Total,
 		"inserted", res.Inserted,
 		"updated", res.Updated,
+		"removed", res.Removed,
 		"source", res.SourceFile,
 	)
 

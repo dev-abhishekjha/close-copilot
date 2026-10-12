@@ -328,3 +328,103 @@ func (s *Store) ListGSTR2BEntries(ctx context.Context, companyID, period string)
 	}
 	return out, nil
 }
+
+// monthBounds returns the first day of month (YYYY-MM) and of the next month, at UTC midnight.
+func monthBounds(month string) (time.Time, time.Time, error) {
+	start, err := time.Parse("2006-01", month)
+	if err != nil {
+		return time.Time{}, time.Time{}, fmt.Errorf("store: invalid month %q (want YYYY-MM): %w", month, err)
+	}
+	return start.UTC(), start.UTC().AddDate(0, 1, 0), nil
+}
+
+// ReplaceBankLines makes the company's bank lines for month (YYYY-MM) exactly
+// lines: in one transaction it deletes that company's lines dated in the
+// month, then inserts lines. A line of another company or dated outside the
+// month is an error before anything is deleted. An empty list clears the month.
+func (s *Store) ReplaceBankLines(ctx context.Context, companyID, month string, lines []BankLine) error {
+	start, end, err := monthBounds(month)
+	if err != nil {
+		return err
+	}
+	for _, l := range lines {
+		if l.CompanyID != companyID {
+			return fmt.Errorf("store: replace bank lines: line %s belongs to company %q, not %q", l.TxnID, l.CompanyID, companyID)
+		}
+		if l.TxnDate.Before(start) || !l.TxnDate.Before(end) {
+			return fmt.Errorf("store: replace bank lines %s/%s: line %s is dated %s, outside the month",
+				companyID, month, l.TxnID, l.TxnDate.Format("2006-01-02"))
+		}
+	}
+
+	return s.WithTx(ctx, func(tx pgx.Tx) error {
+		if _, err := tx.Exec(ctx,
+			`DELETE FROM bank_lines WHERE company_id = $1 AND txn_date >= $2 AND txn_date < $3`,
+			companyID, start, end); err != nil {
+			return fmt.Errorf("store: clear bank lines %s/%s: %w", companyID, month, err)
+		}
+		const query = `
+			INSERT INTO bank_lines (
+				company_id, txn_id, txn_date, value_date,
+				narration, ref, amount_paise, balance_paise, source_file
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9);
+		`
+		for _, line := range lines {
+			var bal *int64
+			if line.BalancePaise != nil {
+				v := int64(*line.BalancePaise)
+				bal = &v
+			}
+			if _, err := tx.Exec(ctx, query,
+				line.CompanyID, line.TxnID, line.TxnDate, line.ValueDate,
+				line.Narration, line.Ref, int64(line.AmountPaise), bal, line.SourceFile,
+			); err != nil {
+				return fmt.Errorf("store: insert bank line %s/%s: %w", line.CompanyID, line.TxnID, err)
+			}
+		}
+		return nil
+	})
+}
+
+// ReplaceGSTR2BEntries makes the company's GSTR-2B entries for period
+// (YYYY-MM) exactly entries: in one transaction it deletes that company's
+// entries of the period, then inserts entries. An entry of another company or
+// period is an error before anything is deleted. An empty list clears the period.
+func (s *Store) ReplaceGSTR2BEntries(ctx context.Context, companyID, period string, entries []GSTR2BEntry) error {
+	if _, _, err := monthBounds(period); err != nil {
+		return err
+	}
+	for _, e := range entries {
+		if e.CompanyID != companyID || e.Period != period {
+			return fmt.Errorf("store: replace gstr2b entries: entry %s is for %s/%s, not %s/%s",
+				e.InvoiceNoNorm, e.CompanyID, e.Period, companyID, period)
+		}
+	}
+
+	return s.WithTx(ctx, func(tx pgx.Tx) error {
+		if _, err := tx.Exec(ctx,
+			`DELETE FROM gstr2b_entries WHERE company_id = $1 AND period = $2`,
+			companyID, period); err != nil {
+			return fmt.Errorf("store: clear gstr2b entries %s/%s: %w", companyID, period, err)
+		}
+		const query = `
+			INSERT INTO gstr2b_entries (
+				company_id, period, supplier_gstin, supplier_name,
+				invoice_no, invoice_no_norm, invoice_date,
+				taxable_paise, igst_paise, cgst_paise, sgst_paise, itc_available
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
+		`
+		for _, e := range entries {
+			if _, err := tx.Exec(ctx, query,
+				e.CompanyID, e.Period, e.SupplierGSTIN, e.SupplierName,
+				e.InvoiceNo, e.InvoiceNoNorm, e.InvoiceDate,
+				int64(e.TaxablePaise), int64(e.IGSTPaise), int64(e.CGSTPaise), int64(e.SGSTPaise), e.ITCAvailable,
+			); err != nil {
+				return fmt.Errorf("store: insert gstr2b entry %s/%s/%s: %w", e.CompanyID, e.Period, e.InvoiceNoNorm, err)
+			}
+		}
+		return nil
+	})
+}

@@ -23,6 +23,8 @@ type GSTR2BLoadResult struct {
 	Total      int    `json:"total"`
 	Inserted   int    `json:"inserted"`
 	Updated    int    `json:"updated"`
+	Removed    int    `json:"removed"`
+	Warning    string `json:"warning,omitempty"`
 }
 
 type gstr2bFile struct {
@@ -151,7 +153,8 @@ func ParseGSTR2B(r io.Reader, companyID, month string) ([]store.GSTR2BEntry, err
 	return out, nil
 }
 
-// LoadGSTR2B parses a GSTR-2B and upserts its rows in one transaction.
+// LoadGSTR2B parses a GSTR-2B and replaces the company's rows for the month
+// with its rows, in one transaction.
 func LoadGSTR2B(ctx context.Context, st *store.Store, companyID, month string, r io.Reader, sourceFile string) (GSTR2BLoadResult, error) {
 	res := GSTR2BLoadResult{Company: companyID, Month: month, SourceFile: sourceFile}
 	entries, err := ParseGSTR2B(r, companyID, month)
@@ -160,7 +163,7 @@ func LoadGSTR2B(ctx context.Context, st *store.Store, companyID, month string, r
 	}
 	res.Total = len(entries)
 	if len(entries) == 0 {
-		return res, nil
+		res.Warning = "gstr2b file holds no rows; the period's existing rows are removed"
 	}
 
 	var inserted, updated int
@@ -175,11 +178,17 @@ func LoadGSTR2B(ctx context.Context, st *store.Store, companyID, month string, r
 			return res, fmt.Errorf("check existing gstr2b entry: %w", err)
 		}
 	}
-	if err := st.UpsertGSTR2BEntries(ctx, entries); err != nil {
-		return res, fmt.Errorf("upsert gstr2b entries: %w", err)
+	existing, err := st.ListGSTR2BEntries(ctx, companyID, month)
+	if err != nil {
+		return res, fmt.Errorf("list existing gstr2b entries: %w", err)
+	}
+	removed := len(existing) - updated
+	if err := st.ReplaceGSTR2BEntries(ctx, companyID, month, entries); err != nil {
+		return res, fmt.Errorf("replace gstr2b entries: %w", err)
 	}
 	res.Inserted = inserted
 	res.Updated = updated
+	res.Removed = removed
 	return res, nil
 }
 
