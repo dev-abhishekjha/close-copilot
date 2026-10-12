@@ -232,8 +232,8 @@ func TestKillResume(t *testing.T) {
 		t.Fatalf("reference close: %v", err)
 	}
 	refID := uuid.MustParse(ref.RunID)
-	if ref.Status != store.RunPartial || ref.Findings != 3 {
-		t.Fatalf("reference run %+v, want partial with 3 findings", ref)
+	if ref.Status != store.RunPartial || ref.Findings != 5 {
+		t.Fatalf("reference run %+v, want partial with 5 findings", ref)
 	}
 
 	// The interrupted run: SIGKILL once it is held after two done steps.
@@ -297,8 +297,14 @@ func TestKillResume(t *testing.T) {
 			t.Errorf("step %s/%s was done before the kill but ran again (attempt %d)", s.Kind, s.Subject, s.Attempt)
 		}
 	}
-	want := map[string]int{"router=done": 1, "check.bankrec=done": 1, "retrieve=skipped": 1,
-		"explain=skipped": 3, "verify=skipped": 3, "investigate=skipped": 1, "synthesize=done": 1}
+	// The skeleton month yields five findings from the seven default checks:
+	// three planted bank charges, a variance on Sales (the fake ledger holds
+	// only the one month) and a GSTR-2B missing-in-2B for the rent invoice
+	// (the fake evidence server has no GSTR-2B entries).
+	want := map[string]int{"router=done": 1, "check.bankrec=done": 1, "check.duplicates=done": 1,
+		"check.gstr2b=done": 1, "check.accruals=done": 1, "check.rules=done": 1,
+		"check.suspicious_text=done": 1, "check.variance=done": 1, "retrieve=skipped": 1,
+		"explain=skipped": 5, "verify=skipped": 5, "investigate=skipped": 1, "synthesize=done": 1}
 	for k, n := range want {
 		if counts[k] != n {
 			t.Errorf("steps %s: %d, want %d (all: %v)", k, counts[k], n, counts)
