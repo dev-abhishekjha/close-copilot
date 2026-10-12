@@ -659,6 +659,7 @@ tasks:
     files:
       - "internal/checks/variance.go"
       - "internal/checks/variance_test.go"
+      - "internal/agent/snapshot_test.go"
     check: "A variance finding's invoice evidence is backed by a call the variance step made"
 
   # ---- Phase 2 ----
