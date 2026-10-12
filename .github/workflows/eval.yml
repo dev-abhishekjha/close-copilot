@@ -114,6 +114,11 @@ jobs:
         env:
           LLM: ${{ steps.tier.outputs.llm }}
         run: |
+          # An empty SUITES would loop zero times and pass with nothing gated.
+          if [ -z "${SUITES// /}" ]; then
+            echo "::error::eval (G4): SUITES is empty"
+            exit 1
+          fi
           suites="$SUITES"
           if [ "$LLM" = true ]; then
             case " $suites " in
@@ -293,8 +298,13 @@ jobs:
         run: |
           # Every suite is judged, even after an earlier one fails; the step
           # exits with the worst code. A suite with no requirements, or no
-          # recorded replay, fails closed.
+          # recorded replay, fails closed, and so does judging no suite at all.
+          if [ -z "${SUITES// /}" ]; then
+            echo "::error::eval (G4): SUITES is empty"
+            exit 1
+          fi
           worst=0
+          judged=0
           for s in $SUITES; do
             case "$s" in
               suite-skeleton) req=(--require 'unrecorded_bank_charge.recall>=3/3' --require 'clean.false_alarms==0') ;;
@@ -320,6 +330,7 @@ jobs:
               "${req[@]}"
             rc=$?
             set -e
+            judged=$((judged + 1))
             if [ "$rc" != 0 ]; then
               echo "::error::eval (G4): $s failed the comparison with the baseline (exit $rc)"
               [ "$worst" -ge "$rc" ] || worst=$rc
@@ -329,6 +340,10 @@ jobs:
               [ "$worst" -ge 1 ] || worst=1
             fi
           done
+          if [ "$judged" = 0 ]; then
+            echo "::error::eval (G4): no suite in SUITES was judged"
+            exit 1
+          fi
           exit "$worst"
 
       - name: "tier 2 gate: compare with the baseline, latency and cost"
