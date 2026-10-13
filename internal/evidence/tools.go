@@ -6,15 +6,22 @@ package evidence
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
+	"reflect"
+	"slices"
 	"strings"
 	"time"
+	"unicode/utf8"
 
+	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
 
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/money"
+	"github.com/abhishekjha/close-copilot/internal/retrieval"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
@@ -63,7 +70,94 @@ type GSTR2BEntryOutput struct {
 type Option func(*options)
 
 type options struct {
-	scope *mcpkit.Scoper
+	scope    *mcpkit.Scoper
+	searcher DocSearcher
+}
+
+// Document types search_documents accepts: the fixed list, never caller text.
+const (
+	DocTypePolicy    = "policy"
+	DocTypeContract  = "contract"
+	DocTypeCloseNote = "close_note"
+)
+
+// MaxSnippetChars is the most runes a search_documents snippet holds,
+// including the ellipsis of a cut one.
+const MaxSnippetChars = 600
+
+const (
+	maxQueryChars = 500
+	defaultK      = 5
+	maxK          = 10
+)
+
+// SearchDocumentsInput is the input of the search_documents MCP tool. There
+// is no date argument: documents are not month-bound.
+type SearchDocumentsInput struct {
+	Query    string   `json:"query" jsonschema:"search text, at most 500 characters"`
+	Company  string   `json:"company,omitempty" jsonschema:"company ID; defaults to the run's company, any other company is refused"`
+	DocTypes []string `json:"doc_types,omitempty" jsonschema:"optional filter: any of policy, contract, close_note"`
+	K        int      `json:"k,omitempty" jsonschema:"number of results, 1 to 10 (default 5)"`
+}
+
+// SearchDocumentsOutput is one search hit, best first.
+type SearchDocumentsOutput struct {
+	DocID   string `json:"doc_id"`
+	DocType string `json:"doc_type"`
+	Section string `json:"section"`
+	Title   string `json:"title"`
+	Snippet string `json:"snippet" jsonschema:"the chunk text, whitespace-collapsed, at most 600 characters"`
+	// Score is the raw cross-encoder score as a JSON number. It is a
+	// json.Number because the nofloat analyzer bans float types in this
+	// package; the value is never computed on here.
+	Score json.Number `json:"score" jsonschema:"raw cross-encoder rerank score"`
+}
+
+// DocSearcher is what search_documents needs from retrieval.Searcher.
+type DocSearcher interface {
+	Search(ctx context.Context, query, company string, docTypes []string, k int) ([]retrieval.Hit, error)
+}
+
+// WithSearcher gives search_documents its searcher. Without one the tool is
+// listed but answers "document search is not configured".
+func WithSearcher(s DocSearcher) Option {
+	return func(o *options) { o.searcher = s }
+}
+
+// snippet collapses whitespace and cuts to MaxSnippetChars runes at a rune
+// boundary; a cut snippet ends in an ellipsis within the limit.
+func snippet(content string) string {
+	s := strings.Join(strings.Fields(content), " ")
+	if utf8.RuneCountInString(s) <= MaxSnippetChars {
+		return s
+	}
+	r := []rune(s)
+	return string(r[:MaxSnippetChars-1]) + "\u2026"
+}
+
+// scoreNumber wraps a rerank score's decimal text as a JSON number. A
+// non-finite score (never produced by TEI) becomes 0.
+func scoreNumber(text string) json.Number {
+	n := json.Number(text)
+	if _, err := json.Marshal(n); err != nil {
+		return "0"
+	}
+	return n
+}
+
+// validDocTypes checks and de-duplicates doc_types against the fixed list.
+func validDocTypes(in []string) ([]string, error) {
+	allowed := []string{DocTypePolicy, DocTypeContract, DocTypeCloseNote}
+	var out []string
+	for _, d := range in {
+		if !slices.Contains(allowed, d) {
+			return nil, fmt.Errorf("invalid doc_types entry: must be one of %s", strings.Join(allowed, ", "))
+		}
+		if !slices.Contains(out, d) {
+			out = append(out, d)
+		}
+	}
+	return out, nil
 }
 
 // WithScope binds every call to its run's company and window (CC-506): a
@@ -191,6 +285,74 @@ func RegisterTools(server *mcp.Server, st *store.Store, opts ...Option) {
 			})
 		}
 
+		return nil, out, nil
+	})
+
+	// json.Number would be described as a string; the score is a number.
+	searchOut, err := jsonschema.For[[]SearchDocumentsOutput](&jsonschema.ForOptions{
+		TypeSchemas: map[reflect.Type]*jsonschema.Schema{reflect.TypeFor[json.Number](): {Type: "number"}},
+	})
+	if err != nil {
+		panic(fmt.Sprintf("evidence: search_documents output schema: %v", err)) // a programming error, caught by every test
+	}
+	mcpkit.AddTool(server, &mcp.Tool{
+		Name:         "search_documents",
+		OutputSchema: searchOut,
+		Description:  "Search the policy, contract and close-note documents readable by the run's company; returns the best chunks with snippets of at most 600 characters.",
+		Annotations: &mcp.ToolAnnotations{
+			ReadOnlyHint: true,
+		},
+	}, func(ctx context.Context, req *mcp.CallToolRequest, in SearchDocumentsInput) (*mcp.CallToolResult, []SearchDocumentsOutput, error) {
+		company := in.Company
+		if o.scope != nil {
+			if company == "" {
+				if sc, ok := o.scope.Scope(req); ok {
+					company = sc.Company
+				}
+			}
+			if err := o.scope.CheckCompany(req, company); err != nil {
+				return nil, nil, err
+			}
+		} else if strings.TrimSpace(company) == "" {
+			return nil, nil, errors.New("company is required")
+		}
+		if strings.TrimSpace(in.Query) == "" {
+			return nil, nil, errors.New("query is required")
+		}
+		if utf8.RuneCountInString(in.Query) > maxQueryChars {
+			return nil, nil, fmt.Errorf("query must be at most %d characters", maxQueryChars)
+		}
+		docTypes, err := validDocTypes(in.DocTypes)
+		if err != nil {
+			return nil, nil, err
+		}
+		k := in.K
+		if k == 0 {
+			k = defaultK
+		}
+		if k < 1 || k > maxK {
+			return nil, nil, fmt.Errorf("k must be 1 to %d", maxK)
+		}
+		if o.searcher == nil {
+			return nil, nil, errors.New("document search is not configured")
+		}
+
+		hits, err := o.searcher.Search(ctx, in.Query, company, docTypes, k)
+		if err != nil {
+			return nil, nil, fmt.Errorf("search documents: %w", err)
+		}
+		out := make([]SearchDocumentsOutput, 0, len(hits))
+		for _, h := range hits {
+			if h.CompanyID != nil && *h.CompanyID != company {
+				slog.Warn("search_documents dropped a hit of another company",
+					"doc_id", h.DocID, "hit_company", *h.CompanyID, "scope_company", company)
+				continue
+			}
+			out = append(out, SearchDocumentsOutput{
+				DocID: h.DocID, DocType: h.DocType, Section: h.Section, Title: h.Title,
+				Snippet: snippet(h.Content), Score: scoreNumber(h.ScoreText()),
+			})
+		}
 		return nil, out, nil
 	})
 }

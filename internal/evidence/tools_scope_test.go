@@ -180,7 +180,19 @@ var evidenceScopeCases = map[string]struct {
 		},
 		ok: []map[string]any{gstr2b(), gstr2b("period", "2025-09"), gstr2b("period", "2026-10")},
 	},
+	// search_documents has no date argument, and with no searcher behind it
+	// an in-scope call ends in a tool error, not a store panic (see noStore).
+	"search_documents": {
+		refused: []evidenceCase{
+			{"unconfigured company", map[string]any{"query": "rent", "company": "nobody"}},
+			{"another company", map[string]any{"query": "rent", "company": "mehta"}},
+		},
+		ok: []map[string]any{{"query": "rent"}, {"query": "rent", "company": scopeCompany}},
+	},
 }
+
+// noStore lists the tools whose in-scope call does not reach the nil store.
+var noStore = map[string]bool{"search_documents": true}
 
 func TestScopeEveryTool(t *testing.T) {
 	for _, tool := range evidenceTools {
@@ -205,7 +217,7 @@ func TestScopeEveryTool(t *testing.T) {
 						t.Errorf("in-scope call %v refused: %s", args, msg)
 					}
 				}
-				if !sink.panicked() {
+				if !sink.panicked() && !noStore[tool] {
 					t.Error("in-scope calls never reached the store")
 				}
 			})

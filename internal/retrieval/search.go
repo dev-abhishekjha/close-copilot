@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -60,6 +61,10 @@ type Querier interface {
 type candidateSource interface {
 	candidates(ctx context.Context, mode SearchMode, vec []float32, query, company string, docTypes []string) ([]Hit, error)
 }
+
+// ScoreText is RerankScore as decimal text (a valid JSON number), for callers
+// that may not hold a float type (internal/evidence).
+func (h Hit) ScoreText() string { return strconv.FormatFloat(float64(h.RerankScore), 'g', -1, 32) }
 
 // Searcher runs hybrid search over doc_chunks. It calls no generative model:
 // TEI embedding and reranking are local, non-generative services.
@@ -201,7 +206,7 @@ func buildSQL(mode SearchMode, withTypes bool) string {
   LIMIT %d
 )`, where, branchLimit)
 	const final = `SELECT c.id, c.doc_id, c.doc_type, c.company_id, c.section, c.title, c.content, f.rrf
-FROM fused f JOIN doc_chunks c ON c.id = f.id
+FROM fused f JOIN doc_chunks c ON c.id = f.id AND (c.company_id IS NULL OR c.company_id = $2)
 ORDER BY f.rrf DESC, c.id`
 	if mode == ModeVector {
 		return fmt.Sprintf(`WITH %s, fused AS (

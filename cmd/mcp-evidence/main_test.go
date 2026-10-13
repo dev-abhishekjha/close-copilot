@@ -28,6 +28,8 @@ func testEvidenceConfig(dbURL string) config.Config {
 		DatabaseURL:   config.NewSecret(dbURL),
 		MCPTokenAgent: config.NewSecret("agent-secret-token"),
 		MCPScopeKey:   config.NewSecret("evidence-scope-key-for-tests"),
+		TEIEmbedURL:   "http://127.0.0.1:1", // built, never called: no unit test searches
+		TEIRerankURL:  "http://127.0.0.1:1",
 	}
 }
 
@@ -217,13 +219,13 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 		t.Fatalf("client.Connect: %v", err)
 	}
 
-	// 3. List tools: expect exactly list_bank_lines and list_gstr2b_entries
+	// 3. List tools: expect the two ledger-evidence tools and search_documents
 	toolsList, err := sess.ListTools(ctx, nil)
 	if err != nil {
 		t.Fatalf("sess.ListTools: %v", err)
 	}
-	if len(toolsList.Tools) != 2 {
-		t.Fatalf("want 2 tools, got %d", len(toolsList.Tools))
+	if len(toolsList.Tools) != 3 {
+		t.Fatalf("want 3 tools, got %d", len(toolsList.Tools))
 	}
 	found := make(map[string]bool)
 	for _, tool := range toolsList.Tools {
@@ -232,8 +234,8 @@ func TestMCPEvidenceRun_HTTP_StreamableHandshake(t *testing.T) {
 			t.Errorf("tool %s missing ReadOnlyHint", tool.Name)
 		}
 	}
-	if !found["list_bank_lines"] || !found["list_gstr2b_entries"] {
-		t.Errorf("expected list_bank_lines and list_gstr2b_entries, got %v", found)
+	if !found["list_bank_lines"] || !found["list_gstr2b_entries"] || !found["search_documents"] {
+		t.Errorf("expected list_bank_lines, list_gstr2b_entries and search_documents, got %v", found)
 	}
 
 	// Close client session and idle connections so server shutdown doesn't wait
@@ -282,7 +284,7 @@ func TestMCPEvidenceHTTPRequiresScopeKey(t *testing.T) {
 	if !errors.Is(err, errNoScopeKey) || !strings.Contains(err.Error(), config.EnvMCPScopeKey) {
 		t.Errorf("http without a scope key: %v, want an error naming %s", err, config.EnvMCPScopeKey)
 	}
-	if _, _, err := httpRoutes(cfg, nil); !errors.Is(err, errNoScopeKey) {
+	if _, _, err := httpRoutes(cfg, nil, nil); !errors.Is(err, errNoScopeKey) {
 		t.Errorf("httpRoutes without a scope key: %v", err)
 	}
 
@@ -301,7 +303,7 @@ func TestMCPEvidenceHTTPRequiresScopeKey(t *testing.T) {
 func TestMCPEvidenceHTTPScoped(t *testing.T) {
 	cfg := testEvidenceConfig("postgres://unused")
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
-	routes, opts, err := httpRoutes(cfg, nil)
+	routes, opts, err := httpRoutes(cfg, nil, nil)
 	if err != nil {
 		t.Fatalf("httpRoutes: %v", err)
 	}
@@ -328,6 +330,7 @@ func TestMCPEvidenceHTTPScoped(t *testing.T) {
 	for tool, args := range map[string]map[string]any{
 		"list_bank_lines":     {"company": "mehta", "from_date": "2026-09-01", "to_date": "2026-09-30"},
 		"list_gstr2b_entries": {"company": "mehta", "period": "2026-09"},
+		"search_documents":    {"company": "mehta", "query": "rent"},
 	} {
 		res, err := cs.CallTool(t.Context(), &mcp.CallToolParams{Name: tool, Arguments: args})
 		if err != nil {

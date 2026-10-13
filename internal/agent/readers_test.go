@@ -44,14 +44,22 @@ var wireTypes = []struct {
 // tool's outputSchema to map to a JSON tag of the matching private struct
 // and every tag to a property, at every level.
 func TestWireStructsMatchSchemaGoldens(t *testing.T) {
-	// Every golden on disk is covered.
+	// Every golden on disk is covered, except the tools the agent must
+	// never read. search_documents.json: the agent never reads documents;
+	// retrieval is a workflow step (CC-806), so no agent wire type exists
+	// for it (no-agent-search invariant).
+	notAgentTools := []string{"search_documents.json"}
 	var onDisk []string
 	for _, dir := range []string{"../books/testdata/schemas", "../evidence/testdata/schemas"} {
 		m, err := filepath.Glob(filepath.Join(dir, "*.json"))
 		if err != nil {
 			t.Fatal(err)
 		}
-		onDisk = append(onDisk, m...)
+		for _, p := range m {
+			if !slices.Contains(notAgentTools, filepath.Base(p)) {
+				onDisk = append(onDisk, p)
+			}
+		}
 	}
 	var covered []string
 	for _, w := range wireTypes {

@@ -98,8 +98,8 @@ BNK-20260915-003,2026-09-15,2026-09-15,PG SETTL 0915 BATCH 7781,PGS7781,,97640.0
 	if err != nil {
 		t.Fatalf("sess.ListTools: %v", err)
 	}
-	if len(toolsList.Tools) != 2 {
-		t.Fatalf("expected 2 tools, got %d", len(toolsList.Tools))
+	if len(toolsList.Tools) != 3 {
+		t.Fatalf("expected 3 tools, got %d", len(toolsList.Tools))
 	}
 	toolsMap := make(map[string]*mcp.Tool)
 	for _, tool := range toolsList.Tools {
@@ -113,6 +113,9 @@ BNK-20260915-003,2026-09-15,2026-09-15,PG SETTL 0915 BATCH 7781,PGS7781,,97640.0
 	}
 	if _, ok := toolsMap["list_gstr2b_entries"]; !ok {
 		t.Errorf("missing tool list_gstr2b_entries")
+	}
+	if _, ok := toolsMap["search_documents"]; !ok {
+		t.Errorf("missing tool search_documents")
 	}
 
 	// 3. Test list_bank_lines call: all lines
