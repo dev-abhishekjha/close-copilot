@@ -49,6 +49,11 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodGet, "/runs/{id}/progress", anyRole, s.runsHTML(s.handleRunProgress)},
 		{http.MethodGet, "/runs/{id}/findings", anyRole, s.runsHTML(s.handleRunFindingsPage)},
 
+		// Finding detail (CC-1003). They answer 501 until Runs.Findings is set.
+		{http.MethodGet, "/findings/{id}", anyRole, s.findingsHTML(s.handleFindingPage)},
+		{http.MethodPost, "/findings/{id}/accept", makerOnly, s.findingsHTML(s.handleFindingAccept)},
+		{http.MethodPost, "/findings/{id}/dismiss", makerOnly, s.findingsHTML(s.handleFindingDismiss)},
+
 		// JSON API (shared spec).
 		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},
 		{http.MethodGet, "/api/close-runs/{id}", anyRole, s.runsAPI(s.handleAPIRun)},
