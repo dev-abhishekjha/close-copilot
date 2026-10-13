@@ -8,7 +8,8 @@ package agent
 //	verifying -> investigating -> synthesizing -> done | partial | failed
 //
 // and each state is one or more run_steps rows (CC-709): router/close,
-// check.<name>/<name>, retrieve/close, explain/<finding id>,
+// check.<name>/<name>, retrieve/<finding id> (or one skipped
+// retrieve/close), explain/<finding id>,
 // verify/<finding id>, investigate/<finding id> with
 // verify/investigate/<finding id> (or one skipped investigate/close) and
 // synthesize/report. Every step
@@ -22,9 +23,17 @@ package agent
 // missing report file. Nothing here logs prompts, tool results or
 // narrations: only run and step identifiers, statuses and counts.
 //
-// Phase 1 runs preflight, the bank reconciliation check, explaining,
-// verifying and synthesizing; retrieving (CC-806) is recorded as a skipped
-// step. Investigating (CC-706) runs per unmatched_bank_line finding,
+// Retrieving (CC-806) runs one retrieve step per finding, Parallel at a
+// time, before any finding is explained: a query built from the finding
+// (buildQuery) goes to the Retriever under the run's scope, and the top
+// passages are stored as a retrieval artifact, the step's output. The
+// explain step gets those refs as ExplainRequest.DocumentRefs on every
+// attempt (a retry never searches again) and sends the passages as
+// DOCUMENTS to the explainer, whose only tool is emit_explanation. A
+// tainted finding's retrieve step is skipped with reasonTainted. A failed
+// search fails only that step, with a fixed reason; the finding is still
+// explained, with empty DOCUMENTS. With no Retriever, explainer or model,
+// one retrieve/close step is recorded as skipped. Investigating (CC-706) runs per unmatched_bank_line finding,
 // Parallel at a time, after every finding is explained and verified: an
 // investigate step, whose model is pseudonymised (WrapRedacting outside
 // the recording wrapper, so stored prompts hold tokens only), then a
@@ -125,7 +134,16 @@ const (
 	reasonNoExplainer   = "no explainer configured"
 	reasonNoVerifier    = "no verifier configured"
 	reasonNoExplanation = "no explanation to verify"
-	reasonRetrieve      = "retrieval arrives with CC-806"
+	// reasonRetrieve is the reason a pre-CC-806 run recorded on its
+	// retrieve/close step; stored runs and report fixtures still hold it.
+	reasonRetrieve    = "retrieval arrives with CC-806"
+	reasonNoRetriever = "no retriever configured"
+	// reasonNothingToRetrieve is the retrieve/close reason of a run with a
+	// retriever but no finding.
+	reasonNothingToRetrieve = "no findings to retrieve documents for"
+	// reasonRetrieveFailed is a failed retrieve step's fixed reason: the
+	// search's own error text is never recorded.
+	reasonRetrieveFailed = "document search failed"
 	// reasonInvestigate is the reason a pre-CC-706 run recorded on its
 	// investigate/close step; stored runs and report fixtures still hold it.
 	reasonInvestigate    = "investigation arrives with CC-706"
@@ -209,6 +227,9 @@ type ExplainRequest struct {
 	EvidenceRefs []string
 	// Feedback is the step's stored verifier feedback, if any.
 	Feedback []byte
+	// DocumentRefs are the retrieval artifacts of the finding's retrieve
+	// step, whose passages go in DOCUMENTS (CC-806). Empty means none.
+	DocumentRefs []string
 	// Model records every call against this step (RecordingProvider) and
 	// refuses a call once the run's token cap is reached (ErrRunTokenCap).
 	// It is nil when the workflow has no model.
@@ -293,6 +314,10 @@ type Workflow struct {
 	// Investigator investigates unmatched_bank_line findings (CC-706); nil
 	// records one skipped investigate/close step.
 	Investigator Investigator
+	// Retriever finds each finding's passages before it is explained
+	// (CC-806). Nil records one skipped retrieve/close step. It is never
+	// given to the investigator.
+	Retriever Retriever
 	// NewRedactor builds the run's Redactor (CC-710) for investigate
 	// steps, whose model is WrapRedacting over the recorded provider. Nil
 	// refuses investigation: identifiers never reach a tool-using model
@@ -616,12 +641,13 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 	}
 	sortFindings(findings)
 
-	if err := w.skipStep(ctx, run.ID, store.StepKindRetrieve, SubjectClose, reasonRetrieve); err != nil {
+	tainted := taintedFindings(findings)
+	docs, err := w.retrieveAll(ctx, run, findings, tainted)
+	if err != nil {
 		return outcome{}, err
 	}
 
-	tainted := taintedFindings(findings)
-	explained, verified, err := w.explainAndVerifyAll(ctx, run, findings, tainted)
+	explained, verified, err := w.explainAndVerifyAll(ctx, run, findings, tainted, docs)
 	if err != nil {
 		return outcome{}, err
 	}
@@ -945,6 +971,104 @@ func (w *Workflow) linkVariances(ctx context.Context, runID uuid.UUID, fs []stor
 	return linked[len(stored):], nil
 }
 
+// ---- retrieving ----
+
+// retrieveAll runs each finding's retrieve step, Parallel at a time, and
+// returns the retrieval artifact refs per finding ID. A tainted finding's
+// step is skipped and gets none. With no Retriever, explainer or model, or
+// no finding, it records one skipped retrieve/close step instead.
+func (w *Workflow) retrieveAll(ctx context.Context, run store.CloseRun, findings []store.Finding, tainted map[uuid.UUID]bool) (map[uuid.UUID][]string, error) {
+	reason := ""
+	switch {
+	case w.Retriever == nil:
+		reason = reasonNoRetriever
+	case w.Explainer == nil:
+		reason = reasonNoExplainer
+	case w.Model == nil:
+		reason = reasonExplainNoModel
+	case len(findings) == 0:
+		reason = reasonNothingToRetrieve
+	}
+	if reason != "" {
+		return nil, w.skipStep(ctx, run.ID, store.StepKindRetrieve, SubjectClose, reason)
+	}
+	var mu sync.Mutex
+	out := make(map[uuid.UUID][]string, len(findings))
+	failed := 0
+	g, gctx := errgroup.WithContext(ctx)
+	g.SetLimit(w.parallel())
+	for _, f := range findings {
+		g.Go(func() error {
+			if tainted[f.ID] {
+				return w.skipStep(gctx, run.ID, store.StepKindRetrieve, f.ID.String(), reasonTainted)
+			}
+			refs, ok, err := w.retrieveOne(gctx, run, f)
+			if err != nil {
+				return err
+			}
+			mu.Lock()
+			defer mu.Unlock()
+			if !ok {
+				failed++
+			}
+			out[f.ID] = refs
+			return nil
+		})
+	}
+	if err := g.Wait(); err != nil {
+		return nil, err
+	}
+	if failed > 0 {
+		// Counts only: never queries, passages or the search's error text.
+		w.log().WarnContext(ctx, "document search failed; findings explained without documents", "run_id", run.ID, "failed", failed, "findings", len(findings))
+	}
+	return out, nil
+}
+
+// retrieveOne runs the finding's retrieve step unless it is done (a done
+// step's refs are reused, so a resume never searches again). It reports
+// whether the step ended done; a failed search fails the step with a fixed
+// reason and is not an error.
+func (w *Workflow) retrieveOne(ctx context.Context, run store.CloseRun, f store.Finding) ([]string, bool, error) {
+	step, done, err := w.begin(ctx, run.ID, store.StepKindRetrieve, f.ID.String())
+	if err != nil {
+		return nil, false, err
+	}
+	if done {
+		return step.OutputRefs, true, nil
+	}
+	query := buildQuery(f)
+	passages, err := w.Retriever.Retrieve(ctx, RetrieveRequest{Company: run.CompanyID, Month: run.Month, Finding: f, Query: query})
+	if err != nil {
+		if workerFatal(ctx, err) {
+			return nil, false, w.failStep(ctx, step, err)
+		}
+		if ferr := w.failStep(ctx, step, errors.New(reasonRetrieveFailed)); errors.Is(ferr, store.ErrStaleAttempt) {
+			return nil, false, ferr
+		}
+		w.log().WarnContext(ctx, "retrieve step failed", "run_id", run.ID, "step_id", step.ID)
+		return nil, false, nil
+	}
+	if len(passages) > maxPassages {
+		passages = passages[:maxPassages]
+	}
+	art := RetrievalArtifact{Query: query, Passages: make([]Passage, 0, len(passages))}
+	for _, p := range passages {
+		// The hash is always of the stored text.
+		art.Passages = append(art.Passages, newPassage(p.DocID, p.DocType, p.Section, p.Title, p.Text))
+	}
+	sha, err := w.Store.PutArtifact(ctx, store.ArtifactRetrieval, run.ID, step.ID, art)
+	if err != nil {
+		return nil, false, w.failStep(ctx, step, err)
+	}
+	refs := []string{sha}
+	if err := w.finish(ctx, step, store.StepDone, refs, ""); err != nil {
+		return nil, false, err
+	}
+	w.log().DebugContext(ctx, "documents retrieved", "run_id", run.ID, "step_id", step.ID, "passages", len(art.Passages))
+	return refs, true, nil
+}
+
 // ---- explaining and verifying ----
 
 // evidenceRefs are the distinct snapshot addresses of a finding's
@@ -990,7 +1114,7 @@ func (w *Workflow) finishWorker(ctx context.Context, step store.Step, res StepRe
 // Parallel findings at a time; a tainted finding is held instead
 // (holdTainted). It returns how many findings have an explanation and how
 // many of those passed verification.
-func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding, tainted map[uuid.UUID]bool) (int, int, error) {
+func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, findings []store.Finding, tainted map[uuid.UUID]bool, docs map[uuid.UUID][]string) (int, int, error) {
 	var mu sync.Mutex
 	explained, verified := 0, 0
 	g, gctx := errgroup.WithContext(ctx)
@@ -1000,7 +1124,7 @@ func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, 
 			if tainted[f.ID] {
 				return w.holdTainted(gctx, run, f)
 			}
-			hasExplanation, passed, err := w.explainAndVerify(gctx, run, f)
+			hasExplanation, passed, err := w.explainAndVerify(gctx, run, f, docs[f.ID])
 			if err != nil {
 				return err
 			}
@@ -1025,9 +1149,9 @@ func (w *Workflow) explainAndVerifyAll(ctx context.Context, run store.CloseRun, 
 // verdict reopen both steps and go again, up to MaxExplainAttempts explain
 // attempts. It reports whether the finding has an explanation and whether
 // it passed verification.
-func (w *Workflow) explainAndVerify(ctx context.Context, run store.CloseRun, f store.Finding) (bool, bool, error) {
+func (w *Workflow) explainAndVerify(ctx context.Context, run store.CloseRun, f store.Finding, docRefs []string) (bool, bool, error) {
 	for {
-		explainStep, refs, ok, err := w.explainOne(ctx, run, f)
+		explainStep, refs, ok, err := w.explainOne(ctx, run, f, docRefs)
 		if err != nil {
 			return false, false, err
 		}
@@ -1056,7 +1180,8 @@ func (w *Workflow) explainAndVerify(ctx context.Context, run store.CloseRun, f s
 
 // explainOne runs the finding's explain step unless it is done. It returns
 // the step (for its attempt) and its output refs when it ends done.
-func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.Finding) (store.Step, []string, bool, error) {
+// docRefs are the finding's retrieval artifacts, the same on every attempt.
+func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.Finding, docRefs []string) (store.Step, []string, bool, error) {
 	step, done, err := w.begin(ctx, run.ID, store.StepKindExplain, f.ID.String())
 	if err != nil {
 		return store.Step{}, nil, false, err
@@ -1078,7 +1203,8 @@ func (w *Workflow) explainOne(ctx context.Context, run store.CloseRun, f store.F
 		RunID: run.ID, StepID: step.ID, Attempt: step.Attempt,
 		Company: run.CompanyID, Month: run.Month,
 		Finding: f, EvidenceRefs: evidenceRefs(f), Feedback: step.Feedback,
-		Model: w.stepModel(run.ID, step.ID),
+		DocumentRefs: slices.Clone(docRefs),
+		Model:        w.stepModel(run.ID, step.ID),
 	})
 	if err != nil {
 		telemetry.Fail(span, "explain failed")
