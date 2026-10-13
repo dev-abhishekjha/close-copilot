@@ -1,0 +1,27 @@
+# CC-804 dev set: 20 hand-written retrieval queries. Not the golden set (CC-907).
+# `section` is the exact string ChunkMarkdown produces from the corpus .md source.
+queries:
+  # shared policy, paraphrase
+  - {company: sharma, query: "how long do we have to finish the month-end close", doc_id: POL-001-accounting-policy, section: "§2.1 Working days"}
+  - {company: mehta, query: "minimum cost before a purchase must be treated as a long-lived asset", doc_id: POL-001-accounting-policy, section: "§3.1 Capitalisation threshold"}
+  - {company: sharma, query: "spread a yearly licence fee over the months it covers", doc_id: POL-001-accounting-policy, section: "§4.2 Spread annual costs monthly"}
+  - {company: mehta, query: "what to book when a regular supplier's invoice has not arrived", doc_id: POL-001-accounting-policy, section: "§5.1 Accrue recurring suppliers at their usual amount"}
+  - {company: sharma, query: "which entries may an accountant approve and up to what amount", doc_id: POL-001-accounting-policy, section: "§9.2 Approval limits"}
+  - {company: mehta, query: "when is a bank line matched to a ledger entry", doc_id: POL-001-accounting-policy, section: "§7.3 Matching rule"}
+  # shared policy, exact terms
+  - {company: sharma, query: "GSTR-2B", doc_id: POL-001-accounting-policy, section: "§6.1 Claim credit only for invoices in GSTR-2B"}
+  - {company: mehta, query: "payment gateway fee and GST on the fee settlement", doc_id: POL-001-accounting-policy, section: "§7.2 Book gateway settlements with fee and GST"}
+  - {company: sharma, query: "unregistered supplier no GSTIN reverse charge", doc_id: POL-001-accounting-policy, section: "§6.5 Unregistered suppliers"}
+  - {company: mehta, query: "change of more than 25% month-on-month investigated", doc_id: POL-001-accounting-policy, section: "§10.1 Month-on-month review"}
+  # Sharma contracts and notes
+  - {company: sharma, query: "Omkar Estates monthly rent amount", doc_id: CON-omkar-estates, section: "§3 Billing and amount"}
+  - {company: sharma, query: "Cloudly SaaS annual fee billed upfront in September", doc_id: CON-cloudly, section: "§3 Billing and amount"}
+  - {company: sharma, query: "Bharat Polymers IGST state code 24", doc_id: CON-bharat-polymers, section: "§4 GST"}
+  - {company: sharma, query: "May 2026 close note: usual accrual amount for City Power electricity bill", doc_id: NOTE-sharma-2026-05, section: "Recurring suppliers and accruals"}
+  - {company: sharma, query: "May 2026 close note: Securewell guarding bill on the 28th", doc_id: NOTE-sharma-2026-05, section: "Recurring suppliers and accruals"}
+  # Mehta contracts and notes
+  - {company: mehta, query: "Lotus Business Parks fixed monthly charge", doc_id: CON-lotus-business-parks, section: "§3 Billing and amount"}
+  - {company: mehta, query: "Tiffin Corner Caterers not registered for GST", doc_id: CON-tiffin-corner, section: "§4 GST"}
+  - {company: mehta, query: "Codeforge licences annual renewal prepaid", doc_id: CON-codeforge-licences, section: "§3 Billing and amount"}
+  - {company: mehta, query: "Hostmesa Cloud variable monthly bill between 80,000 and 1,40,000", doc_id: CON-hostmesa-cloud, section: "§3 Billing and amount"}
+  - {company: mehta, query: "Mehta May 2026 close note: payroll paid on the last day of the month", doc_id: NOTE-mehta-2026-05, section: "Payroll"}
