@@ -26,8 +26,10 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
-// stopArgs is `docker compose ... --profile ingest stop`, as in the Makefile.
-var stopArgs = []string{"compose", "-f", "deploy/docker-compose.yml", "--profile", "ingest", "stop"}
+// stopArgs is `docker compose ... --profile ingest stop docling`. It must name
+// the service: a bare `stop` stops every service of the project, including
+// Postgres and TEI.
+var stopArgs = []string{"compose", "-f", "deploy/docker-compose.yml", "--profile", "ingest", "stop", "docling"}
 
 const stopTimeout = 2 * time.Minute
 
