@@ -1,0 +1,25 @@
+package templates
+
+// Home is the signed-in landing page. It lists only the actions the user's
+// role may take; the server's middleware is still the authority.
+templ Home(p HomePage) {
+	@Base(Layout{Title: "Home", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card">
+			<h1>Welcome, { p.User }</h1>
+			<p>You are signed in as <strong class="role-name">{ p.Role }</strong>.</p>
+			<h2>What you can do</h2>
+			if len(p.Actions) == 0 {
+				<p>No actions are available to your role.</p>
+			} else {
+				<ul class="actions">
+					for _, a := range p.Actions {
+						<li data-action={ a.ID }>
+							<span class="label">{ a.Label }</span>
+							<code>{ a.Method } { a.Path }</code>
+						</li>
+					}
+				</ul>
+			}
+		</section>
+	}
+}

@@ -1,0 +1,22 @@
+# Close Copilot web users (CC-1001). Protected path: change only with the owner.
+#
+# Synthetic dev accounts. password_hash is bcrypt (cost >= 10); plaintext
+# passwords are never stored in the repo. Rotate every hash before the public
+# demo: a changed hash ends that user's existing sessions.
+#
+# Roles are explicit sets, not a ladder: viewer reads, maker proposes, checker
+# approves. token_sha256 is the hex SHA-256 of a bearer token for scripts
+# (/api/* only); empty means bearer auth is off for that user.
+users:
+  - username: asha
+    role: maker
+    password_hash: "$2a$12$jky5tV.LAyi.Wh/myKGQe.8MKpHCBHLfK63Rk2COq3gYVm7oLwH2e"
+    token_sha256: ""
+  - username: ravi
+    role: checker
+    password_hash: "$2a$12$cFr5t915mesBPRhC7LsfaOycKVYSUqrSnqALQQkrM0M/grKXb/ZPq"
+    token_sha256: ""
+  - username: demo
+    role: viewer
+    password_hash: "$2a$12$WQBKMml7s.kl1yITswm8IO39JPONo8/GhvIEQVlY/PutK8wh7J1WW"
+    token_sha256: ""
