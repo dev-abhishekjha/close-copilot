@@ -1,0 +1,59 @@
+package templates
+
+// Runs is the runs page: a start form for makers and the past runs.
+templ Runs(p RunsPage) {
+	@Base(Layout{Title: "Close runs", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card">
+			<h1>Close runs</h1>
+			if p.Error != "" {
+				<p class="error" role="alert">{ p.Error }</p>
+			}
+			if p.CanStart {
+				<form method="post" action="/runs" class="start-run">
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<label>
+						Company
+						<select name="company">
+							for _, c := range p.Companies {
+								<option value={ c } selected?={ c == p.Company }>{ c }</option>
+							}
+						</select>
+					</label>
+					<label>
+						Month
+						<input type="text" name="month" value={ p.Month } placeholder="YYYY-MM" pattern="\d{4}-(0[1-9]|1[0-2])" required/>
+					</label>
+					<button type="submit">Start close</button>
+				</form>
+			}
+			if len(p.Runs) == 0 {
+				<p>No runs yet.</p>
+			} else {
+				<table class="runs">
+					<thead>
+						<tr>
+							<th>Company</th>
+							<th>Month</th>
+							<th>Status</th>
+							<th>Findings</th>
+							<th>Cost</th>
+							<th>Duration</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range p.Runs {
+							<tr data-run={ r.ID }>
+								<td><a href={ templ.SafeURL(runURL(r.ID)) }>{ r.Company }</a></td>
+								<td>{ r.Month }</td>
+								<td class="status">{ r.Status }</td>
+								<td class="findings">{ itoa(r.Findings) }</td>
+								<td class="cost">{ r.Cost }</td>
+								<td class="duration">{ r.Duration }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</section>
+	}
+}

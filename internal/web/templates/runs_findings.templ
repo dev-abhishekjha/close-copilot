@@ -1,0 +1,73 @@
+package templates
+
+// RunFindings is the findings list of one run, with type and status filters.
+templ RunFindings(p FindingsPage) {
+	@Base(Layout{Title: "Findings", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card">
+			<h1>Findings: { p.Company } { p.Month }</h1>
+			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(runURL(p.RunID)) }>Run status</a></p>
+			<form method="get" action={ templ.SafeURL(findingsURL(p.RunID)) } class="filters">
+				<label>
+					Type
+					<select name="type">
+						<option value="">All</option>
+						for _, t := range p.Types {
+							<option value={ t } selected?={ t == p.SelType }>{ t }</option>
+						}
+					</select>
+				</label>
+				<label>
+					Status
+					<select name="status">
+						<option value="">All</option>
+						for _, s := range p.Statuses {
+							<option value={ s } selected?={ s == p.SelStatus }>{ s }</option>
+						}
+					</select>
+				</label>
+				<button type="submit">Filter</button>
+			</form>
+			if len(p.Rows) == 0 {
+				<p>No findings.</p>
+			} else {
+				<table class="findings">
+					<thead>
+						<tr>
+							<th>Severity</th>
+							<th>Type</th>
+							<th>Title</th>
+							<th>Amount</th>
+							<th>Status</th>
+							<th>Verified</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range p.Rows {
+							@findingRow(r, false)
+							for _, n := range r.Nested {
+								@findingRow(n, true)
+							}
+						}
+					</tbody>
+				</table>
+			}
+		</section>
+	}
+}
+
+templ findingRow(r FindingRow, nested bool) {
+	<tr data-finding={ r.ID } data-severity={ r.Severity } class={ rowClass(nested) }>
+		<td class="severity">{ r.Severity }</td>
+		<td class="type">{ r.Type }</td>
+		<td class="title">{ r.Title }</td>
+		<td class="amount">{ r.Amount }</td>
+		<td class="status">{ r.Status }</td>
+		<td class="verified">
+			if r.Verified {
+				<span class="badge verified">verified</span>
+			} else {
+				<span class="badge unverified">unverified</span>
+			}
+		</td>
+	</tr>
+}
