@@ -411,6 +411,22 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 ---
 
+### CC-708b · Score the router's refusals against the golden set
+
+**Goal.** `eval score` reports correct refusal per category and over-refusal against `evals/golden/refusal.yaml` (CC-907), so CC-708's acceptance ("correct refusal at or above the threshold, zero misses in other_company and injection") is measured by someone other than CC-708's author.
+
+**Finding** (from CC-708's spec, 2026-10-13). CC-708's own test only runs the rules with a `FakeProvider`, which is a self-check. `internal/evals` and `cmd/eval` have no refusal metric, so a G4-tier2 gate for CC-708 would skip silently, and the llm-engineer may not touch `internal/evals` or `cmd/eval`.
+
+**Subtasks**
+- A scorer in `internal/evals` that runs each of the 60 items through `agent.Triage.Route` and compares `Decision.Action` and `Category` with `expect_action` and `category`; report correct refusal per category and over-refusal on the 20 should-answer items in `score.json` and `score.md`, and add a `--require` key (for example `refusal.other_company.recall>=8/8`).
+- A real-model run (fast model) and a `--replay` mode with recorded classifier responses, so `--no-llm` runs need no model.
+- Tests with fixtures for a correct refusal, a wrong category, a miss and an over-refusal.
+- The baseline gets its refusal numbers in its own `baseline-update` commit, owner-approved. This ticket does not edit `evals/baseline.json` or `evals/golden/**`.
+
+**Notes.** CC-708 exposes `NewTriage(...)` and `Triage.Route`; the scorer builds one with the same redacting and recording wrappers. The `refusal.yaml` header still says DRAFT; the owner confirms it before this ticket relies on it.
+
+**Files.** `internal/evals/refusal.go`, `internal/evals/refusal_test.go`, `internal/evals/score.go`, `internal/evals/report.go`, `cmd/eval/main.go`. Phase 3, eval-engineer, standard. Depends on CC-708 and CC-907.
+
 ## Notes for later specs
 
 

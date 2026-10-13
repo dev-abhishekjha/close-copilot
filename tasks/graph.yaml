@@ -1016,6 +1016,22 @@ tasks:
       - "internal/agent/triage.go"
       - "internal/agent/prompts/triage.txt"
     check: "Correct refusal at or above threshold; refused requests make no tool or retrieval call"
+  # CC-708b is not in the tickets doc; see tasks/hardening.md (split off CC-708, 2026-10-13).
+  - id: CC-708b
+    title: "Score the router's refusals against the golden set"
+    phase: 3
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-708, CC-907]
+    needs_erpnext: false
+    files:
+      - "internal/evals/refusal.go"
+      - "internal/evals/refusal_test.go"
+      - "internal/evals/score.go"
+      - "internal/evals/report.go"
+      - "cmd/eval/main.go"
+    check: "eval score reports correct refusal per category and over-refusal from evals/golden/refusal.yaml; --require key works; zero misses in other_company and injection"
   - id: CC-801
     title: "Document corpus"
     phase: 3
