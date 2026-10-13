@@ -1,0 +1,50 @@
+{
+  "annotations": {
+    "destructiveHint": false,
+    "idempotentHint": true,
+    "readOnlyHint": false
+  },
+  "description": "Posts one journal proposal that a checker other than its maker approved, as a submitted ERPNext Journal Entry. It takes only the proposal ID; the lines (amounts in paise), company and posting date (YYYY-MM-DD) come from the approved proposal. Calling it again for the same proposal returns the first call's entry with already_posted true and writes nothing.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "proposal_id": {
+        "description": "ID (UUID) of an approved journal proposal; the entry's lines, company and date are read from the approved proposal, never from the call",
+        "type": "string"
+      }
+    },
+    "required": [
+      "proposal_id"
+    ],
+    "type": "object"
+  },
+  "name": "post_approved_journal_entry",
+  "outputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "already_posted": {
+        "description": "true when an earlier call had already recorded this post; nothing new was written to ERPNext",
+        "type": "boolean"
+      },
+      "erp_name": {
+        "description": "name of the submitted ERPNext Journal Entry",
+        "type": "string"
+      },
+      "proposal_id": {
+        "description": "the proposal ID",
+        "type": "string"
+      },
+      "status": {
+        "description": "always posted",
+        "type": "string"
+      }
+    },
+    "required": [
+      "proposal_id",
+      "erp_name",
+      "status",
+      "already_posted"
+    ],
+    "type": "object"
+  }
+}
