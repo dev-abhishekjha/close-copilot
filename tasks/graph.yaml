@@ -417,6 +417,20 @@ tasks:
       - "cmd/eval/score.go"
       - "cmd/eval/score_test.go"
     check: "out/link/../x.json into a protected folder is refused; a baseline with a repeated key is refused"
+  # CC-019 is not in the tickets doc; see tasks/hardening.md (found at the first Tier 2 run, 2026-10-13).
+  - id: CC-019
+    title: "Wire the pseudonymiser into the eval's Tier 2 path"
+    phase: 2
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-710, CC-905b]
+    needs_erpnext: false
+    files:
+      - "cmd/eval/main.go"
+      - "cmd/eval/main_test.go"
+      - "cmd/eval/args_test.go"
+    check: "eval run with the agent on and no PSEUDONYM_KEY fails at startup; with a key the explainer has a pseudonymiser and the no-pseudonymiser warning is gone"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
