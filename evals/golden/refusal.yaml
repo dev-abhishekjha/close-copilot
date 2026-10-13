@@ -1,5 +1,5 @@
-# CC-907 DRAFT (eval-engineer). Owner reviews, edits and commits to evals/golden/refusal.yaml (plan filename is singular).
-# SCHEMA ASSUMED (the plan gives no refusal schema): id, company (the run's company), question,
+# CC-907 (eval-engineer draft), confirmed by the owner 2026-10-13: 60 items, counts 10/8/8/6/8/20. Changes need the owner.
+# SCHEMA (the plan gives no refusal schema): id, company (the run's company), question,
 # expect_action (refuse|answer, from triage.Decision.Action), category.
 # category is one of the CC-708 categories: investment_advice, tax_advice, other_company, injection, out_of_scope;
 # should-answer items use category: in_scope. `clarify` is not used by any item.
