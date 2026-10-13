@@ -1,7 +1,122 @@
 {
   "suites": {
     "suite-skeleton": {
-      "llm": null,
+      "llm": {
+        "agent": true,
+        "aggregates": {
+          "clean": {
+            "failed_months": 0,
+            "false_alarms": 0,
+            "findings": 3,
+            "months": 1
+          },
+          "overall": {
+            "caught": 3,
+            "correct": 8,
+            "false_alarms": 0,
+            "findings": 8,
+            "missed": 0,
+            "planted": 3,
+            "precision": {
+              "den": 8,
+              "num": 8,
+              "percent": "100.0%"
+            },
+            "recall": {
+              "den": 3,
+              "num": 3,
+              "percent": "100.0%"
+            },
+            "unscored": 0
+          },
+          "runs": {
+            "cost_usd": {
+              "mean": "0.003006",
+              "p95": "0.003963",
+              "total": "0.006012"
+            },
+            "duration_ms": {
+              "mean": 11735,
+              "p95": 15913,
+              "total": 23471
+            },
+            "runs": 2,
+            "tokens": {
+              "cache_read": 20622,
+              "input": 16,
+              "output": 10429
+            }
+          },
+          "types": {
+            "unmatched_bank_line": {
+              "caught": 0,
+              "correct": 5,
+              "false_alarms": 0,
+              "findings": 5,
+              "missed": 0,
+              "planted": 0,
+              "precision": {
+                "den": 5,
+                "num": 5,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 0,
+                "num": 0,
+                "percent": "n/a"
+              }
+            },
+            "unrecorded_bank_charge": {
+              "caught": 3,
+              "correct": 3,
+              "false_alarms": 0,
+              "findings": 3,
+              "missed": 0,
+              "planted": 3,
+              "precision": {
+                "den": 3,
+                "num": 3,
+                "percent": "100.0%"
+              },
+              "recall": {
+                "den": 3,
+                "num": 3,
+                "percent": "100.0%"
+              }
+            }
+          },
+          "verified_rate": {
+            "den": 8,
+            "num": 3,
+            "percent": "37.5%"
+          }
+        },
+        "commit": "dev",
+        "investigations": {
+          "sharma-2026-08/X01": "surfaced",
+          "sharma-2026-08/X02": "surfaced",
+          "sharma-2026-08/X03": "surfaced",
+          "sharma-2026-09/X01": "surfaced",
+          "sharma-2026-09/X02": "surfaced"
+        },
+        "items": {
+          "sharma-2026-09/E01": "caught",
+          "sharma-2026-09/E02": "caught",
+          "sharma-2026-09/E03": "caught"
+        },
+        "models": {
+          "fast": "haiku",
+          "strong": "sonnet"
+        },
+        "noise": {
+          "clean.false_alarms": 0,
+          "unmatched_bank_line.caught": 0,
+          "unrecorded_bank_charge.caught": 0,
+          "verified": 1
+        },
+        "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
+        "suite": "suite-skeleton"
+      },
       "replay": {
         "agent": false,
         "aggregates": {
