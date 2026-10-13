@@ -47,6 +47,10 @@ Commit `c1`, models fast `haiku` / strong `sonnet`, agent false. 1 months scored
 | F08 | not_run | (none) | POL-1 §1 |
 | F09 | right | POL-1 §2 | POL-1 §1; POL-1 §2 |
 
+## Refusals
+
+Refusals: not measured: no refusal run given \(eval score --refusal\)
+
 ## Cost and time per close run
 
 | Metric | Total | Mean | p95 |

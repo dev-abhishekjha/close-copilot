@@ -267,6 +267,9 @@ type Score struct {
 	// Citations is the citation validity and precision (CC-806b).
 	Citations Citations `json:"citations"`
 
+	// Refusal is the router's refusal and over-refusal score (CC-708b).
+	Refusal Refusal `json:"refusal"`
+
 	Runs RunStats `json:"runs"`
 	// VerifierRejects and Retries sum the runs' failed verdicts and explain
 	// retries (0 without the agent).
@@ -375,6 +378,12 @@ type ScoreOptions struct {
 	// FixturesDir holds <suite>/corpus-sections.json, the corpus validity
 	// is checked against; empty leaves the citations unmeasured.
 	FixturesDir string
+	// RefusalPath is a refusal.json from eval refusal; empty leaves the
+	// refusal score unmeasured.
+	RefusalPath string
+	// GoldenRefusalPath is the golden refusal file; empty is
+	// DefaultRefusalGoldenPath.
+	GoldenRefusalPath string
 }
 
 // DefaultTruthDir is the ground truth folder of a suite.
@@ -500,6 +509,10 @@ func ScoreRun(opts ScoreOptions) (Score, error) {
 		return Score{}, err
 	}
 	s.Citations, err = scoreCitationsFor(opts, s.Suite, months)
+	if err != nil {
+		return Score{}, err
+	}
+	s.Refusal, err = scoreRefusalFor(opts)
 	if err != nil {
 		return Score{}, err
 	}
