@@ -39,6 +39,7 @@ templ RunFindings(p FindingsPage) {
 							<th>Amount</th>
 							<th>Status</th>
 							<th>Verified</th>
+							<th>Detail</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -69,5 +70,6 @@ templ findingRow(r FindingRow, nested bool) {
 				<span class="badge unverified">unverified</span>
 			}
 		</td>
+		<td class="detail"><a href={ templ.SafeURL(findingURL(r.ID)) }>Details</a></td>
 	</tr>
 }

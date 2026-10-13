@@ -38,6 +38,8 @@ type RunExecutor func(ctx context.Context, runID uuid.UUID) error
 type RunsBackend struct {
 	Store   RunsStore
 	Execute RunExecutor
+	// Findings backs the finding pages (CC-1003). Nil means they answer 501.
+	Findings FindingsStore
 }
 
 // runListLimit is how many past runs the runs page shows.

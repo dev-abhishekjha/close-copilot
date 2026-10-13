@@ -86,3 +86,23 @@ button {
 /* htmx's own indicator style is disabled (CSP); this replaces it. */
 .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+
+/* Finding detail (CC-1003). */
+.banner { border-color: var(--danger); background: #fff4f2; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.25rem 1rem; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; }
+.evidence-block { margin-bottom: 1.5rem; overflow-x: auto; }
+table.evidence { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+table.evidence th, table.evidence td {
+  border: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+table.evidence tr.totals th { background: var(--bg); }
+.note { color: var(--muted); }
+details { margin: 0.25rem 0; }
+textarea { font: inherit; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; }
+button[disabled] { opacity: 0.6; cursor: not-allowed; }

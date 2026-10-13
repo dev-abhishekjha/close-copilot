@@ -1,0 +1,206 @@
+package templates
+
+// Finding is the finding detail page.
+templ Finding(p FindingPage) {
+	@Base(Layout{Title: "Finding", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card" id="header" data-severity={ p.Severity }>
+			<p><a href={ templ.SafeURL(findingsURL(p.RunID)) }>Back to findings</a> · { p.Company } { p.Month }</p>
+			<h1>{ p.Title }</h1>
+			<dl class="facts">
+				<dt>Type</dt>
+				<dd class="type">{ p.Type }</dd>
+				<dt>Severity</dt>
+				<dd class="severity">{ p.Severity }</dd>
+				<dt>Amount</dt>
+				<dd class="amount">{ p.Amount }</dd>
+				<dt>Status</dt>
+				<dd class="status">{ p.Status }</dd>
+				<dt>Verified</dt>
+				<dd>
+					if p.Verified {
+						<span class="badge verified">verified</span>
+					} else {
+						<span class="badge unverified">unverified</span>
+					}
+				</dd>
+			</dl>
+		</section>
+		if p.Review != nil {
+			<section class="card banner" id="review">
+				<h2>Needs review</h2>
+				if len(p.Review.Reasons) == 0 {
+					<p>{ p.Review.Fallback }</p>
+				} else {
+					<ul>
+						for _, r := range p.Review.Reasons {
+							<li>{ r }</li>
+						}
+					</ul>
+				}
+			</section>
+		}
+		<section class="card" id="explanation">
+			<h2>Explanation</h2>
+			if p.HasExplanation {
+				<p class="explanation">{ p.Explanation }</p>
+				<p class="action"><strong>Suggested action:</strong> { p.Action }</p>
+			} else {
+				<p>no explanation yet</p>
+			}
+		</section>
+		<section class="card" id="citations">
+			<h2>Citations</h2>
+			if len(p.Citations) == 0 {
+				<p>No citations.</p>
+			}
+			for _, c := range p.Citations {
+				<details>
+					<summary>{ c.DocID }, { c.Section }</summary>
+					<p>{ c.DocID } · { c.Section }</p>
+					<p>snippet not stored on the finding</p>
+				</details>
+			}
+		</section>
+		<section class="card" id="evidence">
+			<h2>Evidence</h2>
+			if len(p.Evidence) == 0 {
+				<p>No evidence recorded.</p>
+			}
+			for _, b := range p.Evidence {
+				@evidenceBlock(b)
+			}
+		</section>
+		if p.HasTrail {
+			<section class="card" id="trail">
+				<h2>Investigation trail</h2>
+				<ol>
+					for _, t := range p.Trail {
+						<li><code>{ t.Call }</code> <code>{ t.Args }</code> rows: { t.Rows }</li>
+					}
+				</ol>
+			</section>
+		}
+		if p.Proposal != nil {
+			<section class="card" id="proposal">
+				<h2>Proposal</h2>
+				@proposalView(*p.Proposal)
+			</section>
+		}
+		<section class="card" id="actions">
+			<h2>Actions</h2>
+			if p.Actions.Error != "" {
+				<p class="error" role="alert">{ p.Actions.Error }</p>
+			}
+			if p.Actions.CanDecide {
+				if p.Actions.CreateButton {
+					<button type="button" disabled>Create proposal (available with approvals)</button>
+				}
+				<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/accept") }>
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<button type="submit">Mark accepted</button>
+				</form>
+				<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/dismiss") }>
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<label>
+						Reason
+						<textarea name="reason" required maxlength="500" rows="3">{ p.Actions.Reason }</textarea>
+					</label>
+					<button type="submit">Dismiss</button>
+				</form>
+			} else {
+				<p>Status: { p.Status }</p>
+			}
+		</section>
+	}
+}
+
+templ evidenceBlock(b EvidenceBlock) {
+	<div class="evidence-block">
+		<h3>{ b.Heading }</h3>
+		<p><code class="args">{ b.Args }</code></p>
+		if len(b.IDs) > 0 {
+			<p class="ids">ids: { joinIDs(b.IDs) }</p>
+		}
+		if b.Note != "" {
+			<p class="note">{ b.Note }</p>
+		}
+		if len(b.Rows) > 0 {
+			<table class="evidence">
+				<thead>
+					<tr>
+						for _, c := range b.Columns {
+							<th>{ c }</th>
+						}
+						if b.HasSource {
+							<th>Source</th>
+						}
+					</tr>
+				</thead>
+				<tbody>
+					for _, r := range b.Rows {
+						<tr>
+							for _, c := range r.Cells {
+								<td>{ c }</td>
+							}
+							if b.HasSource {
+								<td>
+									if r.Source.Link != "" {
+										<a href={ templ.SafeURL(r.Source.Link) } rel="noopener noreferrer" target="_blank">{ r.Source.Text }</a>
+									} else {
+										{ r.Source.Text }
+									}
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+		if b.More > 0 {
+			<p class="note">{ itoa(b.More) } more not shown</p>
+		}
+	</div>
+}
+
+templ proposalView(v ProposalView) {
+	<p>Status: { v.Status } · Maker: { v.Maker } · Posting date: { v.PostingDate }</p>
+	<p>{ v.Remark }</p>
+	<table class="evidence">
+		<thead>
+			<tr>
+				<th>Account</th>
+				<th>Debit</th>
+				<th>Credit</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, l := range v.Lines {
+				<tr>
+					<td>{ l.Account }</td>
+					<td>{ l.Debit }</td>
+					<td>{ l.Credit }</td>
+				</tr>
+			}
+			<tr class="totals">
+				<th>Total</th>
+				<th>{ v.TotalDebit }</th>
+				<th>{ v.TotalCredit }</th>
+			</tr>
+		</tbody>
+	</table>
+	if v.Balanced {
+		<p class="balanced">Balanced</p>
+	} else {
+		<p class="error">Unbalanced: difference { v.Difference }</p>
+	}
+	if v.ERPName != "" {
+		<p>
+			Journal entry:
+			if v.ERPLink != "" {
+				<a href={ templ.SafeURL(v.ERPLink) } rel="noopener noreferrer" target="_blank">{ v.ERPName }</a>
+			} else {
+				{ v.ERPName }
+			}
+		</p>
+	}
+}

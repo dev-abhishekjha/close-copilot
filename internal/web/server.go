@@ -44,11 +44,14 @@ type Options struct {
 	// Runs backs the close-run pages and API (CC-1002). Nil means not
 	// configured: those routes answer 501 after the role check.
 	Runs *RunsBackend
+	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
+	// Empty or not an http(s) URL with a host means no links.
+	ERPBaseURL string
 }
 
 // OptionsFromConfig takes APP_ADDR and APP_SESSION_KEY from cfg.
 func OptionsFromConfig(cfg config.Config) Options {
-	return Options{Addr: cfg.AppAddr, SessionKey: cfg.AppSessionKey}
+	return Options{Addr: cfg.AppAddr, SessionKey: cfg.AppSessionKey, ERPBaseURL: cfg.ERPBaseURL}
 }
 
 // Server is the web UI and JSON API. It is an http.Handler.
@@ -62,6 +65,7 @@ type Server struct {
 	routes        []route
 	handler       http.Handler
 	runs          *runsService // nil when Options.Runs is nil
+	erpBase       string
 }
 
 // NewServer builds the server. It refuses a session key shorter than 32
@@ -83,6 +87,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		log:           log,
 		secureCookies: !opts.InsecureCookies,
 		now:           opts.Now,
+		erpBase:       opts.ERPBaseURL,
 	}
 	if s.addr == "" {
 		s.addr = defaultAddr
