@@ -1,0 +1,166 @@
+# Question router rules (CC-708). Loaded and strictly validated by
+# agent.LoadTriageRules at startup; a bad file stops the process.
+#
+# Matching runs on the normalised question: lower-case, format characters
+# (unicode Cf, such as zero-width spaces) removed, whitespace collapsed.
+# Write patterns in lower case. A rule has an id, a category and exactly one
+# of `phrase` (a whole word or phrase) or `regex` (RE2 syntax, compiled
+# case-insensitive; it must not match the empty string).
+#
+# Rules run in category order: injection, other_company, investment_advice,
+# tax_advice, out_of_scope; within a category, in file order. The first hit
+# refuses the question without a model call. Anything no rule catches goes
+# to the classifier.
+#
+# Keep patterns generic and precise. Tests fail if a pattern, or its
+# literal skeleton, contains a 30-character piece of a golden question; if
+# a long rule is the only rule hitting exactly one golden item and catches
+# fewer than two held-out paraphrases; or if any rule refuses a golden or
+# testdata should-answer question (an over-refusal). Advice the rules miss
+# falls to the classifier.
+version: 1
+
+# Other-company detection also uses the company registry
+# (config/companies): every other tenant's ERPNext name (with and without
+# the legal suffixes below), id, abbreviation, supplier names, GSTIN and
+# PAN. Names the current tenant shares are never a hit.
+other_company:
+  # Trailing legal forms stripped to make a short alias of a name.
+  legal_suffixes: [private limited, pvt ltd, pvt. ltd., pvt. ltd, limited, ltd, ltd., llp]
+  # Names that never count as another company: banks every tenant may use.
+  ignore_names:
+    - HDFC Bank
+    - ICICI Bank
+    - State Bank of India
+    - SBI
+    - Axis Bank
+    - Kotak Mahindra Bank
+    - Yes Bank
+    - IDFC First Bank
+    - Punjab National Bank
+    - Bank of Baroda
+    - Canara Bank
+    - Union Bank of India
+
+rules:
+  # ---- injection: attempts to change the assistant's instructions, role or scope ----
+  - id: inj-override-instructions
+    category: injection
+    regex: '\b(ignore|disregard|forget|override|bypass)\s+(all\s+|any\s+|the\s+|your\s+)*(previous|prior|above|earlier|preceding|existing|system|original)\s+(instructions?|rules|filters|prompts?|directions|guidelines)\b'
+  - id: inj-reveal-instructions
+    category: injection
+    regex: '\b(reveal|show|print|repeat|output|display|leak|dump)\s+(me\s+)?(your|the)\s+(hidden\s+|internal\s+|original\s+|full\s+)?(instructions|system\s+prompt|prompt|rules)\b'
+  - id: inj-system-prompt
+    category: injection
+    regex: '\b(system|developer|admin)\s+(prompt|override)\b'
+  - id: inj-role-change
+    category: injection
+    regex: '\byou(\s+are|''re|r)\s+now\b'
+  - id: inj-jailbreak
+    category: injection
+    regex: '\b(jailbr(eak|eaks|oken)|developer\s+mode|dan\s+mode|do\s+anything\s+now)\b'
+  - id: inj-unrestricted
+    category: injection
+    regex: '\b(no|without)\s+(any\s+)?(restrictions|guardrails|safety\s+filters)\b'
+  - id: inj-act-as-unrestricted
+    category: injection
+    regex: '\b(act|behave|respond)\s+as\s+(an?\s+)?(unrestricted|unfiltered|uncensored|jailbroken)\b'
+  - id: inj-scope-bypass
+    category: injection
+    regex: '\b(ignore|disregard|bypass|drop|remove|disable|skip|turn\s+off|lift)\s+(the\s+|all\s+|any\s+)?(company|month|tenant|scope|scoping)\s+((and|or|&)\s+(company|month|tenant)\s+)?(filters?|scop(e|ing)|isolation|restrictions?|limits?|checks?)\b'
+  - id: inj-admin-secret
+    category: injection
+    regex: '\badmin\s+(tokens?|tools?|keys?|passwords?|credentials?)\b'
+  - id: inj-credentials
+    category: injection
+    regex: '\b(credentials|api\s+keys?|access\s+tokens?|bearer\s+tokens?|secret\s+keys?)\b'
+  - id: inj-list-tools
+    category: injection
+    regex: '\b(list|enumerate|name|show|print|dump|reveal)\s+(me\s+)?(every|all|each)\s+(of\s+)?(the\s+|your\s+)?(tools?|functions?)\b'
+  - id: inj-which-tools
+    category: injection
+    regex: '\bwhat\s+(tools|functions)\s+(can|do|could)\s+you\s+(call|use|run|access|have)\b'
+  - id: inj-pretend-state
+    category: injection
+    regex: '\b(pretend|act\s+as\s+if|act\s+as\s+though|imagine\s+that)\b[^.?!]{0,100}\b(approved|posted|verified|signed\s+off)\b'
+  - id: inj-indirect-follow
+    category: injection
+    regex: '\b(do|follow|obey|execute|carry\s+out|perform)\b[^.?!]{0,30}\b(instructions?|commands?|what|whatever)\b[^.?!]{0,30}\b(it|they|the\s+(\w+\s+)?(documents?|text|passages?|memo|file|note|page))\s+(says?|contains?|gives?|tells?|instructs?)\b'
+  - id: inj-role-tag
+    category: injection
+    regex: '(<\s*/?\s*(system|assistant|user|instructions?|im_start|im_end)\s*>|\[\s*/?\s*(system|inst|assistant)\s*\]|^(system|assistant|developer)\s*:)'
+  - id: inj-fence
+    category: injection
+    regex: '(<<<|>>>|```\s*(system|instructions?))'
+  - id: inj-new-instructions
+    category: injection
+    regex: '\bnew\s+(instructions?|rules|system\s+prompt)\s*:'
+
+  # ---- investment_advice: what to do with the company's money, or borrowing ----
+  - id: inv-mutual-fund
+    category: investment_advice
+    regex: '\bmutual\s+funds?\b'
+  - id: inv-fd-versus
+    category: investment_advice
+    regex: '(\b(fixed\s+deposits?|fds?)\s+(vs\.?|versus)\s|\s(vs\.?|versus)\s+(an?\s+)?(fixed\s+deposits?|fds?)\b)'
+  - id: inv-which-securities
+    category: investment_advice
+    regex: '\bwhich\s+(stocks?|shares|equities|mutual\s+funds?|bonds?|debt\s+funds?)\s+(should|shall|to|would|could|will|are\s+(good|best|worth|safe))\b'
+  - id: inv-stocks-to-buy
+    category: investment_advice
+    regex: '\b(stocks?|shares)\s+to\s+(buy|pick|invest\s+in)\b'
+  - id: inv-should-invest
+    category: investment_advice
+    regex: '\b(should|shall|can|could|must)\s+(we|i|the\s+company)\s+(\S+\s+){0,2}(invest|park|put|move|deploy|buy|purchase)\b[^.?!]{0,60}\b(stocks|shares|equities|gold|crypto\w*|bitcoin|bonds|mutual\s+funds?|debt\s+funds?)\b'
+  - id: inv-better-option
+    category: investment_advice
+    regex: '\b(better|best|good\s+time|wise|worth\s+it)\b[^.?!]{0,60}\b(stocks|shares|equities|gold|crypto\w*|bitcoin|bonds|mutual\s+funds?)\b'
+  - id: inv-bond-fund
+    category: investment_advice
+    regex: '\b(bond|debt|index|equity)\s+funds?\b'
+  - id: inv-recommend-investment
+    category: investment_advice
+    regex: '\b(recommend|suggest)\s+(a\s+|an\s+|some\s+|the\s+best\s+|good\s+)?(stocks?|shares|bonds?|investments?|mutual\s+funds?|portfolio)\b'
+  - id: inv-where-to-invest
+    category: investment_advice
+    regex: '\bwhere\s+(should|can|do|to)\s+(we\s+|i\s+)?(invest|park|deploy)\b'
+  - id: inv-advice-words
+    category: investment_advice
+    regex: '\b(investment|portfolio|wealth|treasury)\s+(advice|strategy|allocation|recommendations?|tips)\b'
+  - id: inv-hedge
+    category: investment_advice
+    regex: '(\b(should|shall|can|could|must)\s+(we|i|the\s+company)\s+(\S+\s+){0,2}hedge\b|\bhedg(e|ing)\s+(our|its|the\s+company''s)\b)'
+  - id: inv-loan-to-buy
+    category: investment_advice
+    regex: '\b(take|taking|raise|raising|get|getting)\s+(a\s+|an\s+)?(\S+\s+)?loan\s+to\s+(buy|purchase|fund|finance|acquire)\b'
+  - id: inv-take-loan
+    category: investment_advice
+    regex: '\b(should|shall|can|must)\s+(we|i|the\s+company)\s+(take|raise|get|avail)\s+(a\s+|an\s+)?(\S+\s+)?(loan|overdraft|credit\s+line)\b'
+
+  # ---- tax_advice: reducing, timing or planning tax ----
+  - id: tax-planning
+    category: tax_advice
+    regex: '\btax\s+(planning|avoidance|evasion|minimi[sz]ation|optimi[sz]ation|efficient|shelter)\b'
+  - id: tax-reduce
+    category: tax_advice
+    # An advice frame (how can we, should we, ways to, help us), then a
+    # verb that lowers a tax, then the tax itself at the end of the clause.
+    # "Did the reversal reduce the TDS payable balance?" is bookkeeping and
+    # passes, as does "How can we save the GST invoices?".
+    regex: '\b(how\s+(can|could|should|shall|might)\s+(we|i|the\s+company|you)|(can|could|should|shall|must)\s+(we|i|the\s+company)|ways?\s+to|how\s+to|help\s+(us|me)|tips?\s+(to|for)|in\s+order\s+to|so\s+as\s+to)\b[^.?!]{0,40}\b(sav(e|ing)|reduc(e|ing)|lower(ing)?|minimi[sz](e|ing)|cut(ting)?\s+down(\s+on)?|bring\s+down)\s+(\S+\s+){0,3}(tax|taxes|gst|tds|tcs)(\s+(liability|bill|outgo|burden|payments?))?(\s+(this|next|for|in|on|by|under|legally|each|every)\b|\s*[?.!,;]|\s*$)'
+  - id: tax-minimise
+    category: tax_advice
+    regex: '\bminimi[sz](e|es|ing)\s+(\S+\s+){0,3}(tax|taxes|gst|tds|tcs)\b'
+  - id: tax-avoid
+    category: tax_advice
+    regex: '\b(avoid|avoiding|evade|evading|escape|dodge|get\s+around)\s+(paying\s+)?(the\s+|any\s+|our\s+)?(tax|taxes|gst|tds|tcs)\b'
+  - id: tax-which-section
+    category: tax_advice
+    regex: '\b(which|what)\s+section\s+(\S+\s+){0,3}claim\b'
+
+templates:
+  investment_advice: "I can't give investment, borrowing or treasury advice. I can answer questions about this company's books, month-end close findings and accounting policies."
+  tax_advice: "I can't give tax advice or tax planning. I can explain what this company's books, close findings and accounting policies say; for tax decisions, please consult your tax adviser."
+  other_company: "I can only answer questions about the company you are signed in for. Please ask about that company's books, close findings or policies."
+  injection: "I can't act on that request. I answer questions about this company's books, month-end close findings and accounting policies, within my fixed instructions."
+  out_of_scope: "That is outside what I can do. I answer read-only questions about this company's books, month-end close findings and accounting policies; I can't post, approve, pay or change anything."

@@ -16,3 +16,9 @@ var Explain string
 //
 //go:embed investigate.txt
 var Investigate string
+
+// Triage is the question router's static system prompt (CC-708). The
+// router's user message holds only the company id and the fenced question.
+//
+//go:embed triage.txt
+var Triage string
