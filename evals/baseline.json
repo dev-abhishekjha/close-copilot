@@ -31,20 +31,20 @@
           },
           "runs": {
             "cost_usd": {
-              "mean": "0.003006",
-              "p95": "0.003963",
-              "total": "0.006012"
+              "mean": "0.003285",
+              "p95": "0.00413",
+              "total": "0.00657"
             },
             "duration_ms": {
-              "mean": 11735,
-              "p95": 15913,
-              "total": 23471
+              "mean": 11617,
+              "p95": 15197,
+              "total": 23234
             },
             "runs": 2,
             "tokens": {
-              "cache_read": 20622,
-              "input": 16,
-              "output": 10429
+              "cache_read": 26812,
+              "input": 20,
+              "output": 10535
             }
           },
           "types": {
@@ -87,8 +87,8 @@
           },
           "verified_rate": {
             "den": 8,
-            "num": 3,
-            "percent": "37.5%"
+            "num": 1,
+            "percent": "12.5%"
           }
         },
         "commit": "dev",
@@ -112,7 +112,7 @@
           "clean.false_alarms": 0,
           "unmatched_bank_line.caught": 0,
           "unrecorded_bank_charge.caught": 0,
-          "verified": 1
+          "verified": 2
         },
         "pricing_version": "4568a8540bb99d7089b9e59d43a748fd816c4261cea3affc4d6fe6410ca7225d",
         "suite": "suite-skeleton"
