@@ -1,0 +1,45 @@
+# CC-907 DRAFT (eval-engineer). Owner reviews, edits and commits to evals/golden/citations.yaml.
+# One case per planted type (plan "Golden sets"), plus F09/F10 extras. `finding` keys are the ground-truth
+# keys in evals/scenarios/<scenario>/ground_truth/<company>-<month>.json; matching is by those keys, never by text.
+# `expect` is any-of: a cited (doc_id, section) matching ANY entry counts as correct (assumed semantics).
+# Citation validity (cited section exists in the ingested corpus) is a separate metric and needs no field here.
+# Cloudly SaaS annual renewal, 12 months, booked whole to Software Subscriptions
+- id: F01
+  finding: {scenario: suite-v1, company: sharma, month: "2026-08", type: prepaid_not_spread, keys: {"invoice": "PINV-26-00116"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§4.2 Spread annual costs monthly"}]
+# laptop 70,847 booked to Repairs and Maintenance; 3.1 is the ticket mapping, 3.2 is the clause that says a laptop via repairs is still an asset
+- id: F02
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: misclassified_expense, keys: {"invoice": "PINV-26-00095"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§3.1 Capitalisation threshold"}, {doc_id: "POL-001-accounting-policy", section: "§3.2 What counts as an asset"}]
+# ticket: 6.1 or 6.2
+- id: F03
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: gstr2b_missing_in_2b, keys: {"invoice_no_norm": "RDK2026744", "supplier_gstin": "36VNOCR2477I1ZI"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.1 Claim credit only for invoices in GSTR-2B"}, {doc_id: "POL-001-accounting-policy", section: "§6.2 Follow up with suppliers"}]
+# 1,180 bank charge
+- id: F04
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: unrecorded_bank_charge, keys: {"bank_txn_id": "BNK-20260703-001"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.1 Book bank charges monthly"}]
+# investigation X01 (expected_resolution gateway_settlement), not a planted type
+- id: F05
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: gateway_settlement, keys: {"bank_txn_id": "BNK-20260707-002"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.2 Book gateway settlements with fee and GST"}]
+# recurring guarding bill missing
+- id: F06
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: missing_accrual, keys: {"month": "2026-07", "supplier": "Securewell Guarding Services"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§5.1 Accrue recurring suppliers at their usual amount"}]
+# Lakeview rent for August booked 2026-07-05
+- id: F07
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: wrong_period_posting, keys: {"invoice": "PINV-26-00074"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§8.1 Expenses belong to their service period"}]
+# Vaani Telecom Services duplicate; ticket says the supplier contract; 3 = agreed amount/frequency, 7 = duplicate invoice not payable
+- id: F08
+  finding: {scenario: suite-v1, company: sharma, month: "2026-07", type: duplicate_vendor_payment, keys: {"invoice": "PINV-26-00080"}}
+  expect: [{doc_id: "CON-vaani-telecom", section: "§3 Billing and amount"}, {doc_id: "CON-vaani-telecom", section: "§7 Invoices"}]
+# extra beyond the 8 mapped types: tax differs beyond the 1 rupee tolerance
+- id: F09
+  finding: {scenario: suite-v1, company: mehta, month: "2026-07", type: gstr2b_amount_mismatch, keys: {"invoice_no_norm": "BLP2026740", "supplier_gstin": "29UZKCB5181Q1ZV"}}
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.1 Claim credit only for invoices in GSTR-2B"}]
+# Swiftmove Cabs duplicate; second company for the contract mapping
+- id: F10
+  finding: {scenario: suite-v1, company: mehta, month: "2026-08", type: duplicate_vendor_payment, keys: {"invoice": "PINV-26-00242"}}
+  expect: [{doc_id: "CON-swiftmove-cabs", section: "§3 Billing and amount"}, {doc_id: "CON-swiftmove-cabs", section: "§7 Invoices"}]

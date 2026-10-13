@@ -1,0 +1,246 @@
+# CC-907 DRAFT (eval-engineer). Owner reviews, edits and commits to evals/golden/retrieval.yaml.
+# Matching: a query is a hit when ANY expected (doc_id, section) is in the top 5 (assumed any-of semantics).
+# doc_id is the corpus file stem; section is the exact string retrieval.ChunkMarkdown emits.
+# expect: [] is a tenant-boundary query: correct result is that no chunk comes back (see README).
+# ID ranges: R01-R18 policy (two phrasings per section 1-9), R19-R28 finding types, R29-R48 contract
+# lookups (R29-R38 sharma, R39-R48 mehta), R49-R54 close notes, R55-R60 tenant boundary.
+- id: R01
+  query: "if two documents differ by less than a rupee, do we have to explain the gap"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§1.4 Materiality"}]
+- id: R02
+  query: "what is treated as a rounding difference and left alone"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§1.4 Materiality"}]
+- id: R03
+  query: "how do we fix a mistake found after the month has been locked"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§2.4 Locking the month"}]
+- id: R04
+  query: "can a locked month be reopened to post a correction"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§2.4 Locking the month"}]
+- id: R05
+  query: "in which month does depreciation begin for a newly bought machine"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§3.5 Depreciation"}]
+- id: R06
+  query: "an asset became ready on the 20th; is a full month of depreciation charged"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§3.5 Depreciation"}]
+- id: R07
+  query: "what happens to the unused prepaid balance when a service contract ends early"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§4.5 Early termination"}]
+- id: R08
+  query: "supplier cancelled the annual plan and refunded part of it, how is the refund booked"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§4.5 Early termination"}]
+- id: R09
+  query: "on which day is an accrual reversed"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§5.4 Reversal"}]
+- id: R10
+  query: "the real invoice came in different from the accrual; do we chase the difference"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§5.4 Reversal"}]
+- id: R11
+  query: "how is the books-to-GSTR-2B comparison done, per invoice or in total"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.3 Matching"}]
+- id: R12
+  query: "can a shortfall on one supplier invoice be set off against an excess on another"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.3 Matching"}]
+- id: R13
+  query: "what does the bank reconciliation statement have to show at the end"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.5 Reconciliation statement"}]
+- id: R14
+  query: "closing balance per bank statement versus per books and items in transit"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.5 Reconciliation statement"}]
+- id: R15
+  query: "wages earned in June but paid on 1 July: which month carries the cost"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§8.4 Payroll"}]
+- id: R16
+  query: "in what month is a bonus or an arrear expensed"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§8.4 Payroll"}]
+- id: R17
+  query: "may the preparer of a journal entry also approve that same entry"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§9.1 Maker and checker"}]
+- id: R18
+  query: "does a software tool that proposes an entry count as a maker"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§9.1 Maker and checker"}]
+- id: R19
+  query: "bank debit of ₹1,180 on the statement with no matching ledger entry; charges for the current account"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.1 Book bank charges monthly"}]
+- id: R20
+  query: "bank debit with nothing in the ledger within the three-day window, what must be recorded about it"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§7.4 Unmatched items"}]
+- id: R21
+  query: "supplier invoice booked twice, which entry do we keep and may we pay both"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§8.5 Duplicate invoices"}]
+- id: R22
+  query: "purchase invoice in our books that the supplier has not filed so it is absent from the government return"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.1 Claim credit only for invoices in GSTR-2B"}, {doc_id: "POL-001-accounting-policy", section: "§6.2 Follow up with suppliers"}]
+- id: R23
+  query: "invoice tax in books is ₹2 more than the tax shown in the return"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§6.1 Claim credit only for invoices in GSTR-2B"}, {doc_id: "POL-001-accounting-policy", section: "§6.8 Worked example"}]
+- id: R24
+  query: "monthly supplier bill missing at month end; amount to book based on prior months and the evidence needed"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§5.1 Accrue recurring suppliers at their usual amount"}, {doc_id: "POL-001-accounting-policy", section: "§5.2 Who is a recurring supplier"}, {doc_id: "POL-001-accounting-policy", section: "§5.5 Evidence"}]
+- id: R25
+  query: "invoice for twelve months of service dated 01-08-2026 to 31-07-2027 was debited wholly to the software subscriptions expense"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§4.2 Spread annual costs monthly"}, {doc_id: "POL-001-accounting-policy", section: "§4.1 What is a prepaid expense"}]
+- id: R26
+  query: "laptop bought for ₹70,847 recorded under repairs and maintenance"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§3.2 What counts as an asset"}, {doc_id: "POL-001-accounting-policy", section: "§3.6 Repairs and maintenance"}]
+- id: R27
+  query: "invoice for services of August 2026 booked in July 2026"
+  company: sharma
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§8.1 Expenses belong to their service period"}, {doc_id: "POL-001-accounting-policy", section: "§8.2 Purchases"}]
+- id: R28
+  query: "expense account moved by more than a quarter against last month and nobody has explained why"
+  company: mehta
+  expect: [{doc_id: "POL-001-accounting-policy", section: "§10.1 Month-on-month review"}, {doc_id: "POL-001-accounting-policy", section: "§10.2 Explaining a variance"}, {doc_id: "POL-001-accounting-policy", section: "§10.3 Action"}]
+- id: R29
+  query: "what is the range of the monthly Vaani Telecom Services bill before GST"
+  company: sharma
+  expect: [{doc_id: "CON-vaani-telecom", section: "§3 Billing and amount"}]
+- id: R30
+  query: "which state does Sundaram Steelware invoice from and is its tax IGST"
+  company: sharma
+  expect: [{doc_id: "CON-sundaram-steelware", section: "§4 GST"}]
+- id: R31
+  query: "is Quickfix Repairs charging us GST"
+  company: sharma
+  expect: [{doc_id: "CON-quickfix-repairs", section: "§4 GST"}]
+- id: R32
+  query: "number of days we have to pay TechKart Supplies"
+  company: sharma
+  expect: [{doc_id: "CON-techkart", section: "§6 Payment terms"}]
+- id: R33
+  query: "how quickly must BlueNet Broadband invoices be paid"
+  company: sharma
+  expect: [{doc_id: "CON-bluenet-broadband", section: "§6 Payment terms"}]
+- id: R34
+  query: "GST rate on Deccan Textiles purchases and how it is split"
+  company: sharma
+  expect: [{doc_id: "CON-deccan-textiles", section: "§4 GST"}]
+- id: R35
+  query: "what does Lakeview Warehousing LLP charge us each month"
+  company: sharma
+  expect: [{doc_id: "CON-lakeview-warehousing", section: "§3 Billing and amount"}]
+- id: R36
+  query: "Ledgerwise Associates fee and billing frequency"
+  company: sharma
+  expect: [{doc_id: "CON-ledgerwise-associates", section: "§3 Billing and amount"}]
+- id: R37
+  query: "between which amounts does the Securewell guarding bill vary"
+  company: sharma
+  expect: [{doc_id: "CON-securewell-guards", section: "§3 Billing and amount"}]
+- id: R38
+  query: "how much notice ends the Stockbook Cloud agreement"
+  company: sharma
+  expect: [{doc_id: "CON-stockbook-cloud", section: "§5 Service period"}]
+- id: R39
+  query: "DesignDeck Software yearly fee and the month it is invoiced"
+  company: mehta
+  expect: [{doc_id: "CON-designdeck-software", section: "§3 Billing and amount"}]
+- id: R40
+  query: "tax rate charged by Swiftmove Cabs"
+  company: mehta
+  expect: [{doc_id: "CON-swiftmove-cabs", section: "§4 GST"}]
+- id: R41
+  query: "payment period for Nexa Computers invoices"
+  company: mehta
+  expect: [{doc_id: "CON-nexa-computers", section: "§6 Payment terms"}]
+- id: R42
+  query: "Talentbridge Staffing monthly amount range"
+  company: mehta
+  expect: [{doc_id: "CON-talentbridge-staffing", section: "§3 Billing and amount"}]
+- id: R43
+  query: "does Sahyadri Power Distribution charge GST"
+  company: mehta
+  expect: [{doc_id: "CON-sahyadri-power", section: "§4 GST"}]
+- id: R44
+  query: "fixed monthly charge for the SecureMail Suite subscription"
+  company: mehta
+  expect: [{doc_id: "CON-securemail-suite", section: "§3 Billing and amount"}]
+- id: R45
+  query: "how long do we have to settle a Konkan Mobile Services invoice"
+  company: mehta
+  expect: [{doc_id: "CON-konkan-mobile", section: "§6 Payment terms"}]
+- id: R46
+  query: "when did the FibreLink Networks agreement start"
+  company: mehta
+  expect: [{doc_id: "CON-fibrelink-networks", section: "§5 Service period"}]
+- id: R47
+  query: "Paperline Stationers GST rate"
+  company: mehta
+  expect: [{doc_id: "CON-paperline-stationers", section: "§4 GST"}]
+- id: R48
+  query: "is a repeat invoice from Bluepeak Consulting for the same period payable"
+  company: mehta
+  expect: [{doc_id: "CON-bluepeak-consulting", section: "§7 Invoices"}]
+- id: R49
+  query: "Sharma Traders April 2026 close: weekday on which the month ended"
+  company: sharma
+  expect: [{doc_id: "NOTE-sharma-2026-04", section: "Calendar"}]
+- id: R50
+  query: "Sharma Traders May 2026 close: number of days in the month and weekday it ended"
+  company: sharma
+  expect: [{doc_id: "NOTE-sharma-2026-05", section: "Calendar"}]
+- id: R51
+  query: "Sharma Traders June 2026 close calendar, month length and last weekday"
+  company: sharma
+  expect: [{doc_id: "NOTE-sharma-2026-06", section: "Calendar"}]
+- id: R52
+  query: "Mehta Tech Services April 2026 close note: annual contract that renewed and how to book it"
+  company: mehta
+  expect: [{doc_id: "NOTE-mehta-2026-04", section: "Annual costs"}]
+- id: R53
+  query: "Mehta Tech Services May 2026 close: what weekday did the month end"
+  company: mehta
+  expect: [{doc_id: "NOTE-mehta-2026-05", section: "Calendar"}]
+- id: R54
+  query: "Mehta Tech Services June 2026 close calendar and when working day 6 falls"
+  company: mehta
+  expect: [{doc_id: "NOTE-mehta-2026-06", section: "Calendar"}]
+- id: R55
+  query: "payment terms in our contract with Talentbridge Staffing"
+  company: sharma
+  expect: []
+- id: R56
+  query: "does Sahyadri Power Distribution charge GST on its bills"
+  company: sharma
+  expect: []
+- id: R57
+  query: "billing range for Nexa Computers"
+  company: sharma
+  expect: []
+- id: R58
+  query: "what rent does Lakeview Warehousing LLP bill every month"
+  company: mehta
+  expect: []
+- id: R59
+  query: "notice period to end the Securewell Guarding Services agreement"
+  company: mehta
+  expect: []
+- id: R60
+  query: "Deccan Textiles GST rate and state of supply"
+  company: mehta
+  expect: []
