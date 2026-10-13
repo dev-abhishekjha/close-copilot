@@ -309,87 +309,153 @@ func (iv *LLMInvestigator) Investigate(ctx context.Context, req InvestigateReque
 	}
 	tools, allowed := iv.offered()
 	v := validator{accounts: accounts, from: sc.from, to: sc.to}
-	lim := iv.limit()
+	var out resolutionOutput
+	loop := toolLoop{
+		model: req.Model, modelName: iv.Model, system: system, tools: tools, finish: resolutionTool,
+		maxTokens: investigateMaxTokens, lim: iv.limit(), malformedReason: reasonInvestigateMalformed,
+		exec: toolRunner{
+			store: iv.Store, tools: iv.Tools, log: iv.log(), runID: req.RunID, stepID: req.StepID,
+			company: req.Company, sc: sc, allowed: allowed,
+		}.execute,
+		parse: func(resp llm.Response) *malformed {
+			var bad *malformed
+			out, bad = v.parseResolution(resp, run.seen)
+			return bad
+		},
+		correct: resolutionCorrection,
+		onMalformed: func(ctx context.Context, bad *malformed, retried bool) {
+			iv.log().WarnContext(ctx, "resolution malformed", "run_id", req.RunID, "step_id", req.StepID, "field", bad.field, "retried", retried)
+		},
+	}
+	end, err := loop.run(ctx, user, run)
+	if err != nil {
+		return StepResult{}, err
+	}
+	if end.stopped() {
+		return iv.stop(ctx, req, run, end.status, end.reason)
+	}
+	return iv.finish(ctx, req, sc, run, accounts, out, end.model, end.retried)
+}
 
-	ictx, cancel := context.WithTimeout(ctx, lim.duration)
+// ---- the loop (shared with the Asker, CC-707) ----
+
+// toolLoop is the finding-independent part of the investigator: offer the
+// read tools and a finishing tool, run the calls the model asks for under
+// the limits, feed the projected results back, retry a malformed answer
+// once, and force the finishing tool when the calls are used up.
+type toolLoop struct {
+	model     llm.Provider
+	modelName string
+	system    []llm.Block
+	// tools are the offered read tools followed by finish.
+	tools []llm.ToolSpec
+	// finish is the finishing tool, offered alone and forced once the
+	// calls are used up.
+	finish    llm.ToolSpec
+	maxTokens int
+	lim       investigateLimits
+	// malformedReason is the fixed reason of a step whose answer is still
+	// malformed after the corrective retry.
+	malformedReason string
+	// exec runs one read tool call; only a store error is returned.
+	exec func(ctx context.Context, c llm.ToolCall, run *investigation) (llm.ToolResultBlock, error)
+	// parse validates an answer that calls finish; nil accepts it.
+	parse func(resp llm.Response) *malformed
+	// correct appends the corrective turn after a malformed answer.
+	correct func(messages []llm.Message, resp llm.Response, bad *malformed) []llm.Message
+	// onMalformed logs a malformed answer (fixed fields only).
+	onMalformed func(ctx context.Context, bad *malformed, retried bool)
+}
+
+// loopEnd is how a loop ended: answered (status "") with the model that
+// served the answer, or stopped with a step status and a fixed reason.
+type loopEnd struct {
+	model   string
+	retried bool
+	status  string
+	reason  string
+}
+
+func (e loopEnd) stopped() bool { return e.status != "" }
+
+func loopStopped(status, reason string) loopEnd { return loopEnd{status: status, reason: reason} }
+
+// run drives the loop from the first user turn. A model error or the
+// caller's cancellation is returned; a breach or a malformed answer after
+// one retry is a stopped loopEnd.
+func (l toolLoop) run(ctx context.Context, user string, run *investigation) (loopEnd, error) {
+	ictx, cancel := context.WithTimeout(ctx, l.lim.duration)
 	defer cancel()
 	messages := []llm.Message{llm.NewUserTextMessage(user)}
 	corrected := false
-	var out resolutionOutput
-	var resolved string
 	for {
 		if err := ctx.Err(); err != nil {
-			return StepResult{}, err
+			return loopEnd{}, err
 		}
 		if ictx.Err() != nil {
-			return iv.stop(ctx, req, run, store.StepDone, reasonLimitTime)
+			return loopStopped(store.StepDone, reasonLimitTime), nil
 		}
-		r := llm.Request{Model: iv.Model, System: system, Messages: slices.Clone(messages), Tools: tools, MaxTokens: investigateMaxTokens}
-		if run.calls >= lim.calls {
+		r := llm.Request{Model: l.modelName, System: l.system, Messages: slices.Clone(messages), Tools: l.tools, MaxTokens: l.maxTokens}
+		if run.calls >= l.lim.calls {
 			// No tool calls left: only the answer is offered.
-			r.Tools, r.ForceTool = []llm.ToolSpec{resolutionTool}, InvestigateToolName
+			r.Tools, r.ForceTool = []llm.ToolSpec{l.finish}, l.finish.Name
 		}
-		resp, err := req.Model.Complete(ictx, r)
+		resp, err := l.model.Complete(ictx, r)
 		run.tokens += resp.Usage.InputTokens + resp.Usage.OutputTokens
 		if err != nil {
 			if ctx.Err() != nil {
-				return StepResult{}, fmt.Errorf("agent: investigate: %w", ctx.Err())
+				return loopEnd{}, fmt.Errorf("agent: investigate: %w", ctx.Err())
 			}
 			if ictx.Err() != nil {
-				return iv.stop(ctx, req, run, store.StepDone, reasonLimitTime)
+				return loopStopped(store.StepDone, reasonLimitTime), nil
 			}
-			return StepResult{}, fmt.Errorf("agent: investigate: %w", err)
+			return loopEnd{}, fmt.Errorf("agent: investigate: %w", err)
 		}
-		if run.tokens > lim.tokens {
-			return iv.stop(ctx, req, run, store.StepDone, reasonLimitTokens)
+		if run.tokens > l.lim.tokens {
+			return loopStopped(store.StepDone, reasonLimitTokens), nil
 		}
 
 		var bad *malformed
 		switch {
-		case slices.ContainsFunc(resp.ToolCalls, func(c llm.ToolCall) bool { return c.Name == InvestigateToolName }):
-			out, bad = v.parseResolution(resp, run.seen)
-			if bad == nil {
-				resolved = cmp.Or(resp.Model, iv.Model)
+		case slices.ContainsFunc(resp.ToolCalls, func(c llm.ToolCall) bool { return c.Name == l.finish.Name }):
+			if bad = l.parse(resp); bad == nil {
+				return loopEnd{model: cmp.Or(resp.Model, l.modelName), retried: corrected}, nil
 			}
 		case len(resp.ToolCalls) == 0:
-			bad = &malformed{"tool_call", "call a read tool or " + InvestigateToolName}
-		}
-		if resolved != "" {
-			break
+			bad = &malformed{"tool_call", "call a read tool or " + l.finish.Name}
 		}
 		if bad != nil {
-			iv.log().WarnContext(ctx, "resolution malformed", "run_id", req.RunID, "step_id", req.StepID, "field", bad.field, "retried", corrected)
+			l.onMalformed(ctx, bad, corrected)
 			if corrected {
-				return iv.stop(ctx, req, run, store.StepFailed, reasonInvestigateMalformed+" ("+bad.field+")")
+				return loopStopped(store.StepFailed, l.malformedReason+" ("+bad.field+")"), nil
 			}
-			messages = resolutionCorrection(messages, resp, bad)
+			messages = l.correct(messages, resp, bad)
 			corrected = true
 			continue
 		}
 
 		results := make([]llm.ToolResultBlock, 0, len(resp.ToolCalls))
 		for _, c := range resp.ToolCalls {
-			if run.calls++; run.calls > lim.calls {
-				return iv.stop(ctx, req, run, store.StepDone, reasonLimitCalls)
+			if run.calls++; run.calls > l.lim.calls {
+				return loopStopped(store.StepDone, reasonLimitCalls), nil
 			}
-			res, err := iv.execute(ictx, req, sc, allowed, c, run)
+			res, err := l.exec(ictx, c, run)
 			if err != nil {
 				if ctx.Err() != nil {
-					return StepResult{}, fmt.Errorf("agent: investigate: %w", ctx.Err())
+					return loopEnd{}, fmt.Errorf("agent: investigate: %w", ctx.Err())
 				}
-				return StepResult{}, err
+				return loopEnd{}, err
 			}
 			results = append(results, res)
 		}
 		if ctx.Err() == nil && ictx.Err() != nil {
-			return iv.stop(ctx, req, run, store.StepDone, reasonLimitTime)
+			return loopStopped(store.StepDone, reasonLimitTime), nil
 		}
 		if run.refusals >= maxInvestigateRefusals {
-			return iv.stop(ctx, req, run, store.StepDone, reasonRefusals)
+			return loopStopped(store.StepDone, reasonRefusals), nil
 		}
 		messages = append(messages, llm.NewAssistantToolCallMessage(resp.ToolCalls...), llm.NewUserToolResultMessage(results...))
 	}
-	return iv.finish(ctx, req, sc, run, accounts, out, resolved, corrected)
 }
 
 // finish stores the answer and the finding's resolution.
@@ -459,38 +525,58 @@ func (iv *LLMInvestigator) stop(ctx context.Context, req InvestigateRequest, run
 // offered are the tool specs the model sees: the allowlisted registry
 // tools, then emit_resolution, and the set of names that may be executed.
 func (iv *LLMInvestigator) offered() ([]llm.ToolSpec, map[string]bool) {
+	tools, allowed := offeredReadTools(iv.Tools)
+	return append(tools, resolutionTool), allowed
+}
+
+// offeredReadTools are the allowlisted registry tools the executor offers,
+// in its order, and the set of names that may be executed. Never
+// search_documents, never an admin tool.
+func offeredReadTools(te ToolExecutor) ([]llm.ToolSpec, map[string]bool) {
 	allowed := map[string]bool{}
 	var tools []llm.ToolSpec
-	for _, s := range iv.Tools.Specs() {
+	for _, s := range te.Specs() {
 		if slices.Contains(investigatorAllowlist, s.Name) && !allowed[s.Name] {
 			allowed[s.Name] = true
 			tools = append(tools, s)
 		}
 	}
-	return append(tools, resolutionTool), allowed
+	return tools, allowed
+}
+
+// toolRunner executes a loop's read tool calls for one step.
+type toolRunner struct {
+	store   ArtifactPutter
+	tools   ToolExecutor
+	log     *slog.Logger
+	runID   uuid.UUID
+	stepID  uuid.UUID
+	company string
+	sc      scope
+	allowed map[string]bool
 }
 
 // execute runs one tool call: refused outside the allowlist or the run's
 // window, otherwise run on the registry, snapshotted and projected. Only a
 // store error is returned.
-func (iv *LLMInvestigator) execute(ctx context.Context, req InvestigateRequest, sc scope, allowed map[string]bool, c llm.ToolCall, run *investigation) (llm.ToolResultBlock, error) {
+func (t toolRunner) execute(ctx context.Context, c llm.ToolCall, run *investigation) (llm.ToolResultBlock, error) {
 	fail := func(text string) (llm.ToolResultBlock, error) {
 		return llm.ToolResultBlock{ToolCallID: c.ID, Content: text, IsError: true}, nil
 	}
-	if !allowed[c.Name] {
+	if !t.allowed[c.Name] {
 		run.refusals++
-		iv.log().WarnContext(ctx, "investigator tool call refused", "run_id", req.RunID, "step_id", req.StepID, "tool", safeName(c.Name), "error_class", "not_allowed")
+		t.log.WarnContext(ctx, "investigator tool call refused", "run_id", t.runID, "step_id", t.stepID, "tool", safeName(c.Name), "error_class", "not_allowed")
 		return fail(MsgUnknownTool)
 	}
 	args, ok := decodeArgs(c.Args)
 	if !ok {
 		return fail(MsgBadArgs)
 	}
-	if bad := sc.outOfScope(args); len(bad) > 0 {
-		iv.log().InfoContext(ctx, "investigator tool call outside the run's window", "run_id", req.RunID, "step_id", req.StepID, "tool", c.Name, "args", bad)
-		return fail(fmt.Sprintf(msgOutOfWindowFormat, req.Company, argDate(sc.from), argDate(sc.to)))
+	if bad := t.sc.outOfScope(args); len(bad) > 0 {
+		t.log.InfoContext(ctx, "investigator tool call outside the run's window", "run_id", t.runID, "step_id", t.stepID, "tool", c.Name, "args", bad)
+		return fail(fmt.Sprintf(msgOutOfWindowFormat, t.company, argDate(t.sc.from), argDate(t.sc.to)))
 	}
-	res := iv.Tools.Execute(ctx, c)
+	res := t.tools.Execute(ctx, c)
 	if res.IsError {
 		return fail(fixedError(res.Content))
 	}
@@ -501,7 +587,7 @@ func (iv *LLMInvestigator) execute(ctx context.Context, req InvestigateRequest, 
 		return fail(msgNotJSON)
 	}
 	server, tool, _ := strings.Cut(c.Name, toolSep)
-	sha, err := iv.Store.PutArtifact(ctx, store.ArtifactToolResult, req.RunID, req.StepID, toolSnapshot{
+	sha, err := t.store.PutArtifact(ctx, store.ArtifactToolResult, t.runID, t.stepID, toolSnapshot{
 		Server: server, Tool: tool, Args: args, Result: result,
 	})
 	if err != nil {
@@ -789,7 +875,20 @@ func resolutionSchema() json.RawMessage {
 // answer. It names the field and the problem in our words, never the
 // model's text.
 func resolutionCorrection(messages []llm.Message, resp llm.Response, bad *malformed) []llm.Message {
-	text := fmt.Sprintf("Your answer was rejected: %s: %s. Call %s again with a corrected answer.", bad.field, bad.problem, InvestigateToolName)
+	return toolCorrection(InvestigateToolName)(messages, resp, bad)
+}
+
+// toolCorrection is the corrective turn of a loop whose finishing tool is
+// name.
+func toolCorrection(name string) func([]llm.Message, llm.Response, *malformed) []llm.Message {
+	return func(messages []llm.Message, resp llm.Response, bad *malformed) []llm.Message {
+		return appendCorrection(messages, resp, fmt.Sprintf("Your answer was rejected: %s: %s. Call %s again with a corrected answer.", bad.field, bad.problem, name))
+	}
+}
+
+// appendCorrection appends text as the answer to every tool call of resp,
+// or as a user turn when resp called no tool.
+func appendCorrection(messages []llm.Message, resp llm.Response, text string) []llm.Message {
 	if len(resp.ToolCalls) == 0 {
 		return append(messages, llm.NewAssistantTextMessage("(no tool call)"), llm.NewUserTextMessage(text))
 	}
