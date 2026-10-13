@@ -1,0 +1,23 @@
+package templates
+
+// Login is the sign-in form. The csrf_token field pairs with the pre-session
+// cookie issued by GET /login.
+templ Login(p LoginPage) {
+	@Base(Layout{Title: "Sign in"}) {
+		<section class="card narrow">
+			<h1>Sign in</h1>
+			if p.Error != "" {
+				<p class="error" role="alert">{ p.Error }</p>
+			}
+			<form method="post" action="/login">
+				<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+				<input type="hidden" name="next" value={ p.Next }/>
+				<label for="username">Username</label>
+				<input id="username" name="username" type="text" autocomplete="username" required autofocus/>
+				<label for="password">Password</label>
+				<input id="password" name="password" type="password" autocomplete="current-password" required/>
+				<button type="submit">Sign in</button>
+			</form>
+		</section>
+	}
+}

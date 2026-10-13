@@ -1,0 +1,39 @@
+package templates
+
+// Base is the shared page shell: strict-CSP friendly (no inline script or
+// style), htmx pinned with SRI, and the CSRF token in hx-headers.
+templ Base(l Layout) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="htmx-config" content={ htmxConfig }/>
+			<title>{ l.Title } · Close Copilot</title>
+			<link rel="stylesheet" href="/static/app.css"/>
+			<script src={ htmxSrc } integrity={ htmxIntegrity } crossorigin="anonymous" defer></script>
+		</head>
+		<body
+			if l.CSRFToken != "" {
+				hx-headers={ csrfHeaders(l.CSRFToken) }
+			}
+		>
+			<header class="topbar">
+				<span class="brand">Close Copilot</span>
+				if l.User != "" {
+					<span class="who">
+						<span class="user">{ l.User }</span>
+						<span class="role" data-role={ l.Role }>{ l.Role }</span>
+						<form method="post" action="/logout" class="inline">
+							<input type="hidden" name="csrf_token" value={ l.CSRFToken }/>
+							<button type="submit">Sign out</button>
+						</form>
+					</span>
+				}
+			</header>
+			<main>
+				{ children... }
+			</main>
+		</body>
+	</html>
+}

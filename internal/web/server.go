@@ -1,0 +1,181 @@
+package web
+
+import (
+	"context"
+	"embed"
+	"errors"
+	"fmt"
+	"io/fs"
+	"log/slog"
+	"net/http"
+	"sync/atomic"
+	"time"
+
+	"github.com/a-h/templ"
+
+	"github.com/abhishekjha/close-copilot/internal/config"
+)
+
+// HTTP server timeouts.
+const (
+	readHeaderTimeout = 5 * time.Second
+	readTimeout       = 15 * time.Second
+	writeTimeout      = 30 * time.Second
+	idleTimeout       = 60 * time.Second
+	shutdownTimeout   = 10 * time.Second
+	maxHeaderBytes    = 64 << 10
+	defaultAddr       = ":8000"
+)
+
+//go:embed static
+var staticFiles embed.FS
+
+// Options configure a Server.
+type Options struct {
+	// Addr is the listen address (APP_ADDR). Empty means ":8000".
+	Addr string
+	// SessionKey is APP_SESSION_KEY: the raw string, at least 32 bytes.
+	SessionKey config.Secret
+	// InsecureCookies drops the Secure flag from cookies. For tests only:
+	// the default is Secure, and it is never inferred from the request.
+	InsecureCookies bool
+	// Now is the clock; nil means time.Now.
+	Now func() time.Time
+}
+
+// OptionsFromConfig takes APP_ADDR and APP_SESSION_KEY from cfg.
+func OptionsFromConfig(cfg config.Config) Options {
+	return Options{Addr: cfg.AppAddr, SessionKey: cfg.AppSessionKey}
+}
+
+// Server is the web UI and JSON API. It is an http.Handler.
+type Server struct {
+	addr          string
+	keys          keys
+	users         atomic.Pointer[Users]
+	log           *slog.Logger
+	secureCookies bool
+	now           func() time.Time
+	routes        []route
+	handler       http.Handler
+}
+
+// NewServer builds the server. It refuses a session key shorter than 32
+// bytes and an empty users set.
+func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
+	k, err := deriveKeys(opts.SessionKey)
+	if err != nil {
+		return nil, err
+	}
+	if users.Len() == 0 {
+		return nil, errors.New("web: no users")
+	}
+	if log == nil {
+		log = slog.Default()
+	}
+	s := &Server{
+		addr:          opts.Addr,
+		keys:          k,
+		log:           log,
+		secureCookies: !opts.InsecureCookies,
+		now:           opts.Now,
+	}
+	if s.addr == "" {
+		s.addr = defaultAddr
+	}
+	if s.now == nil {
+		s.now = time.Now
+	}
+	s.users.Store(&users)
+	// Warm the dummy-hash cache so the first unknown-user login isn't slower.
+	if _, err := dummyHash(users.maxCost()); err != nil {
+		return nil, err
+	}
+
+	static, err := fs.Sub(staticFiles, "static")
+	if err != nil {
+		return nil, fmt.Errorf("web: static files: %w", err)
+	}
+	s.routes = s.routeTable(http.StripPrefix("/static/", noDirListing(http.FileServerFS(static))))
+	mux := http.NewServeMux()
+	for _, rt := range s.routes {
+		mux.Handle(rt.method+" "+rt.path, s.wrap(rt))
+	}
+	s.handler = s.baseMiddleware(mux)
+	return s, nil
+}
+
+// SetUsers replaces the users set (for example after the owner edits
+// config/users.yaml). Sessions of removed users or users whose hashes changed
+// end at their next request.
+func (s *Server) SetUsers(users Users) error {
+	if users.Len() == 0 {
+		return errors.New("web: no users")
+	}
+	if _, err := dummyHash(users.maxCost()); err != nil {
+		return err
+	}
+	s.users.Store(&users)
+	return nil
+}
+
+// ServeHTTP implements http.Handler.
+func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.handler.ServeHTTP(w, r)
+}
+
+// Run serves on the configured address until ctx is cancelled, then shuts
+// down gracefully, letting in-flight requests finish.
+func (s *Server) Run(ctx context.Context) error {
+	srv := &http.Server{
+		Addr:              s.addr,
+		Handler:           s,
+		ReadHeaderTimeout: readHeaderTimeout,
+		ReadTimeout:       readTimeout,
+		WriteTimeout:      writeTimeout,
+		IdleTimeout:       idleTimeout,
+		MaxHeaderBytes:    maxHeaderBytes,
+		ErrorLog:          slog.NewLogLogger(s.log.Handler(), slog.LevelWarn),
+	}
+	errc := make(chan error, 1)
+	go func() { errc <- srv.ListenAndServe() }()
+	s.log.InfoContext(ctx, "web: listening", "addr", s.addr)
+
+	select {
+	case err := <-errc:
+		if errors.Is(err, http.ErrServerClosed) {
+			return nil
+		}
+		return fmt.Errorf("web: serve %s: %w", s.addr, err)
+	case <-ctx.Done():
+	}
+	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), shutdownTimeout)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		return fmt.Errorf("web: shutdown: %w", err)
+	}
+	if err := <-errc; err != nil && !errors.Is(err, http.ErrServerClosed) {
+		return fmt.Errorf("web: serve %s: %w", s.addr, err)
+	}
+	return nil
+}
+
+// render writes a templ component as HTML.
+func (s *Server) render(w http.ResponseWriter, r *http.Request, status int, c templ.Component) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.WriteHeader(status)
+	if err := c.Render(r.Context(), w); err != nil {
+		s.log.ErrorContext(r.Context(), "web: render", "path", r.URL.Path, "err", err)
+	}
+}
+
+// noDirListing answers 404 for directory paths instead of listing them.
+func noDirListing(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "" || r.URL.Path[len(r.URL.Path)-1] == '/' {
+			http.NotFound(w, r)
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
+}
