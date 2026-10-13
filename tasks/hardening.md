@@ -373,6 +373,42 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 **Files.** `cmd/eval/main.go`, `cmd/eval/main_test.go`, `cmd/eval/args_test.go`. Phase 2, llm-engineer, data-sensitive. G4-tier2 is skipped (no `llm` section for `suite-skeleton` in `evals/baseline.json` yet, so the compare would fail with `baseline_tier_missing`); the check is the unit tests plus one eval run with no baseline compare.
 
+### CC-806b · Score citation precision and validity
+
+**Goal.** `eval score` reports citation validity and citation precision against `evals/golden/citations.yaml` (CC-907), so CC-806's Gate D ("validity 100%, precision at or above the baseline") can be measured and gated.
+
+**Finding** (from CC-806, merged 2026-10-13). CC-806 retrieves passages and the explainer cites exact `(doc_id, section)` pairs, but nothing scores them: `internal/evals` has no citation metric, the eval workflow sets no `Retriever` (its runs keep one skipped `retrieve/close` step), and the llm-engineer may not touch `internal/evals` or `cmd/eval`.
+
+**Subtasks**
+- A scorer in `internal/evals`: match each golden case to its finding by the ground-truth keys (never by text); validity = every cited pair exists in the ingested corpus; precision = the cited pair is in the case's `expect` any-of list. Report both in `score.json` and `score.md`, and add a `--require` key.
+- Wire a `Retriever` into `cmd/eval` for Tier 2, with recorded search results in the fixtures so `--replay` needs no TEI or live search; the retrieve steps then appear per finding in the eval runs.
+- Tests with fixtures for a right, a wrong-section, a wrong-document and an unsupported citation.
+- The baseline gets its citation numbers in its own `baseline-update` commit, owner-approved. This ticket does not edit `evals/baseline.json` or `evals/golden/**`.
+
+**Notes.** CC-806 leaves the retrieval artifact reachable through the retrieve step's `output_refs` and the explanation's `document_refs` (the store cannot set a first attempt's `input_refs`; a small store ticket if the owner wants it literal). The `citations.yaml` header still says DRAFT; the owner confirms it before this ticket relies on it.
+
+**Files.** `internal/evals/citations.go`, `internal/evals/citations_test.go`, `internal/evals/score.go`, `internal/evals/report.go`, `internal/evals/fixtures.go`, `internal/evals/testdata/**`, `cmd/eval/main.go`, `cmd/eval/main_test.go`. Phase 3, eval-engineer, standard. Depends on CC-806, CC-907 and CC-902.
+
+### CC-020 · Why the explainer flags nearly every finding `needs_review`
+
+**Goal.** Find and fix the cause of 7 or 8 of 8 findings ending `needs_review` in agent-on runs, so Tier 2 `verified_rate` is stable and meaningful.
+
+**Finding** (2026-10-13, `suite-skeleton`, `--replay`, agent on). On the same commit `verified_rate` ranged 0/8 to 3/8 across runs (baseline 3/8). In the low runs the explainer sets `needs_review` itself on nearly every finding, including the three planted `unrecorded_bank_charge` findings that stayed verified in the good runs. Recall, precision and clean false alarms were unaffected. This blocks a trustworthy `verified` baseline; see `tasks/tier2-verified-informational.md`.
+
+**Suspects, to confirm or rule out with evidence from stored explanations and prompts, not by guessing**
+- The pseudonymised input from CC-019: tokens such as `GSTIN_xxxx` or masked names in EVIDENCE may read as unexplained, so the model flags the finding.
+- The self-flag rule in `internal/agent/prompts/explain.txt` rule 4 ("if the evidence does not explain the finding, say so and set needs_review to true") combined with what EVIDENCE actually contains for these findings.
+- Run-to-run variance of the fast model (`LLM_MODEL_FAST`), or a change in the `claude -p` provider's behaviour, since the morning runs of the same code scored 3/8 and 2/8.
+
+**Subtasks**
+- Reproduce on a pinned commit and record, per run, which findings are flagged and the explanation text's stated reason (read the stored artifacts; do not paste raw model text into logs).
+- Run a controlled comparison of at least the two prompt and input variants the evidence points to, with at least three runs each, interleaved in time.
+- Fix the cause in `prompts/explain.txt`, `explain.go` or the input builder, without weakening the verifier or the invariants.
+
+**Acceptance.** After the owner's 6-run baseline-update lands, a 3-run Tier 2 on `suite-skeleton` has a `verified_rate` median at or above the baseline median and no run below its tolerance floor; recall, precision, clean false alarms and failed runs unchanged. The baseline is not edited by this ticket.
+
+**Files.** `internal/agent/prompts/explain.txt`, `internal/agent/explain.go`, `internal/agent/explain_test.go`, `internal/agent/testdata/explain/**`. Phase 2, llm-engineer, data-sensitive. Depends on CC-019 and CC-806. G4-tier2 required (informational for `verified_rate` until the baseline-update lands; after that it is the acceptance).
+
 ---
 
 ## Notes for later specs

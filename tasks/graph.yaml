@@ -431,6 +431,21 @@ tasks:
       - "cmd/eval/main_test.go"
       - "cmd/eval/args_test.go"
     check: "eval run with the agent on and no PSEUDONYM_KEY fails at startup; with a key the explainer has a pseudonymiser and the no-pseudonymiser warning is gone"
+  # CC-020 is not in the tickets doc; see tasks/hardening.md (found at the CC-806 tier-2 runs, 2026-10-13).
+  - id: CC-020
+    title: "Why the explainer flags nearly every finding needs_review"
+    phase: 2
+    owner: llm-engineer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-019, CC-806]
+    needs_erpnext: false
+    files:
+      - "internal/agent/prompts/explain.txt"
+      - "internal/agent/explain.go"
+      - "internal/agent/explain_test.go"
+      - "internal/agent/testdata/explain/**"
+    check: "3-run Tier 2 verified_rate median at or above the re-measured baseline median; recall, precision, clean false alarms and failed runs unchanged"
   - id: CC-301
     title: "Company profiles, rules config and GSTIN generator"
     phase: 1
@@ -1072,6 +1087,23 @@ tasks:
       - "internal/agent/explain.go"
       - "internal/agent/workflow.go"
     check: "Citation precision at or above baseline"
+  # CC-806b is not in the tickets doc; see tasks/hardening.md (split off CC-806, 2026-10-13).
+  - id: CC-806b
+    title: "Score citation precision and validity"
+    phase: 3
+    owner: eval-engineer
+    risk: standard
+    human_review: false
+    depends_on: [CC-806, CC-907, CC-902]
+    needs_erpnext: false
+    files:
+      - "internal/evals/citations.go"
+      - "internal/evals/citations_test.go"
+      - "internal/evals/score.go"
+      - "internal/evals/report.go"
+      - "internal/evals/fixtures.go"
+      - "cmd/eval/main.go"
+    check: "eval score reports citation validity and precision from evals/golden/citations.yaml; --require key works; replay needs no live search"
   - id: CC-906
     title: "Benchmarks: the trade-off write-up"
     phase: 3
