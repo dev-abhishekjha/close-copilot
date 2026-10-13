@@ -6,7 +6,10 @@
 #
 # Roles are explicit sets, not a ladder: viewer reads, maker proposes, checker
 # approves. token_sha256 is the hex SHA-256 of a bearer token for scripts
-# (/api/* only); empty means bearer auth is off for that user.
+# (/api/* only); empty means bearer auth is off for that user. Because it is
+# stored as an unsalted SHA-256, a bearer token must be generated from at least
+# 32 random bytes (e.g. `openssl rand -base64 32`); never use a chosen or
+# guessable token.
 users:
   - username: asha
     role: maker

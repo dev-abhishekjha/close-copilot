@@ -251,7 +251,7 @@ func (ts *testServer) loginForm(t testing.TB) (*http.Cookie, string) {
 	if w.Code != http.StatusOK {
 		t.Fatalf("GET /login = %d", w.Code)
 	}
-	ck := responseCookie(t, w, loginCSRFCookieName)
+	ck := responseCookie(t, w, ts.loginCSRFCookieName())
 	if ck == nil {
 		t.Fatal("GET /login set no login CSRF cookie")
 	}

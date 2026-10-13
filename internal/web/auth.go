@@ -24,10 +24,18 @@ import (
 )
 
 const (
-	sessionCookieName   = "cc_session"
-	loginCSRFCookieName = "cc_login_csrf"
-	csrfHeaderName      = "X-CSRF-Token"
-	csrfFieldName       = "csrf_token"
+	// Cookie names. By default (Secure cookies) they carry the browser-enforced
+	// prefixes: __Host- pins the session cookie to this host with Secure,
+	// Path=/ and no Domain; __Secure- requires Secure on the login CSRF cookie.
+	// The plain names are used only with Options.InsecureCookies (tests),
+	// because browsers reject prefixed cookies without Secure.
+	sessionCookieSecure     = "__Host-cc_session"
+	sessionCookieInsecure   = "cc_session"
+	loginCSRFCookieSecure   = "__Secure-cc_login_csrf"
+	loginCSRFCookieInsecure = "cc_login_csrf"
+
+	csrfHeaderName = "X-CSRF-Token"
+	csrfFieldName  = "csrf_token"
 
 	// sessionTTL is the server-side session lifetime, checked from the
 	// signed payload on every request.
@@ -129,7 +137,7 @@ func (s *Server) newSession(u User) (*http.Cookie, string) {
 	payload, _ := json.Marshal(c) // a struct of strings and ints always marshals
 	p := b64.EncodeToString(payload)
 	sig := mac(s.keys.session, []byte(p))
-	cookie := s.cookie(sessionCookieName, p+"."+b64.EncodeToString(sig), "/", int(sessionTTL/time.Second), now.Add(sessionTTL))
+	cookie := s.cookie(s.sessionCookieName(), p+"."+b64.EncodeToString(sig), "/", int(sessionTTL/time.Second), now.Add(sessionTTL))
 	return cookie, s.csrfToken(sig)
 }
 
@@ -174,7 +182,7 @@ func (s *Server) verifySession(value string) (sessionClaims, []byte, bool) {
 // sessionPrincipal resolves the request's session cookie to a principal. A
 // removed user or a changed fingerprint yields nil (anonymous).
 func (s *Server) sessionPrincipal(r *http.Request) *principal {
-	ck, err := r.Cookie(sessionCookieName)
+	ck, err := r.Cookie(s.sessionCookieName())
 	if err != nil {
 		return nil
 	}
@@ -288,13 +296,13 @@ func (s *Server) handleLoginForm(w http.ResponseWriter, r *http.Request) {
 // one when it is missing or malformed. Reusing a good one keeps two open
 // login tabs working.
 func (s *Server) loginNonce(w http.ResponseWriter, r *http.Request) string {
-	if ck, err := r.Cookie(loginCSRFCookieName); err == nil {
+	if ck, err := r.Cookie(s.loginCSRFCookieName()); err == nil {
 		if raw, err := b64.DecodeString(ck.Value); err == nil && len(raw) == 32 {
 			return ck.Value
 		}
 	}
 	nonce := randomToken()
-	http.SetCookie(w, s.cookie(loginCSRFCookieName, nonce, "/login", int(loginCSRFTTL/time.Second), time.Time{}))
+	http.SetCookie(w, s.cookie(s.loginCSRFCookieName(), nonce, "/login", int(loginCSRFTTL/time.Second), time.Time{}))
 	return nonce
 }
 
@@ -316,7 +324,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		forbidden(w, r, "cross-site login refused")
 		return
 	}
-	ck, err := r.Cookie(loginCSRFCookieName)
+	ck, err := r.Cookie(s.loginCSRFCookieName())
 	if err != nil || !validCSRF(r.PostFormValue(csrfFieldName), s.loginCSRFToken(ck.Value)) {
 		forbidden(w, r, "missing or invalid login form token; reload the login page")
 		return
@@ -346,7 +354,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	cookie, _ := s.newSession(u)
 	http.SetCookie(w, cookie)
-	http.SetCookie(w, s.expired(loginCSRFCookieName, "/login"))
+	http.SetCookie(w, s.expired(s.loginCSRFCookieName(), "/login"))
 	if info := requestInfoFrom(r.Context()); info != nil {
 		info.user, info.role, info.event = u.Name, u.Role, "login"
 	}
@@ -359,8 +367,25 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 // copy of the cookie: a copied cookie stays valid until it expires or the
 // user's password hash or token hash changes.
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
-	http.SetCookie(w, s.expired(sessionCookieName, "/"))
+	http.SetCookie(w, s.expired(s.sessionCookieName(), "/"))
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+// sessionCookieName is the session cookie's name for this server's cookie mode.
+func (s *Server) sessionCookieName() string {
+	if s.secureCookies {
+		return sessionCookieSecure
+	}
+	return sessionCookieInsecure
+}
+
+// loginCSRFCookieName is the login CSRF cookie's name for this server's
+// cookie mode.
+func (s *Server) loginCSRFCookieName() string {
+	if s.secureCookies {
+		return loginCSRFCookieSecure
+	}
+	return loginCSRFCookieInsecure
 }
 
 // expired is a cookie that deletes name at path.

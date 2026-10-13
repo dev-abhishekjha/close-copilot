@@ -14,23 +14,45 @@ import (
 
 func TestSessionCookieFlags(t *testing.T) {
 	tests := []struct {
-		name       string
-		insecure   bool
-		wantSecure bool
+		name          string
+		insecure      bool
+		wantSecure    bool
+		wantSession   string
+		wantLoginCSRF string
 	}{
-		{"secure by default", false, true},
-		{"explicit test option drops Secure", true, false},
+		{"secure by default", false, true, "__Host-cc_session", "__Secure-cc_login_csrf"},
+		{"explicit test option drops Secure and prefixes", true, false, "cc_session", "cc_login_csrf"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			ts := newTestServer(t, func(o *Options) { o.InsecureCookies = tt.insecure })
+
+			// The pre-session login CSRF cookie: prefixed name, Secure by
+			// default, scoped to /login.
+			lw := ts.do(t, req{method: http.MethodGet, path: "/login"})
+			lc := responseCookie(t, lw, tt.wantLoginCSRF)
+			if lc == nil {
+				t.Fatalf("GET /login set no %s cookie (Set-Cookie: %q)", tt.wantLoginCSRF, lw.Header().Values("Set-Cookie"))
+			}
+			if lc.Secure != tt.wantSecure || !lc.HttpOnly || lc.Path != "/login" || lc.Domain != "" || lc.SameSite != http.SameSiteLaxMode {
+				t.Errorf("login CSRF cookie = %+v; want Secure=%v HttpOnly Path=/login no Domain SameSite=Lax", lc, tt.wantSecure)
+			}
+
 			w := ts.login(t, "asha", ts.fix.passwords["asha"], "")
 			if w.Code != http.StatusSeeOther || w.Header().Get("Location") != "/" {
 				t.Fatalf("login = %d to %q, want 303 to /", w.Code, w.Header().Get("Location"))
 			}
-			c := responseCookie(t, w, sessionCookieName)
+			c := responseCookie(t, w, tt.wantSession)
 			if c == nil {
-				t.Fatal("no session cookie")
+				t.Fatalf("no %s cookie (Set-Cookie: %q)", tt.wantSession, w.Header().Values("Set-Cookie"))
+			}
+			if c.Domain != "" {
+				t.Errorf("Domain = %q, want none (required by __Host-)", c.Domain)
+			}
+			for _, other := range []string{"cc_session", "__Host-cc_session"} {
+				if other != tt.wantSession && responseCookie(t, w, other) != nil {
+					t.Errorf("unexpected %s cookie set", other)
+				}
 			}
 			if !c.HttpOnly {
 				t.Error("HttpOnly not set")
@@ -48,8 +70,8 @@ func TestSessionCookieFlags(t *testing.T) {
 				t.Errorf("MaxAge = %d, Expires = %v; want 8h expiry", c.MaxAge, c.Expires)
 			}
 			// The login CSRF cookie is cleared after a successful login.
-			if lc := responseCookie(t, w, loginCSRFCookieName); lc == nil || lc.MaxAge >= 0 {
-				t.Error("login CSRF cookie not cleared")
+			if lc := responseCookie(t, w, tt.wantLoginCSRF); lc == nil || lc.MaxAge >= 0 || lc.Path != "/login" || lc.Secure != tt.wantSecure {
+				t.Errorf("login CSRF cookie not cleared at /login: %+v", lc)
 			}
 			// The cookie works.
 			if got := ts.do(t, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{c}}).Code; got != http.StatusOK {
@@ -117,7 +139,7 @@ func TestSessionTamper(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			expectAnonymous(t, ts, &http.Cookie{Name: sessionCookieName, Value: tt.value})
+			expectAnonymous(t, ts, &http.Cookie{Name: ts.sessionCookieName(), Value: tt.value})
 		})
 	}
 	t.Run("untampered still works", func(t *testing.T) {
@@ -241,7 +263,7 @@ func TestRemovedUser(t *testing.T) {
 		t.Errorf("removed user's bearer = %d, want 401", w.Code)
 	}
 	w = ts.login(t, "asha", f.passwords["asha"], "")
-	if w.Code != http.StatusUnauthorized || responseCookie(t, w, sessionCookieName) != nil {
+	if w.Code != http.StatusUnauthorized || responseCookie(t, w, ts.sessionCookieName()) != nil {
 		t.Errorf("removed user's login = %d, want 401 without a session", w.Code)
 	}
 }
@@ -319,7 +341,7 @@ func TestLoginCSRF(t *testing.T) {
 			if w.Code != tt.want {
 				t.Fatalf("status = %d, want %d", w.Code, tt.want)
 			}
-			if got := responseCookie(t, w, sessionCookieName) != nil; got != (tt.want == http.StatusSeeOther) {
+			if got := responseCookie(t, w, ts.sessionCookieName()) != nil; got != (tt.want == http.StatusSeeOther) {
 				t.Errorf("session cookie set = %v", got)
 			}
 		})
@@ -331,7 +353,7 @@ func TestLoginCSRF(t *testing.T) {
 			if w.Code != http.StatusUnauthorized || !strings.Contains(w.Body.String(), invalidLogin) {
 				t.Errorf("%s: status %d, want 401 with %q", creds[0], w.Code, invalidLogin)
 			}
-			if responseCookie(t, w, sessionCookieName) != nil {
+			if responseCookie(t, w, ts.sessionCookieName()) != nil {
 				t.Errorf("%s: failed login set a session", creds[0])
 			}
 		}
@@ -374,7 +396,7 @@ func TestBearer(t *testing.T) {
 			if tt.wantLoc && !strings.HasPrefix(w.Header().Get("Location"), "/login") {
 				t.Errorf("Location = %q, want /login", w.Header().Get("Location"))
 			}
-			if responseCookie(t, w, sessionCookieName) != nil {
+			if responseCookie(t, w, ts.sessionCookieName()) != nil {
 				t.Error("bearer request set a session cookie")
 			}
 		})
@@ -421,7 +443,7 @@ func TestLogout(t *testing.T) {
 			if w.Code != tt.want {
 				t.Fatalf("status = %d, want %d", w.Code, tt.want)
 			}
-			c := responseCookie(t, w, sessionCookieName)
+			c := responseCookie(t, w, ts.sessionCookieName())
 			if !tt.clears {
 				if c != nil {
 					t.Error("cookie changed without a valid logout")

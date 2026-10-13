@@ -4,14 +4,16 @@ package templates
 
 import "encoding/json"
 
-// htmx is pinned to one version and loaded with Subresource Integrity. The
-// Content-Security-Policy in internal/web allows this origin for scripts.
+// htmx 2.0.4 is vendored as internal/web/static/htmx.min.js, served from
+// this origin (the Content-Security-Policy allows only 'self' for scripts)
+// and still loaded with Subresource Integrity so a changed file fails closed.
 const (
-	htmxSrc       = "https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"
+	htmxSrc       = "/static/htmx.min.js"
 	htmxIntegrity = "sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"
-	// htmxConfig keeps htmx within the strict CSP: no inline indicator
-	// style, no eval, no inline script tags in swapped content.
-	htmxConfig = `{"includeIndicatorStyles":false,"allowEval":false,"allowScriptTags":false}`
+	// htmxConfig keeps htmx within the strict CSP and this origin: no inline
+	// indicator style, no eval, no inline script tags in swapped content, and
+	// no requests to other origins.
+	htmxConfig = `{"includeIndicatorStyles":false,"allowEval":false,"allowScriptTags":false,"selfRequestsOnly":true}`
 )
 
 // Layout is the base page. CSRFToken, when set, is sent by htmx on every

@@ -2,6 +2,8 @@ package web
 
 import (
 	"context"
+	"crypto/sha512"
+	"encoding/base64"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -30,13 +32,15 @@ func TestSecurityHeaders(t *testing.T) {
 				t.Error("Referrer-Policy missing")
 			}
 			csp := h.Get("Content-Security-Policy")
-			for _, want := range []string{"default-src 'self'", "script-src 'self' " + htmxOrigin + ";", "frame-ancestors 'none'", "object-src 'none'"} {
+			for _, want := range []string{"default-src 'self';", "script-src 'self';", "frame-ancestors 'none'", "object-src 'none'"} {
 				if !strings.Contains(csp, want) {
 					t.Errorf("CSP %q lacks %q", csp, want)
 				}
 			}
-			if strings.Contains(csp, "unsafe-inline") || strings.Contains(csp, "unsafe-eval") {
-				t.Errorf("CSP allows unsafe sources: %q", csp)
+			for _, bad := range []string{"unsafe-inline", "unsafe-eval", "http:", "https:", "jsdelivr", "*"} {
+				if strings.Contains(csp, bad) {
+					t.Errorf("CSP allows %q: %q", bad, csp)
+				}
 			}
 		})
 	}
@@ -46,18 +50,19 @@ func TestBaseLayout(t *testing.T) {
 	ts := newTestServer(t)
 	body := ts.do(t, req{method: http.MethodGet, path: "/login"}).Body.String()
 	for _, want := range []string{
-		`src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js"`,
-		`integrity="sha384-`,
+		`src="/static/htmx.min.js"`,
+		`integrity="sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+"`,
 		`crossorigin="anonymous"`,
-		`includeIndicatorStyles`,
-		`allowEval`,
+		`&#34;includeIndicatorStyles&#34;:false`,
+		`&#34;allowEval&#34;:false`,
+		`&#34;selfRequestsOnly&#34;:true`,
 		`href="/static/app.css"`,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("layout lacks %s", want)
 		}
 	}
-	for _, bad := range []string{"hx-on", "<style", "style="} {
+	for _, bad := range []string{"hx-on", "<style", "style=", "jsdelivr", "https://"} {
 		if strings.Contains(body, bad) {
 			t.Errorf("layout contains %q (blocked by CSP)", bad)
 		}
@@ -104,6 +109,16 @@ func TestStaticAndHealthz(t *testing.T) {
 	body, _ := io.ReadAll(w.Body)
 	if w.Code != http.StatusOK || !strings.Contains(string(body), `"ok"`) {
 		t.Errorf("healthz = %d %s", w.Code, body)
+	}
+	// The vendored htmx is served from this origin and matches the layout's
+	// Subresource Integrity hash.
+	w = ts.do(t, req{method: http.MethodGet, path: "/static/htmx.min.js"})
+	if w.Code != http.StatusOK || !strings.Contains(w.Header().Get("Content-Type"), "javascript") {
+		t.Errorf("htmx.min.js = %d %q", w.Code, w.Header().Get("Content-Type"))
+	}
+	sum := sha512.Sum384(w.Body.Bytes())
+	if got := "sha384-" + base64.StdEncoding.EncodeToString(sum[:]); !strings.Contains(ts.do(t, req{method: http.MethodGet, path: "/login"}).Body.String(), `integrity="`+got+`"`) {
+		t.Errorf("served htmx.min.js hash %s does not match the layout's integrity attribute", got)
 	}
 	if got := ts.do(t, req{method: http.MethodGet, path: "/static/missing.css"}).Code; got != http.StatusNotFound {
 		t.Errorf("missing static file = %d, want 404", got)

@@ -14,15 +14,13 @@ import (
 // maxBodyBytes caps every request body.
 const maxBodyBytes = 1 << 20
 
-// contentSecurityPolicy allows only this origin plus the pinned htmx CDN
-// origin (scripts only). No inline scripts or styles, no eval.
+// contentSecurityPolicy allows only this origin. htmx is vendored under
+// /static/ (and loaded with Subresource Integrity), so no third-party script
+// origin is needed. No inline scripts or styles, no eval.
 const contentSecurityPolicy = "default-src 'self'; " +
-	"script-src 'self' " + htmxOrigin + "; " +
+	"script-src 'self'; " +
 	"style-src 'self'; img-src 'self'; connect-src 'self'; font-src 'self'; " +
 	"object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
-
-// htmxOrigin is the CDN origin of the pinned htmx script in the base layout.
-const htmxOrigin = "https://cdn.jsdelivr.net"
 
 type authMethod string
 
