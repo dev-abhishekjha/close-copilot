@@ -405,7 +405,7 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 - Run a controlled comparison of at least the two prompt and input variants the evidence points to, with at least three runs each, interleaved in time.
 - Fix the cause in `prompts/explain.txt`, `explain.go` or the input builder, without weakening the verifier or the invariants.
 
-**Acceptance.** After the owner's 6-run baseline-update lands, a 3-run Tier 2 on `suite-skeleton` has a `verified_rate` median at or above the baseline median and no run below its tolerance floor; recall, precision, clean false alarms and failed runs unchanged. The baseline is not edited by this ticket.
+**Acceptance.** The six-run baseline-update landed (`bf2f236`, 2026-10-13): median 0.5/8, baseline 1/8, tolerance 2, so the compare cannot fail on `verified_rate`; today's range on the old and new code was 0 to 3 of 8. After the self-flag fix, a 3-run Tier 2 on `suite-skeleton` has recall, precision, clean false alarms and failed runs unchanged and passes a hard check `--require verified_rate>=N/8`, where the owner chooses N from the 3-run median after the fix. A re-baseline commit (`baseline-update: ...`, the owner's) follows the fix, and it ends `tasks/tier2-verified-informational.md`. This ticket itself does not edit the baseline.
 
 **Files.** `internal/agent/prompts/explain.txt`, `internal/agent/explain.go`, `internal/agent/explain_test.go`, `internal/agent/testdata/explain/**`. Phase 2, llm-engineer, data-sensitive. Depends on CC-019 and CC-806. G4-tier2 required (informational for `verified_rate` until the baseline-update lands; after that it is the acceptance).
 

@@ -1,13 +1,14 @@
 # Tier 2 `verified_rate` is informational (temporary)
 
 - **Decided:** 2026-10-13, by the owner.
-- **Expires:** when the `baseline-update: suite-skeleton llm tier (6-run noise)` commit lands on `main`. Delete this file in that commit's follow-up, or at the latest the next time `/build` reads it and finds the commit.
+- **Expires:** at the CC-020 re-baseline, or 2026-11-13, whichever comes first.
+- **Updated 2026-10-13:** the `baseline-update: suite-skeleton llm tier (6-run noise)` commit (`bf2f236`) landed, set `verified_rate` to 1/8 with a noise tolerance of 2, and did **not** end this file. The compare fails only when `baseline - actual > max(noise, 1)`, so with baseline 1 and tolerance 2 it cannot fail on `verified_rate`. It stays informational until CC-020 raises the level and re-baselines.
 
 ## What changes for tickets
 
 While this file exists, a G4-tier2 `FAIL compare: verified_drop ...` line does **not** fail a ticket. `/build` records the run's `verified_rate` in the merge note and moves on.
 
-Still hard gates, unchanged: recall, precision, clean false alarms, failed runs, and every zero-tolerance item (unauthorized writes, out-of-scope calls, tenant leaks, invalid citations).
+Still hard gates, unchanged: recall, precision, clean false alarms, failed runs, items, investigations, and every zero-tolerance item (unauthorized writes, out-of-scope calls, tenant leaks, invalid citations).
 
 Any other `FAIL compare:` line (for example `recall_drop` or `precision_drop`) still fails the ticket. `go run ./cmd/eval score ... --compare` exits non-zero on `verified_drop`, so read the FAIL lines and ignore only that one; do not change `gates/**`, `internal/evals` or `evals/baseline.json` to get around it.
 
@@ -23,4 +24,4 @@ Same-day runs of one commit, `suite-skeleton`, agent on, `--replay`:
 
 ## Ends with
 
-The 6-run re-measure on `main` (owner runs the six commands; the orchestrator drafts the baseline diff with median, min/max and a tolerance derived from the spread, and the owner approves it).
+The CC-020 re-baseline (after its self-flag fix and a hard `--require verified_rate>=N/8` check), or 2026-11-13, whichever comes first. The six-run re-measure is done: 0, 0, 1, 1, 0, 2 of 8 (median 0.5).
