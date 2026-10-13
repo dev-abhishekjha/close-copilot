@@ -42,10 +42,17 @@ func (s *Server) routeTable(static http.Handler) []route {
 		// missing, so anonymous callers can't map the site.
 		{http.MethodGet, "/", anyRole, http.NotFoundHandler()},
 
+		// Close runs (CC-1002). They answer 501 until Options.Runs is set.
+		{http.MethodGet, "/runs", anyRole, s.runsHTML(s.handleRunsPage)},
+		{http.MethodPost, "/runs", makerOnly, s.runsHTML(s.handleRunsStartForm)},
+		{http.MethodGet, "/runs/{id}", anyRole, s.runsHTML(s.handleRunPage)},
+		{http.MethodGet, "/runs/{id}/progress", anyRole, s.runsHTML(s.handleRunProgress)},
+		{http.MethodGet, "/runs/{id}/findings", anyRole, s.runsHTML(s.handleRunFindingsPage)},
+
 		// JSON API (shared spec).
-		{http.MethodPost, "/api/close-runs", makerOnly, notImplemented},               // CC-1002
-		{http.MethodGet, "/api/close-runs/{id}", anyRole, notImplemented},             // CC-1002
-		{http.MethodGet, "/api/close-runs/{id}/findings", anyRole, notImplemented},    // CC-1002
+		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},
+		{http.MethodGet, "/api/close-runs/{id}", anyRole, s.runsAPI(s.handleAPIRun)},
+		{http.MethodGet, "/api/close-runs/{id}/findings", anyRole, s.runsAPI(s.handleAPIRunFindings)},
 		{http.MethodPost, "/api/findings/{id}/proposals", makerOnly, notImplemented},  // CC-1004
 		{http.MethodPost, "/api/proposals/{id}/approve", checkerOnly, notImplemented}, // CC-1004
 		{http.MethodPost, "/api/proposals/{id}/reject", checkerOnly, notImplemented},  // CC-1004

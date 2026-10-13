@@ -41,6 +41,9 @@ type Options struct {
 	InsecureCookies bool
 	// Now is the clock; nil means time.Now.
 	Now func() time.Time
+	// Runs backs the close-run pages and API (CC-1002). Nil means not
+	// configured: those routes answer 501 after the role check.
+	Runs *RunsBackend
 }
 
 // OptionsFromConfig takes APP_ADDR and APP_SESSION_KEY from cfg.
@@ -58,6 +61,7 @@ type Server struct {
 	now           func() time.Time
 	routes        []route
 	handler       http.Handler
+	runs          *runsService // nil when Options.Runs is nil
 }
 
 // NewServer builds the server. It refuses a session key shorter than 32
@@ -87,6 +91,12 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		s.now = time.Now
 	}
 	s.users.Store(&users)
+	if opts.Runs != nil {
+		if opts.Runs.Store == nil || opts.Runs.Execute == nil {
+			return nil, errors.New("web: runs backend needs a store and an executor")
+		}
+		s.runs = newRunsService(*opts.Runs, log, s.now)
+	}
 	// Warm the dummy-hash cache so the first unknown-user login isn't slower.
 	if _, err := dummyHash(users.maxCost()); err != nil {
 		return nil, err
@@ -127,6 +137,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // Run serves on the configured address until ctx is cancelled, then shuts
 // down gracefully, letting in-flight requests finish.
 func (s *Server) Run(ctx context.Context) error {
+	if s.runs != nil {
+		// Runs started from here on stop when ctx is cancelled; Run waits
+		// for them (bounded) after the HTTP server has stopped. A run cut
+		// short stays "running" and can be resumed.
+		runCtx, cancel := context.WithCancel(ctx)
+		s.runs.setBase(runCtx)
+		defer func() {
+			cancel()
+			s.runs.drain(shutdownTimeout)
+		}()
+	}
 	srv := &http.Server{
 		Addr:              s.addr,
 		Handler:           s,

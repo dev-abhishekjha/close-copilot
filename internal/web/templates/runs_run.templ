@@ -1,0 +1,50 @@
+package templates
+
+// Run is the run page: the progress panel (polling until the run ends).
+templ Run(p RunPage) {
+	@Base(Layout{Title: "Close run", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card">
+			<h1>Close run: { p.Company } { p.Month }</h1>
+			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(findingsURL(p.Panel.ID)) }>Findings</a></p>
+			@RunProgress(p.Panel)
+		</section>
+	}
+}
+
+// RunProgress is the progress partial. While the run is not terminal it
+// polls itself every two seconds; a terminal run has no trigger.
+templ RunProgress(p RunPanel) {
+	<div
+		id="run-progress"
+		data-status={ p.Status }
+		if p.Polling {
+			hx-get={ progressURL(p.ID) }
+			hx-trigger="every 2s"
+			hx-swap="outerHTML"
+		}
+	>
+		<ol class="timeline">
+			for _, s := range p.Timeline {
+				<li data-step={ s.Status } class={ stepClass(s) }>{ s.Status }</li>
+			}
+		</ol>
+		if p.Error != "" {
+			<p class="error">{ p.Error }</p>
+		}
+		<p class="duration">Duration: { p.Duration }</p>
+		<p class="tokens">
+			Tokens: <span class="input">{ i64(p.InputTokens) }</span> in,
+			<span class="output">{ i64(p.OutputTokens) }</span> out,
+			<span class="cache">{ i64(p.CacheReadTokens) }</span> cache read.
+			Cost: <span class="cost">{ p.Cost }</span>
+		</p>
+		<h2>Findings: { itoa(p.Total) }</h2>
+		if len(p.Counts) > 0 {
+			<ul class="counts">
+				for _, c := range p.Counts {
+					<li data-type={ c.Type }>{ c.Type }: { itoa(c.Count) }</li>
+				}
+			</ul>
+		}
+	</div>
+}
