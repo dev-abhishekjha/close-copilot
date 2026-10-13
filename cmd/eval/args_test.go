@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"io"
 	"slices"
 	"strings"
 	"testing"
@@ -237,5 +238,16 @@ func TestChecksFor(t *testing.T) {
 	}
 	if _, err := checksFor("suite-v1", "nope"); err == nil {
 		t.Error("bad value accepted")
+	}
+}
+
+func TestParseScoreCitationsFlags(t *testing.T) {
+	c, err := parseArgs([]string{"score", "results/x"}, io.Discard)
+	if err != nil || c.score.Citations != evals.DefaultCitationsPath || c.score.FixturesDir != evals.DefaultFixturesDir {
+		t.Errorf("defaults %+v, %v", c.score, err)
+	}
+	c, err = parseArgs([]string{"score", "results/x", "--citations", "g.yaml", "--fixtures-dir", "fx"}, io.Discard)
+	if err != nil || c.score.Citations != "g.yaml" || c.score.FixturesDir != "fx" {
+		t.Errorf("flags %+v, %v", c.score, err)
 	}
 }

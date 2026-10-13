@@ -57,6 +57,8 @@ func RenderReport(s Score) string {
 	}
 	w("\n")
 
+	renderCitations(w, s.Citations)
+
 	w("## Cost and time per close run\n\n")
 	w("| Metric | Total | Mean | p95 |\n| --- | ---: | ---: | ---: |\n")
 	w("| Duration (ms) | %d | %d | %d |\n", s.Runs.DurationMS.Total, s.Runs.DurationMS.Mean, s.Runs.DurationMS.P95)
@@ -245,4 +247,35 @@ func mdCell(s string) string {
 // mdCode makes text safe inside a code span.
 func mdCode(s string) string {
 	return strings.NewReplacer("`", "'", "\n", " ", "\r", " ", "|", `\|`).Replace(s)
+}
+
+// renderCitations writes the Citations section. An unmeasured score says
+// why and shows no ratio, so it never reads as 100%.
+func renderCitations(w func(string, ...any), c Citations) {
+	w("## Citations\n\n")
+	if !c.Measured {
+		w("Citations: %s\n\n", unmeasured(false, c.Reason, ""))
+		if len(c.Cases) == 0 {
+			return
+		}
+	} else {
+		w("| Metric | Value |\n| --- | --- |\n")
+		w("| Validity | %s |\n| Precision | %s |\n| Cited | %s |\n\n", c.Validity, c.Precision, c.Cited)
+	}
+	w("| Case | Outcome | Cited | Expected (any of) |\n| --- | --- | --- | --- |\n")
+	for _, k := range c.Cases {
+		w("| %s | %s | %s | %s |\n", mdCell(k.ID), k.Outcome, mdPairs(k.Cited), mdPairs(k.Expected))
+	}
+	w("\n")
+}
+
+func mdPairs(ps []CitationRef) string {
+	if len(ps) == 0 {
+		return "(none)"
+	}
+	parts := make([]string, 0, len(ps))
+	for _, p := range ps {
+		parts = append(parts, mdCell(p.String()))
+	}
+	return strings.Join(parts, "; ")
 }

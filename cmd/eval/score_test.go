@@ -460,3 +460,40 @@ func TestScoreCLIDotDotSymlink(t *testing.T) {
 		}
 	}
 }
+
+// TestScoreCLICitations: citations are not measured without a golden file
+// and a corpus fixture, score.md says why, and --require citations.* fails
+// with that reason rather than passing.
+func TestScoreCLICitations(t *testing.T) {
+	truth := filepath.Join(scoreData, "truth")
+	out := t.TempDir()
+	code, _, errText := runCLI(t, "score", filepath.Join(scoreData, "run-pass"), "--truth-dir", truth, "--out", out,
+		"--citations", filepath.Join(t.TempDir(), "none.yaml"), "--fixtures-dir", t.TempDir(),
+		"--require", "citations.validity>=1/1", "--require", "citations.precision>=1/1")
+	if code == 0 {
+		t.Fatal("exit 0 with unmeasured citations")
+	}
+	for _, want := range []string{"citations.validity>=1/1", "citations.precision>=1/1", "not measured", "golden citations file not found"} {
+		if !strings.Contains(errText, want) {
+			t.Errorf("stderr lacks %q:\n%s", want, errText)
+		}
+	}
+	md, err := os.ReadFile(filepath.Join(out, "score.md"))
+	if err != nil || !strings.Contains(string(md), "Citations: not measured") {
+		t.Errorf("score.md: %v\n%s", err, md)
+	}
+	js, _ := os.ReadFile(filepath.Join(out, "score.json"))
+	var s struct {
+		Citations struct {
+			Measured bool   `json:"measured"`
+			Reason   string `json:"reason"`
+		} `json:"citations"`
+	}
+	if err := json.Unmarshal(js, &s); err != nil || s.Citations.Measured || s.Citations.Reason == "" {
+		t.Errorf("score.json citations %+v, %v", s.Citations, err)
+	}
+	// A malformed requirement fails before scoring.
+	if code, _, _ := runCLI(t, "score", filepath.Join(scoreData, "run-pass"), "--truth-dir", truth, "--out", t.TempDir(), "--require", "citations.cited>=1/1"); code == 0 {
+		t.Error("citations.cited accepted")
+	}
+}

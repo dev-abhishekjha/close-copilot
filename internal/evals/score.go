@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -263,6 +264,9 @@ type Score struct {
 	InvestigationAccuracy Unmeasured  `json:"investigation_accuracy"`
 	UnauthorizedWrites    WritesCheck `json:"unauthorized_writes"`
 
+	// Citations is the citation validity and precision (CC-806b).
+	Citations Citations `json:"citations"`
+
 	Runs RunStats `json:"runs"`
 	// VerifierRejects and Retries sum the runs' failed verdicts and explain
 	// retries (0 without the agent).
@@ -365,6 +369,12 @@ type ScoreOptions struct {
 	ResultsDir string // holds manifest.json and the result files
 	// TruthDir defaults to evals/scenarios/<suite>/ground_truth.
 	TruthDir string
+	// CitationsPath is the golden citations file; empty leaves the
+	// citations unmeasured. A missing file leaves them unmeasured too.
+	CitationsPath string
+	// FixturesDir holds <suite>/corpus-sections.json, the corpus validity
+	// is checked against; empty leaves the citations unmeasured.
+	FixturesDir string
 }
 
 // DefaultTruthDir is the ground truth folder of a suite.
@@ -485,7 +495,51 @@ func ScoreRun(opts ScoreOptions) (Score, error) {
 	if err != nil {
 		return Score{}, err
 	}
-	return ScoreMonths(man, months)
+	s, err := ScoreMonths(man, months)
+	if err != nil {
+		return Score{}, err
+	}
+	s.Citations, err = scoreCitationsFor(opts, s.Suite, months)
+	if err != nil {
+		return Score{}, err
+	}
+	return s, nil
+}
+
+// scoreCitationsFor loads the golden file and the corpus fixture and grades
+// the months. A missing golden file or corpus fixture, or no case for the
+// suite, is unmeasured with the reason; a malformed one is an error.
+func scoreCitationsFor(opts ScoreOptions, suite string, months []MonthInput) (Citations, error) {
+	if opts.CitationsPath == "" {
+		return unmeasuredCitations(reasonCitationsNoGold), nil
+	}
+	all, err := LoadCitationGolden(opts.CitationsPath)
+	switch {
+	case errors.Is(err, fs.ErrNotExist):
+		return unmeasuredCitations("golden citations file not found: " + opts.CitationsPath), nil
+	case err != nil:
+		return Citations{}, err
+	}
+	var cases []CitationGolden
+	for _, c := range all {
+		if c.Finding.Scenario == suite {
+			cases = append(cases, c)
+		}
+	}
+	if len(cases) == 0 {
+		return unmeasuredCitations("no golden citation case for suite " + suite), nil
+	}
+	if opts.FixturesDir == "" {
+		return unmeasuredCitations(reasonCitationsNoCorp), nil
+	}
+	corpus, err := LoadCorpusSections(opts.FixturesDir, suite)
+	switch {
+	case errors.Is(err, ErrFixtureMissing):
+		return unmeasuredCitations(reasonCitationsNoCorp), nil
+	case err != nil:
+		return Citations{}, err
+	}
+	return ScoreCitations(cases, months, corpus), nil
 }
 
 // target is one truth item a finding can match.
@@ -675,6 +729,7 @@ func ScoreMonths(man Manifest, months []MonthInput) (Score, error) {
 		Types:                 map[string]TypeScore{},
 		InvestigationAccuracy: Unmeasured{Measured: false, Reason: reasonNoInvestigator},
 		UnauthorizedWrites:    writesCheck(man, months),
+		Citations:             unmeasuredCitations(reasonCitationsNoGold),
 		Items:                 []ItemOutcome{},
 		Investigations:        []InvestigationOutcome{},
 		FalseAlarms:           []FalseAlarm{},

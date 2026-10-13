@@ -27,6 +27,10 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 | --- | ---: | ---: | ---: | --- | ---: | ---: | ---: | --- |
 | `unrecorded_bank_charge` | 3 | 3 | 0 | 3/3 (100.0%) | 4 | 3 | 1 | 3/4 (75.0%) |
 
+## Citations
+
+Citations: not measured: no golden citations file given \(eval score --citations\)
+
 ## Cost and time per close run
 
 | Metric | Total | Mean | p95 |
