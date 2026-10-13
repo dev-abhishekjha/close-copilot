@@ -31,6 +31,10 @@ Commit `dev-abc123`, models fast `haiku` / strong `sonnet`, agent false. 2 month
 
 Citations: not measured: no golden citations file given \(eval score --citations\)
 
+## Refusals
+
+Refusals: not measured: no refusal run given \(eval score --refusal\)
+
 ## Cost and time per close run
 
 | Metric | Total | Mean | p95 |

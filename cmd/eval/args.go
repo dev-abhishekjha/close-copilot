@@ -17,10 +17,12 @@ const (
 	cmdRun   = "run"
 	cmdScore = "score"
 	cmdNoise = "noise"
+	// cmdRefusal scores the question router against the golden refusals.
+	cmdRefusal = "refusal"
 )
 
 // commandsUsage names every subcommand, for errors.
-const commandsUsage = "usage: eval run --suite <name> | eval score <results-dir> | eval noise <score.json>... --out <file>"
+const commandsUsage = "usage: eval run --suite <name> | eval score <results-dir> | eval noise <score.json>... --out <file> | eval refusal --out <dir>"
 
 // usage is the help text of eval run.
 const usage = `usage: eval run --suite <name> [flags]
@@ -69,6 +71,8 @@ type command struct {
 	flags evals.Flags
 	score scoreFlags
 	noise noiseFlags
+	// refusal is set for refusal.
+	refusal refusalFlags
 }
 
 // onlyList collects --only values; each may be comma-separated.
@@ -105,11 +109,14 @@ func parseArgs(args []string, out io.Writer) (command, error) {
 		return parseScoreArgs(args, out)
 	case cmdNoise:
 		return parseNoiseArgs(args, out)
+	case cmdRefusal:
+		return parseRefusalArgs(args, out)
 	}
 	return command{}, fmt.Errorf("eval: unknown command %.40q; %s", args[0], commandsUsage)
 }
 
-// requiredFor is the environment a command line needs: run reaches
+// requiredFor is the environment a command line needs: refusal --live and
+// --record need the LLM settings only (no Postgres, no MCP); run reaches
 // Postgres and the MCP servers, run --replay only Postgres; score and
 // noise read files and need none. A run line that doesn't parse (or asks
 // for help) needs nothing: it stops on its arguments, before any I/O.
@@ -117,6 +124,13 @@ func requiredFor(args []string) []string {
 	for i, a := range args {
 		if strings.HasPrefix(a, "-") {
 			continue // cli.Run's own flags, such as -version
+		}
+		if a == cmdRefusal {
+			c, err := parseRefusalArgs(args[i:], io.Discard)
+			if err != nil || (c.refusal.Mode != evals.RefusalModeLive && c.refusal.Mode != evals.RefusalModeRecord) {
+				return nil // a usage error, --rules-only and --replay need no environment
+			}
+			return requiredRefusalLive
 		}
 		if a != cmdRun {
 			return nil

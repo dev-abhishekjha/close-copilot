@@ -15,11 +15,13 @@ import (
 type Requirement struct {
 	Expr    string
 	Subject string // a scored finding type, overall, clean, citations, unauthorized_writes or verified_rate
-	Metric  string // recall, precision, caught, missed, false_alarms, validity; "" for unauthorized_writes and verified_rate
-	Op      string // >=, <=, ==, >, <
-	Ratio   bool   // the value is N/M
-	N       int64
-	M       int64 // the required denominator when Ratio
+	// Category is the refusal category (or overall) of a refusal key.
+	Category string
+	Metric   string // recall, precision, caught, missed, false_alarms, validity; "" for unauthorized_writes and verified_rate
+	Op       string // >=, <=, ==, >, <
+	Ratio    bool   // the value is N/M
+	N        int64
+	M        int64 // the required denominator when Ratio
 }
 
 // Requirement subjects and metrics.
@@ -29,6 +31,11 @@ const (
 	SubjectUnauthorizedWrites = "unauthorized_writes"
 	SubjectVerifiedRate       = "verified_rate"
 	SubjectCitations          = "citations"
+	// Refusal subjects (CC-708b): the combined router, the rules alone and
+	// the classifier alone.
+	SubjectRefusal           = "refusal"
+	SubjectRefusalRules      = "refusal_rules"
+	SubjectRefusalClassifier = "refusal_classifier"
 
 	MetricRecall      = "recall"
 	MetricPrecision   = "precision"
@@ -36,6 +43,11 @@ const (
 	MetricMissed      = "missed"
 	MetricFalseAlarms = "false_alarms"
 	MetricValidity    = "validity"
+	MetricRefused     = "refused"
+	MetricOverRefusal = "over_refusal"
+
+	// categoryOverall is the refusal category covering all five.
+	categoryOverall = "overall"
 )
 
 // ErrRequire reports a malformed --require expression.
@@ -43,8 +55,10 @@ var ErrRequire = errors.New("evals: --require")
 
 var (
 	requireLHSRe = regexp.MustCompile(`^([a-z0-9_]+)(?:\.([a-z_]+))?$`)
-	countRe      = regexp.MustCompile(`^[0-9]{1,18}$`)
-	ratioRe      = regexp.MustCompile(`^([0-9]{1,18})/([0-9]{1,18})$`)
+	// requireRefusalRe is subject.category.metric, for refusal subjects only.
+	requireRefusalRe = regexp.MustCompile(`^(refusal(?:_rules|_classifier)?)\.([a-z_]+)\.([a-z_]+)$`)
+	countRe          = regexp.MustCompile(`^[0-9]{1,18}$`)
+	ratioRe          = regexp.MustCompile(`^([0-9]{1,18})/([0-9]{1,18})$`)
 )
 
 // requireOps in matching order: two-character operators first.
@@ -84,12 +98,19 @@ func ParseRequire(expr string) (Requirement, error) {
 		return bad("no value after %s", op)
 	}
 
-	m := requireLHSRe.FindStringSubmatch(lhs)
-	if m == nil {
+	var r Requirement
+	if rm := requireRefusalRe.FindStringSubmatch(lhs); rm != nil {
+		r = Requirement{Expr: expr, Subject: rm[1], Category: rm[2], Metric: rm[3], Op: op}
+	} else if m := requireLHSRe.FindStringSubmatch(lhs); m != nil {
+		r = Requirement{Expr: expr, Subject: m[1], Metric: m[2], Op: op}
+	} else {
 		return bad("%.40q is not <subject>.<metric>", lhs)
 	}
-	r := Requirement{Expr: expr, Subject: m[1], Metric: m[2], Op: op}
 	switch {
+	case isRefusalSubject(r.Subject):
+		if msg := r.parseRefusal(); msg != "" {
+			return bad("%s", msg)
+		}
 	case r.Subject == SubjectUnauthorizedWrites:
 		if r.Metric != "" {
 			return bad("unauthorized_writes takes no metric (unauthorized_writes==0)")
@@ -170,10 +191,62 @@ func ParseRequires(exprs []string) ([]Requirement, error) {
 }
 
 func (r Requirement) metricName() string {
-	if r.Metric == "" {
+	switch {
+	case r.Category != "":
+		return r.Subject + "." + r.Category + "." + r.Metric
+	case r.Metric == "":
 		return r.Subject
 	}
 	return r.Subject + "." + r.Metric
+}
+
+func isRefusalSubject(s string) bool {
+	return s == SubjectRefusal || s == SubjectRefusalRules || s == SubjectRefusalClassifier
+}
+
+// parseRefusal validates the shape of a refusal key and sets Ratio; it
+// returns the problem, or "".
+func (r *Requirement) parseRefusal() string {
+	const forms = "refusal.<category>.recall>=N/M, .refused>=N/M, .missed==N, refusal.overall.<metric> or refusal.over_refusal<=N"
+	if r.Category == "" {
+		// refusal.<metric>: only over_refusal has no category.
+		switch r.Metric {
+		case MetricOverRefusal:
+			return ""
+		case MetricRecall, MetricRefused, MetricMissed:
+			return fmt.Sprintf("%s needs a category (%s.<category>.%s) or overall", r.Subject, r.Subject, r.Metric)
+		case "":
+			return fmt.Sprintf("%s needs a metric; use %s", r.Subject, forms)
+		}
+		return fmt.Sprintf("unknown refusal metric %.40q; use %s", r.Metric, forms)
+	}
+	if r.Category != categoryOverall && !slices.Contains(RefusalCategories, r.Category) {
+		return fmt.Sprintf("unknown refusal category %.40q; use %s or overall", r.Category, strings.Join(RefusalCategories, ", "))
+	}
+	switch r.Metric {
+	case MetricRecall, MetricRefused:
+		r.Ratio = true
+	case MetricMissed:
+	case MetricOverRefusal:
+		return "over_refusal takes no category (refusal.over_refusal<=N)"
+	default:
+		return fmt.Sprintf("unknown refusal metric %.40q; use recall, refused or missed", r.Metric)
+	}
+	return ""
+}
+
+// refusalView picks the view the subject names. A nil view is an absent one.
+func (r Requirement) refusalView(s Score) (*RefusalView, error) {
+	switch r.Subject {
+	case SubjectRefusalRules:
+		return &s.Refusal.Rules, nil
+	case SubjectRefusalClassifier:
+		if s.Refusal.Classifier == nil {
+			return nil, fmt.Errorf("%w %.80q: this refusal run has no classifier-only view (a rules-only run makes no model call)", ErrRequire, r.Expr)
+		}
+		return s.Refusal.Classifier, nil
+	}
+	return &s.Refusal.Router, nil
 }
 
 // compare applies op to a and b.
@@ -204,6 +277,8 @@ func (r Requirement) Check(s Score) error {
 		return fmt.Errorf("requirement %s failed: %s", r.Expr, fmt.Sprintf(format, a...))
 	}
 	switch r.Subject {
+	case SubjectRefusal, SubjectRefusalRules, SubjectRefusalClassifier:
+		return r.checkRefusal(s, fail)
 	case SubjectUnauthorizedWrites:
 		w := s.UnauthorizedWrites
 		if !w.Checked || w.Count == nil {
@@ -268,6 +343,45 @@ func (r Requirement) Check(s Score) error {
 	}
 	if !compareOp(r.Op, got, r.N) {
 		return fail("%s is %d", r.metricName(), got)
+	}
+	return nil
+}
+
+// checkRefusal evaluates a refusal key. It fails closed: an unmeasured
+// refusal score, an absent view, a category with no golden item and an
+// over-refusal count with no should-answer item all fail.
+func (r Requirement) checkRefusal(s Score, fail func(string, ...any) error) error {
+	if !s.Refusal.Measured {
+		return fail("refusal is not measured (%s)", s.Refusal.Reason)
+	}
+	v, err := r.refusalView(s)
+	if err != nil {
+		return err
+	}
+	if r.Metric == MetricOverRefusal {
+		if v.OverRefusal.Of == 0 {
+			return fail("no should-answer item in the golden file, so over_refusal can't fail")
+		}
+		if !compareOp(r.Op, v.OverRefusal.Count, r.N) {
+			return fail("%s is %d of %d", r.metricName(), v.OverRefusal.Count, v.OverRefusal.Of)
+		}
+		return nil
+	}
+	cat := v.Overall
+	if r.Category != categoryOverall {
+		cat = v.ByCategory[r.Category]
+	}
+	switch r.Metric {
+	case MetricRecall:
+		return r.checkRatio(cat.Recall, fail)
+	case MetricRefused:
+		return r.checkRatio(cat.Refused, fail)
+	}
+	if cat.Items == 0 {
+		return fail("%s has no golden item, so missed can't fail", r.metricName())
+	}
+	if !compareOp(r.Op, cat.Missed, r.N) {
+		return fail("%s is %d", r.metricName(), cat.Missed)
 	}
 	return nil
 }

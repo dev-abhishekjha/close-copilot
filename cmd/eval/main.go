@@ -11,6 +11,9 @@
 //	         [--max-p95-increase-pct N] [--min-latency-delta-ms N] [--max-cost-increase-pct N]
 //	         [--baseline-out FILE] [--noise FILE] [--pricing config/pricing.yaml]
 //	eval noise <score.json> <score.json>... --out FILE
+//	eval refusal --out DIR [--rules-only | --live | --record | --replay] [--golden FILE] [--triage-rules FILE]
+//	         [--companies DIR] [--fixtures-dir DIR] [--pricing FILE] [--require EXPR]...
+//	eval score ... [--refusal refusal.json] [--golden evals/golden/refusal.yaml]
 //
 // score and noise read files only and need no environment variables; run
 // needs DATABASE_URL and the MCP settings, run --replay DATABASE_URL only.
@@ -100,6 +103,8 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		return runScore(cmd.score)
 	case cmdNoise:
 		return runNoise(cmd.noise)
+	case cmdRefusal:
+		return runRefusal(ctx, cfg, cmd.refusal)
 	}
 	return runSuite(ctx, cfg, log, cmd.flags)
 }

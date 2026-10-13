@@ -58,6 +58,7 @@ func RenderReport(s Score) string {
 	w("\n")
 
 	renderCitations(w, s.Citations)
+	renderRefusals(w, s.Refusal)
 
 	w("## Cost and time per close run\n\n")
 	w("| Metric | Total | Mean | p95 |\n| --- | ---: | ---: | ---: |\n")
@@ -278,4 +279,62 @@ func mdPairs(ps []CitationRef) string {
 		parts = append(parts, mdCell(p.String()))
 	}
 	return strings.Join(parts, "; ")
+}
+
+// RenderRefusal renders the refusal section alone, for refusal-score.md.
+func RenderRefusal(r Refusal) string {
+	var b strings.Builder
+	renderRefusals(func(format string, a ...any) { fmt.Fprintf(&b, format, a...) }, r)
+	return b.String()
+}
+
+// renderRefusals writes the Refusals section. An unmeasured score says why
+// and shows no ratio, so it never reads as 100%.
+func renderRefusals(w func(string, ...any), r Refusal) {
+	w("## Refusals\n\n")
+	if !r.Measured {
+		reason := r.Reason
+		if reason == "" {
+			reason = reasonRefusalNone
+		}
+		w("Refusals: %s\n\n", unmeasured(false, reason, ""))
+		return
+	}
+	golden := r.Golden
+	if len(golden) > 12 {
+		golden = golden[:12]
+	}
+	w("Mode `%s`, model `%s`, golden `%s`.\n\n", mdCode(r.Mode), mdCode(r.Model), mdCode(golden))
+	renderRefusalView(w, "Router (rules, then classifier)", r.Router)
+	renderRefusalView(w, "Rules only", r.Rules)
+	if r.Classifier == nil {
+		w("### Classifier only\n\nNot measured: this run made no model call.\n\n")
+		return
+	}
+	renderRefusalView(w, "Classifier only", *r.Classifier)
+}
+
+func renderRefusalView(w func(string, ...any), title string, v RefusalView) {
+	w("### %s\n\n", title)
+	w("| Category | Items | Correct | Wrong category | Missed | Recall |\n| --- | ---: | ---: | ---: | ---: | --- |\n")
+	for _, c := range RefusalCategories {
+		cs := v.ByCategory[c]
+		w("| `%s` | %d | %d | %d | %d | %s |\n", mdCode(c), cs.Items, cs.Correct, cs.WrongCategory, cs.Missed, cs.Recall)
+	}
+	o := v.Overall
+	w("| overall | %d | %d | %d | %d | %s |\n\n", o.Items, o.Correct, o.WrongCategory, o.Missed, o.Recall)
+	w("Over-refusal: %d of %d.\n\n", v.OverRefusal.Count, v.OverRefusal.Of)
+	n := 0
+	for _, it := range v.Items {
+		switch it.Outcome {
+		case RefusalCorrect, RefusalAnswered:
+			continue
+		}
+		n++
+		w("- %s `%s` decided by `%s`: %s\n", mdCell(it.ID), mdCode(it.Category), mdCode(it.Reason), mdCell(it.Outcome))
+	}
+	if n == 0 {
+		w("No missed, wrong-category or over-refused item.\n")
+	}
+	w("\n")
 }
