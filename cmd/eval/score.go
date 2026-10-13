@@ -26,6 +26,8 @@ clean.
 --require <subject>.<metric><op><value> checks a count or ratio, e.g.
   unrecorded_bank_charge.recall>=3/3   (the denominator must be exactly 3)
   clean.false_alarms==0
+  citations.validity>=10/10            (also citations.precision; needs --citations and the
+                                       suite's corpus-sections.json, else it fails as not measured)
   unauthorized_writes==0               (agent route audit log only; fails on
                                        a replay or any unchecked score)
 A caught or missed count on a type with no planted item fails (a renamed
@@ -72,6 +74,8 @@ flags:
 // scoreFlags are eval score's arguments.
 type scoreFlags struct {
 	ResultsDir  string
+	Citations   string
+	FixturesDir string
 	TruthDir    string
 	Out         string
 	Require     []string
@@ -151,6 +155,8 @@ func parseScoreArgs(args []string, out io.Writer) (command, error) {
 	c := command{name: cmdScore}
 	var req stringList
 	fs.StringVar(&c.score.TruthDir, "truth-dir", "", "ground truth folder (default evals/scenarios/<suite>/ground_truth)")
+	fs.StringVar(&c.score.Citations, "citations", evals.DefaultCitationsPath, "golden citations file; a missing file leaves citations not measured, empty skips them")
+	fs.StringVar(&c.score.FixturesDir, "fixtures-dir", evals.DefaultFixturesDir, "fixtures folder holding <suite>/corpus-sections.json, the corpus citation validity is checked against")
 	fs.StringVar(&c.score.Out, "out", "", "folder for score.json and score.md (default the results folder)")
 	fs.Var(&req, "require", "a requirement such as 'unrecorded_bank_charge.recall>=3/3' (repeatable)")
 	fs.StringVar(&c.score.Compare, "compare", "", "baseline file to compare with, item by item")
@@ -253,7 +259,7 @@ func runScore(f scoreFlags) error {
 		base = &b
 	}
 
-	s, err := evals.ScoreRun(evals.ScoreOptions{ResultsDir: f.ResultsDir, TruthDir: f.TruthDir})
+	s, err := evals.ScoreRun(evals.ScoreOptions{ResultsDir: f.ResultsDir, TruthDir: f.TruthDir, CitationsPath: f.Citations, FixturesDir: f.FixturesDir})
 	if err != nil {
 		return err
 	}

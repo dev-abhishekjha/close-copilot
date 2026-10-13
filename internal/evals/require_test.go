@@ -162,3 +162,54 @@ func TestRequireBoundaries(t *testing.T) {
 		t.Errorf("no clean month: %v", err)
 	}
 }
+
+func TestRequireCitations(t *testing.T) {
+	cases, months := citFixture()
+	s := mustScore(t, months[0])
+	s.Citations = ScoreCitations(cases, months, citCorpus()) // validity 6/8, precision 2/6
+	for expr, want := range map[string]bool{
+		"citations.validity>=6/8":  true,
+		"citations.validity>=7/8":  false,
+		"citations.validity==8/8":  false,
+		"citations.validity>=6/9":  false, // the denominator changed
+		"citations.precision>=2/6": true,
+		"citations.precision>2/6":  false,
+		"citations.precision<=2/6": true,
+	} {
+		r, err := ParseRequire(expr)
+		if err != nil {
+			t.Errorf("%s: %v", expr, err)
+			continue
+		}
+		if r.Subject != SubjectCitations || !r.Ratio {
+			t.Errorf("%s parsed as %+v", expr, r)
+		}
+		if err := r.Check(s); (err == nil) != want {
+			t.Errorf("%s: err %v, want pass=%t", expr, err, want)
+		}
+	}
+	// A failure names the requirement and the actual value.
+	r, _ := ParseRequire("citations.validity>=8/8")
+	if err := r.Check(s); err == nil || !strings.Contains(err.Error(), "citations.validity>=8/8") || !strings.Contains(err.Error(), "6/8") {
+		t.Errorf("failure text: %v", err)
+	}
+	// Unmeasured fails with its reason, even for 0/N.
+	s.Citations = unmeasuredCitations("no corpus fixture")
+	for _, expr := range []string{"citations.validity>=0/1", "citations.precision>=0/1"} {
+		r, _ := ParseRequire(expr)
+		if err := r.Check(s); err == nil || !strings.Contains(err.Error(), "not measured") || !strings.Contains(err.Error(), "no corpus fixture") {
+			t.Errorf("%s on unmeasured: %v", expr, err)
+		}
+	}
+	// A measured score with no cited pair (0/0) fails as unmeasured, as checkRatio does.
+	s.Citations = Citations{Measured: true, Validity: NewRatio(0, 0), Precision: NewRatio(0, 0), Cited: NewRatio(0, 1)}
+	r, _ = ParseRequire("citations.validity>=0/1")
+	if err := r.Check(s); err == nil || !strings.Contains(err.Error(), "denominator is 0") {
+		t.Errorf("0/0 validity: %v", err)
+	}
+	for _, bad := range []string{"citations>=1/1", "citations.recall>=1/1", "citations.validity>=1", "citations.validity>=2/1", "citations.cited>=1/1"} {
+		if _, err := ParseRequire(bad); err == nil {
+			t.Errorf("%s parsed", bad)
+		}
+	}
+}

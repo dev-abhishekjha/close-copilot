@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"path/filepath"
+	"reflect"
 	"regexp"
 	"slices"
 	"strings"
@@ -347,4 +349,82 @@ func (s *fakeExplainStore) GetArtifact(_ context.Context, sha string) (store.Art
 
 func (s *fakeExplainStore) SetFindingExplanation(context.Context, uuid.UUID, uuid.UUID, string, string, string, []store.Citation, *store.JournalProposal) error {
 	return nil
+}
+
+type cannedDocs struct{ ps []agent.Passage }
+
+func (c cannedDocs) Retrieve(context.Context, agent.RetrieveRequest) ([]agent.Passage, error) {
+	return c.ps, nil
+}
+
+// recordRP records the replay test suite, with the given documents (nil
+// records none), and returns an opened replay.
+func recordRP(t *testing.T, docs agent.Retriever) *evals.Replayer {
+	t.Helper()
+	scen := replaySuite(t)
+	suite, err := evals.LoadSuite(filepath.Join(scen, "suite-rp.yaml"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	truth := filepath.Join(scen, "suite-rp", "ground_truth")
+	root := filepath.Join(t.TempDir(), "fixtures")
+	rec, err := evals.NewRecorder(root, suite.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rec.Abort()
+	for _, m := range suite.Months {
+		rec.UseMonth(m.Company, m.Month)
+		if docs == nil {
+			continue
+		}
+		if _, err := rec.Documents(docs).Retrieve(t.Context(), agent.RetrieveRequest{Company: m.Company, Month: m.Month, Query: "prepaid not spread"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if _, _, err := rec.Finish(t.Context(), evals.RecordMeta{Suite: suite, TruthDir: truth, Months: suite.Months, SeederCommit: "dev-test",
+		RecordedAt: time.Date(2026, 10, 10, 9, 0, 0, 0, time.UTC)}); err != nil {
+		t.Fatal(err)
+	}
+	rp, _, err := evals.OpenReplay(evals.ReplayOptions{Dir: root, Suite: suite, TruthDir: truth, Months: suite.Months})
+	if err != nil {
+		t.Fatal(err)
+	}
+	return rp
+}
+
+// TestReplayRetriever: replay serves the recorded passages through the
+// agent's Retriever with no registry and no network, and a query that was
+// never recorded is ErrFixtureMissing.
+func TestReplayRetriever(t *testing.T) {
+	want := []agent.Passage{{DocID: "POL-1", DocType: "policy", Section: "§1 Spread", Title: "Policy", Text: "Spread annual costs monthly.", SHA256: "ab"}}
+	rp := recordRP(t, cannedDocs{ps: want})
+	r := replayRetriever(rp, slog.New(slog.NewTextHandler(io.Discard, nil)), "suite-rp")
+	if r == nil {
+		t.Fatal("no retriever for a suite recorded with searches")
+	}
+	rp.UseMonth("sharma", "2026-09")
+	got, err := r.Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Month: "2026-09", Query: "prepaid not spread"})
+	if err != nil || !reflect.DeepEqual(got, want) {
+		t.Errorf("replayed %+v, %v; want %+v", got, err, want)
+	}
+	_, err = r.Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Month: "2026-09", Query: "never recorded"})
+	if !errors.Is(err, evals.ErrFixtureMissing) {
+		t.Errorf("missing fixture: %v", err)
+	}
+	// The clean control month was recorded too, under its own scope.
+	rp.UseMonth("sharma", "2026-08")
+	if got, err := r.Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Month: "2026-08", Query: "prepaid not spread"}); err != nil || len(got) != 1 {
+		t.Errorf("control month: %+v, %v", got, err)
+	}
+}
+
+// TestReplayRetrieverNone: a suite recorded without search fixtures (the
+// committed suites) replays with no retriever, a true nil interface, so
+// the workflow records its single skipped retrieve step as before.
+func TestReplayRetrieverNone(t *testing.T) {
+	rp := recordRP(t, nil)
+	if r := replayRetriever(rp, slog.New(slog.NewTextHandler(io.Discard, nil)), "suite-rp"); r != nil {
+		t.Errorf("retriever %T for a suite with no search fixtures", r)
+	}
 }

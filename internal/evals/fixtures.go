@@ -24,6 +24,7 @@ import (
 	"regexp"
 	"slices"
 	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -56,6 +57,7 @@ const (
 	ToolRecurringSuppliers = "list_recurring_suppliers"
 	ToolBankLines          = "list_bank_lines"
 	ToolGSTR2BEntries      = "list_gstr2b_entries"
+	ToolSearchDocuments    = "search_documents"
 )
 
 var (
@@ -97,7 +99,8 @@ type fixtureFile struct {
 }
 
 // fixtureRelRe is the shape of a fixture's path under the suite folder.
-var fixtureRelRe = regexp.MustCompile(`^[a-z0-9][a-z0-9_-]{0,63}-[0-9]{4}-[0-9]{2}/[a-z0-9_]{1,64}-[0-9a-f]{16}\.json$`)
+// The one file at the suite root is the corpus (CorpusSectionsFile).
+var fixtureRelRe = regexp.MustCompile(`^(?:[a-z0-9][a-z0-9_-]{0,63}-[0-9]{4}-[0-9]{2}/[a-z0-9_]{1,64}-[0-9a-f]{16}\.json|corpus-sections\.json)$`)
 
 // dateArg is a date argument as YYYY-MM-DD, "" for the zero time.
 func dateArg(t time.Time) string {
@@ -195,8 +198,11 @@ type Recorder struct {
 	mu    sync.Mutex
 	scope string            // <company>-<month>
 	files map[string]string // fixture path -> sha256
-	err   error
-	done  bool
+	// corpus is each company's cited-able (doc_id, section) pairs, written
+	// as corpus-sections.json by Finish when any was recorded.
+	corpus map[string][]CitationRef
+	err    error
+	done   bool
 }
 
 // NewRecorder starts a recording of suite under root.
@@ -214,7 +220,7 @@ func NewRecorder(root, suite string) (*Recorder, error) {
 	if err != nil {
 		return nil, fmt.Errorf("evals: record: %w", err)
 	}
-	return &Recorder{root: root, suite: suite, stage: stage, files: map[string]string{}}, nil
+	return &Recorder{root: root, suite: suite, stage: stage, files: map[string]string{}, corpus: map[string][]CitationRef{}}, nil
 }
 
 // UseMonth files the next calls under company-month.
@@ -250,6 +256,23 @@ func (r *Recorder) Books(live checks.BooksReader) *RecordingBooks {
 // Evidence wraps a live evidence reader.
 func (r *Recorder) Evidence(live checks.EvidenceReader) *RecordingEvidence {
 	return &RecordingEvidence{rec: r, Live: live}
+}
+
+// Documents wraps a live document retriever.
+func (r *Recorder) Documents(live agent.Retriever) *RecordingDocuments {
+	return &RecordingDocuments{rec: r, Live: live}
+}
+
+// RecordCorpus records the (doc_id, section) pairs company may cite. It
+// is written once per company; a second call replaces the first.
+func (r *Recorder) RecordCorpus(company string, sections []CitationRef) error {
+	if err := r.before(); err != nil {
+		return err
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.corpus[company] = slices.Clone(sections)
+	return nil
 }
 
 // before fails a call once the recording is aborted or finished.
@@ -378,7 +401,21 @@ func (r *Recorder) finish(ctx context.Context, meta RecordMeta) (FixtureIndex, s
 	for k, v := range r.files {
 		files[k] = v
 	}
+	corpus := CorpusSections{Companies: map[string][]CitationRef{}}
+	for k, v := range r.corpus {
+		corpus.Companies[k] = v
+	}
 	r.mu.Unlock()
+	if !corpus.Empty() {
+		body, err := marshalCorpus(corpus)
+		if err != nil {
+			return FixtureIndex{}, "", err
+		}
+		if err := writeFileAtomic(filepath.Join(r.stage, CorpusSectionsFile), body); err != nil {
+			return FixtureIndex{}, "", err
+		}
+		files[CorpusSectionsFile] = sha256Hex(body)
+	}
 
 	if meta.Suite.Name != r.suite {
 		return FixtureIndex{}, "", fmt.Errorf("evals: record: suite %s, recording %s", meta.Suite.Name, r.suite)
@@ -541,6 +578,29 @@ func (e *RecordingEvidence) BankLines(ctx context.Context, company string, from,
 func (e *RecordingEvidence) GSTR2BEntries(ctx context.Context, company string, period string) ([]store.GSTR2BEntry, error) {
 	return recordCall(e.rec, ToolGSTR2BEntries, gstr2bArgs(company, period), func() ([]store.GSTR2BEntry, error) {
 		return e.Live.GSTR2BEntries(ctx, company, period)
+	})
+}
+
+// searchK is the result count recorded in search_documents' args.
+const searchK = 3
+
+func searchArgs(company, query string) map[string]any {
+	return map[string]any{"query": query, "company": company, "k": searchK}
+}
+
+// RecordingDocuments is a live retriever whose every result is recorded.
+type RecordingDocuments struct {
+	rec  *Recorder
+	Live agent.Retriever
+}
+
+var _ agent.Retriever = (*RecordingDocuments)(nil)
+
+// Retrieve records search_documents, keyed by company, month (the scope)
+// and the query.
+func (d *RecordingDocuments) Retrieve(ctx context.Context, req agent.RetrieveRequest) ([]agent.Passage, error) {
+	return recordCall(d.rec, ToolSearchDocuments, searchArgs(req.Company, req.Query), func() ([]agent.Passage, error) {
+		return d.Live.Retrieve(ctx, req)
 	})
 }
 
@@ -715,6 +775,28 @@ func (p *Replayer) UseMonth(company, month string) {
 	p.scope = company + "-" + month
 }
 
+// HasDocuments reports whether the suite was recorded with search results.
+// A suite without any replays with no retriever.
+func (p *Replayer) HasDocuments() bool {
+	for rel := range p.index.Files {
+		if i := strings.IndexByte(rel, '/'); i >= 0 && strings.HasPrefix(rel[i+1:], ToolSearchDocuments+"-") {
+			return true
+		}
+	}
+	return false
+}
+
+// Documents is the replaying document retriever.
+func (p *Replayer) Documents() *ReplayDocuments { return &ReplayDocuments{rp: p} }
+
+// Corpus is the recorded corpus; ErrFixtureMissing when none was recorded.
+func (p *Replayer) Corpus() (CorpusSections, error) {
+	if _, ok := p.index.Files[CorpusSectionsFile]; !ok {
+		return CorpusSections{}, fmt.Errorf("%w: no %s recorded", ErrFixtureMissing, CorpusSectionsFile)
+	}
+	return decodeCorpus(p.bodies[CorpusSectionsFile])
+}
+
 // Books is the replaying books reader.
 func (p *Replayer) Books() *ReplayBooks { return &ReplayBooks{rp: p} }
 
@@ -841,4 +923,17 @@ func (e *ReplayEvidence) BankLines(_ context.Context, company string, from, to t
 // GSTR2BEntries replays list_gstr2b_entries.
 func (e *ReplayEvidence) GSTR2BEntries(_ context.Context, company string, period string) ([]store.GSTR2BEntry, error) {
 	return replay[[]store.GSTR2BEntry](e.rp, ToolGSTR2BEntries, gstr2bArgs(company, period))
+}
+
+// ReplayDocuments serves recorded search_documents calls. It holds no
+// live retriever: a call with no fixture is ErrFixtureMissing.
+type ReplayDocuments struct {
+	rp *Replayer
+}
+
+var _ agent.Retriever = (*ReplayDocuments)(nil)
+
+// Retrieve replays search_documents.
+func (d *ReplayDocuments) Retrieve(_ context.Context, req agent.RetrieveRequest) ([]agent.Passage, error) {
+	return replay[[]agent.Passage](d.rp, ToolSearchDocuments, searchArgs(req.Company, req.Query))
 }

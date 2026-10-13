@@ -701,3 +701,157 @@ func TestPrimeMonth(t *testing.T) {
 		t.Errorf("fixtures were written: %v", err)
 	}
 }
+
+// fakeDocs is a live retriever with synthetic passages; it counts calls.
+type fakeDocs struct {
+	calls int
+	text  string
+}
+
+func (f *fakeDocs) Retrieve(_ context.Context, req agent.RetrieveRequest) ([]agent.Passage, error) {
+	f.calls++
+	if req.Query == "none" {
+		return nil, nil
+	}
+	return []agent.Passage{{DocID: "POL-1", DocType: "policy", Section: "§1 " + req.Month, Title: "Policy", Text: f.text, SHA256: sha256Hex([]byte(f.text))}}, nil
+}
+
+func recordDocs(t *testing.T, env fxEnv, docs agent.Retriever) map[string][]agent.Passage {
+	t.Helper()
+	rec, err := NewRecorder(env.root, env.suite.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(rec.Abort)
+	got := map[string][]agent.Passage{}
+	rd := rec.Documents(docs)
+	for _, m := range env.months {
+		rec.UseMonth(m.Company, m.Month)
+		for _, q := range []string{"prepaid not spread", "none"} {
+			ps, err := rd.Retrieve(t.Context(), agent.RetrieveRequest{Company: m.Company, Month: m.Month, Query: q})
+			if err != nil {
+				t.Fatal(err)
+			}
+			got[m.Month+"/"+q] = ps
+		}
+	}
+	// Recorded out of order and twice: the file is sorted and de-duplicated.
+	if err := rec.RecordCorpus("sharma", []CitationRef{{DocID: "POL-2", Section: "§1"}, {DocID: "POL-1", Section: "§2"}, {DocID: "POL-1", Section: "§1"}, {DocID: "POL-1", Section: "§1"}}); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := rec.Finish(t.Context(), RecordMeta{Suite: env.suite, TruthDir: env.truthDir, Months: env.months,
+		SeederCommit: "dev-test", RecordedAt: time.Date(2026, 10, 10, 9, 0, 0, 0, time.UTC), ExtraAllowed: fxExtra}); err != nil {
+		t.Fatal(err)
+	}
+	return got
+}
+
+func TestRecordReplayDocuments(t *testing.T) {
+	env := newFxEnv(t)
+	live := &fakeDocs{text: "Spread annual costs monthly."}
+	want := recordDocs(t, env, live)
+	if live.calls != 4 {
+		t.Fatalf("live calls %d", live.calls)
+	}
+
+	rp, _, err := openReplay(env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !rp.HasDocuments() {
+		t.Fatal("HasDocuments false after recording searches")
+	}
+	docs := rp.Documents()
+	for _, m := range env.months {
+		rp.UseMonth(m.Company, m.Month)
+		for _, q := range []string{"prepaid not spread", "none"} {
+			got, err := docs.Retrieve(t.Context(), agent.RetrieveRequest{Company: m.Company, Month: m.Month, Query: q})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if w := want[m.Month+"/"+q]; len(got) != len(w) || (len(w) > 0 && !reflect.DeepEqual(got, w)) {
+				t.Errorf("%s/%s: replayed %+v, want %+v", m.Month, q, got, w)
+			}
+		}
+	}
+	if live.calls != 4 {
+		t.Errorf("replay made %d live calls", live.calls-4)
+	}
+	// A query that was never recorded is ErrFixtureMissing, never a live search.
+	if _, err := docs.Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Month: "2026-09", Query: "other"}); !errors.Is(err, ErrFixtureMissing) {
+		t.Errorf("unrecorded query: %v", err)
+	}
+
+	// The corpus round trip, through the replayer and through the score loader.
+	wantCorpus := CorpusSections{Companies: map[string][]CitationRef{"sharma": {ref("POL-1", "§1"), ref("POL-1", "§2"), ref("POL-2", "§1")}}}
+	if c, err := rp.Corpus(); err != nil || !reflect.DeepEqual(c, wantCorpus) {
+		t.Errorf("replayer corpus %+v, %v", c, err)
+	}
+	if c, err := LoadCorpusSections(env.root, env.suite.Name); err != nil || !reflect.DeepEqual(c, wantCorpus) {
+		t.Errorf("loaded corpus %+v, %v", c, err)
+	}
+	if !wantCorpus.Has("sharma", "POL-2", "§1") || wantCorpus.Has("other", "POL-2", "§1") {
+		t.Error("Has")
+	}
+}
+
+func TestRecordDocumentsErrors(t *testing.T) {
+	// A suite recorded without searches or corpus: no documents, no corpus.
+	env := newFxEnv(t)
+	record(t, env, &fakeLive{})
+	rp, _, err := openReplay(env)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rp.HasDocuments() {
+		t.Error("HasDocuments true with no search fixtures")
+	}
+	if _, err := rp.Corpus(); !errors.Is(err, ErrFixtureMissing) {
+		t.Errorf("corpus of a suite without one: %v", err)
+	}
+	if _, err := LoadCorpusSections(env.root, env.suite.Name); !errors.Is(err, ErrFixtureMissing) {
+		t.Errorf("LoadCorpusSections: %v", err)
+	}
+	rp.UseMonth("sharma", "2026-09")
+	if _, err := rp.Documents().Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Query: "q"}); !errors.Is(err, ErrFixtureMissing) {
+		t.Errorf("search with no fixture: %v", err)
+	}
+
+	// The scan covers the new files: a real-looking GSTIN in a passage fails Finish.
+	env2 := newFxEnv(t)
+	rec, err := NewRecorder(env2.root, env2.suite.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rec.Abort()
+	rec.UseMonth("sharma", "2026-09")
+	rd := rec.Documents(&fakeDocs{text: "Supplier 29ABCPE1234F1Z5 must be paid."})
+	if _, err := rd.Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Month: "2026-09", Query: "q"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := rec.Finish(t.Context(), RecordMeta{Suite: env2.suite, TruthDir: env2.truthDir, Months: env2.months}); !errors.Is(err, ErrFixtureLeak) {
+		t.Errorf("scan of a passage with an unknown GSTIN: %v", err)
+	}
+
+	// A live search error aborts the recording.
+	env3 := newFxEnv(t)
+	rec3, err := NewRecorder(env3.root, env3.suite.Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer rec3.Abort()
+	rec3.UseMonth("sharma", "2026-09")
+	bad := failingDocs{}
+	if _, err := rec3.Documents(bad).Retrieve(t.Context(), agent.RetrieveRequest{Company: "sharma", Query: "q"}); !errors.Is(err, errLive) {
+		t.Errorf("live error: %v", err)
+	}
+	if err := rec3.Err(); err == nil {
+		t.Error("recording not aborted")
+	}
+}
+
+type failingDocs struct{}
+
+func (failingDocs) Retrieve(context.Context, agent.RetrieveRequest) ([]agent.Passage, error) {
+	return nil, errLive
+}

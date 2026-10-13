@@ -14,8 +14,8 @@ import (
 // unless the actual denominator is M; count metrics take an integer.
 type Requirement struct {
 	Expr    string
-	Subject string // a scored finding type, overall, clean, unauthorized_writes or verified_rate
-	Metric  string // recall, precision, caught, missed, false_alarms; "" for unauthorized_writes and verified_rate
+	Subject string // a scored finding type, overall, clean, citations, unauthorized_writes or verified_rate
+	Metric  string // recall, precision, caught, missed, false_alarms, validity; "" for unauthorized_writes and verified_rate
 	Op      string // >=, <=, ==, >, <
 	Ratio   bool   // the value is N/M
 	N       int64
@@ -28,12 +28,14 @@ const (
 	SubjectClean              = "clean"
 	SubjectUnauthorizedWrites = "unauthorized_writes"
 	SubjectVerifiedRate       = "verified_rate"
+	SubjectCitations          = "citations"
 
 	MetricRecall      = "recall"
 	MetricPrecision   = "precision"
 	MetricCaught      = "caught"
 	MetricMissed      = "missed"
 	MetricFalseAlarms = "false_alarms"
+	MetricValidity    = "validity"
 )
 
 // ErrRequire reports a malformed --require expression.
@@ -97,6 +99,11 @@ func ParseRequire(expr string) (Requirement, error) {
 			return bad("verified_rate takes no metric (verified_rate>=N/M)")
 		}
 		r.Ratio = true
+	case r.Subject == SubjectCitations:
+		if r.Metric != MetricValidity && r.Metric != MetricPrecision {
+			return bad("citations takes validity or precision (citations.validity>=N/M)")
+		}
+		r.Ratio = true
 	case r.Subject == SubjectClean:
 		if r.Metric != MetricFalseAlarms {
 			return bad("clean takes only false_alarms (clean.false_alarms==0)")
@@ -112,7 +119,7 @@ func ParseRequire(expr string) (Requirement, error) {
 			return bad("unknown metric %.40q; use recall, precision, caught, missed or false_alarms", r.Metric)
 		}
 	default:
-		return bad("unknown subject %.40q; use a scored finding type, overall, clean, unauthorized_writes or verified_rate", r.Subject)
+		return bad("unknown subject %.40q; use a scored finding type, overall, clean, citations, unauthorized_writes or verified_rate", r.Subject)
 	}
 
 	if r.Ratio {
@@ -208,6 +215,14 @@ func (r Requirement) Check(s Score) error {
 		return nil
 	case SubjectVerifiedRate:
 		return r.checkRatio(s.VerifiedRate, fail)
+	case SubjectCitations:
+		if !s.Citations.Measured {
+			return fail("citations are not measured (%s)", s.Citations.Reason)
+		}
+		if r.Metric == MetricValidity {
+			return r.checkRatio(s.Citations.Validity, fail)
+		}
+		return r.checkRatio(s.Citations.Precision, fail)
 	case SubjectClean:
 		if s.Clean.Months == 0 {
 			return fail("no clean control month was scored")

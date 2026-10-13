@@ -7,7 +7,7 @@
 //	         [--checks bankrec|all]
 //	         [--record | --replay] [--fixtures-dir evals/fixtures]
 //	         [--results-dir results] [--scenarios-dir evals/scenarios] [--config-dir config]
-//	eval score <results-dir> [--truth-dir D] [--out D] [--require EXPR]... [--compare FILE]
+//	eval score <results-dir> [--truth-dir D] [--citations FILE] [--fixtures-dir D] [--out D] [--require EXPR]... [--compare FILE]
 //	         [--max-p95-increase-pct N] [--min-latency-delta-ms N] [--max-cost-increase-pct N]
 //	         [--baseline-out FILE] [--noise FILE] [--pricing config/pricing.yaml]
 //	eval noise <score.json> <score.json>... --out FILE
@@ -43,6 +43,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
 	"github.com/abhishekjha/close-copilot/internal/buildinfo"
@@ -184,6 +185,9 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 	switch {
 	case f.Replay:
 		wf.Books, wf.Evidence = replayer.Books(), replayer.Evidence()
+		if agentOn {
+			wf.Retriever = replayRetriever(replayer, log, suite.Name)
+		}
 		closer = &evals.ScopedCloser{Closer: wf, Scope: replayer}
 	default:
 		reg, err := agent.NewRegistry(ctx, cfg, log)
@@ -194,6 +198,9 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		books := &agent.MCPBooks{Registry: reg, Companies: st}
 		evidence := &agent.MCPEvidence{Registry: reg}
 		wf.Books, wf.Evidence = books, evidence
+		if agentOn {
+			wf.Retriever = &agent.MCPDocuments{Registry: reg}
+		}
 		if f.Record {
 			if rec, err = evals.NewRecorder(f.FixturesDir, suite.Name); err != nil {
 				return err
@@ -201,7 +208,14 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 			defer rec.Abort()
 			rb := rec.Books(books)
 			wf.Books, wf.Evidence = rb, rec.Evidence(evidence)
-			closer = &evals.ScopedCloser{Closer: wf, Scope: rec, After: primeScope(cfg.MCPScopeKey.Reveal(), time.Now, agent.WithRunScope, rb.PrimeMonth)}
+			if wf.Retriever != nil {
+				wf.Retriever = rec.Documents(wf.Retriever)
+			}
+			prime := primeScope(cfg.MCPScopeKey.Reveal(), time.Now, agent.WithRunScope, rb.PrimeMonth)
+			corpus := recordCorpus(rec, st.Pool())
+			closer = &evals.ScopedCloser{Closer: wf, Scope: rec, After: func(ctx context.Context, companyID, month string) error {
+				return errors.Join(prime(ctx, companyID, month), corpus(ctx, companyID))
+			}}
 		}
 	}
 
@@ -377,4 +391,53 @@ func primeScope(key string, now func() time.Time, withScope func(context.Context
 		}
 		return prime(withScope(ctx, header), companyID, month)
 	}
+}
+
+// corpusQuerier is the part of the pgx pool recordCorpus reads doc_chunks with.
+type corpusQuerier interface {
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+}
+
+// recordCorpus returns a hook that records, once per company, the
+// (doc_id, section) pairs the company may cite: its own chunks plus the
+// shared ones (company_id IS NULL), as Store.CitationExists reads them.
+// Pairs only; no passage text is read.
+func recordCorpus(rec *evals.Recorder, db corpusQuerier) func(ctx context.Context, companyID string) error {
+	done := map[string]bool{}
+	return func(ctx context.Context, companyID string) error {
+		if done[companyID] {
+			return nil
+		}
+		rows, err := db.Query(ctx, `SELECT DISTINCT doc_id, section FROM doc_chunks
+			WHERE company_id = $1 OR company_id IS NULL ORDER BY doc_id, section`, companyID)
+		if err != nil {
+			return fmt.Errorf("eval: record corpus: %w", err)
+		}
+		defer rows.Close()
+		var sections []evals.CitationRef
+		for rows.Next() {
+			var c evals.CitationRef
+			if err := rows.Scan(&c.DocID, &c.Section); err != nil {
+				return fmt.Errorf("eval: record corpus: %w", err)
+			}
+			sections = append(sections, c)
+		}
+		if err := rows.Err(); err != nil {
+			return fmt.Errorf("eval: record corpus: %w", err)
+		}
+		done[companyID] = true
+		return rec.RecordCorpus(companyID, sections)
+	}
+}
+
+// replayRetriever is the retriever of an agent-on replay: the recorded
+// searches, or none (the workflow's single skipped retrieve step) when the
+// suite was recorded without any, as the committed suites were. It returns
+// a nil interface in that case, never a typed nil.
+func replayRetriever(rp *evals.Replayer, log *slog.Logger, suite string) agent.Retriever {
+	if !rp.HasDocuments() {
+		log.Info("no search_documents fixtures: citations are unmeasured until the suite is re-recorded", "suite", suite)
+		return nil
+	}
+	return rp.Documents()
 }
