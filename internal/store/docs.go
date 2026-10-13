@@ -55,6 +55,51 @@ func (s *Store) InsertDocChunks(ctx context.Context, chunks []DocChunk) error {
 	})
 }
 
+// DocHashes returns the stored content hash of every ingested document, keyed by doc_id.
+func (s *Store) DocHashes(ctx context.Context) (map[string]string, error) {
+	rows, err := s.pool.Query(ctx, `SELECT DISTINCT doc_id, content_hash FROM doc_chunks;`)
+	if err != nil {
+		return nil, fmt.Errorf("store: doc hashes: %w", err)
+	}
+	defer rows.Close()
+	out := map[string]string{}
+	for rows.Next() {
+		var id, h string
+		if err := rows.Scan(&id, &h); err != nil {
+			return nil, fmt.Errorf("store: scan doc hash: %w", err)
+		}
+		out[id] = h
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("store: iterate doc hashes: %w", err)
+	}
+	return out, nil
+}
+
+// ReplaceDocChunks deletes a document's chunks and inserts the new ones in
+// one transaction, so a failed insert keeps the old chunks.
+func (s *Store) ReplaceDocChunks(ctx context.Context, docID string, chunks []DocChunk) error {
+	return s.WithTx(ctx, func(tx pgx.Tx) error {
+		if _, err := tx.Exec(ctx, `DELETE FROM doc_chunks WHERE doc_id = $1;`, docID); err != nil {
+			return fmt.Errorf("store: replace doc chunks for %s: delete: %w", docID, err)
+		}
+		const query = `
+			INSERT INTO doc_chunks (
+				doc_id, doc_type, company_id, section, title,
+				content, content_hash, embedding
+			)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
+		`
+		for _, c := range chunks {
+			if _, err := tx.Exec(ctx, query, docID, c.DocType, c.CompanyID, c.Section,
+				c.Title, c.Content, c.ContentHash, c.Embedding); err != nil {
+				return fmt.Errorf("store: replace doc chunks for %s: insert: %w", docID, err)
+			}
+		}
+		return nil
+	})
+}
+
 // DeleteDocChunksByDocID deletes all chunks belonging to a document.
 func (s *Store) DeleteDocChunksByDocID(ctx context.Context, docID string) error {
 	const query = `DELETE FROM doc_chunks WHERE doc_id = $1;`
