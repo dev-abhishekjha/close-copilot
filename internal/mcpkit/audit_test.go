@@ -319,3 +319,100 @@ func inspectAddTool(f *goast.File, pkg string, hit func()) {
 		return true
 	})
 }
+
+// TestAudit_SetAuditActor: a handler that calls SetAuditActor names its
+// own row's actor; a handler that doesn't keeps the route actor; an actor
+// argument is still ignored; a blank actor and a context outside an
+// audited call are no-ops.
+func TestAudit_SetAuditActor(t *testing.T) {
+	sink := &fakeSink{}
+	srv := mcpkit.NewServer("test", "1.0.0")
+	mcpkit.EnableAudit(srv, "books-admin", sink)
+	mcpkit.AddTool(srv, &mcp.Tool{Name: "sets_actor", Description: "d"},
+		func(ctx context.Context, _ *mcp.CallToolRequest, in auditIn) (*mcp.CallToolResult, auditOut, error) {
+			mcpkit.SetAuditActor(ctx, "  ") // blank: ignored
+			mcpkit.SetAuditActor(ctx, "checker@example.test")
+			if in.Fail {
+				return nil, auditOut{}, errors.New("refused")
+			}
+			return nil, auditOut{OK: true}, nil
+		})
+	mcpkit.AddTool(srv, &mcp.Tool{Name: "keeps_actor", Description: "d"},
+		func(_ context.Context, _ *mcp.CallToolRequest, _ auditIn) (*mcp.CallToolResult, auditOut, error) {
+			return nil, auditOut{OK: true}, nil
+		})
+	h := mcpkit.BuildHandler(map[string]mcpkit.Route{"/mcp-admin": mcpkit.NewRoute(srv, "tok")}, testLogger(),
+		mcpkit.WithActors(map[string]string{"/mcp-admin": "admin"}))
+	ts := httptest.NewServer(h)
+	t.Cleanup(ts.Close)
+	sess, err := mcp.NewClient(&mcp.Implementation{Name: "c", Version: "1"}, nil).Connect(context.Background(),
+		&mcp.StreamableClientTransport{Endpoint: ts.URL + "/mcp-admin", HTTPClient: &http.Client{Transport: bearerTransport{token: "tok"}}}, nil)
+	if err != nil {
+		t.Fatalf("connect: %v", err)
+	}
+	t.Cleanup(func() { _ = sess.Close() })
+
+	call(t, sess, "sets_actor", map[string]any{"company": "x", "actor": "hostile"})
+	call(t, sess, "sets_actor", map[string]any{"company": "x", "fail": true})
+	call(t, sess, "keeps_actor", map[string]any{"company": "x", "actor": "hostile"})
+
+	if len(sink.rows) != 3 {
+		t.Fatalf("rows: %d, want 3", len(sink.rows))
+	}
+	for i, want := range []string{"checker@example.test", "checker@example.test", "admin"} {
+		if got := sink.rows[i].Actor; got != want {
+			t.Errorf("row %d actor %q, want %q", i, got, want)
+		}
+		if *sink.rows[i].Server != "books-admin" {
+			t.Errorf("row %d server %q", i, *sink.rows[i].Server)
+		}
+	}
+
+	// Outside an audited call it does nothing (and doesn't panic).
+	mcpkit.SetAuditActor(context.Background(), "nobody")
+}
+
+// TestSetAuditActorOnlyInAdmin: outside tests, the only file that refers
+// to mcpkit.SetAuditActor is internal/books/admin.go (any selector, not
+// just calls), and inside mcpkit only audit.go names it.
+func TestSetAuditActorOnlyInAdmin(t *testing.T) {
+	root := filepath.Join("..", "..")
+	allowed := filepath.Join(root, "internal", "books", "admin.go")
+	var bad []string
+	for _, dir := range []string{"internal", "cmd", "evals", "tools"} {
+		base := filepath.Join(root, dir)
+		if _, err := os.Stat(base); err != nil {
+			continue
+		}
+		err := filepath.WalkDir(base, func(p string, d fs.DirEntry, err error) error {
+			if err != nil || d.IsDir() || !strings.HasSuffix(p, ".go") || strings.HasSuffix(p, "_test.go") {
+				return err
+			}
+			f, err := parser.ParseFile(token.NewFileSet(), p, nil, 0)
+			if err != nil {
+				return err
+			}
+			inMCPKit := filepath.Base(filepath.Dir(p)) == "mcpkit"
+			goast.Inspect(f, func(n goast.Node) bool {
+				switch x := n.(type) {
+				case *goast.SelectorExpr:
+					if x.Sel.Name == "SetAuditActor" && p != allowed {
+						bad = append(bad, p)
+					}
+				case *goast.Ident:
+					if inMCPKit && x.Name == "SetAuditActor" && filepath.Base(p) != "audit.go" {
+						bad = append(bad, p)
+					}
+				}
+				return true
+			})
+			return nil
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(bad) > 0 {
+		t.Errorf("SetAuditActor referenced outside internal/books/admin.go: %v", bad)
+	}
+}

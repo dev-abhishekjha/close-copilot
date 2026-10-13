@@ -100,23 +100,49 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 var errNoScopeKey = errors.New("mcp-books: --transport http needs " + config.EnvMCPScopeKey +
 	" (see .env.example); without it /mcp can't bind calls to a run")
 
+// AdminStore is what the HTTP server needs from Postgres: the audit sink of
+// both routes and the proposals the admin tool posts. *store.Store
+// satisfies it.
+type AdminStore interface {
+	mcpkit.AuditSink
+	books.ProposalStore
+}
+
+// errNoAdminStore refuses an HTTP server without Postgres: the admin tool
+// reads approved proposals from it and every call writes an audit row.
+var errNoAdminStore = errors.New("mcp-books: --transport http needs the database for the admin tool and the audit log")
+
 // httpRoutes is what --transport http serves: the scoped read-only books
-// tools at /mcp and the admin server at /mcp-admin, which is never scoped.
-// The same Scoper guards /mcp at the HTTP layer (401 without a valid
-// X-Run-Scope) and in every tool handler (out_of_scope).
-func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, sinks ...mcpkit.AuditSink) (map[string]mcpkit.Route, []mcpkit.Option, error) {
+// tools at /mcp and post_approved_journal_entry at /mcp-admin, which is
+// never scoped. The same Scoper guards /mcp at the HTTP layer (401 without
+// a valid X-Run-Scope) and in every tool handler (out_of_scope). Both
+// servers audit every call to st, the admin one as "books-admin", and
+// share one ERPNext client (the bot key).
+func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, st AdminStore) (map[string]mcpkit.Route, []mcpkit.Option, error) {
 	if cfg.MCPScopeKey.IsZero() {
 		return nil, nil, errNoScopeKey
+	}
+	if st == nil {
+		return nil, nil, errNoAdminStore
 	}
 	scoper, err := mcpkit.NewScoper(cfg.MCPScopeKey.Reveal())
 	if err != nil {
 		return nil, nil, fmt.Errorf("mcp-books: %w", err)
 	}
-	booksServer, err := newBooksServer(cfg, companiesDir, log, scoper, sinks...)
+	deps, err := booksDeps(cfg, companiesDir)
 	if err != nil {
 		return nil, nil, err
 	}
+	booksServer := buildBooksServer(deps, log, scoper, st)
 	adminServer := mcpkit.NewServer("close-copilot-books-admin", buildinfo.Version)
+	mcpkit.EnableAudit(adminServer, "books-admin", st)
+	books.RegisterAdminTools(adminServer, books.AdminDeps{
+		Client:    deps.client,
+		Companies: deps.companies,
+		Proposals: st,
+		Now:       time.Now,
+		Logger:    log,
+	})
 	routes := map[string]mcpkit.Route{
 		"/mcp":           mcpkit.NewAgentRoute(booksServer, cfg),
 		mcpkit.AdminPath: mcpkit.NewAdminRoute(adminServer, cfg),
@@ -128,30 +154,51 @@ func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, sinks 
 	return routes, opts, nil
 }
 
-// newBooksServer builds the /mcp server with the read-only books tools: it
-// loads the company profiles from companiesDir and an ERPNext client with
-// the bot key (ERP_API_KEY, ERP_API_SECRET), never the seeder key. Failed
-// tool calls are logged to log in full; the model sees fixed messages.
-// scope binds calls to their run (nil only for stdio and tests).
-func newBooksServer(cfg config.Config, companiesDir string, log *slog.Logger, scope *mcpkit.Scoper, sinks ...mcpkit.AuditSink) (*mcp.Server, error) {
+// serverDeps are what both servers share: the company resolver and one
+// ERPNext client with the bot key.
+type serverDeps struct {
+	client    *frappe.Client
+	companies books.CompanyResolver
+}
+
+// booksDeps loads the company profiles from companiesDir and builds the
+// ERPNext client with the bot key (ERP_API_KEY, ERP_API_SECRET), never the
+// seeder key.
+func booksDeps(cfg config.Config, companiesDir string) (serverDeps, error) {
 	profiles, err := seed.LoadProfiles(companiesDir)
 	if err != nil {
-		return nil, fmt.Errorf("mcp-books: company profiles: %w", err)
+		return serverDeps{}, fmt.Errorf("mcp-books: company profiles: %w", err)
 	}
 	client, err := frappe.New(cfg, cfg.ERPAPIKey.Reveal(), cfg.ERPAPISecret)
 	if err != nil {
-		return nil, fmt.Errorf("mcp-books: ERPNext client: %w", err)
+		return serverDeps{}, fmt.Errorf("mcp-books: ERPNext client: %w", err)
 	}
+	return serverDeps{client: client, companies: books.ProfileCompanies(profiles)}, nil
+}
+
+// newBooksServer builds the /mcp server with the read-only books tools
+// (see booksDeps). Failed tool calls are logged to log in full; the model
+// sees fixed messages. scope binds calls to their run (nil only for stdio
+// and tests).
+func newBooksServer(cfg config.Config, companiesDir string, log *slog.Logger, scope *mcpkit.Scoper, sinks ...mcpkit.AuditSink) (*mcp.Server, error) {
+	deps, err := booksDeps(cfg, companiesDir)
+	if err != nil {
+		return nil, err
+	}
+	return buildBooksServer(deps, log, scope, sinks...), nil
+}
+
+func buildBooksServer(deps serverDeps, log *slog.Logger, scope *mcpkit.Scoper, sinks ...mcpkit.AuditSink) *mcp.Server {
 	s := mcpkit.NewServer("close-copilot-books", buildinfo.Version)
 	for _, sink := range sinks { // the binary passes the store; unit tests pass none
 		mcpkit.EnableAudit(s, "books", sink)
 	}
 	books.RegisterTools(s, books.ToolDeps{
-		Client:    client,
-		Companies: books.ProfileCompanies(profiles),
+		Client:    deps.client,
+		Companies: deps.companies,
 		Now:       time.Now,
 		Logger:    log,
 		Scope:     scope,
 	})
-	return s, nil
+	return s
 }

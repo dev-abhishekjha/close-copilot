@@ -8,6 +8,7 @@ import (
 	"log/slog"
 	"reflect"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
@@ -56,6 +57,40 @@ func ActorFromContext(ctx context.Context) string {
 		return v
 	}
 	return "unknown"
+}
+
+// auditSlotKey holds the *auditSlot AddTool's wrapper puts in the context
+// it passes to an audited handler.
+type auditSlotKey struct{}
+
+// auditSlot is the actor a handler set for its own audit row.
+type auditSlot struct {
+	mu    sync.Mutex
+	actor string
+}
+
+func (s *auditSlot) get() string {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.actor
+}
+
+// SetAuditActor makes the audit row of the call ctx belongs to name actor
+// instead of the route's actor. Only the admin write tool may call it (a
+// test pins that): it names the checker of the proposal it posts, which
+// the route can't know. A blank actor, or a ctx that isn't an audited
+// call's, is a no-op. Tool arguments never reach it.
+func SetAuditActor(ctx context.Context, actor string) {
+	if strings.TrimSpace(actor) == "" {
+		return
+	}
+	s, ok := ctx.Value(auditSlotKey{}).(*auditSlot)
+	if !ok || s == nil {
+		return
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.actor = actor
 }
 
 var secretKeyRE = regexp.MustCompile(`(?i)token|secret|password|api_?key|authorization`)
@@ -127,6 +162,7 @@ func AddTool[In, Out any](s *mcp.Server, t *mcp.Tool, h mcp.ToolHandlerFor[In, O
 	wrapped := func(ctx context.Context, req *mcp.CallToolRequest, in In) (res *mcp.CallToolResult, out Out, err error) {
 		start := time.Now()
 		count := 0
+		slot := &auditSlot{}
 		defer func() {
 			if rec := recover(); rec != nil {
 				err = fmt.Errorf("tool %s panicked: %v", name, rec)
@@ -140,8 +176,12 @@ func AddTool[In, Out any](s *mcp.Server, t *mcp.Tool, h mcp.ToolHandlerFor[In, O
 			if len(raw) == 0 {
 				raw, _ = json.Marshal(in)
 			}
+			actor := slot.get()
+			if actor == "" {
+				actor = ActorFromContext(ctx)
+			}
 			e := store.AuditLogEntry{
-				Actor:       ActorFromContext(ctx),
+				Actor:       actor,
 				Server:      &cfg.server,
 				Tool:        &name,
 				Args:        redactArgs(raw),
@@ -165,7 +205,7 @@ func AddTool[In, Out any](s *mcp.Server, t *mcp.Tool, h mcp.ToolHandlerFor[In, O
 				err = errors.New("audit log unavailable; call refused")
 			}
 		}()
-		res, out, err = h(ctx, req, in)
+		res, out, err = h(context.WithValue(ctx, auditSlotKey{}, slot), req, in)
 		if err == nil && (res == nil || !res.IsError) {
 			count = resultCount(out)
 		}
