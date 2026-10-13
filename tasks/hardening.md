@@ -22,6 +22,7 @@ Status was checked against `main` at `c96642d` on 2026-10-09. Line numbers refer
 | CC-016a Eval workflow gates suite-v1 and the suite-v1 baseline | 2 | eval-engineer | regulated | a `suite-v1` baseline, Gate C |
 | CC-017 Loader that replaces a period's evidence, and `make load` that works | 2 | implementer | data-sensitive | trustworthy re-records |
 | CC-018 Close the scorer's output-path and duplicate-key gaps | 2 | eval-engineer | regulated | relying on the baseline guard |
+| CC-019 Wire the pseudonymiser into the eval's Tier 2 path | 2 | llm-engineer | data-sensitive | the suite-skeleton Tier 2 baseline |
 
 CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec is in `tmp/held-specs/CC-003.md`, and it's in the graph because CC-004 builds on it.
 
@@ -354,6 +355,23 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 - Make baseline loading reject a key repeated in one object (walk the tokens with `json.Decoder.Token`). A case in `TestLoadBaselineV3Invalid`.
 
 **Files.** `internal/evals/baseline.go`, `result.go`, `score.go`, their tests, `cmd/eval/score.go`, `score_test.go`. Phase 2, eval-engineer, regulated (the output guard is a protected invariant); security review and the Opus diff review run.
+
+---
+
+### CC-019 · Wire the pseudonymiser into the eval's Tier 2 path
+
+**Goal.** `eval run` with the agent on masks GSTINs, PANs and individual names before every explainer model call, the way `cmd/agent` does, so Tier 2 measures the setup the product runs.
+
+**Finding** (first Tier 2 run on `suite-skeleton`, `results/suite-skeleton/20261013T091848Z`, 2026-10-13). The run logged `explainer: no pseudonymiser configured; identifiers are sent to the model unmasked`. `cmd/agent/main.go:185` sets `agent.LLMExplainer.NewPseudonymiser`; `cmd/eval/main.go` never does. That breaks the CC-710 invariant on the eval path, and a baseline recorded this way would be invalid once it is fixed, so this ticket comes before the Tier 2 baseline.
+
+**Subtasks**
+- When the agent is on, `eval run` requires `PSEUDONYM_KEY` (32 bytes as 64 hex digits) and fails at startup with a fixed error that never carries the value; `--no-llm` / `--no-agent` don't need it.
+- Set `NewPseudonymiser` from that key with `agent.NewRedactor`, as `cmd/agent` does.
+- Tests: Tier 2 setup without a key fails; with a key the explainer has a non-nil pseudonymiser; Tier 1 needs no key; the model input holds no raw GSTIN from the fixtures.
+
+**Follow-ups (not this ticket).** Hoist `pseudonymKey` into a shared package so `cmd/agent` and `cmd/eval` use one copy. `cmd/agent` runs `cfg.CheckLLM()` and wraps the model in `llmtrace.Provider`; `cmd/eval` does neither, another way Tier 2 differs from the product.
+
+**Files.** `cmd/eval/main.go`, `cmd/eval/main_test.go`, `cmd/eval/args_test.go`. Phase 2, llm-engineer, data-sensitive. G4-tier2 is skipped (no `llm` section for `suite-skeleton` in `evals/baseline.json` yet, so the compare would fail with `baseline_tier_missing`); the check is the unit tests plus one eval run with no baseline compare.
 
 ---
 

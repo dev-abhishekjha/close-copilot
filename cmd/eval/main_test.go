@@ -2,12 +2,28 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"log/slog"
 	"regexp"
+	"slices"
+	"strings"
+	"sync"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
+	"github.com/abhishekjha/close-copilot/internal/agent"
+	"github.com/abhishekjha/close-copilot/internal/company"
+	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/evals"
+	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
+	"github.com/abhishekjha/close-copilot/internal/money"
+	"github.com/abhishekjha/close-copilot/internal/store"
 )
 
 type ctxKey struct{}
@@ -79,4 +95,256 @@ func TestPrimeScope(t *testing.T) {
 			t.Errorf("err = %v", err)
 		}
 	})
+}
+
+// goodKey is a synthetic, test-only pseudonym key (32 bytes as hex).
+var goodKey = strings.Repeat("a1", 32)
+
+func TestPseudonymKey(t *testing.T) {
+	t.Run("good keys", func(t *testing.T) {
+		for _, v := range []string{goodKey, "  " + goodKey + "\n"} {
+			key, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(v)})
+			if err != nil || len(key) != 32 || key[0] != 0xa1 {
+				t.Errorf("key of %d chars: %d bytes, %v", len(v), len(key), err)
+			}
+		}
+	})
+	t.Run("bad keys", func(t *testing.T) {
+		for name, bad := range map[string]string{
+			"empty":   "",
+			"short":   strings.Repeat("b2", 16),
+			"long":    strings.Repeat("b2", 33),
+			"non-hex": strings.Repeat("g7", 32),
+			"text":    "sekret-pseudonym-zz",
+		} {
+			_, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(bad)})
+			if !errors.Is(err, errPseudonymKey) {
+				t.Errorf("%s: err %v, want errPseudonymKey", name, err)
+				continue
+			}
+			msg := err.Error()
+			if !strings.Contains(msg, config.EnvPseudonymKey) || !strings.Contains(msg, "--no-llm") {
+				t.Errorf("%s: error %q must name %s and --no-llm", name, msg, config.EnvPseudonymKey)
+			}
+			for n := 4; n <= len(bad); n++ {
+				if strings.Contains(msg, bad[:n]) {
+					t.Errorf("%s: error holds a %d-char prefix of the value", name, n)
+					break
+				}
+			}
+		}
+	})
+	t.Run("tier 2 needs the key", func(t *testing.T) {
+		if _, err := explainerKey(config.Config{}, true); !errors.Is(err, errPseudonymKey) {
+			t.Errorf("no key: err %v, want errPseudonymKey", err)
+		}
+		key, err := explainerKey(config.Config{PseudonymKey: config.NewSecret(goodKey)}, true)
+		if err != nil || len(key) != 32 {
+			t.Errorf("good key: %d bytes, %v", len(key), err)
+		}
+	})
+}
+
+func TestTier1NeedsNoPseudonymKey(t *testing.T) {
+	key, err := explainerKey(config.Config{}, false)
+	if key != nil || err != nil {
+		t.Errorf("agent off: %v, %v; want nil, nil", key, err)
+	}
+	// Even a malformed key is not read with the agent off.
+	key, err = explainerKey(config.Config{PseudonymKey: config.NewSecret("not-hex")}, false)
+	if key != nil || err != nil {
+		t.Errorf("agent off, bad key: %v, %v; want nil, nil", key, err)
+	}
+}
+
+// Synthetic identifiers: invented names, a PAN shaped like a company's
+// and a GSTIN derived from it (company.GSTIN). Never real ones.
+const (
+	testPersonA = "Lakshmi Venkatesan"
+	testPersonB = "Arvind Kulkarni"
+	testPAN     = "ZIACS2610I"
+)
+
+func individual(name string) company.Supplier {
+	return company.Supplier{ID: strings.ToLower(strings.ReplaceAll(name, " ", "-")), Name: name, Individual: true}
+}
+
+func TestNewExplainer(t *testing.T) {
+	key, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(goodKey)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Run("pseudonymiser set", func(t *testing.T) {
+		ex := newExplainer(newFakeExplainStore(), staticAccounts{}, config.Config{LLMModelFast: "fast", LLMModelStrong: "strong"}, key, []string{testPersonA}, nil)
+		if ex.NewPseudonymiser == nil {
+			t.Fatal("NewPseudonymiser is nil")
+		}
+		if p := ex.NewPseudonymiser(uuid.New()); p == nil {
+			t.Fatal("NewPseudonymiser returned nil")
+		}
+		if ex.Store == nil || ex.Accounts == nil || ex.FastModel != "fast" || ex.StrongModel != "strong" {
+			t.Errorf("explainer fields: %+v", ex)
+		}
+	})
+	t.Run("names union over the suite's companies", func(t *testing.T) {
+		byID := map[string]company.Profile{
+			"sharma": {ID: "sharma", Suppliers: []company.Supplier{individual(testPersonA), {ID: "acme", Name: "Acme Pvt Ltd"}, individual(testPersonB)}},
+			"mehta":  {ID: "mehta", Suppliers: []company.Supplier{individual(testPersonB), individual("Meera Pillai")}},
+			"other":  {ID: "other", Suppliers: []company.Supplier{individual("Not In Suite")}},
+		}
+		months := []evals.SuiteMonth{
+			{Company: "sharma", Month: "2026-08"}, {Company: "sharma", Month: "2026-09"},
+			{Company: "mehta", Month: "2026-09"}, {Company: "missing", Month: "2026-09"},
+		}
+		got := suiteIndividualNames(byID, months)
+		want := []string{testPersonA, testPersonB, "Meera Pillai"}
+		if !slices.Equal(got, want) {
+			t.Errorf("names = %q, want %q", got, want)
+		}
+		if got := suiteIndividualNames(byID, nil); len(got) != 0 {
+			t.Errorf("no months: names = %q", got)
+		}
+	})
+}
+
+func TestExplainerInputMasked(t *testing.T) {
+	key, err := pseudonymKey(config.Config{PseudonymKey: config.NewSecret(goodKey)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	gstin, err := company.GSTIN("29", testPAN)
+	if err != nil {
+		t.Fatal(err)
+	}
+	names := []string{testPersonA}
+	st := newFakeExplainStore()
+	snap := map[string]any{
+		"server": agent.ServerEvidence, "tool": "list_bank_lines",
+		"args": map[string]any{"company": "sharma", "from_date": "2026-09-01", "to_date": "2026-09-30"},
+		"result": []map[string]any{{
+			"company_id": "sharma", "txn_id": "HDFC-20260915-C1", "txn_date": "2026-09-15",
+			"narration": "NEFT " + strings.ToUpper(testPersonA) + " " + gstin + " PAN " + testPAN, "amount_paise": -590,
+		}},
+	}
+	sha, err := st.PutArtifact(t.Context(), store.ArtifactToolResult, uuid.Nil, uuid.Nil, snap)
+	if err != nil {
+		t.Fatal(err)
+	}
+	amt := money.Paise(590)
+	runID := uuid.New()
+	model := llm.NewFakeProvider()
+	req := agent.ExplainRequest{
+		RunID: runID, StepID: uuid.New(), Attempt: 1, Company: "sharma", Month: "2026-09",
+		Finding: store.Finding{
+			ID: uuid.New(), RunID: runID, Type: "unrecorded_bank_charge", Severity: "low",
+			Title:       "Unrecorded payment to " + testPersonA + " (" + gstin + ")",
+			AmountPaise: &amt,
+			Keys:        map[string]string{"bank_txn_id": "HDFC-20260915-C1", "supplier_gstin": gstin},
+			Evidence: []store.EvidenceRef{{Server: agent.ServerEvidence, Tool: "list_bank_lines",
+				Args: json.RawMessage(`{"company":"sharma"}`), IDs: []string{"HDFC-20260915-C1"}, Artifact: sha}},
+			Status: "open",
+		},
+		EvidenceRefs: []string{sha},
+		Model:        model,
+	}
+	accounts := staticAccounts{"Bank Charges - STPL", testPersonA + " Capital - STPL"}
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	ex := newExplainer(st, accounts, config.Config{LLMModelFast: "fast"}, key, names, log)
+	_, _ = ex.Explain(t.Context(), req) // the fake's answer is malformed; only the requests matter
+
+	calls := model.Calls()
+	if len(calls) == 0 {
+		t.Fatal("the model was never called")
+	}
+	r := agent.NewRedactor(key, runID, names)
+	for i, c := range calls {
+		var b strings.Builder
+		for _, blk := range c.System {
+			b.WriteString(blk.Text)
+		}
+		for _, m := range c.Messages {
+			b.WriteString(m.Content)
+		}
+		text := b.String()
+		for _, raw := range []string{gstin, testPAN, testPersonA, strings.ToUpper(testPersonA)} {
+			if strings.Contains(text, raw) {
+				t.Errorf("call %d holds a raw identifier (%d chars)", i, len(raw))
+			}
+		}
+		for _, masked := range []string{r.MaskString(gstin), r.MaskString(testPAN), r.MaskString(testPersonA)} {
+			if !strings.Contains(text, masked) {
+				t.Errorf("call %d lacks the masked form %q", i, masked)
+			}
+		}
+	}
+}
+
+func TestRunSuiteNeedsPseudonymKey(t *testing.T) {
+	base := []string{"run", "--suite", "suite-skeleton", "--scenarios-dir", "../../evals/scenarios", "--config-dir", "../../config"}
+	// A URL that fails at parse: the run never dials a database.
+	cfg := config.Config{DatabaseURL: config.NewSecret("::not-a-url")}
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	for _, tc := range []struct {
+		name    string
+		mode    []string
+		wantKey bool
+	}{
+		{"agent on", nil, true},
+		{"replay, agent on", []string{"--replay", "--fixtures-dir", t.TempDir(), "--results-dir", t.TempDir()}, true},
+		{"no-llm", []string{"--no-llm", "--results-dir", t.TempDir()}, false},
+		{"no-agent", []string{"--no-agent", "--results-dir", t.TempDir()}, false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			err := run(t.Context(), cfg, log, append(slices.Clone(base), tc.mode...))
+			if got := errors.Is(err, errPseudonymKey); got != tc.wantKey {
+				t.Errorf("err = %v; errPseudonymKey %v, want %v", err, got, tc.wantKey)
+			}
+			if !tc.wantKey && err == nil {
+				t.Error("want the store error, got nil")
+			}
+		})
+	}
+}
+
+// staticAccounts is a fixed account list.
+type staticAccounts []string
+
+func (a staticAccounts) Accounts(context.Context, string, string) ([]string, error) {
+	return slices.Clone(a), nil
+}
+
+// fakeExplainStore keeps artifacts in memory, hashed as the store hashes
+// them, and records explanations.
+type fakeExplainStore struct {
+	mu        sync.Mutex
+	artifacts map[string]store.Artifact
+}
+
+func newFakeExplainStore() *fakeExplainStore {
+	return &fakeExplainStore{artifacts: map[string]store.Artifact{}}
+}
+
+func (s *fakeExplainStore) PutArtifact(_ context.Context, kind string, _, _ uuid.UUID, v any) (string, error) {
+	canon, sha, err := store.CanonicalHash(v)
+	if err != nil {
+		return "", err
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.artifacts[sha] = store.Artifact{SHA256: sha, Kind: kind, Content: canon}
+	return sha, nil
+}
+
+func (s *fakeExplainStore) GetArtifact(_ context.Context, sha string) (store.Artifact, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	a, ok := s.artifacts[sha]
+	if !ok {
+		return store.Artifact{}, fmt.Errorf("%w: artifact %s", store.ErrNotFound, sha)
+	}
+	return a, nil
+}
+
+func (s *fakeExplainStore) SetFindingExplanation(context.Context, uuid.UUID, uuid.UUID, string, string, string, []store.Citation, *store.JournalProposal) error {
+	return nil
 }

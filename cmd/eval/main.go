@@ -14,6 +14,8 @@
 //
 // score and noise read files only and need no environment variables; run
 // needs DATABASE_URL and the MCP settings, run --replay DATABASE_URL only.
+// With the agent on (no --no-llm or --no-agent, replay or not) run also
+// needs PSEUDONYM_KEY, so identifiers are masked before every model call.
 //
 // run closes every evaluated company-month of the suite and its clean
 // control month, one after another, through the same agent.Workflow as
@@ -28,13 +30,16 @@ package main
 
 import (
 	"context"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -134,6 +139,15 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		byID[p.ID] = p
 	}
 
+	// The explainer masks identifiers before every model call (CC-710), so
+	// with the agent on a missing or malformed key stops the run here,
+	// before the fixtures, the store, the MCP registry or the model.
+	agentOn := !f.NoAgent
+	pseudoKey, err := explainerKey(cfg, agentOn)
+	if err != nil {
+		return err
+	}
+
 	// A replay checks its fixtures before it touches anything else.
 	var (
 		replayer *evals.Replayer
@@ -191,20 +205,16 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		}
 	}
 
-	agentOn := !f.NoAgent
 	if agentOn {
 		model, err := newProvider(cfg, filepath.Join(f.ConfigDir, "pricing.yaml"))
 		if err != nil {
 			return err
 		}
 		wf.Model = model
-		wf.Explainer = &agent.LLMExplainer{
-			Store:       st,
-			Accounts:    agent.BooksAccounts{Books: wf.Books},
-			FastModel:   cfg.LLMModelFast,
-			StrongModel: cfg.LLMModelStrong,
-			Log:         log,
-		}
+		names := suiteIndividualNames(byID, months)
+		// Counts only: names are personal data, never logged.
+		log.Info("pseudonymisation on", "individual_names", len(names))
+		wf.Explainer = newExplainer(st, agent.BooksAccounts{Books: wf.Books}, cfg, pseudoKey, names, log)
 		wf.Verifier = &agent.CodeVerifier{Store: st, Citations: st}
 	}
 	if workflowHook != nil {
@@ -245,6 +255,70 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 			"months", len(idx.Months), "index_sha256", sum)
 	}
 	return err
+}
+
+// errPseudonymKey is the startup error for a missing or malformed
+// PSEUDONYM_KEY when the explainer runs. It never carries the value.
+var errPseudonymKey = errors.New("eval: " + config.EnvPseudonymKey +
+	" must be 32 random bytes as 64 hex digits to explain findings (see .env.example), or pass --no-llm")
+
+// pseudonymKey decodes PSEUDONYM_KEY: 32 bytes as 64 hex digits, as the
+// agent binary requires. Any other value is errPseudonymKey.
+func pseudonymKey(cfg config.Config) ([]byte, error) {
+	if cfg.PseudonymKey.IsZero() {
+		return nil, errPseudonymKey
+	}
+	key, err := hex.DecodeString(strings.TrimSpace(cfg.PseudonymKey.Reveal()))
+	if err != nil || len(key) != 32 {
+		return nil, errPseudonymKey
+	}
+	return key, nil
+}
+
+// explainerKey is the pseudonym key when the explainer runs (agentOn);
+// with the agent off the key is neither read nor required (nil, nil).
+func explainerKey(cfg config.Config, agentOn bool) ([]byte, error) {
+	if !agentOn {
+		return nil, nil
+	}
+	return pseudonymKey(cfg)
+}
+
+// newExplainer builds the explainer as the agent binary does: every model
+// call goes through a per-run Redactor keyed by key, which masks GSTINs,
+// PANs and the individual names (CC-710).
+func newExplainer(st agent.ExplainStore, accounts agent.AccountLister, cfg config.Config, key []byte, names []string, log *slog.Logger) *agent.LLMExplainer {
+	return &agent.LLMExplainer{
+		Store:       st,
+		Accounts:    accounts,
+		FastModel:   cfg.LLMModelFast,
+		StrongModel: cfg.LLMModelStrong,
+		NewPseudonymiser: func(runID uuid.UUID) agent.Pseudonymiser {
+			return agent.NewRedactor(key, runID, names)
+		},
+		Log: log,
+	}
+}
+
+// suiteIndividualNames is the union, without repeats, of the individual
+// names of every company the months cover. The pseudonymiser is per run,
+// not per company, so a name is masked in every company's run: masking
+// another company's name is harmless, leaving one unmasked is not.
+func suiteIndividualNames(byID map[string]company.Profile, months []evals.SuiteMonth) []string {
+	var out []string
+	seen := map[string]bool{}
+	for _, m := range months {
+		if seen[m.Company] {
+			continue
+		}
+		seen[m.Company] = true
+		for _, n := range byID[m.Company].IndividualNames() {
+			if !slices.Contains(out, n) {
+				out = append(out, n)
+			}
+		}
+	}
+	return out
 }
 
 // newProvider builds the model provider LLM_PROVIDER names, priced from
