@@ -182,6 +182,10 @@ func TestBuildSQLTenantFilterInsideCTEs(t *testing.T) {
 					t.Fatalf("%s %s: tenant predicate not inside the CTE before LIMIT", mode, name)
 				}
 			}
+			const joinPred = "JOIN doc_chunks c ON c.id = f.id AND (c.company_id IS NULL OR c.company_id = $2)"
+			if strings.Count(sql, joinPred) != 1 {
+				t.Fatalf("%s types=%v: final join lacks the company predicate", mode, withTypes)
+			}
 			if withTypes != strings.Contains(sql, "doc_type = ANY(") {
 				t.Fatalf("%s: doc_type filter presence wrong", mode)
 			}

@@ -1,0 +1,79 @@
+{
+  "annotations": {
+    "idempotentHint": false,
+    "readOnlyHint": true
+  },
+  "description": "Search the policy, contract and close-note documents readable by the run's company; returns the best chunks with snippets of at most 600 characters.",
+  "inputSchema": {
+    "additionalProperties": false,
+    "properties": {
+      "company": {
+        "description": "company ID; defaults to the run's company, any other company is refused",
+        "type": "string"
+      },
+      "doc_types": {
+        "description": "optional filter: any of policy, contract, close_note",
+        "items": {
+          "type": "string"
+        },
+        "type": [
+          "null",
+          "array"
+        ]
+      },
+      "k": {
+        "description": "number of results, 1 to 10 (default 5)",
+        "type": "integer"
+      },
+      "query": {
+        "description": "search text, at most 500 characters",
+        "type": "string"
+      }
+    },
+    "required": [
+      "query"
+    ],
+    "type": "object"
+  },
+  "name": "search_documents",
+  "outputSchema": {
+    "items": {
+      "additionalProperties": false,
+      "properties": {
+        "doc_id": {
+          "type": "string"
+        },
+        "doc_type": {
+          "type": "string"
+        },
+        "score": {
+          "description": "raw cross-encoder rerank score",
+          "type": "number"
+        },
+        "section": {
+          "type": "string"
+        },
+        "snippet": {
+          "description": "the chunk text, whitespace-collapsed, at most 600 characters",
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "doc_id",
+        "doc_type",
+        "section",
+        "title",
+        "snippet",
+        "score"
+      ],
+      "type": "object"
+    },
+    "type": [
+      "null",
+      "array"
+    ]
+  }
+}

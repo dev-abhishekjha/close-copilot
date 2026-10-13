@@ -18,6 +18,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/evidence"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
+	"github.com/abhishekjha/close-copilot/internal/retrieval"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 )
@@ -26,6 +27,8 @@ func main() {
 	cli.Main("mcp-evidence", []string{
 		config.EnvDatabaseURL,
 		config.EnvMCPTokenAgent,
+		config.EnvTEIEmbedURL,
+		config.EnvTEIRerankURL,
 	}, run)
 }
 
@@ -61,13 +64,21 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	}
 	defer st.Close()
 
+	// Built once, before serving: a server that cannot answer search_documents
+	// should not start.
+	tei, err := retrieval.NewTEI(cfg)
+	if err != nil {
+		return fmt.Errorf("mcp-evidence: %w", err)
+	}
+	searcher := retrieval.NewSearcher(st.Pool(), tei, tei)
+
 	switch *transport {
 	case "stdio":
 		// Unscoped: a local process with no network, driven by one user.
 		log.Info("starting mcp-evidence in stdio mode")
-		return mcpkit.RunStdio(ctx, newEvidenceServer(st, nil, st))
+		return mcpkit.RunStdio(ctx, newEvidenceServer(st, nil, searcher, st))
 	case "http":
-		routes, opts, err := httpRoutes(cfg, st, st)
+		routes, opts, err := httpRoutes(cfg, st, searcher, st)
 		if err != nil {
 			return err
 		}
@@ -85,19 +96,19 @@ var errNoScopeKey = errors.New("mcp-evidence: --transport http needs " + config.
 // newEvidenceServer builds the evidence server over st, audited to each
 // sink (the binary passes the store; unit tests pass none). scope binds
 // calls to their run (nil only for stdio and tests).
-func newEvidenceServer(st *store.Store, scope *mcpkit.Scoper, sinks ...mcpkit.AuditSink) *mcp.Server {
+func newEvidenceServer(st *store.Store, scope *mcpkit.Scoper, searcher evidence.DocSearcher, sinks ...mcpkit.AuditSink) *mcp.Server {
 	s := mcpkit.NewServer("close-copilot-evidence", buildinfo.Version)
 	for _, sink := range sinks {
 		mcpkit.EnableAudit(s, "evidence", sink)
 	}
-	evidence.RegisterTools(s, st, evidence.WithScope(scope))
+	evidence.RegisterTools(s, st, evidence.WithScope(scope), evidence.WithSearcher(searcher))
 	return s
 }
 
 // httpRoutes is what --transport http serves: the scoped evidence tools at
 // /mcp. The same Scoper guards /mcp at the HTTP layer (401 without a valid
 // X-Run-Scope) and in every tool handler (out_of_scope).
-func httpRoutes(cfg config.Config, st *store.Store, sinks ...mcpkit.AuditSink) (map[string]mcpkit.Route, []mcpkit.Option, error) {
+func httpRoutes(cfg config.Config, st *store.Store, searcher evidence.DocSearcher, sinks ...mcpkit.AuditSink) (map[string]mcpkit.Route, []mcpkit.Option, error) {
 	if cfg.MCPScopeKey.IsZero() {
 		return nil, nil, errNoScopeKey
 	}
@@ -106,7 +117,7 @@ func httpRoutes(cfg config.Config, st *store.Store, sinks ...mcpkit.AuditSink) (
 		return nil, nil, fmt.Errorf("mcp-evidence: %w", err)
 	}
 	routes := map[string]mcpkit.Route{
-		"/mcp": mcpkit.NewAgentRoute(newEvidenceServer(st, scoper, sinks...), cfg),
+		"/mcp": mcpkit.NewAgentRoute(newEvidenceServer(st, scoper, searcher, sinks...), cfg),
 	}
 	opts := []mcpkit.Option{
 		mcpkit.WithActors(map[string]string{"/mcp": "agent"}),

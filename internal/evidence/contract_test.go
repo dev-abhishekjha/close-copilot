@@ -34,6 +34,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/evidence"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/money"
+	"github.com/abhishekjha/close-copilot/internal/retrieval"
 	"github.com/abhishekjha/close-copilot/internal/seed"
 	"github.com/abhishekjha/close-copilot/internal/store"
 )
@@ -51,7 +52,7 @@ const contractToken = "contract-test-token"
 const schemaDir = "testdata/schemas"
 
 // evidenceTools are the tools RegisterTools adds.
-var evidenceTools = []string{"list_bank_lines", "list_gstr2b_entries"}
+var evidenceTools = []string{"list_bank_lines", "list_gstr2b_entries", "search_documents"}
 
 // bearerTransport adds a fixed Authorization header to every request.
 type bearerTransport struct {
@@ -233,6 +234,33 @@ func TestContractEvidence(t *testing.T) {
 		call(t, cs, "list_gstr2b_entries", map[string]any{"company": co, "period": "2026-09", "supplier_gstin": gstinA}, &got)
 		if len(got) != 1 || got[0].SupplierGSTIN != gstinA || got[0].InvoiceNo != "CA/26-27/0042" || got[0].IGST != 180000 {
 			t.Errorf("supplier_gstin filter = %+v, want only CA/26-27/0042 with IGST 180000 paise", got)
+		}
+	})
+
+	t.Run("search_documents_snippets", func(t *testing.T) {
+		f := &fakeSearcher{hits: []retrieval.Hit{
+			{DocID: "c-1", DocType: "contract", Section: "s", Title: "T", Content: strings.Repeat("₹ rent clause ", 300)},
+			{DocID: "c-2", DocType: "policy", Content: "short"},
+		}}
+		s := mcp.NewServer(&mcp.Implementation{Name: "close-copilot-evidence", Version: "contract"}, nil)
+		evidence.RegisterTools(s, st, evidence.WithSearcher(f))
+		log := slog.New(slog.NewTextHandler(io.Discard, nil))
+		srv := httptest.NewServer(mcpkit.BuildHandler(map[string]mcpkit.Route{"/mcp": mcpkit.NewRoute(s, contractToken)}, log))
+		t.Cleanup(srv.Close)
+		cs, err := contractConnect(t, srv, contractToken)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Cleanup(func() { _ = cs.Close() })
+		var got []evidence.SearchDocumentsOutput
+		call(t, cs, "search_documents", map[string]any{"company": co, "query": "rent"}, &got)
+		if len(got) != 2 {
+			t.Fatalf("got %d hits, want 2", len(got))
+		}
+		for _, h := range got {
+			if n := len([]rune(h.Snippet)); n > evidence.MaxSnippetChars {
+				t.Errorf("%s: snippet of %d characters, want at most %d", h.DocID, n, evidence.MaxSnippetChars)
+			}
 		}
 	})
 
