@@ -4,14 +4,16 @@ package evidence_test
 //
 // The behavioural checks live in the agent package (TestInvestigatorAllowlist
 // and the injection test's assertAllowlist) and run in make check. The source
-// scan below covers only investigate.go and explain.go, because CC-806 adds
-// the workflow's retrieve step in workflow.go and explain.go's input
-// handling; if that ticket legitimately touches explain.go it updates this
-// test with the owner's agreement.
+// scan below forbids the tool in investigate.go and explain.go: the
+// workflow's retrieve step (CC-806) lives in workflow.go and retrieve.go, and
+// explain.go only reads the stored retrieval artifacts. The positive check
+// requires retrieve.go to be the only non-test file of the agent package
+// that names the tool.
 
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -54,5 +56,31 @@ func TestSearchDocumentsInvariantSourceScan(t *testing.T) {
 				t.Errorf("internal/agent/%s mentions %q", f, bad)
 			}
 		}
+	}
+}
+
+func TestSearchDocumentsInvariantOnlyRetrieve(t *testing.T) {
+	files, err := filepath.Glob(filepath.Join("..", "agent", "*.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var naming []string
+	for _, f := range files {
+		if strings.HasSuffix(f, "_test.go") {
+			continue
+		}
+		b, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, line := range strings.Split(string(b), "\n") {
+			if !strings.HasPrefix(strings.TrimSpace(line), "//") && strings.Contains(line, "search_documents") {
+				naming = append(naming, filepath.Base(f))
+				break
+			}
+		}
+	}
+	if !slices.Equal(naming, []string{"retrieve.go"}) {
+		t.Errorf("non-test agent files naming search_documents in code: %v, want only retrieve.go", naming)
 	}
 }

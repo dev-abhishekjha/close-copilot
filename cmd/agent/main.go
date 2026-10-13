@@ -189,6 +189,9 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 			Log:   log,
 		}
 		wf.Verifier = &agent.CodeVerifier{Store: st, Citations: st}
+		// Retrieval is a workflow step (CC-806): its passages reach only the
+		// explainer, never the investigator.
+		wf.Retriever = &agent.MCPDocuments{Registry: reg}
 	}
 
 	var res agent.Result

@@ -8,8 +8,8 @@ package agent
 //
 // The static rules and the company's accounts sit in one cached system
 // block. The user message carries the finding, its evidence (projected
-// from the stored tool_result snapshots) and DOCUMENTS (empty until
-// CC-806), each as compact JSON between unforgeable fences: the JSON is
+// from the stored tool_result snapshots) and DOCUMENTS (the passages of
+// the finding's retrieval artifacts, CC-806), each as compact JSON between unforgeable fences: the JSON is
 // HTML-escaped, so '<' and '>' never occur inside a section.
 //
 // The answer is decoded with exact numbers and validated in Go. A
@@ -20,7 +20,10 @@ package agent
 // verifier's job (CC-705): the explanation artifact names the account
 // list the model saw (AccountsRef, a tool_result snapshot stored by the
 // explain step) and the DOCUMENTS it was given (DocumentRefs), so the
-// verifier can check the answer offline.
+// verifier can check the answer offline. A citation must name the exact
+// doc_id and section of a passage in DOCUMENTS: it is checked against the
+// masked passages the model saw and stored as that passage's unmasked
+// pair, which is what the retrieval artifact holds.
 //
 // Nothing here logs prompt, evidence or response text: RecordingProvider
 // (req.Model) stores prompts and responses as artifacts.
@@ -321,7 +324,7 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 	if err != nil {
 		return StepResult{}, err
 	}
-	data, err := e.inputJSON(ctx, req)
+	data, docs, err := e.inputJSON(ctx, req)
 	if err != nil {
 		return StepResult{}, err
 	}
@@ -329,6 +332,15 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 	masked, unmaskUser, err := pseudo.Mask(data)
 	if err != nil {
 		return StepResult{}, fmt.Errorf("agent: pseudonymise: %w", err)
+	}
+	// Citations are validated against DOCUMENTS exactly as the model saw
+	// them: the masked slice, passage for passage with docs.
+	maskedDocs, err := maskedDocuments(masked, len(docs))
+	if err != nil {
+		return StepResult{}, err
+	}
+	if masked, err = capMaskedDocuments(masked, maskedDocs); err != nil {
+		return StepResult{}, err
 	}
 	maskedAccounts, unmaskAccounts, err := maskAccounts(pseudo, accounts)
 	if err != nil {
@@ -350,8 +362,9 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 		return StepResult{}, err
 	}
 
-	// Proposals are validated against the masked list the model saw.
-	v := validator{accounts: maskedAccounts, from: from, to: to}
+	// Proposals and citations are validated against the masked lists the
+	// model saw.
+	v := validator{accounts: maskedAccounts, from: from, to: to, documents: maskedDocs}
 	model := e.model(req.Attempt)
 	messages := []llm.Message{llm.NewUserTextMessage(user)}
 	var out explainOutput
@@ -389,7 +402,7 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 		SuggestedAction:   out.action,
 		ActionNote:        unmask(out.actionNote),
 		CitedAmountsPaise: out.amounts,
-		Citations:         out.citations,
+		Citations:         restoreCitations(out.citations, maskedDocs, docs),
 		NeedsReview:       out.needsReview,
 		Proposal:          out.proposal,
 		Retried:           retried,
@@ -410,7 +423,10 @@ func (e *LLMExplainer) Explain(ctx context.Context, req ExplainRequest) (StepRes
 	if art.AccountsRef, err = e.putAccounts(ctx, req, accounts, from, to); err != nil {
 		return StepResult{}, err
 	}
-	art.DocumentRefs = []string{}
+	art.DocumentRefs = slices.Clone(req.DocumentRefs)
+	if art.DocumentRefs == nil {
+		art.DocumentRefs = []string{}
+	}
 	if e.Fault.corruptExplanation(req.Attempt, &art) {
 		e.log().WarnContext(ctx, "COPILOT_FAULT: explanation corrupted on purpose", "run_id", req.RunID, "step_id", req.StepID, "fault", e.Fault.Mode())
 	}
@@ -532,8 +548,9 @@ type explainInput struct {
 // sections are the user message's fenced sections, in order.
 var sections = []string{"FINDING", "EVIDENCE", "DOCUMENTS", "VERIFIER_FEEDBACK"}
 
-// inputJSON builds the user message's data as JSON.
-func (e *LLMExplainer) inputJSON(ctx context.Context, req ExplainRequest) ([]byte, error) {
+// inputJSON builds the user message's data as JSON. It also returns the
+// DOCUMENTS slice it holds, unmasked.
+func (e *LLMExplainer) inputJSON(ctx context.Context, req ExplainRequest) ([]byte, []documentView, error) {
 	f := req.Finding
 	in := explainInput{
 		Finding: findingView{
@@ -546,22 +563,121 @@ func (e *LLMExplainer) inputJSON(ctx context.Context, req ExplainRequest) ([]byt
 	for _, sha := range req.EvidenceRefs {
 		ev, err := e.evidence(ctx, sha, f.Evidence)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		in.Evidence = append(in.Evidence, ev)
 	}
+	docs, err := loadDocuments(ctx, e.Store, req.DocumentRefs)
+	if err != nil {
+		return nil, nil, err
+	}
+	in.Documents = docs
 	if len(bytes.TrimSpace(req.Feedback)) > 0 {
 		fb, err := feedbackJSON(req.Feedback)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		in.Feedback = fb
 	}
 	b, err := json.Marshal(in)
 	if err != nil {
+		return nil, nil, fmt.Errorf("agent: encode explain input: %w", err)
+	}
+	return b, docs, nil
+}
+
+// maxDocuments caps the passages in DOCUMENTS (the retrieve step keeps
+// three per finding). Passage text is capped only after masking.
+const maxDocuments = 3
+
+// loadDocuments reads the retrieval artifacts (GetArtifact verifies their
+// hashes) and returns their passages as DOCUMENTS, in order, at most
+// maxDocuments, text uncapped. Passages without a doc_id or section
+// cannot be cited and are left out.
+func loadDocuments(ctx context.Context, st artifactReader, refs []string) ([]documentView, error) {
+	out := []documentView{}
+	for _, sha := range refs {
+		a, err := st.GetArtifact(ctx, sha)
+		if err != nil {
+			return nil, fmt.Errorf("agent: documents: %w", err)
+		}
+		if a.Kind != store.ArtifactRetrieval {
+			return nil, fmt.Errorf("agent: documents %s is a %s artifact, not a retrieval", shortSHA(sha), a.Kind)
+		}
+		var r RetrievalArtifact
+		if err := json.Unmarshal(a.Content, &r); err != nil {
+			return nil, fmt.Errorf("agent: decode documents %s: %w", shortSHA(sha), err)
+		}
+		for _, p := range r.Passages {
+			if len(out) == maxDocuments {
+				return out, nil
+			}
+			if p.DocID == "" || p.Section == "" {
+				continue
+			}
+			// Uncapped here: the text is capped after masking
+			// (capMaskedDocuments), so a cut never splits an identifier
+			// before the pseudonymiser sees it.
+			out = append(out, documentView{DocID: p.DocID, Section: p.Section, Text: p.Text})
+		}
+	}
+	return out, nil
+}
+
+// maskedDocuments decodes the DOCUMENTS section of the masked user
+// message: the passages as the model sees them. It must hold n passages,
+// in the order of the unmasked slice.
+func maskedDocuments(masked []byte, n int) ([]documentView, error) {
+	var in struct {
+		Documents []documentView `json:"DOCUMENTS"`
+	}
+	if err := json.Unmarshal(masked, &in); err != nil {
+		return nil, fmt.Errorf("agent: pseudonymised explain input: %w", err)
+	}
+	if len(in.Documents) != n {
+		return nil, fmt.Errorf("agent: pseudonymise: %d documents became %d", n, len(in.Documents))
+	}
+	return in.Documents, nil
+}
+
+// capMaskedDocuments caps each masked passage's text (capText) in place
+// and writes the capped DOCUMENTS back into the masked user message.
+// Capping after masking means a cut can split only a token, never a raw
+// GSTIN, PAN or name the pseudonymiser would then fail to recognise.
+func capMaskedDocuments(masked []byte, docs []documentView) ([]byte, error) {
+	for i := range docs {
+		docs[i].Text = capText(docs[i].Text)
+	}
+	var m map[string]json.RawMessage
+	if err := json.Unmarshal(masked, &m); err != nil {
+		return nil, fmt.Errorf("agent: pseudonymised explain input: %w", err)
+	}
+	b, err := json.Marshal(docs)
+	if err != nil {
+		return nil, fmt.Errorf("agent: encode documents: %w", err)
+	}
+	m["DOCUMENTS"] = b
+	out, err := json.Marshal(m)
+	if err != nil {
 		return nil, fmt.Errorf("agent: encode explain input: %w", err)
 	}
-	return b, nil
+	return out, nil
+}
+
+// restoreCitations maps each validated citation (a masked doc_id and
+// section pair from DOCUMENTS) to the unmasked pair of the same passage,
+// so a stored citation always equals a pair in the retrieval artifact.
+func restoreCitations(cs []store.Citation, masked, plain []documentView) []store.Citation {
+	out := make([]store.Citation, 0, len(cs))
+	for _, c := range cs {
+		i := slices.IndexFunc(masked, func(d documentView) bool { return d.DocID == c.DocID && d.Section == c.Section })
+		if i < 0 || i >= len(plain) {
+			// validate admits only DOCUMENTS pairs; never reached.
+			continue
+		}
+		out = append(out, store.Citation{DocID: plain[i].DocID, Section: plain[i].Section})
+	}
+	return out
 }
 
 // snapshotContent is a tool_result artifact decoded with exact numbers.
@@ -886,8 +1002,8 @@ func (v validator) validate(w explainWire) (explainOutput, *malformed) {
 		if strings.TrimSpace(c.DocID) == "" || strings.TrimSpace(c.Section) == "" {
 			return explainOutput{}, &malformed{"citations", "every citation needs a doc_id and a section"}
 		}
-		if !slices.ContainsFunc(v.documents, func(d documentView) bool { return d.DocID == c.DocID }) {
-			return explainOutput{}, &malformed{"citations", "cite only documents listed in DOCUMENTS"}
+		if !slices.ContainsFunc(v.documents, func(d documentView) bool { return d.DocID == c.DocID && d.Section == c.Section }) {
+			return explainOutput{}, &malformed{"citations", "cite only passages listed in DOCUMENTS, with their exact doc_id and section"}
 		}
 		out.citations = append(out.citations, c)
 	}
