@@ -54,6 +54,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/evals"
+	"github.com/abhishekjha/close-copilot/internal/faults"
 	"github.com/abhishekjha/close-copilot/internal/llm"
 	"github.com/abhishekjha/close-copilot/internal/mcpkit"
 	"github.com/abhishekjha/close-copilot/internal/store"
@@ -106,11 +107,11 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	case cmdRefusal:
 		return runRefusal(ctx, cfg, cmd.refusal)
 	}
-	return runSuite(ctx, cfg, log, cmd.flags)
+	return runSuite(ctx, cfg, log, cmd.flags, cmd.fault)
 }
 
 // runSuite is eval run.
-func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.Flags) error {
+func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.Flags, ft faultFlags) error {
 	if cfg.Fault != "" {
 		return fmt.Errorf("eval run: %s is set; an eval run never injects faults, unset it", config.EnvCopilotFault)
 	}
@@ -251,6 +252,12 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 		FixturesIndexSHA256: indexSHA,
 		Log:                 log,
 	}
+	if len(ft.Specs) > 0 {
+		if replayer == nil {
+			return errors.New("eval run: --faults needs --replay")
+		}
+		return runWithFaults(ctx, log, wf, replayer, r, suite, months, truthDir, ft)
+	}
 	log.Info("eval suite starting", "suite", suite.Name, "sha256", suite.SHA256, "months", len(months),
 		"agent", agentOn, "checks", f.Checks, "replay", f.Replay, "record", f.Record)
 	dir, man, err := r.Run(ctx, suite, months)
@@ -275,6 +282,115 @@ func runSuite(ctx context.Context, cfg config.Config, log *slog.Logger, f evals.
 	}
 	return err
 }
+
+// runWithFaults is eval run --faults (CC-1101). It runs the replayed suite
+// twice over the same fixtures: clean into a temporary folder, then with the
+// erp faults injected into the books reader into r.ResultsDir itself (so
+// eval score <results-dir> finds the manifest). It scores both and writes
+// the comparison, recall lost included, to ft.Out. A faulted month that ends
+// failed is an expected outcome, not an error; the faults-off run must pass.
+func runWithFaults(ctx context.Context, log *slog.Logger, wf *agent.Workflow, replayer *evals.Replayer, r *evals.Runner,
+	suite evals.Suite, months []evals.SuiteMonth, truthDir string, ft faultFlags) error {
+	ctrlDir, err := os.MkdirTemp("", "eval-faults-off-")
+	if err != nil {
+		return fmt.Errorf("eval run --faults: %w", err)
+	}
+	defer func() { _ = os.RemoveAll(ctrlDir) }()
+
+	log.Info("eval faults: running the suite without faults", "suite", suite.Name)
+	off := *r
+	off.ResultsDir, off.Flags.ResultsDir = ctrlDir, ctrlDir
+	wf.ResultsDir = ctrlDir
+	offDir, _, err := off.Run(ctx, suite, months)
+	if err != nil {
+		return fmt.Errorf("eval run --faults: the run without faults failed: %w", err)
+	}
+	clean, err := evals.ScoreRun(evals.ScoreOptions{ResultsDir: offDir, TruthDir: truthDir})
+	if err != nil {
+		return err
+	}
+
+	specs := make([]string, len(ft.Specs))
+	for i, sp := range ft.Specs {
+		specs[i] = sp.String()
+	}
+	log.Info("eval faults: running the suite with faults", "suite", suite.Name, "faults", strings.Join(specs, ","), "seed", ft.Seed)
+	wf.Books = &faults.Books{Reader: replayer.Books(), Inj: faults.NewInjector(ft.Specs, ft.Seed)}
+	wf.ResultsDir = r.ResultsDir
+	on := *r
+	on.FlatDir = true
+	onDir, man, err := on.Run(ctx, suite, months)
+	if onDir != "" {
+		_, _ = fmt.Fprintf(stdout, "%s\n", filepath.Join(onDir, evals.ManifestFile))
+	}
+	if err != nil && !errors.Is(err, evals.ErrRunsFailed) {
+		return err
+	}
+	log.Info("eval faults: suite ended", "suite", suite.Name, "results", onDir, "failed", man.Failed)
+	faulted, err := evals.ScoreRun(evals.ScoreOptions{ResultsDir: onDir, TruthDir: truthDir})
+	if err != nil {
+		return err
+	}
+
+	if err := evals.CheckOutputPath("--faults-out", ft.Out); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(ft.Out), 0o750); err != nil {
+		return fmt.Errorf("eval run --faults: %w", err)
+	}
+	md := faultsReport(suite.Name, strings.Join(specs, ","), ft.Seed, clean, faulted)
+	if err := os.WriteFile(ft.Out, []byte(md), 0o600); err != nil {
+		return fmt.Errorf("eval run --faults: %w", err)
+	}
+	_, _ = fmt.Fprintf(stdout, "%s\n", ft.Out)
+	return nil
+}
+
+// faultsReport is the Markdown of evals/faults/results.md: the scores with
+// faults off and on, and every planted item the faults made the run miss.
+func faultsReport(suite, specs string, seed int64, clean, faulted evals.Score) string {
+	var b strings.Builder
+	fmt.Fprintf(&b, "# Eval under injected faults\n\n")
+	fmt.Fprintf(&b, "Suite `%s`, replayed without a model. Faults `%s`, seed %d. Written by `eval run --faults`; `evals/baseline.json` is untouched.\n\n", suite, specs, seed)
+	b.WriteString("| Metric | Faults off | Faults on |\n| --- | --- | --- |\n")
+	row := func(name, off, on string) { fmt.Fprintf(&b, "| %s | %s | %s |\n", name, off, on) }
+	row("Recall", fmt.Sprintf("%s (%s)", clean.Overall.Recall.Percent, ratioText(clean.Overall.Recall)), fmt.Sprintf("%s (%s)", faulted.Overall.Recall.Percent, ratioText(faulted.Overall.Recall)))
+	row("Precision", fmt.Sprintf("%s (%s)", clean.Overall.Precision.Percent, ratioText(clean.Overall.Precision)), fmt.Sprintf("%s (%s)", faulted.Overall.Precision.Percent, ratioText(faulted.Overall.Precision)))
+	row("False alarms", strconv.FormatInt(clean.Overall.FalseAlarms, 10), strconv.FormatInt(faulted.Overall.FalseAlarms, 10))
+	row("Clean-month false alarms", strconv.FormatInt(clean.Clean.FalseAlarms, 10), strconv.FormatInt(faulted.Clean.FalseAlarms, 10))
+	row("Failed runs", strconv.Itoa(len(clean.FailedRuns)), strconv.Itoa(len(faulted.FailedRuns)))
+	b.WriteString("\n")
+
+	caught := map[string]bool{}
+	for _, it := range faulted.Items {
+		if it.Outcome == evals.OutcomeCaught {
+			caught[it.Key] = true
+		}
+	}
+	var lost []string
+	for _, it := range clean.Items {
+		if it.Outcome == evals.OutcomeCaught && !caught[it.Key] {
+			lost = append(lost, fmt.Sprintf("- `%s` (%s) caught without faults, missed with them", it.Key, it.Type))
+		}
+	}
+	slices.Sort(lost)
+	b.WriteString("## Recall lost\n\n")
+	if len(lost) == 0 {
+		b.WriteString("None: every item caught without faults was caught with them.\n")
+	} else {
+		b.WriteString(strings.Join(lost, "\n") + "\n")
+	}
+	if len(faulted.FailedRuns) > 0 {
+		b.WriteString("\n## Runs that ended failed under faults\n\n")
+		for _, r := range faulted.FailedRuns {
+			reason, _, _ := strings.Cut(r.Reason, "; agent: run failed")
+			fmt.Fprintf(&b, "- %s %s: %s\n", r.Company, r.Month, reason)
+		}
+	}
+	return b.String()
+}
+
+func ratioText(r evals.Ratio) string { return fmt.Sprintf("%d/%d", r.Num, r.Den) }
 
 // errPseudonymKey is the startup error for a missing or malformed
 // PSEUDONYM_KEY when the explainer runs. It never carries the value.

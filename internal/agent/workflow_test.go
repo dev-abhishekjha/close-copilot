@@ -2270,3 +2270,123 @@ func TestRetrieveWorkflowInvestigatorNeverSeesDocuments(t *testing.T) {
 		}
 	}
 }
+
+// ---- resilience (CC-1101) ----
+
+// erroringCheck is a check that always fails.
+type erroringCheck struct {
+	name string
+	err  error
+}
+
+func (c *erroringCheck) Name() string { return c.name }
+func (c *erroringCheck) Run(context.Context, checks.Inputs) ([]checks.Finding, error) {
+	return nil, c.err
+}
+
+// blockingCheck waits for its context to end.
+type blockingCheck struct{}
+
+func (blockingCheck) Name() string { return "blocker" }
+func (blockingCheck) Run(ctx context.Context, _ checks.Inputs) ([]checks.Finding, error) {
+	<-ctx.Done()
+	return nil, ctx.Err()
+}
+
+func TestRunCloseCheckFailsLeavesPartialRun(t *testing.T) {
+	r := newRig(t)
+	r.wf.Checks = []checks.Check{
+		&erroringCheck{name: "flaky", err: errors.New("ERPNext unavailable")},
+		&checks.BankRecCheck{},
+	}
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatalf("RunClose: %v", err)
+	}
+	if res.Status != store.RunPartial || !strings.Contains(res.Reason, "check flaky failed") {
+		t.Fatalf("result %+v, want partial naming check flaky", res)
+	}
+	if res.Findings != 4 {
+		t.Errorf("findings %d, want the other check's 4", res.Findings)
+	}
+	st := r.stepStatuses(res.RunID)
+	if !slices.Equal(st["check.flaky"], []string{"failed"}) || !slices.Equal(st["check.bankrec"], []string{"done"}) {
+		t.Errorf("check steps %v", st)
+	}
+	for _, s := range r.st.stepsByKind(res.RunID)["check.flaky"] {
+		if s.Error == nil || !strings.HasPrefix(*s.Error, "check flaky failed: ") {
+			t.Errorf("failed step reason %v", s.Error)
+		}
+	}
+	fs, _ := r.st.ListFindingsByRun(t.Context(), res.RunID)
+	for _, f := range fs {
+		if f.Type == "flaky" {
+			t.Errorf("finding %s from the failed check", f.Type)
+		}
+	}
+	// What the run could find is still explained and verified.
+	if r.expl.calls != 4 {
+		t.Errorf("explainer calls %d, want 4", r.expl.calls)
+	}
+}
+
+func TestRunCloseCheckFailsEveryCheckStillPartial(t *testing.T) {
+	r := newRig(t)
+	r.wf.Checks = []checks.Check{&erroringCheck{name: "one", err: errors.New("boom")}, &erroringCheck{name: "two", err: errors.New("bang")}}
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if res.Status != store.RunPartial || !strings.Contains(res.Reason, "check one failed") || !strings.Contains(res.Reason, "check two failed") || res.Findings != 0 {
+		t.Fatalf("result %+v", res)
+	}
+}
+
+func TestRunCloseERPUnavailable(t *testing.T) {
+	r := newRig(t)
+	r.books.err = fmt.Errorf("books.trial_balance: %w", errors.New("ERPNext unavailable"))
+	start := time.Now()
+	res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+	if !errors.Is(err, ErrRunFailed) {
+		t.Fatalf("err %v, want a failed run", err)
+	}
+	if res.Status != store.RunFailed || !strings.Contains(res.Reason, "ERPNext unavailable") {
+		t.Errorf("result %+v, want failed with ERPNext unavailable", res)
+	}
+	if time.Since(start) > 30*time.Second {
+		t.Error("the run took over 30 s")
+	}
+	if r.expl.calls != 0 || r.model.CallCount() != 0 {
+		t.Error("a run without ERPNext explained something")
+	}
+	if fs, _ := r.st.ListFindingsByRun(t.Context(), res.RunID); len(fs) != 0 {
+		t.Errorf("%d findings stored for a failed run", len(fs))
+	}
+}
+
+func TestRunCloseTimeouts(t *testing.T) {
+	if DefaultRunTimeout != 10*time.Minute || DefaultCallTimeout != 10*time.Second {
+		t.Errorf("run timeout %s, call timeout %s; want 10m and 10s", DefaultRunTimeout, DefaultCallTimeout)
+	}
+	tests := []struct {
+		name  string
+		setup func(r *testRig)
+	}{
+		{"a blocked check", func(r *testRig) { r.wf.Checks = []checks.Check{blockingCheck{}} }},
+		{"a blocked explainer", func(r *testRig) { r.expl.block = true }},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newRig(t)
+			r.wf.Timeout = 50 * time.Millisecond
+			tt.setup(r)
+			res, err := r.wf.RunClose(t.Context(), synthCompany, synthMonth)
+			if !errors.Is(err, ErrRunFailed) {
+				t.Fatalf("err %v, want a failed run", err)
+			}
+			if res.Status != store.RunFailed || !strings.HasPrefix(res.Reason, "timeout: the run exceeded its 50ms deadline") {
+				t.Errorf("result %+v, want a timeout", res)
+			}
+		})
+	}
+}

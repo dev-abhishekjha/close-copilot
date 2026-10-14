@@ -428,3 +428,35 @@ func TestReplayRetrieverNone(t *testing.T) {
 		t.Errorf("retriever %T for a suite with no search fixtures", r)
 	}
 }
+
+func TestFaultsReport(t *testing.T) {
+	clean := evals.Score{Items: []evals.ItemOutcome{
+		{Key: "sharma-2026-09/E01", Type: "unrecorded_bank_charge", Outcome: evals.OutcomeCaught},
+		{Key: "sharma-2026-09/E02", Type: "unrecorded_bank_charge", Outcome: evals.OutcomeCaught},
+	}}
+	clean.Overall.Recall = evals.NewRatio(2, 2)
+	clean.Overall.Precision = evals.NewRatio(2, 2)
+	faulted := evals.Score{
+		Items:      []evals.ItemOutcome{{Key: "sharma-2026-09/E01", Outcome: evals.OutcomeCaught}, {Key: "sharma-2026-09/E02", Outcome: evals.OutcomeMissed}},
+		FailedRuns: []evals.RunRef{{Company: "sharma", Month: "2026-08", Reason: "preflight: books are unreachable: ERPNext unavailable; agent: run failed: x"}},
+	}
+	faulted.Overall.Recall = evals.NewRatio(1, 2)
+	faulted.Overall.Precision = evals.NewRatio(1, 1)
+	md := faultsReport("suite-x", "erp:error=503:rate=0.1", 1, clean, faulted)
+	for _, want := range []string{
+		"`erp:error=503:rate=0.1`, seed 1",
+		"| Recall | 100.0% (2/2) | 50.0% (1/2) |",
+		"- `sharma-2026-09/E02` (unrecorded_bank_charge) caught without faults, missed with them",
+		"- sharma 2026-08: preflight: books are unreachable: ERPNext unavailable\n",
+	} {
+		if !strings.Contains(md, want) {
+			t.Errorf("report lacks %q:\n%s", want, md)
+		}
+	}
+	if strings.Contains(md, "E01") {
+		t.Errorf("report lists E01, which was still caught:\n%s", md)
+	}
+	if none := faultsReport("s", "x", 0, clean, clean); !strings.Contains(none, "None: every item") {
+		t.Errorf("no loss not stated:\n%s", none)
+	}
+}

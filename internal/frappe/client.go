@@ -63,6 +63,18 @@ type Options struct {
 	// deadline. Each request inside still gets Deadline as well. Zero
 	// means DefaultListDeadline (5 min).
 	ListDeadline time.Duration
+	// BreakerThreshold is the consecutive failures (transport errors and
+	// 5xx) after which the circuit breaker opens. Zero means
+	// DefaultBreakerThreshold (5).
+	BreakerThreshold int
+	// BreakerCooldown is how long an open breaker fails fast before one
+	// probe is let through. Zero means DefaultBreakerCooldown (30 s).
+	BreakerCooldown time.Duration
+	// BreakerClock replaces time.Now for the breaker (tests). Nil means time.Now.
+	BreakerClock func() time.Time
+	// Transport, when set, wraps the HTTP transport. It exists for fault
+	// injection in tests and eval runs; no product binary sets it.
+	Transport func(http.RoundTripper) http.RoundTripper
 }
 
 // Client is a Frappe REST client for one site and one API key. It is safe
@@ -90,6 +102,7 @@ type Client struct {
 	backoffMax   time.Duration
 	afterCap     time.Duration
 	sleep        func(context.Context, time.Duration) error
+	brk          *breaker
 }
 
 // New returns a client for cfg.ERPBaseURL and cfg.ERPSite that
@@ -121,6 +134,10 @@ func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Op
 		return nil, fmt.Errorf("frappe: negative Options.MaxRows %d", opts.MaxRows)
 	case opts.ListDeadline < 0:
 		return nil, fmt.Errorf("frappe: negative Options.ListDeadline %s", opts.ListDeadline)
+	case opts.BreakerThreshold < 0:
+		return nil, fmt.Errorf("frappe: negative Options.BreakerThreshold %d", opts.BreakerThreshold)
+	case opts.BreakerCooldown < 0:
+		return nil, fmt.Errorf("frappe: negative Options.BreakerCooldown %s", opts.BreakerCooldown)
 	}
 	if opts.ListDeadline == 0 {
 		opts.ListDeadline = DefaultListDeadline
@@ -147,6 +164,7 @@ func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Op
 		return nil, fmt.Errorf("frappe: %w", err)
 	}
 	hc.CheckRedirect = checkRedirect
+	wrapTransport(hc, opts.Transport)
 	return &Client{
 		hc:           hc,
 		base:         strings.TrimRight(cfg.ERPBaseURL, "/"),
@@ -163,6 +181,7 @@ func NewWithOptions(cfg config.Config, key string, secret config.Secret, opts Op
 		backoffMax:   backoffMax,
 		afterCap:     retryAfterCap,
 		sleep:        sleepCtx,
+		brk:          newBreaker(opts.BreakerThreshold, opts.BreakerCooldown, opts.BreakerClock),
 	}, nil
 }
 
@@ -312,6 +331,13 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 // wait that would outlast the deadline (a long Retry-After, say) is not
 // taken: request returns the last error at once.
 func (c *Client) request(ctx context.Context, method, path string, query url.Values, body, out any, retryable bool) error {
+	return c.guarded(ctx, func() error {
+		return c.requestOnce(ctx, method, path, query, body, out, retryable)
+	})
+}
+
+// requestOnce is request without the circuit breaker.
+func (c *Client) requestOnce(ctx context.Context, method, path string, query url.Values, body, out any, retryable bool) error {
 	_, has := ctx.Deadline()
 	if (!has || ctx.Value(wholeCallKey{}) != nil) && c.deadline > 0 {
 		var cancel context.CancelFunc

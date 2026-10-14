@@ -626,8 +626,17 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 		return outcome{}, err
 	}
 
+	// A check that errors fails its own step and the run goes on with the
+	// others: the run ends partial and names it (CC-1101).
+	var failedChecks []string
 	for _, c := range w.checks() {
 		if err := w.runCheck(ctx, run, profile, c); err != nil {
+			var cf *checkFailure
+			if errors.As(err, &cf) && !errors.Is(err, store.ErrStaleAttempt) {
+				w.log().WarnContext(ctx, "check failed; the run continues without it", "run_id", run.ID, "check", cf.name, "err", cf.err)
+				failedChecks = append(failedChecks, cf.Error())
+				continue
+			}
 			return outcome{}, err
 		}
 	}
@@ -664,6 +673,7 @@ func (w *Workflow) stages(ctx context.Context, run store.CloseRun) (outcome, err
 
 	out := outcome{status: store.RunDone, findings: len(findings)}
 	var notes []string
+	notes = append(notes, failedChecks...)
 	// A tainted finding is left unexplained on purpose (needs_review), so
 	// it doesn't make the run partial.
 	if n := len(findings) - len(tainted) - explained; n > 0 {
@@ -933,7 +943,12 @@ func (w *Workflow) runCheck(ctx context.Context, run store.CloseRun, profile com
 	}
 	fs, err := checks.NewRunner(nil).Run(ctx, run.ID, in, c)
 	if err != nil {
-		return w.failStep(ctx, step, fmt.Errorf("agent: check %s: %w", name, err))
+		if ctx.Err() != nil || errors.Is(err, store.ErrUnstorableContent) || errors.Is(err, store.ErrStaleAttempt) {
+			return w.failStep(ctx, step, fmt.Errorf("agent: check %s: %w", name, err))
+		}
+		// The check could not finish: it stores no finding and the run
+		// goes on without it.
+		return w.failStep(ctx, step, &checkFailure{name: name, err: err})
 	}
 	if err := snap.Annotate(fs); err != nil {
 		return w.failStep(ctx, step, err)
@@ -949,6 +964,16 @@ func (w *Workflow) runCheck(ctx context.Context, run store.CloseRun, profile com
 	w.log().InfoContext(ctx, "step finished", "run_id", run.ID, "kind", step.Kind, "subject", name, "status", store.StepDone, "findings", len(fs))
 	return nil
 }
+
+// checkFailure is a check that errored for a reason other than the run's
+// own cancellation or a store failure. Its text is the step's reason.
+type checkFailure struct {
+	name string
+	err  error
+}
+
+func (e *checkFailure) Error() string { return fmt.Sprintf("check %s failed: %v", e.name, e.err) }
+func (e *checkFailure) Unwrap() error { return e.err }
 
 // linkVariances links the variance step's findings fs to the run's
 // already-stored findings (and to each other's non-variance peers, should
