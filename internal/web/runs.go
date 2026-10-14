@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"slices"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 
@@ -49,8 +50,9 @@ var monthRE = regexp.MustCompile(`^\d{4}-(0[1-9]|1[0-2])$`)
 
 // Start errors the handlers map to status codes.
 var (
-	errBusy       = errors.New("a close is already running for this company")
-	errBadRequest = errors.New("bad request")
+	errBusy        = errors.New("a close is already running for this company")
+	errTooManyRuns = errors.New("too many closes are running; try again shortly")
+	errBadRequest  = errors.New("bad request")
 )
 
 // timeline is the run states in display order.
@@ -105,6 +107,9 @@ func (rs *runsService) start(ctx context.Context, company, month string) (uuid.U
 	if !monthRE.MatchString(month) {
 		return uuid.Nil, fmt.Errorf("%w: month must be YYYY-MM", errBadRequest)
 	}
+	if len(company) > maxCompanyLen {
+		return uuid.Nil, fmt.Errorf("%w: unknown company", errBadRequest)
+	}
 	companies, err := rs.b.Store.ListCompanies(ctx)
 	if err != nil {
 		return uuid.Nil, fmt.Errorf("web: list companies: %w", err)
@@ -117,6 +122,10 @@ func (rs *runsService) start(ctx context.Context, company, month string) (uuid.U
 	if _, taken := rs.busy[company]; taken {
 		rs.mu.Unlock()
 		return uuid.Nil, errBusy
+	}
+	if len(rs.busy) >= maxRunningCloses {
+		rs.mu.Unlock()
+		return uuid.Nil, errTooManyRuns
 	}
 	rs.busy[company] = struct{}{}
 	runCtx := rs.base
@@ -407,6 +416,9 @@ func (s *Server) handleRunsStartForm(w http.ResponseWriter, r *http.Request) {
 		s.renderRuns(w, r, http.StatusBadRequest, p, company, month, err.Error())
 	case errors.Is(err, errBusy):
 		s.renderRuns(w, r, http.StatusConflict, p, company, month, err.Error())
+	case errors.Is(err, errTooManyRuns):
+		w.Header().Set("Retry-After", strconv.Itoa(runCapRetryAfter))
+		s.renderRuns(w, r, http.StatusTooManyRequests, p, company, month, err.Error())
 	default:
 		s.serverError(w, r, false, err)
 	}
@@ -530,6 +542,9 @@ func (s *Server) handleAPIStartRun(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 	case errors.Is(err, errBusy):
 		writeJSON(w, http.StatusConflict, map[string]string{"error": err.Error()})
+	case errors.Is(err, errTooManyRuns):
+		w.Header().Set("Retry-After", strconv.Itoa(runCapRetryAfter))
+		writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": err.Error()})
 	default:
 		s.serverError(w, r, true, err)
 	}

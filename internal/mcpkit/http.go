@@ -37,6 +37,10 @@ type handlerOptions struct {
 	actors map[string]string
 	scoper *Scoper
 	scoped map[string]bool
+
+	rateSet   bool
+	rateRPS   float64
+	rateBurst int
 }
 
 // AdminPath is the route of the approved-write tools. It is never scoped:
@@ -76,6 +80,15 @@ func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) htt
 		opt(&o)
 	}
 
+	rps, burst := defaultRateRPS, defaultRateBurst
+	if o.rateSet {
+		rps, burst = o.rateRPS, o.rateBurst
+	}
+	var limiter *tokenLimiter
+	if rps > 0 && burst > 0 {
+		limiter = newTokenLimiter(rps, burst)
+	}
+
 	mux := http.NewServeMux()
 
 	// /healthz returns 200 OK without requiring authentication
@@ -106,7 +119,7 @@ func BuildHandler(routes map[string]Route, log *slog.Logger, opts ...Option) htt
 				next.ServeHTTP(w, req.WithContext(ContextWithActor(req.Context(), actor)))
 			})
 		}
-		authed := RequireBearer(r.Token, inner)
+		authed := RequireBearer(r.Token, rateLimited(limiter, inner))
 		mux.Handle(path, authed)
 	}
 

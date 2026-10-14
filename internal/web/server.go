@@ -56,6 +56,16 @@ type Options struct {
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
+
+	// Rate limits (CC-1102). Zero means the default: API 5 requests a
+	// second per user, burst 10; ask 1 a second, burst 3; 10 failed logins
+	// per IP a minute; 5 failed logins per username in 15 minutes.
+	APIRate           float64
+	APIBurst          int
+	AskRate           float64
+	AskBurst          int
+	LoginIPFailures   int
+	LoginUserFailures int
 }
 
 // OptionsFromConfig takes APP_ADDR and APP_SESSION_KEY from cfg.
@@ -77,6 +87,9 @@ type Server struct {
 	ask           AskBackend       // nil when Options.Ask is nil
 	approvals     ApprovalsBackend // nil when Options.Approvals is nil
 	erpBase       string
+	limits        *apiLimits
+	logins        *loginLimiter
+	bcryptHook    func() // tests only: called before each login password compare
 }
 
 // NewServer builds the server. It refuses a session key shorter than 32
@@ -101,6 +114,8 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		erpBase:       opts.ERPBaseURL,
 		ask:           opts.Ask,
 		approvals:     opts.Approvals,
+		limits:        newAPILimits(opts),
+		logins:        newLoginLimiter(opts),
 	}
 	if s.addr == "" {
 		s.addr = defaultAddr
