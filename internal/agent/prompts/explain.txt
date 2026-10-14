@@ -19,7 +19,7 @@ Input:
 - VERIFIER_FEEDBACK lists problems found in your previous explanation of this finding. Fix them.
 
 Output fields:
-- explanation: plain text, at most 600 characters.
+- explanation: plain text, at most 500 characters.
 - suggested_action: one of the listed values. action_note: one line saying what to do.
 - cited_amounts_paise: every amount the explanation uses, in whole paise.
 - citations: each is the doc_id and section of one DOCUMENTS passage, copied exactly; an empty list when DOCUMENTS is empty. In the explanation you may also write a citation as [doc_id section].
