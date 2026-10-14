@@ -24,6 +24,17 @@ type route struct {
 	handler http.Handler
 }
 
+// routeBodyLimits caps the body of some routes below the server-wide limit,
+// before anything (the CSRF check parses a form body) reads it.
+var routeBodyLimits = map[string]int64{
+	http.MethodPost + " /findings/{id}/proposals":     approvalsBodyLimit,
+	http.MethodPost + " /proposals/{id}/approve":      approvalsBodyLimit,
+	http.MethodPost + " /proposals/{id}/reject":       approvalsBodyLimit,
+	http.MethodPost + " /api/findings/{id}/proposals": approvalsBodyLimit,
+	http.MethodPost + " /api/proposals/{id}/approve":  approvalsBodyLimit,
+	http.MethodPost + " /api/proposals/{id}/reject":   approvalsBodyLimit,
+}
+
 // routeTable is every route the server serves with its minimum role. The
 // API rows come from the shared HTTP API spec; rows owned by later tickets
 // answer 501 after the role check so the role matrix is testable now.
@@ -54,13 +65,20 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodPost, "/findings/{id}/accept", makerOnly, s.findingsHTML(s.handleFindingAccept)},
 		{http.MethodPost, "/findings/{id}/dismiss", makerOnly, s.findingsHTML(s.handleFindingDismiss)},
 
+		// Maker-checker approvals (CC-1004). They answer 501 until
+		// Options.Approvals is set. The HTML form posts are twins of the API.
+		{http.MethodPost, "/findings/{id}/proposals", makerOnly, s.approvalsRoute(s.handleProposalCreate)},
+		{http.MethodGet, "/approvals", checkerOnly, s.approvalsRoute(s.handleApprovalsPage)},
+		{http.MethodPost, "/proposals/{id}/approve", checkerOnly, s.approvalsRoute(s.handleProposalApprove)},
+		{http.MethodPost, "/proposals/{id}/reject", checkerOnly, s.approvalsRoute(s.handleProposalReject)},
+
 		// JSON API (shared spec).
 		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},
 		{http.MethodGet, "/api/close-runs/{id}", anyRole, s.runsAPI(s.handleAPIRun)},
 		{http.MethodGet, "/api/close-runs/{id}/findings", anyRole, s.runsAPI(s.handleAPIRunFindings)},
-		{http.MethodPost, "/api/findings/{id}/proposals", makerOnly, notImplemented},  // CC-1004
-		{http.MethodPost, "/api/proposals/{id}/approve", checkerOnly, notImplemented}, // CC-1004
-		{http.MethodPost, "/api/proposals/{id}/reject", checkerOnly, notImplemented},  // CC-1004
+		{http.MethodPost, "/api/findings/{id}/proposals", makerOnly, s.approvalsRoute(s.handleProposalCreate)},
+		{http.MethodPost, "/api/proposals/{id}/approve", checkerOnly, s.approvalsRoute(s.handleProposalApprove)},
+		{http.MethodPost, "/api/proposals/{id}/reject", checkerOnly, s.approvalsRoute(s.handleProposalReject)},
 		{http.MethodPost, "/api/ask", anyRole, s.askAPI(s.handleAPIAsk)},
 	}
 }
@@ -71,7 +89,11 @@ func (s *Server) wrap(rt route) http.Handler {
 	if rt.roles == nil {
 		return rt.handler
 	}
-	return s.authenticate(s.csrfProtect(requireRole(rt.roles...)(rt.handler)))
+	h := s.authenticate(s.csrfProtect(requireRole(rt.roles...)(rt.handler)))
+	if n, ok := routeBodyLimits[rt.method+" "+rt.path]; ok {
+		h = capBody(n, h)
+	}
+	return h
 }
 
 // allows reports whether role may call method path per the route table.
@@ -98,6 +120,7 @@ var homeActions = []homeAction{
 	{"propose-entry", "Propose a journal entry for a finding", http.MethodPost, "/api/findings/{id}/proposals"},
 	{"approve-proposal", "Approve and post a proposal", http.MethodPost, "/api/proposals/{id}/approve"},
 	{"reject-proposal", "Reject a proposal", http.MethodPost, "/api/proposals/{id}/reject"},
+	{"approvals", "Review pending proposals", http.MethodGet, "/approvals"},
 }
 
 // handleHome shows the user's name, role and the actions their role allows.

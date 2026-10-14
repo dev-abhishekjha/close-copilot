@@ -1,0 +1,112 @@
+package templates
+
+// Approvals is the checker's page of proposals awaiting a decision. The
+// buttons it shows are a convenience; the server enforces who may decide.
+templ Approvals(p ApprovalsPage) {
+	@Base(Layout{Title: "Approvals", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card" id="approvals">
+			<h1>Pending proposals</h1>
+			if p.Error != "" {
+				<p class="error" role="alert">{ p.Error }</p>
+			}
+			if p.Posted != nil {
+				<p class="posted" role="status">
+					Proposal { p.Posted.ProposalID } posted as journal entry
+					if p.Posted.ERPLink != "" {
+						<a href={ templ.SafeURL(p.Posted.ERPLink) } rel="noopener noreferrer" target="_blank">{ p.Posted.ERPName }</a>
+					} else {
+						{ p.Posted.ERPName }
+					}
+				</p>
+			}
+			if len(p.Rows) == 0 {
+				<p>No proposals are waiting for a checker.</p>
+			} else {
+				<table class="approvals">
+					<thead>
+						<tr>
+							<th>Proposal</th>
+							<th>Company</th>
+							<th>Posting date</th>
+							<th>Amount</th>
+							<th>Lines</th>
+							<th>Maker</th>
+							<th>Status</th>
+							<th>Finding</th>
+							<th>Created</th>
+							<th>Decision</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range p.Rows {
+							<tr data-proposal={ r.ID }>
+								<td><code title={ r.ID }>{ r.ShortID }</code></td>
+								<td>{ r.Company }</td>
+								<td>{ r.PostingDate }</td>
+								<td class="amount">{ r.Total }</td>
+								<td>
+									<table class="lines">
+										<thead>
+											<tr>
+												<th>Account</th>
+												<th>Debit</th>
+												<th>Credit</th>
+											</tr>
+										</thead>
+										<tbody>
+											for _, l := range r.Lines {
+												<tr>
+													<td>{ l.Account }</td>
+													<td>{ l.Debit }</td>
+													<td>{ l.Credit }</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+									if r.Remark != "" {
+										<p class="remark">{ r.Remark }</p>
+									}
+								</td>
+								<td>{ r.Maker }</td>
+								<td>
+									{ r.Status }
+									if r.StatusNote != "" {
+										<p class="note">{ r.StatusNote }</p>
+									}
+								</td>
+								<td>
+									if r.FindingID != "" {
+										<a href={ templ.SafeURL(findingURL(r.FindingID)) }>finding</a>
+									}
+								</td>
+								<td>{ r.Created }</td>
+								<td class="decision">
+									if r.Own {
+										<p class="own">You proposed this; another checker must decide</p>
+									} else {
+										if r.CanApprove {
+											<form method="post" action={ templ.SafeURL(approveURL(r.ID)) }>
+												<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+												<button type="submit">Approve and post</button>
+											</form>
+										}
+										if r.CanReject {
+											<form method="post" action={ templ.SafeURL(rejectURL(r.ID)) }>
+												<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+												<label>
+													Reason
+													<textarea name="reason" required maxlength="500" rows="2"></textarea>
+												</label>
+												<button type="submit">Reject</button>
+											</form>
+										}
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</section>
+	}
+}

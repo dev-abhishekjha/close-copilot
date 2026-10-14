@@ -30,6 +30,8 @@ type fakeFindings struct {
 	auditErr error
 	audits   []store.AuditLogEntry
 	sets     []string
+	live     map[uuid.UUID]store.JournalProposal // finding id -> live proposal
+	liveErr  error
 }
 
 func newFakeFindings() *fakeFindings {
@@ -96,6 +98,29 @@ func (f *fakeFindings) InsertAuditLog(_ context.Context, e store.AuditLogEntry) 
 	}
 	f.audits = append(f.audits, e)
 	return int64(len(f.audits)), nil
+}
+
+func (f *fakeFindings) GetProposalByFinding(_ context.Context, id uuid.UUID) (store.JournalProposal, bool, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.liveErr != nil {
+		return store.JournalProposal{}, false, f.liveErr
+	}
+	p, ok := f.live[id]
+	if ok && p.Status == "rejected" {
+		// As the store: a rejected proposal is not live.
+		return store.JournalProposal{}, false, nil
+	}
+	return p, ok, nil
+}
+
+func (f *fakeFindings) setLive(findingID uuid.UUID, p store.JournalProposal) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.live == nil {
+		f.live = map[uuid.UUID]store.JournalProposal{}
+	}
+	f.live[findingID] = p
 }
 
 func (f *fakeFindings) status(id uuid.UUID) string {
@@ -434,7 +459,9 @@ func TestFindingActions(t *testing.T) {
 	}
 	ff, x, ts := newOne("open", true)
 	body := page(t, ts, RoleMaker, x.ID)
-	wantAll(t, body, "Mark accepted", ">Dismiss<", `name="reason"`, "Create proposal (available with approvals)", "disabled")
+	wantAll(t, body, "Mark accepted", ">Dismiss<", `name="reason"`)
+	// Without an approvals backend there is no create form.
+	wantNone(t, body, "Create proposal", "/proposals")
 	for _, r := range []Role{RoleViewer, RoleChecker} {
 		wantNone(t, page(t, ts, r, x.ID), "Mark accepted", ">Dismiss<", "Create proposal", `name="reason"`)
 	}
@@ -642,4 +669,68 @@ func TestFindingEscaping(t *testing.T) {
 		t.Fatalf("dismiss = %d", w.Code)
 	}
 	wantNone(t, w.Body.String(), "<script>", `href="javascript:`)
+}
+
+// A finding with a live journal proposal (proposed, approved or posted)
+// can't be accepted or dismissed, and shows no accept or dismiss buttons; a
+// rejected proposal frees it, as does none at all.
+func TestFindingLiveProposalBlocksDecision(t *testing.T) {
+	const msg = "this finding has a live proposal, so it can&#39;t be accepted or dismissed"
+	cases := []struct {
+		name    string
+		status  string // live proposal status; "" for none
+		blocked bool
+	}{
+		{"proposed", "proposed", true},
+		{"approved", "approved", true},
+		{"posted", "posted", true},
+		{"rejected", "rejected", false},
+		{"none", "", false},
+	}
+	for _, tc := range cases {
+		for _, act := range []string{"accept", "dismiss"} {
+			t.Run(tc.name+"/"+act, func(t *testing.T) {
+				ff := newFakeFindings()
+				x := ff.put(fnd(1, "variance", "open"))
+				if tc.status != "" {
+					fidv := x.ID
+					ff.setLive(x.ID, store.JournalProposal{ID: uuid.New(), FindingID: &fidv, Status: tc.status, Maker: "asha",
+						Payload: store.JournalPayload{PostingDate: "2026-09-30"}})
+				}
+				ts := findingsServer(t, ff)
+				body := page(t, ts, RoleMaker, x.ID)
+				if tc.blocked {
+					wantNone(t, body, "Mark accepted", ">Dismiss<", `name="reason"`)
+				} else {
+					wantAll(t, body, "Mark accepted", ">Dismiss<")
+				}
+				w := ts.do(t, formPost(ts, RoleMaker, "/findings/"+x.ID.String()+"/"+act, url.Values{"reason": {"not real"}}))
+				if !tc.blocked {
+					want := map[string]string{"accept": "accepted", "dismiss": "dismissed"}[act]
+					if w.Code != http.StatusSeeOther || ff.status(x.ID) != want || ff.auditCount() != 1 {
+						t.Errorf("%s = %d status %s audits %d", act, w.Code, ff.status(x.ID), ff.auditCount())
+					}
+					return
+				}
+				if w.Code != http.StatusConflict || !strings.Contains(w.Body.String(), msg) {
+					t.Errorf("%s = %d, want 409 with the live-proposal message: %.300s", act, w.Code, w.Body)
+				}
+				if ff.status(x.ID) != "open" || ff.auditCount() != 0 || len(ff.sets) != 0 {
+					t.Errorf("%s changed the finding: status %s audits %d sets %v", act, ff.status(x.ID), ff.auditCount(), ff.sets)
+				}
+				wantNone(t, w.Body.String(), "Mark accepted", ">Dismiss<")
+			})
+		}
+	}
+	t.Run("lookup error", func(t *testing.T) {
+		ff := newFakeFindings()
+		x := ff.put(fnd(1, "variance", "open"))
+		ff.liveErr = errors.New("db down")
+		ts := findingsServer(t, ff)
+		wantNone(t, page(t, ts, RoleMaker, x.ID), "Mark accepted", ">Dismiss<")
+		w := ts.do(t, formPost(ts, RoleMaker, "/findings/"+x.ID.String()+"/accept", nil))
+		if w.Code != http.StatusInternalServerError || ff.status(x.ID) != "open" || ff.auditCount() != 0 {
+			t.Errorf("accept = %d status %s audits %d", w.Code, ff.status(x.ID), ff.auditCount())
+		}
+	})
 }

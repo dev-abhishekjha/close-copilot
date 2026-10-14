@@ -1,6 +1,7 @@
 package web
 
 import (
+	"fmt"
 	"net/http"
 	"os/exec"
 	"slices"
@@ -107,6 +108,111 @@ func TestRoleMatrix(t *testing.T) {
 	}
 }
 
+// pageSpec is the HTML twins of the approvals API and the /approvals page
+// (CC-1004), with their allowed roles.
+var pageSpec = []struct {
+	method, pattern, path string
+	roles                 []Role
+}{
+	{http.MethodGet, "/approvals", "/approvals", []Role{RoleChecker}},
+	{http.MethodPost, "/findings/{id}/proposals", "/findings/f-1/proposals", []Role{RoleMaker}},
+	{http.MethodPost, "/proposals/{id}/approve", "/proposals/p-1/approve", []Role{RoleChecker}},
+	{http.MethodPost, "/proposals/{id}/reject", "/proposals/p-1/reject", []Role{RoleChecker}},
+}
+
+// TestApprovalsPageRoleMatrix: the approvals pages and form posts are
+// checker-only (propose maker-only) for cookie sessions, a bearer token
+// doesn't authenticate them, and anonymous callers go to the login page.
+// With approvals configured, a role outside the set still gets 403 before
+// the backend is called.
+func TestApprovalsPageRoleMatrix(t *testing.T) {
+	for _, configured := range []bool{false, true} {
+		fa := &fakeApprovals{}
+		ts := newTestServer(t)
+		if configured {
+			ts = approvalsServer(t, fa, nil)
+		}
+		for _, row := range pageSpec {
+			found := false
+			for _, rt := range ts.routes {
+				if rt.method == row.method && rt.path == row.pattern {
+					found = slices.Equal(rt.roles, row.roles)
+				}
+			}
+			if !found {
+				t.Errorf("%s %s missing or with other roles", row.method, row.pattern)
+			}
+			for _, c := range callers {
+				want := http.StatusNotImplemented
+				switch {
+				case c.role == "" || c.bearer:
+					want = http.StatusSeeOther
+				case !slices.Contains(row.roles, c.role):
+					want = http.StatusForbidden
+				case configured:
+					want = -1 // reached the backend: any answer
+				}
+				t.Run(fmt.Sprintf("configured=%v %s %s as %s", configured, row.method, row.pattern, c.name), func(t *testing.T) {
+					got := ts.call(t, c, row.method, row.path)
+					if want == -1 {
+						if got == http.StatusForbidden || got == http.StatusUnauthorized || got == http.StatusNotImplemented {
+							t.Errorf("status = %d, want the handler to run", got)
+						}
+						return
+					}
+					if got != want {
+						t.Errorf("status = %d, want %d", got, want)
+					}
+				})
+			}
+		}
+		if configured {
+			// Only allowed roles reached the backend (and only with UUIDs,
+			// which these paths are not, so nobody did).
+			if actors, _ := fa.calls(); len(actors) != 0 {
+				t.Errorf("backend called by %v", actors)
+			}
+		}
+	}
+}
+
+// With approvals configured, the API role matrix still refuses viewers and
+// makers on approve and reject and viewers and checkers on propose, before
+// the backend sees the request.
+func TestApprovalsAPIRolesConfigured(t *testing.T) {
+	fa := &fakeApprovals{}
+	ts := approvalsServer(t, fa, nil)
+	propose := "/api/findings/" + fid(1).String() + "/proposals"
+	approve := "/api/proposals/" + pid(1).String() + "/approve"
+	reject := "/api/proposals/" + pid(1).String() + "/reject"
+	cases := []struct {
+		role Role
+		path string
+		want int
+	}{
+		{RoleViewer, propose, http.StatusForbidden},
+		{RoleChecker, propose, http.StatusForbidden},
+		{RoleViewer, approve, http.StatusForbidden},
+		{RoleMaker, approve, http.StatusForbidden},
+		{RoleViewer, reject, http.StatusForbidden},
+		{RoleMaker, reject, http.StatusForbidden},
+		{RoleMaker, propose, http.StatusCreated},
+		{RoleChecker, approve, http.StatusOK},
+	}
+	for _, tc := range cases {
+		for _, bearer := range []bool{false, true} {
+			c := caller{name: string(tc.role), role: tc.role, bearer: bearer}
+			if got := ts.call(t, c, http.MethodPost, tc.path); got != tc.want {
+				t.Errorf("%s %s bearer=%v = %d, want %d", tc.role, tc.path, bearer, got, tc.want)
+			}
+		}
+	}
+	actors, _ := fa.calls()
+	if strings.Join(actors, ",") != "asha,asha,ravi,ravi" {
+		t.Errorf("backend actors %v, want only asha's proposes and ravi's approves", actors)
+	}
+}
+
 func TestViewerForbiddenOnMakerRoutes(t *testing.T) {
 	ts := newTestServer(t)
 	type ep struct{ method, path string }
@@ -160,7 +266,7 @@ func TestViewerForbiddenOnMakerRoutes(t *testing.T) {
 func TestHomeActions(t *testing.T) {
 	viewerActions := []string{"view-run", "view-findings", "ask"}
 	makerActions := []string{"start-run", "propose-entry"}
-	checkerActions := []string{"approve-proposal", "reject-proposal"}
+	checkerActions := []string{"approve-proposal", "reject-proposal", "approvals"}
 	tests := []struct {
 		role       Role
 		user       string

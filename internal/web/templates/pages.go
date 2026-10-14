@@ -53,3 +53,40 @@ func csrfHeaders(token string) string {
 	b, _ := json.Marshal(map[string]string{"X-CSRF-Token": token}) // a map of strings always marshals
 	return string(b)
 }
+
+// ApprovalsPage is the checker's list of proposals awaiting a decision
+// (CC-1004).
+type ApprovalsPage struct {
+	User      string
+	Role      string
+	CSRFToken string
+	Rows      []ApprovalRow
+	Error     string
+	// Posted, when set, is the proposal just posted.
+	Posted *PostedNotice
+}
+
+// PostedNotice names a just-posted proposal and its ERPNext entry.
+type PostedNotice struct {
+	ProposalID string
+	ERPName    string
+	ERPLink    string // empty when not linkable
+}
+
+// ApprovalRow is one pending proposal. Own, CanApprove and CanReject only
+// decide which controls are shown; the server enforces the rules.
+type ApprovalRow struct {
+	ID, ShortID, Company, PostingDate string
+	Remark, Total, Maker, Status      string
+	StatusNote, FindingID, Created    string
+	Lines                             []ProposalLine
+	Own                               bool
+	CanApprove                        bool
+	CanReject                         bool
+}
+
+func approveURL(id string) string { return "/proposals/" + id + "/approve" }
+
+func rejectURL(id string) string { return "/proposals/" + id + "/reject" }
+
+func proposalsURL(findingID string) string { return "/findings/" + findingID + "/proposals" }

@@ -49,6 +49,10 @@ type Options struct {
 	// answers 501 after the role check. It also needs Runs, whose store
 	// lists the companies a question may name.
 	Ask AskBackend
+	// Approvals backs the maker-checker routes and the /approvals page
+	// (CC-1004). Nil means not configured: they answer 501 after the role
+	// check.
+	Approvals ApprovalsBackend
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
@@ -69,8 +73,9 @@ type Server struct {
 	now           func() time.Time
 	routes        []route
 	handler       http.Handler
-	runs          *runsService // nil when Options.Runs is nil
-	ask           AskBackend   // nil when Options.Ask is nil
+	runs          *runsService     // nil when Options.Runs is nil
+	ask           AskBackend       // nil when Options.Ask is nil
+	approvals     ApprovalsBackend // nil when Options.Approvals is nil
 	erpBase       string
 }
 
@@ -95,6 +100,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		now:           opts.Now,
 		erpBase:       opts.ERPBaseURL,
 		ask:           opts.Ask,
+		approvals:     opts.Approvals,
 	}
 	if s.addr == "" {
 		s.addr = defaultAddr

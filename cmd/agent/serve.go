@@ -11,8 +11,10 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
+	"github.com/abhishekjha/close-copilot/internal/approvals"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
 	"github.com/abhishekjha/close-copilot/internal/web"
@@ -35,11 +37,14 @@ func checkServeKeys(cfg config.Config) error {
 	return nil
 }
 
-// serveBackends are what the web server's run and ask routes call. Ask may
-// be nil (--no-explain): /api/ask then answers 501.
+// serveBackends are what the web server's run, ask and approvals routes
+// call. Ask may be nil (--no-explain): /api/ask then answers 501.
+// Approvals may be nil (no admin token): the proposal routes and
+// /approvals then answer 501.
 type serveBackends struct {
-	runs *web.RunsBackend
-	ask  web.AskBackend
+	runs      *web.RunsBackend
+	ask       web.AskBackend
+	approvals web.ApprovalsBackend
 }
 
 // newServeServer builds the web server on APP_ADDR and APP_SESSION_KEY.
@@ -50,7 +55,91 @@ func newServeServer(cfg config.Config, users web.Users, be serveBackends, log *s
 	opts := web.OptionsFromConfig(cfg)
 	opts.Runs = be.runs
 	opts.Ask = be.ask
+	opts.Approvals = be.approvals
 	return web.NewServer(opts, users, log)
+}
+
+// approvalsStore is what the approvals service needs of the store;
+// *store.Store satisfies it.
+type approvalsStore interface {
+	approvals.ProposalStore
+	approvals.FindingLookup
+}
+
+var _ approvalsStore = (*store.Store)(nil)
+
+// newApprovals builds the maker-checker backend over st. The whole config
+// goes to approvals.NewPoster, which alone reads the admin token. When the
+// poster can't be built (no admin token, no books URL) the server still
+// runs: the reason is logged once at Warn and the approvals routes answer
+// 501.
+func newApprovals(cfg config.Config, st approvalsStore, log *slog.Logger) web.ApprovalsBackend {
+	poster, err := approvals.NewPoster(cfg, log)
+	if err != nil {
+		log.Warn("agent: approvals are disabled; the proposal routes answer 501", "reason", err.Error())
+		return nil
+	}
+	return approvalsAdapter{svc: approvals.New(approvals.Deps{Store: st, Poster: poster, Findings: st, Logger: log})}
+}
+
+// approvalsAdapter adapts approvals.Service to web.ApprovalsBackend, so
+// internal/web never imports internal/approvals.
+type approvalsAdapter struct {
+	svc *approvals.Service
+}
+
+func (a approvalsAdapter) Propose(ctx context.Context, actor string, findingID uuid.UUID) (store.JournalProposal, error) {
+	p, err := a.svc.Propose(ctx, actor, findingID)
+	return p, adaptApprovalErr(err)
+}
+
+func (a approvalsAdapter) Approve(ctx context.Context, actor string, id uuid.UUID) (web.ApproveResult, error) {
+	r, err := a.svc.Approve(ctx, actor, id)
+	if err != nil {
+		return web.ApproveResult{}, adaptApprovalErr(err)
+	}
+	return web.ApproveResult{ProposalID: r.ProposalID, Status: r.Status, ERPName: r.ERPName, AlreadyPosted: r.AlreadyPosted}, nil
+}
+
+func (a approvalsAdapter) Reject(ctx context.Context, actor string, id uuid.UUID, reason string) error {
+	return adaptApprovalErr(a.svc.Reject(ctx, actor, id, reason))
+}
+
+func (a approvalsAdapter) Pending(ctx context.Context) ([]store.JournalProposal, error) {
+	return a.svc.Pending(ctx)
+}
+
+func (a approvalsAdapter) Get(ctx context.Context, id uuid.UUID) (store.JournalProposal, error) {
+	p, err := a.svc.Get(ctx, id)
+	return p, adaptApprovalErr(err)
+}
+
+// approvalKinds maps the service's error kinds to the web's.
+var approvalKinds = []struct{ from, to error }{
+	{approvals.ErrNotFound, web.ErrApprovalNotFound},
+	{approvals.ErrInvalidProposal, web.ErrApprovalInvalid},
+	{approvals.ErrInvalidReason, web.ErrApprovalInvalid},
+	{approvals.ErrSelfApproval, web.ErrApprovalForbidden},
+	{approvals.ErrNotProposable, web.ErrApprovalConflict},
+	{approvals.ErrProposalExists, web.ErrApprovalConflict},
+	{approvals.ErrNotPending, web.ErrApprovalConflict},
+	{approvals.ErrFindingNotOpen, web.ErrApprovalConflict},
+	{approvals.ErrPostFailed, web.ErrApprovalPostFailed},
+}
+
+// adaptApprovalErr turns a service refusal into a *web.ApprovalError with
+// the service's fixed message. Any other error passes through (a 500).
+func adaptApprovalErr(err error) error {
+	var e *approvals.Error
+	if err == nil || !errors.As(err, &e) {
+		return err
+	}
+	for _, k := range approvalKinds {
+		if errors.Is(e, k.from) {
+			return &web.ApprovalError{Kind: k.to, Message: e.Msg}
+		}
+	}
+	return err
 }
 
 // askAdapter adapts agent.Asker to web.AskBackend, so internal/web imports
@@ -127,7 +216,10 @@ func serve(ctx context.Context, cfg config.Config, log *slog.Logger, cmd command
 	if err != nil {
 		return err
 	}
-	be := serveBackends{runs: &web.RunsBackend{Store: d.st, Execute: executeRun(wf), Findings: d.st}}
+	be := serveBackends{
+		runs:      &web.RunsBackend{Store: d.st, Execute: executeRun(wf), Findings: d.st},
+		approvals: newApprovals(cfg, d.st, log),
+	}
 	if !cmd.noExplain {
 		asker, err := newAsker(cfg, log, cmd, d, model, key, names)
 		if err != nil {

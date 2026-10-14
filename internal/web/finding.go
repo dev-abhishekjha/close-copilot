@@ -25,11 +25,18 @@ type FindingsStore interface {
 	GetArtifact(ctx context.Context, sha string) (store.Artifact, error)
 	SetFindingStatus(ctx context.Context, findingID uuid.UUID, status string) error
 	InsertAuditLog(ctx context.Context, e store.AuditLogEntry) (int64, error)
+	// GetProposalByFinding returns the finding's live journal proposal
+	// (any status but rejected); ok is false when there is none (CC-1004).
+	GetProposalByFinding(ctx context.Context, findingID uuid.UUID) (store.JournalProposal, bool, error)
 }
 
 var _ FindingsStore = (*store.Store)(nil)
 
 const maxReasonRunes = 500
+
+// liveProposalMsg refuses accept and dismiss of a finding with a live
+// journal proposal.
+const liveProposalMsg = "this finding has a live proposal, so it can't be accepted or dismissed"
 
 // findingsHTML answers 501 until both Options.Runs and Runs.Findings are
 // set; the role check has run by then.
@@ -147,12 +154,26 @@ func (s *Server) renderFinding(w http.ResponseWriter, r *http.Request, status in
 	}
 	page.HasTrail = investigated
 
-	if f.Proposal != nil {
+	// Once a journal proposal exists it replaces the explainer's preview:
+	// its status, maker and, when posted, the ERPNext entry. A failed
+	// lookup hides the create form; the server refuses a second proposal
+	// anyway.
+	live, hasLive, lerr := fs.GetProposalByFinding(ctx, f.ID)
+	if lerr != nil {
+		s.log.WarnContext(ctx, "web: live proposal lookup", "finding", f.ID.String(), "err", lerr)
+	}
+	switch {
+	case hasLive:
+		page.Proposal = s.proposalView(&live)
+	case f.Proposal != nil:
 		page.Proposal = s.proposalView(f.Proposal)
 	}
 	if p.user.Role == RoleMaker && !decided(f.Status) {
-		page.Actions.CanDecide = true
-		page.Actions.CreateButton = f.Proposal != nil && (f.Proposal.Status == "" || f.Proposal.Status == "proposed")
+		// A live proposal holds the finding: accept and dismiss wait until
+		// it is rejected (decideFinding refuses them too).
+		page.Actions.CanDecide = lerr == nil && !hasLive
+		page.Actions.CreateButton = s.approvals != nil && lerr == nil && !hasLive &&
+			f.Proposal != nil && f.Verified && f.Status == "open"
 	}
 	page.Actions.Error = msg
 	page.Actions.Reason = reason
@@ -321,6 +342,18 @@ func (s *Server) decideFinding(w http.ResponseWriter, r *http.Request, to, tool 
 	}
 	if f.Status != "open" && f.Status != "needs_review" {
 		s.renderFinding(w, r, http.StatusConflict, p, f, run, "this finding is already "+f.Status, "")
+		return
+	}
+	// A finding with a live journal proposal (any status but rejected) can't
+	// be accepted or dismissed: the proposal decides it. A failed lookup
+	// refuses too.
+	_, hasLive, err := s.runs.b.Findings.GetProposalByFinding(r.Context(), f.ID)
+	if err != nil {
+		s.findingErr(w, r, err)
+		return
+	}
+	if hasLive {
+		s.renderFinding(w, r, http.StatusConflict, p, f, run, liveProposalMsg, "")
 		return
 	}
 	args := map[string]string{
