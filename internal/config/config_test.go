@@ -290,6 +290,8 @@ var secretMarkers = map[string]string{
 	EnvERPAPISecret:     "marker-erp-secret",
 	EnvERPSeedAPIKey:    "marker-seed-key",
 	EnvERPSeedAPISecret: "marker-seed-secret",
+	EnvERPPostAPIKey:    "marker-post-key",
+	EnvERPPostAPISecret: "marker-post-secret",
 	EnvDatabaseURL:      "postgres://cc:marker-db-password@localhost/cc",
 	EnvMCPTokenAgent:    "marker-mcp-agent",
 	EnvMCPTokenAdmin:    "marker-mcp-admin",
@@ -339,6 +341,8 @@ func secretFields(c Config) map[string]Secret {
 		EnvERPAPISecret:     c.ERPAPISecret,
 		EnvERPSeedAPIKey:    c.ERPSeedAPIKey,
 		EnvERPSeedAPISecret: c.ERPSeedAPISecret,
+		EnvERPPostAPIKey:    c.ERPPostAPIKey,
+		EnvERPPostAPISecret: c.ERPPostAPISecret,
 		EnvDatabaseURL:      c.DatabaseURL,
 		EnvMCPTokenAgent:    c.MCPTokenAgent,
 		EnvMCPTokenAdmin:    c.MCPTokenAdmin,
@@ -443,6 +447,10 @@ func TestConfigRedacted(t *testing.T) {
 	if group["ERPAPIKey"] != redacted || group["MCPTokenAdmin"] != "" || group["DatabaseURL"] != "" {
 		t.Errorf("LogValue set/unset: ERPAPIKey %q MCPTokenAdmin %q DatabaseURL %q",
 			group["ERPAPIKey"], group["MCPTokenAdmin"], group["DatabaseURL"])
+	}
+	if group["ERPPostAPIKey"] != "" || group["ERPPostAPISecret"] != "" {
+		t.Errorf("LogValue unset posting pair: ERPPostAPIKey %q ERPPostAPISecret %q",
+			group["ERPPostAPIKey"], group["ERPPostAPISecret"])
 	}
 	if len(group) != reflect.TypeOf(Config{}).NumField() {
 		t.Errorf("LogValue lists %d settings, Config has %d fields", len(group), reflect.TypeOf(Config{}).NumField())

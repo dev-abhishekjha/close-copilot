@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"errors"
 	"flag"
 	"fmt"
@@ -116,8 +117,12 @@ var errNoAdminStore = errors.New("mcp-books: --transport http needs the database
 // tools at /mcp and post_approved_journal_entry at /mcp-admin, which is
 // never scoped. The same Scoper guards /mcp at the HTTP layer (401 without
 // a valid X-Run-Scope) and in every tool handler (out_of_scope). Both
-// servers audit every call to st, the admin one as "books-admin", and
-// share one ERPNext client (the bot key).
+// servers audit every call to st, the admin one as "books-admin". The two
+// routes use different ERPNext clients (CC-1007): /mcp reads with the bot
+// key (ERP_API_KEY), /mcp-admin posts with the copilot-poster key
+// (ERP_POST_API_KEY), so the bot key has no write path through Close
+// Copilot. It refuses to build the routes when the posting pair is missing
+// or shared with the bot or the seeder (see postingClient).
 func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, st AdminStore) (map[string]mcpkit.Route, []mcpkit.Option, error) {
 	if cfg.MCPScopeKey.IsZero() {
 		return nil, nil, errNoScopeKey
@@ -129,6 +134,10 @@ func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, st Adm
 	if err != nil {
 		return nil, nil, fmt.Errorf("mcp-books: %w", err)
 	}
+	poster, err := postingClient(cfg)
+	if err != nil {
+		return nil, nil, err
+	}
 	deps, err := booksDeps(cfg, companiesDir)
 	if err != nil {
 		return nil, nil, err
@@ -137,7 +146,7 @@ func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, st Adm
 	adminServer := mcpkit.NewServer("close-copilot-books-admin", buildinfo.Version)
 	mcpkit.EnableAudit(adminServer, "books-admin", st)
 	books.RegisterAdminTools(adminServer, books.AdminDeps{
-		Client:    deps.client,
+		Client:    poster,
 		Companies: deps.companies,
 		Proposals: st,
 		Now:       time.Now,
@@ -154,8 +163,46 @@ func httpRoutes(cfg config.Config, companiesDir string, log *slog.Logger, st Adm
 	return routes, opts, nil
 }
 
-// serverDeps are what both servers share: the company resolver and one
-// ERPNext client with the bot key.
+// postingClient builds the ERPNext client of /mcp-admin from the
+// copilot-poster pair (ERP_POST_API_KEY, ERP_POST_API_SECRET; CC-1007). It
+// fails closed when either is empty, or when the key or the secret equals
+// the bot's or the seeder's, so the admin route never posts with a shared
+// key. Errors name the variables, never a value.
+func postingClient(cfg config.Config) (*frappe.Client, error) {
+	key, secret := cfg.ERPPostAPIKey, cfg.ERPPostAPISecret
+	switch {
+	case key.IsZero():
+		return nil, fmt.Errorf("mcp-books: --transport http needs %s for the /mcp-admin route (see .env.example; deploy/erpnext/api-users.sh writes it to tmp/erp-keys.env)", config.EnvERPPostAPIKey)
+	case secret.IsZero():
+		return nil, fmt.Errorf("mcp-books: --transport http needs %s for the /mcp-admin route (see .env.example; deploy/erpnext/api-users.sh writes it to tmp/erp-keys.env)", config.EnvERPPostAPISecret)
+	case sameSecret(key, cfg.ERPAPIKey):
+		return nil, fmt.Errorf("mcp-books: %s must not equal %s: /mcp-admin needs its own ERPNext key", config.EnvERPPostAPIKey, config.EnvERPAPIKey)
+	case sameSecret(key, cfg.ERPSeedAPIKey):
+		return nil, fmt.Errorf("mcp-books: %s must not equal %s: /mcp-admin needs its own ERPNext key", config.EnvERPPostAPIKey, config.EnvERPSeedAPIKey)
+	case sameSecret(secret, cfg.ERPAPISecret):
+		return nil, fmt.Errorf("mcp-books: %s must not equal %s: /mcp-admin needs its own ERPNext key", config.EnvERPPostAPISecret, config.EnvERPAPISecret)
+	case sameSecret(secret, cfg.ERPSeedAPISecret):
+		return nil, fmt.Errorf("mcp-books: %s must not equal %s: /mcp-admin needs its own ERPNext key", config.EnvERPPostAPISecret, config.EnvERPSeedAPISecret)
+	}
+	client, err := frappe.New(cfg, key.Reveal(), secret)
+	if err != nil {
+		return nil, fmt.Errorf("mcp-books: ERPNext posting client: %w", err)
+	}
+	return client, nil
+}
+
+// sameSecret reports whether a and b are both set and equal, in constant
+// time.
+func sameSecret(a, b config.Secret) bool {
+	if a.IsZero() || b.IsZero() {
+		return false
+	}
+	return subtle.ConstantTimeCompare([]byte(a.Reveal()), []byte(b.Reveal())) == 1
+}
+
+// serverDeps are the read tools' dependencies: the company resolver and
+// the ERPNext client with the bot key. The admin tool's company resolver
+// comes from here too; its client does not (see postingClient).
 type serverDeps struct {
 	client    *frappe.Client
 	companies books.CompanyResolver
