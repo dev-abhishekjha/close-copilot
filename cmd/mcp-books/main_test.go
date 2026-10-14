@@ -30,13 +30,15 @@ const testCompanies = "../../config/companies"
 
 func testBooksConfig() config.Config {
 	return config.Config{
-		ERPBaseURL:    "http://localhost:8080",
-		ERPSite:       "erp.localhost",
-		ERPAPIKey:     config.NewSecret("key"),
-		ERPAPISecret:  config.NewSecret("secret"),
-		MCPTokenAgent: config.NewSecret("agent-token"),
-		MCPTokenAdmin: config.NewSecret("admin-token"),
-		MCPScopeKey:   config.NewSecret("scope-key-for-tests"),
+		ERPBaseURL:       "http://localhost:8080",
+		ERPSite:          "erp.localhost",
+		ERPAPIKey:        config.NewSecret("key"),
+		ERPAPISecret:     config.NewSecret("secret"),
+		ERPPostAPIKey:    config.NewSecret("post-key"),
+		ERPPostAPISecret: config.NewSecret("post-secret"),
+		MCPTokenAgent:    config.NewSecret("agent-token"),
+		MCPTokenAdmin:    config.NewSecret("admin-token"),
+		MCPScopeKey:      config.NewSecret("scope-key-for-tests"),
 	}
 }
 
@@ -344,5 +346,195 @@ func TestMCPBooksAdminRouteTools(t *testing.T) {
 	r := st.rows[0]
 	if *r.Server != "books-admin" || *r.Tool != books.ToolPostApprovedJournalEntry || r.Actor != "admin" || !strings.Contains(string(r.Args), id) {
 		t.Errorf("audit row: actor %q server %q tool %q args %s", r.Actor, *r.Server, *r.Tool, r.Args)
+	}
+}
+
+// fakeERPNext records the Authorization header of every request and
+// refuses each one with a Frappe PermissionError (no retries, no data).
+type fakeERPNext struct {
+	mu    sync.Mutex
+	auths []string
+}
+
+func (f *fakeERPNext) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	f.mu.Lock()
+	f.auths = append(f.auths, r.Header.Get("Authorization"))
+	f.mu.Unlock()
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusForbidden)
+	_, _ = io.WriteString(w, `{"exc_type": "PermissionError", "message": "Not permitted"}`)
+}
+
+// take returns the recorded headers and forgets them.
+func (f *fakeERPNext) take() []string {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	out := f.auths
+	f.auths = nil
+	return out
+}
+
+// approvedStore is fakeAdminStore with one approved, unposted proposal.
+type approvedStore struct {
+	fakeAdminStore
+	p store.JournalProposal
+}
+
+func (a *approvedStore) WithProposalLock(ctx context.Context, id uuid.UUID, fn func(context.Context, store.JournalProposal, func(context.Context, store.JournalProposal) error) error) error {
+	if id != a.p.ID {
+		return fmt.Errorf("%w: journal proposal %s", store.ErrNotFound, id)
+	}
+	return fn(ctx, a.p, func(context.Context, store.JournalProposal) error { return nil })
+}
+
+// TestMCPBooksRoutesUseTheirOwnKeys: the read tools on /mcp call ERPNext
+// with the bot key and the admin tool on /mcp-admin with the posting key
+// (CC-1007), never the other way round.
+func TestMCPBooksRoutesUseTheirOwnKeys(t *testing.T) {
+	erp := &fakeERPNext{}
+	erpServer := httptest.NewServer(erp)
+	t.Cleanup(erpServer.Close)
+
+	cfg := testBooksConfig()
+	cfg.ERPBaseURL = erpServer.URL
+	const botAuth, postAuth = "token key:secret", "token post-key:post-secret"
+	checker := "checker@example.test"
+	decided := time.Now().UTC()
+	st := &approvedStore{p: store.JournalProposal{
+		ID:        uuid.New(),
+		CompanyID: "sharma",
+		Payload: store.JournalPayload{
+			PostingDate: "2026-09-30",
+			Remark:      "CC-1007 unit test",
+			Lines: []store.JournalLine{
+				{Account: "Miscellaneous Expenses - STPL", DebitPaise: 100},
+				{Account: "Administrative Expenses - STPL", CreditPaise: 100},
+			},
+		},
+		Status:    books.ProposalApproved,
+		Maker:     "maker@example.test",
+		Checker:   &checker,
+		DecidedAt: &decided,
+	}}
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	routes, opts, err := httpRoutes(cfg, testCompanies, log, st)
+	if err != nil {
+		t.Fatalf("httpRoutes: %v", err)
+	}
+	ts := httptest.NewServer(mcpkit.BuildHandler(routes, log, opts...))
+	t.Cleanup(ts.Close)
+
+	// A read tool on /mcp.
+	sc, err := mcpkit.Window("sharma", "run-bin-test", "2026-09", time.Now().Add(time.Hour))
+	if err != nil {
+		t.Fatal(err)
+	}
+	header, err := mcpkit.Mint([]byte(cfg.MCPScopeKey.Reveal()), sc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	read, err := mcp.NewClient(&mcp.Implementation{Name: "t", Version: "0"}, nil).Connect(t.Context(), &mcp.StreamableClientTransport{
+		Endpoint:   ts.URL + "/mcp",
+		HTTPClient: &http.Client{Transport: scopeTransport{token: "agent-token", scope: header}},
+		MaxRetries: -1,
+	}, nil)
+	if err != nil {
+		t.Fatalf("connect /mcp: %v", err)
+	}
+	t.Cleanup(func() { _ = read.Close() })
+	if _, err := read.CallTool(t.Context(), &mcp.CallToolParams{Name: books.ToolGetTrialBalance,
+		Arguments: map[string]any{"company": "sharma", "from_date": "2026-09-01", "to_date": "2026-09-30"}}); err != nil {
+		t.Fatalf("CallTool %s: %v", books.ToolGetTrialBalance, err)
+	}
+	auths := erp.take()
+	if len(auths) == 0 {
+		t.Fatal("the read tool made no ERPNext call")
+	}
+	for i, a := range auths {
+		if a != botAuth {
+			t.Errorf("/mcp ERPNext call %d: Authorization is not the bot key (posting key: %v)", i, a == postAuth)
+		}
+	}
+
+	// The admin tool on /mcp-admin.
+	admin, err := mcp.NewClient(&mcp.Implementation{Name: "t", Version: "0"}, nil).Connect(t.Context(), &mcp.StreamableClientTransport{
+		Endpoint:   ts.URL + mcpkit.AdminPath,
+		HTTPClient: &http.Client{Transport: scopeTransport{token: "admin-token"}},
+		MaxRetries: -1,
+	}, nil)
+	if err != nil {
+		t.Fatalf("connect /mcp-admin: %v", err)
+	}
+	t.Cleanup(func() { _ = admin.Close() })
+	if _, err := admin.CallTool(t.Context(), &mcp.CallToolParams{Name: books.ToolPostApprovedJournalEntry,
+		Arguments: map[string]any{"proposal_id": st.p.ID.String()}}); err != nil {
+		t.Fatalf("CallTool %s: %v", books.ToolPostApprovedJournalEntry, err)
+	}
+	auths = erp.take()
+	if len(auths) == 0 {
+		t.Fatal("the admin tool made no ERPNext call")
+	}
+	for i, a := range auths {
+		if a != postAuth {
+			t.Errorf("/mcp-admin ERPNext call %d: Authorization is not the posting key (bot key: %v)", i, a == botAuth)
+		}
+	}
+}
+
+// TestMCPBooksHTTPRefusesSharedPostingKey: --transport http won't build its
+// routes when the posting pair is missing or shared with the bot or the
+// seeder, and the error names the variables, never a value.
+func TestMCPBooksHTTPRefusesSharedPostingKey(t *testing.T) {
+	base := func() config.Config {
+		cfg := testBooksConfig()
+		cfg.ERPAPIKey = config.NewSecret("marker-bot-key")
+		cfg.ERPAPISecret = config.NewSecret("marker-bot-secret")
+		cfg.ERPSeedAPIKey = config.NewSecret("marker-seed-key")
+		cfg.ERPSeedAPISecret = config.NewSecret("marker-seed-secret")
+		cfg.ERPPostAPIKey = config.NewSecret("marker-post-key")
+		cfg.ERPPostAPISecret = config.NewSecret("marker-post-secret")
+		return cfg
+	}
+	cases := []struct {
+		name  string
+		edit  func(*config.Config)
+		names []string
+	}{
+		{"empty key", func(c *config.Config) { c.ERPPostAPIKey = config.Secret{} }, []string{config.EnvERPPostAPIKey}},
+		{"empty secret", func(c *config.Config) { c.ERPPostAPISecret = config.Secret{} }, []string{config.EnvERPPostAPISecret}},
+		{"key is the bot key", func(c *config.Config) { c.ERPPostAPIKey = c.ERPAPIKey }, []string{config.EnvERPPostAPIKey, config.EnvERPAPIKey}},
+		{"secret is the bot secret", func(c *config.Config) { c.ERPPostAPISecret = c.ERPAPISecret }, []string{config.EnvERPPostAPISecret, config.EnvERPAPISecret}},
+		{"key is the seeder key", func(c *config.Config) { c.ERPPostAPIKey = c.ERPSeedAPIKey }, []string{config.EnvERPPostAPIKey, config.EnvERPSeedAPIKey}},
+		{"secret is the seeder secret", func(c *config.Config) { c.ERPPostAPISecret = c.ERPSeedAPISecret }, []string{config.EnvERPPostAPISecret, config.EnvERPSeedAPISecret}},
+	}
+	log := slog.New(slog.NewTextHandler(io.Discard, nil))
+	if _, _, err := httpRoutes(base(), testCompanies, log, &fakeAdminStore{}); err != nil {
+		t.Fatalf("distinct pairs: %v, want the routes", err)
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := base()
+			tc.edit(&cfg)
+			routes, _, err := httpRoutes(cfg, testCompanies, log, &fakeAdminStore{})
+			if err == nil || routes != nil {
+				t.Fatalf("httpRoutes: routes %v, err %v; want a refusal", routes != nil, err)
+			}
+			msg := err.Error()
+			for _, n := range tc.names {
+				if !strings.Contains(msg, n) {
+					t.Errorf("error %q doesn't name %s", msg, n)
+				}
+			}
+			if strings.Contains(msg, "marker-") {
+				t.Errorf("error leaks a secret value: %q", msg)
+			}
+		})
+	}
+
+	// stdio has no admin tool, so it needs no posting pair.
+	cfg := base()
+	cfg.ERPPostAPIKey, cfg.ERPPostAPISecret = config.Secret{}, config.Secret{}
+	if _, err := newBooksServer(cfg, testCompanies, log, nil); err != nil {
+		t.Errorf("newBooksServer without a posting pair: %v", err)
 	}
 }

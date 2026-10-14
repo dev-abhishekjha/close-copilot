@@ -30,6 +30,8 @@ const (
 	EnvERPAPISecret     = "ERP_API_SECRET"
 	EnvERPSeedAPIKey    = "ERP_SEED_API_KEY"
 	EnvERPSeedAPISecret = "ERP_SEED_API_SECRET"
+	EnvERPPostAPIKey    = "ERP_POST_API_KEY"
+	EnvERPPostAPISecret = "ERP_POST_API_SECRET"
 	EnvDatabaseURL      = "DATABASE_URL"
 	EnvBooksMCPURL      = "BOOKS_MCP_URL"
 	EnvEvidenceMCPURL   = "EVIDENCE_MCP_URL"
@@ -78,6 +80,10 @@ type Config struct {
 	ERPAPISecret     Secret
 	ERPSeedAPIKey    Secret
 	ERPSeedAPISecret Secret
+	// ERPPostAPIKey and ERPPostAPISecret are the copilot-poster pair
+	// (CC-1007): only the /mcp-admin route of mcp-books uses them.
+	ERPPostAPIKey    Secret
+	ERPPostAPISecret Secret
 
 	DatabaseURL Secret // carries the Postgres password
 
@@ -126,6 +132,8 @@ func (c Config) view() []slog.Attr {
 		slog.String("ERPAPISecret", c.ERPAPISecret.masked()),
 		slog.String("ERPSeedAPIKey", c.ERPSeedAPIKey.masked()),
 		slog.String("ERPSeedAPISecret", c.ERPSeedAPISecret.masked()),
+		slog.String("ERPPostAPIKey", c.ERPPostAPIKey.masked()),
+		slog.String("ERPPostAPISecret", c.ERPPostAPISecret.masked()),
 		slog.String("DatabaseURL", c.DatabaseURL.masked()),
 		slog.String("BooksMCPURL", redactURL(c.BooksMCPURL)),
 		slog.String("EvidenceMCPURL", redactURL(c.EvidenceMCPURL)),
@@ -296,6 +304,8 @@ func Load(lookup Lookup, required ...string) (Config, error) {
 		EnvERPAPISecret:     &c.ERPAPISecret,
 		EnvERPSeedAPIKey:    &c.ERPSeedAPIKey,
 		EnvERPSeedAPISecret: &c.ERPSeedAPISecret,
+		EnvERPPostAPIKey:    &c.ERPPostAPIKey,
+		EnvERPPostAPISecret: &c.ERPPostAPISecret,
 		EnvDatabaseURL:      &c.DatabaseURL,
 		EnvMCPTokenAgent:    &c.MCPTokenAgent,
 		EnvMCPTokenAdmin:    &c.MCPTokenAdmin,
