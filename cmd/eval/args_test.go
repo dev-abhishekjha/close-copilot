@@ -251,3 +251,42 @@ func TestParseScoreCitationsFlags(t *testing.T) {
 		t.Errorf("flags %+v, %v", c.score, err)
 	}
 }
+
+func TestParseRunFaultArgs(t *testing.T) {
+	t.Setenv("FAULTS", "")
+	var out bytes.Buffer
+	c, err := parseArgs([]string{"run", "--suite", "s", "--replay", "--faults", "erp:error=503:rate=0.1,erp:latency=2s:rate=0.2", "--seed", "7"}, &out)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(c.fault.Specs) != 2 || c.fault.Seed != 7 || c.fault.Out != defaultFaultsOut {
+		t.Errorf("fault flags %+v", c.fault)
+	}
+	d, err := parseArgs([]string{"run", "--suite", "s", "--replay"}, &out)
+	if err != nil || len(d.fault.Specs) != 0 {
+		t.Errorf("default: %+v, %v (faults are off unless asked for)", d.fault, err)
+	}
+
+	// FAULTS is the default of --faults, and the flag overrides it.
+	t.Setenv("FAULTS", "erp:error=500:rate=0.5")
+	e, err := parseArgs([]string{"run", "--suite", "s", "--replay"}, &out)
+	if err != nil || len(e.fault.Specs) != 1 || e.fault.Specs[0].Status != 500 {
+		t.Errorf("env default: %+v, %v", e.fault, err)
+	}
+	f, err := parseArgs([]string{"run", "--suite", "s", "--replay", "--faults", ""}, &out)
+	if err != nil || len(f.fault.Specs) != 0 {
+		t.Errorf("--faults '' did not turn them off: %+v, %v", f.fault, err)
+	}
+
+	for _, args := range [][]string{
+		{"run", "--suite", "s", "--replay", "--faults", "nope"},
+		{"run", "--suite", "s", "--replay", "--faults", "llm:error=503:rate=0.1"},
+		{"run", "--suite", "s", "--replay", "--faults", "erp:error=503:rate=2"},
+		{"run", "--suite", "s", "--faults", "erp:error=503:rate=0.1"}, // live run: nothing to fault
+		{"run", "--suite", "s", "--replay", "--faults", "erp:error=503:rate=0.1", "--seed", "x"},
+	} {
+		if _, err := parseArgs(args, &out); err == nil {
+			t.Errorf("parseArgs(%q) accepted it", args)
+		}
+	}
+}

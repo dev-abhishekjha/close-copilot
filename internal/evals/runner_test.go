@@ -727,3 +727,39 @@ func TestManifestFlagsChecks(t *testing.T) {
 		t.Errorf("empty checks is not omitted: %s", b)
 	}
 }
+
+func TestRunnerFlatDir(t *testing.T) {
+	f := newFake(nil)
+	r := newRunner(t, f)
+	r.FlatDir = true
+	r.ResultsDir = filepath.Join(t.TempDir(), "faults")
+	dir, _, err := r.Run(t.Context(), testSuite, testSuite.Months)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if dir != r.ResultsDir {
+		t.Errorf("folder %s, want %s", dir, r.ResultsDir)
+	}
+	if _, err := os.Stat(filepath.Join(dir, ManifestFile)); err != nil {
+		t.Errorf("no manifest in the flat folder: %v", err)
+	}
+	// A second run into the same folder overwrites the first's files.
+	if _, _, err := newRunnerAt(t, f, dir).Run(t.Context(), testSuite, testSuite.Months); err != nil {
+		t.Errorf("rerun into a flat folder: %v", err)
+	}
+	// A folder holding something else is refused.
+	other := t.TempDir()
+	if err := os.WriteFile(filepath.Join(other, "notes.txt"), []byte("x"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := newRunnerAt(t, f, other).Run(t.Context(), testSuite, testSuite.Months); err == nil || !strings.Contains(err.Error(), "not empty") {
+		t.Errorf("foreign folder err %v, want a refusal", err)
+	}
+}
+
+func newRunnerAt(t *testing.T, f *fakeStack, dir string) *Runner {
+	t.Helper()
+	r := newRunner(t, f)
+	r.FlatDir, r.ResultsDir = true, dir
+	return r
+}
