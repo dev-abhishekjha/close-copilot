@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,15 +14,18 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/modelcontextprotocol/go-sdk/mcp"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
+	"github.com/abhishekjha/close-copilot/internal/approvals"
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
@@ -39,6 +43,10 @@ const (
 type serveStore struct {
 	run     store.CloseRun
 	finding store.Finding
+
+	mu        sync.Mutex
+	proposals map[uuid.UUID]store.JournalProposal
+	audits    []store.AuditLogEntry
 }
 
 func (s *serveStore) CreateCloseRun(context.Context, store.CloseRun) error { return nil }
@@ -68,8 +76,72 @@ func (s *serveStore) GetArtifact(context.Context, string) (store.Artifact, error
 	return store.Artifact{}, store.ErrNotFound
 }
 func (s *serveStore) SetFindingStatus(context.Context, uuid.UUID, string) error { return nil }
-func (s *serveStore) InsertAuditLog(context.Context, store.AuditLogEntry) (int64, error) {
-	return 1, nil
+func (s *serveStore) InsertAuditLog(_ context.Context, e store.AuditLogEntry) (int64, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.audits = append(s.audits, e)
+	return int64(len(s.audits)), nil
+}
+
+// The journal_proposals side of serveStore, for the approvals wiring.
+
+func (s *serveStore) GetProposalByFinding(_ context.Context, id uuid.UUID) (store.JournalProposal, bool, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	for _, p := range s.proposals {
+		if p.FindingID != nil && *p.FindingID == id && p.Status != "rejected" {
+			return p, true, nil
+		}
+	}
+	return store.JournalProposal{}, false, nil
+}
+
+func (s *serveStore) CreateProposalFromFinding(ctx context.Context, p store.JournalProposal) (store.JournalProposal, error) {
+	if live, ok, _ := s.GetProposalByFinding(ctx, *p.FindingID); ok {
+		return live, store.ErrProposalExists
+	}
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if s.proposals == nil {
+		s.proposals = map[uuid.UUID]store.JournalProposal{}
+	}
+	s.proposals[p.ID] = p
+	return p, nil
+}
+
+func (s *serveStore) GetJournalProposal(_ context.Context, id uuid.UUID) (store.JournalProposal, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	p, ok := s.proposals[id]
+	if !ok {
+		return store.JournalProposal{}, store.ErrNotFound
+	}
+	return p, nil
+}
+
+func (s *serveStore) ListProposalsByStatus(_ context.Context, status string, _ int) ([]store.JournalProposal, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	var out []store.JournalProposal
+	for _, p := range s.proposals {
+		if p.Status == status {
+			out = append(out, p)
+		}
+	}
+	return out, nil
+}
+
+func (s *serveStore) WithProposalLock(ctx context.Context, id uuid.UUID, fn func(context.Context, store.JournalProposal, func(context.Context, store.JournalProposal) error) error) error {
+	p, err := s.GetJournalProposal(ctx, id)
+	if err != nil {
+		return err
+	}
+	return fn(ctx, p, func(_ context.Context, np store.JournalProposal) error {
+		s.mu.Lock()
+		defer s.mu.Unlock()
+		s.proposals[id] = np
+		return nil
+	})
 }
 
 func serveUsers(t *testing.T) web.Users {
@@ -338,3 +410,252 @@ type (
 	stubRecorder struct{ agent.LLMCallRecorder }
 	stubTriage   struct{ agent.TriageStore }
 )
+
+// ---- approvals wiring (CC-1004) ----
+
+const (
+	serveAdminToken = "SERVE-ADMIN-TOKEN-SENTINEL-5e1a"
+	serveAgentToken = "serve-agent-token"
+)
+
+// approvalUsers are asha (maker) and ravi (checker) with bearer tokens.
+func approvalUsers(t *testing.T) web.Users {
+	t.Helper()
+	h, err := bcrypt.GenerateFromPassword([]byte(servePassword), web.MinBcryptCost)
+	if err != nil {
+		t.Fatal(err)
+	}
+	tok := func(s string) string { sum := sha256.Sum256([]byte(s)); return hex.EncodeToString(sum[:]) }
+	us, err := web.NewUsers(
+		web.User{Name: "asha", Role: web.RoleMaker, PasswordHash: string(h), TokenSHA256: tok("tok-asha")},
+		web.User{Name: "ravi", Role: web.RoleChecker, PasswordHash: string(h), TokenSHA256: tok("tok-ravi")},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return us
+}
+
+// fakeBooksAdmin is an in-process /mcp-admin that answers
+// post_approved_journal_entry and records the bearer token it saw.
+func fakeBooksAdmin(t *testing.T) (*httptest.Server, func() []string) {
+	t.Helper()
+	var (
+		mu    sync.Mutex
+		auths []string
+	)
+	type in struct {
+		ProposalID string `json:"proposal_id"`
+	}
+	type out struct {
+		ProposalID    string `json:"proposal_id"`
+		ERPName       string `json:"erp_name"`
+		Status        string `json:"status"`
+		AlreadyPosted bool   `json:"already_posted"`
+	}
+	s := mcp.NewServer(&mcp.Implementation{Name: "fake-books-admin", Version: "test"}, nil)
+	mcp.AddTool(s, &mcp.Tool{Name: "post_approved_journal_entry"}, func(_ context.Context, _ *mcp.CallToolRequest, x in) (*mcp.CallToolResult, out, error) {
+		return nil, out{ProposalID: x.ProposalID, ERPName: "ACC-JV-2026-00321", Status: "posted"}, nil
+	})
+	stream := mcp.NewStreamableHTTPHandler(func(*http.Request) *mcp.Server { return s }, nil)
+	mux := http.NewServeMux()
+	mux.Handle("/mcp-admin", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		mu.Lock()
+		auths = append(auths, r.Header.Get("Authorization"))
+		mu.Unlock()
+		if r.Header.Get("Authorization") != "Bearer "+serveAdminToken {
+			http.Error(w, "unauthorized", http.StatusUnauthorized)
+			return
+		}
+		stream.ServeHTTP(w, r)
+	}))
+	srv := httptest.NewServer(mux)
+	t.Cleanup(srv.Close)
+	return srv, func() []string {
+		mu.Lock()
+		defer mu.Unlock()
+		return append([]string(nil), auths...)
+	}
+}
+
+func TestServeApprovalsDisabledWithoutAdminToken(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		mod  func(*config.Config)
+	}{
+		{"no admin token", func(*config.Config) {}},
+		{"no books url", func(c *config.Config) { c.MCPTokenAdmin = config.NewSecret(serveAdminToken); c.BooksMCPURL = "" }},
+		{"admin equals agent", func(c *config.Config) {
+			c.MCPTokenAdmin = config.NewSecret(serveAgentToken)
+			c.MCPTokenAgent = config.NewSecret(serveAgentToken)
+		}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := serveConfig()
+			cfg.BooksMCPURL = "http://127.0.0.1:7001/mcp"
+			tc.mod(&cfg)
+			var logs syncBuf
+			log := slog.New(slog.NewJSONHandler(&logs, nil))
+			be := newApprovals(cfg, newServeStore(), log)
+			if be != nil {
+				t.Fatal("approvals built without a usable admin token")
+			}
+			if n := strings.Count(logs.String(), "approvals are disabled"); n != 1 || !strings.Contains(logs.String(), `"level":"WARN"`) {
+				t.Errorf("warn logged %d times: %s", n, logs.String())
+			}
+			if strings.Contains(logs.String(), serveAgentToken) || strings.Contains(logs.String(), serveAdminToken) {
+				t.Error("a token was logged")
+			}
+			st := newServeStore()
+			srv, err := newServeServer(cfg, approvalUsers(t), serveBackends{
+				runs: &web.RunsBackend{Store: st, Execute: func(context.Context, uuid.UUID) error { return nil }, Findings: st}, approvals: be,
+			}, log)
+			if err != nil {
+				t.Fatal(err)
+			}
+			r := httptest.NewRequest(http.MethodPost, "/api/proposals/"+uuid.NewString()+"/approve", nil)
+			r.Header.Set("Authorization", "Bearer tok-ravi")
+			w := httptest.NewRecorder()
+			srv.ServeHTTP(w, r)
+			if w.Code != http.StatusNotImplemented {
+				t.Errorf("approve without approvals = %d, want 501", w.Code)
+			}
+		})
+	}
+}
+
+// TestServeApprovalsWired runs propose and approve through the serve
+// wiring against an in-process /mcp-admin: the poster presents the admin
+// token there, and the token shows in no response, log or audit row.
+func TestServeApprovalsWired(t *testing.T) {
+	admin, auths := fakeBooksAdmin(t)
+	cfg := serveConfig()
+	cfg.BooksMCPURL = admin.URL + "/mcp"
+	cfg.ERPBaseURL = "http://erp.test:8080"
+	cfg.MCPTokenAdmin = config.NewSecret(serveAdminToken)
+	cfg.MCPTokenAgent = config.NewSecret(serveAgentToken)
+	var logs syncBuf
+	log := slog.New(slog.NewJSONHandler(&logs, &slog.HandlerOptions{Level: slog.LevelDebug}))
+
+	st := newServeStore()
+	st.finding.Verified = true
+	st.finding.Proposal = &store.JournalProposal{CompanyID: "acme", Status: "proposed", Payload: store.JournalPayload{
+		PostingDate: "2026-09-30", Remark: "bank charge", Lines: []store.JournalLine{
+			{Account: "Bank Charges - AC", DebitPaise: 29500}, {Account: "Bank - AC", CreditPaise: 29500},
+		},
+	}}
+	be := newApprovals(cfg, st, log)
+	if be == nil {
+		t.Fatalf("newApprovals: nil; logs %s", logs.String())
+	}
+	srv, err := newServeServer(cfg, approvalUsers(t), serveBackends{
+		runs: &web.RunsBackend{Store: st, Execute: func(context.Context, uuid.UUID) error { return nil }, Findings: st}, approvals: be,
+	}, log)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var bodies strings.Builder
+	call := func(token, method, path string) *httptest.ResponseRecorder {
+		r := httptest.NewRequest(method, path, strings.NewReader(`{"maker":"ravi","checker":"asha"}`))
+		r.Header.Set("Content-Type", "application/json")
+		r.Header.Set("Authorization", "Bearer "+token)
+		w := httptest.NewRecorder()
+		srv.ServeHTTP(w, r)
+		bodies.WriteString(w.Body.String())
+		return w
+	}
+
+	w := call("tok-asha", http.MethodPost, "/api/findings/"+st.finding.ID.String()+"/proposals")
+	if w.Code != http.StatusCreated {
+		t.Fatalf("propose = %d %s", w.Code, w.Body)
+	}
+	var created struct {
+		ProposalID string `json:"proposal_id"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &created); err != nil {
+		t.Fatal(err)
+	}
+	if w := call("tok-asha", http.MethodPost, "/api/findings/"+st.finding.ID.String()+"/proposals"); w.Code != http.StatusConflict {
+		t.Errorf("second propose = %d", w.Code)
+	}
+	if w := call("tok-asha", http.MethodPost, "/api/proposals/"+created.ProposalID+"/approve"); w.Code != http.StatusForbidden {
+		t.Errorf("maker approve = %d", w.Code)
+	}
+	if len(auths()) != 0 {
+		t.Fatal("ERPNext reached before a checker approved")
+	}
+	w = call("tok-ravi", http.MethodPost, "/api/proposals/"+created.ProposalID+"/approve")
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), "ACC-JV-2026-00321") ||
+		!strings.Contains(w.Body.String(), "http://erp.test:8080/app/journal-entry/ACC-JV-2026-00321") {
+		t.Fatalf("approve = %d %s", w.Code, w.Body)
+	}
+	got := auths()
+	if len(got) == 0 {
+		t.Fatal("the admin route was not called")
+	}
+	for _, a := range got {
+		if a != "Bearer "+serveAdminToken {
+			t.Errorf("admin route saw %q", a)
+		}
+	}
+	id := uuid.MustParse(created.ProposalID)
+	row, _ := st.GetJournalProposal(t.Context(), id)
+	if row.Maker != "asha" || row.Checker == nil || *row.Checker != "ravi" || row.Status != "approved" || row.ERPName != nil {
+		t.Errorf("row %+v (the service must not write posted or erp_name)", row)
+	}
+	// Reject of an approved proposal is refused.
+	if w := call("tok-ravi", http.MethodPost, "/api/proposals/"+created.ProposalID+"/reject"); w.Code != http.StatusBadRequest && w.Code != http.StatusConflict {
+		t.Errorf("reject approved = %d", w.Code)
+	}
+
+	st.mu.Lock()
+	audits := append([]store.AuditLogEntry(nil), st.audits...)
+	st.mu.Unlock()
+	var actors []string
+	var auditArgs strings.Builder
+	for _, a := range audits {
+		if a.Server != nil && *a.Server == "approvals" {
+			actors = append(actors, a.Actor+":"+*a.Tool)
+		}
+		auditArgs.Write(a.Args)
+	}
+	if !slices.Contains(actors, "asha:proposal.create") || !slices.Contains(actors, "ravi:proposal.approve") {
+		t.Errorf("audit rows %v", actors)
+	}
+	for name, out := range map[string]string{"responses": bodies.String(), "logs": logs.String(), "audit": auditArgs.String()} {
+		if strings.Contains(out, serveAdminToken) {
+			t.Errorf("%s show the admin token", name)
+		}
+	}
+}
+
+func TestAdaptApprovalErr(t *testing.T) {
+	plain := errors.New("db down")
+	cases := []struct {
+		name string
+		err  error
+		kind error
+	}{
+		{"not found", &approvals.Error{Kind: approvals.ErrNotFound, Msg: "not found"}, web.ErrApprovalNotFound},
+		{"invalid proposal", &approvals.Error{Kind: approvals.ErrInvalidProposal, Msg: "m"}, web.ErrApprovalInvalid},
+		{"invalid reason", &approvals.Error{Kind: approvals.ErrInvalidReason, Msg: "m"}, web.ErrApprovalInvalid},
+		{"self", &approvals.Error{Kind: approvals.ErrSelfApproval, Msg: approvals.ErrSelfApproval.Error()}, web.ErrApprovalForbidden},
+		{"not proposable", &approvals.Error{Kind: approvals.ErrNotProposable, Msg: "m"}, web.ErrApprovalConflict},
+		{"exists", &approvals.Error{Kind: approvals.ErrProposalExists, Msg: "m"}, web.ErrApprovalConflict},
+		{"not pending", &approvals.Error{Kind: approvals.ErrNotPending, Msg: "m"}, web.ErrApprovalConflict},
+		{"post failed", &approvals.Error{Kind: approvals.ErrPostFailed, Msg: "m", Code: "unbalanced"}, web.ErrApprovalPostFailed},
+	}
+	for _, tc := range cases {
+		got := adaptApprovalErr(tc.err)
+		var ae *web.ApprovalError
+		if !errors.Is(got, tc.kind) || !errors.As(got, &ae) || ae.Message != tc.err.Error() {
+			t.Errorf("%s: %v, want kind %v with the service's message", tc.name, got, tc.kind)
+		}
+	}
+	if got := adaptApprovalErr(plain); got != plain {
+		t.Errorf("plain error: %v", got)
+	}
+	if adaptApprovalErr(nil) != nil {
+		t.Error("nil error adapted")
+	}
+}

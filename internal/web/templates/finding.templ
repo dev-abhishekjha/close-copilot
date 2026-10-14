@@ -93,7 +93,10 @@ templ Finding(p FindingPage) {
 			}
 			if p.Actions.CanDecide {
 				if p.Actions.CreateButton {
-					<button type="button" disabled>Create proposal (available with approvals)</button>
+					<form method="post" action={ templ.SafeURL(proposalsURL(p.ID)) }>
+						<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+						<button type="submit">Create proposal</button>
+					</form>
 				}
 				<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/accept") }>
 					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>

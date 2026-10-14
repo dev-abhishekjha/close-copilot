@@ -106,3 +106,11 @@ table.evidence tr.totals th { background: var(--bg); }
 details { margin: 0.25rem 0; }
 textarea { font: inherit; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; }
 button[disabled] { opacity: 0.6; cursor: not-allowed; }
+
+/* Approvals (CC-1004) */
+table.approvals { width: 100%; border-collapse: collapse; }
+table.approvals > tbody > tr > td { vertical-align: top; border-top: 1px solid #ddd; padding: 0.4rem; }
+table.approvals table.lines { font-size: 0.9em; }
+table.approvals .decision form { margin-bottom: 0.5rem; }
+.own { font-style: italic; }
+.posted { font-weight: bold; }

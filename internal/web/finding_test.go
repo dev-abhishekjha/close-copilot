@@ -30,6 +30,8 @@ type fakeFindings struct {
 	auditErr error
 	audits   []store.AuditLogEntry
 	sets     []string
+	live     map[uuid.UUID]store.JournalProposal // finding id -> live proposal
+	liveErr  error
 }
 
 func newFakeFindings() *fakeFindings {
@@ -96,6 +98,25 @@ func (f *fakeFindings) InsertAuditLog(_ context.Context, e store.AuditLogEntry) 
 	}
 	f.audits = append(f.audits, e)
 	return int64(len(f.audits)), nil
+}
+
+func (f *fakeFindings) GetProposalByFinding(_ context.Context, id uuid.UUID) (store.JournalProposal, bool, error) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.liveErr != nil {
+		return store.JournalProposal{}, false, f.liveErr
+	}
+	p, ok := f.live[id]
+	return p, ok, nil
+}
+
+func (f *fakeFindings) setLive(findingID uuid.UUID, p store.JournalProposal) {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.live == nil {
+		f.live = map[uuid.UUID]store.JournalProposal{}
+	}
+	f.live[findingID] = p
 }
 
 func (f *fakeFindings) status(id uuid.UUID) string {
@@ -434,7 +455,9 @@ func TestFindingActions(t *testing.T) {
 	}
 	ff, x, ts := newOne("open", true)
 	body := page(t, ts, RoleMaker, x.ID)
-	wantAll(t, body, "Mark accepted", ">Dismiss<", `name="reason"`, "Create proposal (available with approvals)", "disabled")
+	wantAll(t, body, "Mark accepted", ">Dismiss<", `name="reason"`)
+	// Without an approvals backend there is no create form.
+	wantNone(t, body, "Create proposal", "/proposals")
 	for _, r := range []Role{RoleViewer, RoleChecker} {
 		wantNone(t, page(t, ts, r, x.ID), "Mark accepted", ">Dismiss<", "Create proposal", `name="reason"`)
 	}
