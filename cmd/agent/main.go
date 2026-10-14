@@ -5,6 +5,7 @@
 //	agent close --company sharma --month 2026-09 [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
 //	agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
 //	agent mint-scope --company sharma --month 2026-09 [--ttl 1h]
+//	agent serve [--results-dir results] [--config-dir config] [--no-explain]
 //
 // Each finding is explained by the LLM explainer (CC-704) through
 // LLM_PROVIDER: claude-cli (the default, the local claude -p, no API key)
@@ -30,6 +31,13 @@
 // cancels the run, which is marked failed with reason "cancelled", and
 // the command exits non-zero. On success it prints one JSON line with the
 // run ID, its status and the report path.
+//
+// serve starts the web UI and JSON API (CC-1001 to CC-1003, and POST
+// /api/ask of CC-1006) on APP_ADDR (default :8000). Closes started from the
+// UI run inside this process; Ctrl-C stops the server and cancels them (a
+// cancelled run stays running and resume finishes it). serve needs
+// APP_SESSION_KEY and MCP_SCOPE_KEY, and PSEUDONYM_KEY unless --no-explain
+// (which also turns /api/ask off); users come from <config-dir>/users.yaml.
 //
 // The agent reaches ERPNext and the evidence store only through the
 // read-only MCP servers; this binary must not link the ERPNext client
@@ -96,102 +104,44 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 	if cmd.name == cmdMintScope {
 		return mintScope(cfg, cmd, time.Now(), stdout)
 	}
+	if cmd.name == cmdServe {
+		return serve(ctx, cfg, log, cmd)
+	}
 	stopTrace, err := telemetry.Init(ctx, "agent", cfg, log)
 	if err != nil {
 		return err
 	}
 	defer stopTrace()
 
-	var pseudonymKeyBytes []byte
+	pseudonymKeyBytes, err := explainKey(cfg, log, cmd)
+	if err != nil {
+		return err
+	}
+	d, err := openDeps(ctx, cfg, log, cmd)
+	if err != nil {
+		return err
+	}
+	defer d.close()
+
+	var model llm.Provider
+	var names []string
 	if !cmd.noExplain {
-		if err := cfg.CheckLLM(); err != nil {
+		if model, err = newProvider(cfg, filepath.Join(cmd.configDir, "pricing.yaml")); err != nil {
 			return err
-		}
-		if pseudonymKeyBytes, err = pseudonymKey(cfg); err != nil {
-			return err
-		}
-	}
-	log.Info("llm", "provider", cfg.LLMProvider, "fast", cfg.LLMModelFast, "strong", cfg.LLMModelStrong, "run_token_cap", cfg.LLMRunTokenCap)
-
-	profiles, err := company.LoadProfiles(filepath.Join(cmd.configDir, "companies"))
-	if err != nil {
-		return err
-	}
-	rules, err := company.LoadRules(filepath.Join(cmd.configDir, "rules.yaml"))
-	if err != nil {
-		return err
-	}
-	byID := make(map[string]company.Profile, len(profiles))
-	for _, p := range profiles {
-		byID[p.ID] = p
-	}
-
-	st, err := store.Open(ctx, cfg.DatabaseURL.Reveal())
-	if err != nil {
-		return err
-	}
-	defer st.Close()
-
-	reg, err := agent.NewRegistry(ctx, cfg, log)
-	if err != nil {
-		return err
-	}
-	defer reg.Close()
-
-	books := &agent.MCPBooks{Registry: reg, Companies: st}
-	wf := &agent.Workflow{
-		Store:      st,
-		Books:      books,
-		Evidence:   &agent.MCPEvidence{Registry: reg},
-		Profiles:   byID,
-		Rules:      rules,
-		Checks:     agent.DefaultChecks(),
-		Config:     cfg,
-		ResultsDir: cmd.resultsDir,
-		Timeout:    cmd.timeout,
-		Log:        log,
-	}
-	if cmd.noExplain {
-		log.Info("explaining disabled (--no-explain)")
-	} else {
-		model, err := newProvider(cfg, filepath.Join(cmd.configDir, "pricing.yaml"))
-		if err != nil {
-			return err
-		}
-		fault, err := agent.NewFault(cfg.Fault)
-		if err != nil {
-			return err
-		}
-		if fault != nil {
-			log.Warn("COPILOT_FAULT is on: one explanation will be corrupted on its first attempt", "fault", fault.Mode())
 		}
 		companyID := cmd.company
 		if cmd.name == cmdResume {
-			r, err := st.GetCloseRun(ctx, cmd.runID)
+			r, err := d.st.GetCloseRun(ctx, cmd.runID)
 			if err != nil {
 				return err
 			}
 			companyID = r.CompanyID
 		}
-		names := byID[companyID].IndividualNames()
-		// Counts only: names are personal data.
-		log.Info("pseudonymisation on", "individual_names", len(names))
-		wf.Model = llmtrace.Provider(model)
-		wf.Explainer = &agent.LLMExplainer{
-			Store:       st,
-			Accounts:    agent.BooksAccounts{Books: books},
-			FastModel:   cfg.LLMModelFast,
-			StrongModel: cfg.LLMModelStrong,
-			NewPseudonymiser: func(runID uuid.UUID) agent.Pseudonymiser {
-				return agent.NewRedactor(pseudonymKeyBytes, runID, names)
-			},
-			Fault: fault,
-			Log:   log,
-		}
-		wf.Verifier = &agent.CodeVerifier{Store: st, Citations: st}
-		// Retrieval is a workflow step (CC-806): its passages reach only the
-		// explainer, never the investigator.
-		wf.Retriever = &agent.MCPDocuments{Registry: reg}
+		names = d.byID[companyID].IndividualNames()
+	}
+	wf, err := newWorkflow(cfg, log, cmd, d, model, pseudonymKeyBytes, names)
+	if err != nil {
+		return err
 	}
 
 	var res agent.Result
@@ -211,6 +161,114 @@ func run(ctx context.Context, cfg config.Config, log *slog.Logger, args []string
 		}
 	}
 	return err
+}
+
+// explainKey checks what explaining needs (the LLM settings and
+// PSEUDONYM_KEY) unless cmd.noExplain, and logs the LLM settings. It
+// returns the decoded pseudonym key, nil with --no-explain.
+func explainKey(cfg config.Config, log *slog.Logger, cmd command) ([]byte, error) {
+	var key []byte
+	if !cmd.noExplain {
+		if err := cfg.CheckLLM(); err != nil {
+			return nil, err
+		}
+		var err error
+		if key, err = pseudonymKey(cfg); err != nil {
+			return nil, err
+		}
+	}
+	log.Info("llm", "provider", cfg.LLMProvider, "fast", cfg.LLMModelFast, "strong", cfg.LLMModelStrong, "run_token_cap", cfg.LLMRunTokenCap)
+	return key, nil
+}
+
+// deps are what the workflow (and the web server) are built on.
+type deps struct {
+	st       *store.Store
+	reg      *agent.Registry
+	profiles []company.Profile
+	byID     map[string]company.Profile
+	rules    company.Rules
+}
+
+func (d deps) close() {
+	d.reg.Close()
+	d.st.Close()
+}
+
+// openDeps loads the profiles and rules from cmd.configDir, opens the store
+// and connects the MCP registry. The caller closes the result.
+func openDeps(ctx context.Context, cfg config.Config, log *slog.Logger, cmd command) (deps, error) {
+	profiles, err := company.LoadProfiles(filepath.Join(cmd.configDir, "companies"))
+	if err != nil {
+		return deps{}, err
+	}
+	rules, err := company.LoadRules(filepath.Join(cmd.configDir, "rules.yaml"))
+	if err != nil {
+		return deps{}, err
+	}
+	byID := make(map[string]company.Profile, len(profiles))
+	for _, p := range profiles {
+		byID[p.ID] = p
+	}
+	st, err := store.Open(ctx, cfg.DatabaseURL.Reveal())
+	if err != nil {
+		return deps{}, err
+	}
+	reg, err := agent.NewRegistry(ctx, cfg, log)
+	if err != nil {
+		st.Close()
+		return deps{}, err
+	}
+	return deps{st: st, reg: reg, profiles: profiles, byID: byID, rules: rules}, nil
+}
+
+// newWorkflow builds the close workflow. With cmd.noExplain it has no
+// explainer, verifier or retriever; otherwise model is the provider and
+// names the individuals' names to pseudonymise.
+func newWorkflow(cfg config.Config, log *slog.Logger, cmd command, d deps, model llm.Provider, key []byte, names []string) (*agent.Workflow, error) {
+	books := &agent.MCPBooks{Registry: d.reg, Companies: d.st}
+	wf := &agent.Workflow{
+		Store:      d.st,
+		Books:      books,
+		Evidence:   &agent.MCPEvidence{Registry: d.reg},
+		Profiles:   d.byID,
+		Rules:      d.rules,
+		Checks:     agent.DefaultChecks(),
+		Config:     cfg,
+		ResultsDir: cmd.resultsDir,
+		Timeout:    cmd.timeout,
+		Log:        log,
+	}
+	if cmd.noExplain {
+		log.Info("explaining disabled (--no-explain)")
+		return wf, nil
+	}
+	fault, err := agent.NewFault(cfg.Fault)
+	if err != nil {
+		return nil, err
+	}
+	if fault != nil {
+		log.Warn("COPILOT_FAULT is on: one explanation will be corrupted on its first attempt", "fault", fault.Mode())
+	}
+	// Counts only: names are personal data.
+	log.Info("pseudonymisation on", "individual_names", len(names))
+	wf.Model = llmtrace.Provider(model)
+	wf.Explainer = &agent.LLMExplainer{
+		Store:       d.st,
+		Accounts:    agent.BooksAccounts{Books: books},
+		FastModel:   cfg.LLMModelFast,
+		StrongModel: cfg.LLMModelStrong,
+		NewPseudonymiser: func(runID uuid.UUID) agent.Pseudonymiser {
+			return agent.NewRedactor(key, runID, names)
+		},
+		Fault: fault,
+		Log:   log,
+	}
+	wf.Verifier = &agent.CodeVerifier{Store: d.st, Citations: d.st}
+	// Retrieval is a workflow step (CC-806): its passages reach only the
+	// explainer, never the investigator.
+	wf.Retriever = &agent.MCPDocuments{Registry: d.reg}
+	return wf, nil
 }
 
 // mintScope prints the X-Run-Scope header value of a manual session of

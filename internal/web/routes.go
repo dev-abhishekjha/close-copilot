@@ -61,7 +61,7 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodPost, "/api/findings/{id}/proposals", makerOnly, notImplemented},  // CC-1004
 		{http.MethodPost, "/api/proposals/{id}/approve", checkerOnly, notImplemented}, // CC-1004
 		{http.MethodPost, "/api/proposals/{id}/reject", checkerOnly, notImplemented},  // CC-1004
-		{http.MethodPost, "/api/ask", anyRole, notImplemented},                        // CC-707/708
+		{http.MethodPost, "/api/ask", anyRole, s.askAPI(s.handleAPIAsk)},
 	}
 }
 
