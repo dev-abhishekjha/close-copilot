@@ -455,6 +455,14 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 ---
 
+- **CC-1006 notes for later tickets (from G5; merged 2026-10-14):**
+  - **CC-1102:** the Asker's reroute cap (`ErrAskReroutes`) cannot limit `/api/ask`, because the handler sends no `RunID`, so every request is a new run and a new reroute key. The per-user/IP limit on `/api/ask` is the only cap on questions and LLM spend.
+  - **llm-engineer, `internal/agent/ask.go` `takeRoute` (:441-450):** `Asker.routes` gets one key per request and is never pruned, so memory grows in a long-running `agent serve`. Delete the key when `Ask` finishes, or bound the map.
+  - **Shutdown (optional):** `http.Server.Shutdown` does not cancel in-flight request contexts, so an Ask still running after the 10 s grace is cut off when the store and MCP registry close. Set `BaseContext` to a context `Serve` cancels after the grace.
+  - **Providers (optional):** a claude-cli or Anthropic error could carry a pseudonymised prompt fragment into the `web: ask` log; cap or redact provider error text in `internal/llm`.
+  - **Before CC-1201:** per-user company lists (owner decision), as in the CC-1006 ticket.
+  - **Browser walkthrough** of `agent serve` against the seeded ERPNext is untested; do it once before the demo.
+
 ## Notes for later specs
 
 
