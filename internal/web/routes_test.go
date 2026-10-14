@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"os/exec"
 	"slices"
 	"strings"
 	"testing"
@@ -242,5 +243,24 @@ func TestAnonymous(t *testing.T) {
 	w := ts.do(t, req{method: http.MethodGet, path: "/login?next=%2Fruns%2Fabc%3Ftab%3D1"})
 	if !strings.Contains(w.Body.String(), `name="next" value="/runs/abc?tab=1"`) {
 		t.Error("login form doesn't carry the next path")
+	}
+}
+
+// TestRoutesNoERPClientDependency checks that the web package does not
+// reach the ERPNext client, directly or transitively.
+func TestRoutesNoERPClientDependency(t *testing.T) {
+	const module = "github.com/abhishekjha/close-copilot"
+	out, err := exec.CommandContext(t.Context(), "go", "list", "-deps", module+"/internal/web").CombinedOutput()
+	if err != nil {
+		t.Fatalf("go list -deps: %v\n%s", err, out)
+	}
+	deps := strings.Fields(string(out))
+	if len(deps) < 10 {
+		t.Fatalf("go list -deps listed only %d packages", len(deps))
+	}
+	for _, dep := range deps {
+		if dep == module+"/internal/frappe" || strings.HasPrefix(dep, module+"/internal/frappe/") {
+			t.Errorf("internal/web depends on %s", dep)
+		}
 	}
 }

@@ -19,6 +19,7 @@ const (
 	cmdClose     = "close"
 	cmdResume    = "resume"
 	cmdMintScope = "mint-scope"
+	cmdServe     = "serve"
 )
 
 // maxScopeTTL caps a mint-scope header's life, so a scope minted for an
@@ -28,6 +29,9 @@ const maxScopeTTL = 24 * time.Hour
 const usage = `usage:
   agent close --company <id> --month YYYY-MM [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
   agent resume <run_id> [--results-dir results] [--timeout 10m] [--config-dir config] [--no-explain]
+  agent serve [--results-dir results] [--config-dir config] [--no-explain]
+    serves the web UI and API on APP_ADDR (default :8000); it needs APP_SESSION_KEY and MCP_SCOPE_KEY,
+    and PSEUDONYM_KEY unless --no-explain; each run keeps the 10m deadline
   agent mint-scope --company <id> --month YYYY-MM [--ttl 1h]
     prints an X-Run-Scope header value (at most 24h) for a manual MCP Inspector session; it needs
     MCP_SCOPE_KEY, and the agent's other required variables must be set too, though it uses none of them`
@@ -69,7 +73,10 @@ func parseArgs(args []string) (command, error) {
 	fs := flag.NewFlagSet("agent "+c.name, flag.ContinueOnError)
 	fs.SetOutput(io.Discard)
 	fs.StringVar(&c.resultsDir, "results-dir", agent.DefaultResultsDir, "directory for runs/<run_id>.md")
-	fs.DurationVar(&c.timeout, "timeout", agent.DefaultRunTimeout, "run deadline, at most 10m")
+	c.timeout = agent.DefaultRunTimeout
+	if c.name != cmdServe {
+		fs.DurationVar(&c.timeout, "timeout", agent.DefaultRunTimeout, "run deadline, at most 10m")
+	}
 	fs.StringVar(&c.configDir, "config-dir", "config", "directory holding companies/, rules.yaml and pricing.yaml")
 	fs.BoolVar(&c.noExplain, "no-explain", false, "skip explaining: no model calls, the run ends partial")
 
@@ -108,6 +115,13 @@ func parseArgs(args []string) (command, error) {
 			return command{}, usageErr("run ID %.40q is not a UUID", positional[0])
 		}
 		c.runID = id
+	case cmdServe:
+		if err := fs.Parse(rest); err != nil {
+			return command{}, usageErr("%v", err)
+		}
+		if fs.NArg() > 0 {
+			return command{}, usageErr("unexpected argument %.40q", fs.Arg(0))
+		}
 	default:
 		return command{}, usageErr("unknown command %.40q", c.name)
 	}

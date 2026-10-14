@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log/slog"
+	"net"
 	"net/http"
 	"sync/atomic"
 	"time"
@@ -44,6 +45,10 @@ type Options struct {
 	// Runs backs the close-run pages and API (CC-1002). Nil means not
 	// configured: those routes answer 501 after the role check.
 	Runs *RunsBackend
+	// Ask backs POST /api/ask (CC-1006). Nil means not configured: the route
+	// answers 501 after the role check. It also needs Runs, whose store
+	// lists the companies a question may name.
+	Ask AskBackend
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
@@ -65,6 +70,7 @@ type Server struct {
 	routes        []route
 	handler       http.Handler
 	runs          *runsService // nil when Options.Runs is nil
+	ask           AskBackend   // nil when Options.Ask is nil
 	erpBase       string
 }
 
@@ -88,6 +94,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		secureCookies: !opts.InsecureCookies,
 		now:           opts.Now,
 		erpBase:       opts.ERPBaseURL,
+		ask:           opts.Ask,
 	}
 	if s.addr == "" {
 		s.addr = defaultAddr
@@ -139,11 +146,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.handler.ServeHTTP(w, r)
 }
 
-// Run serves on the configured address until ctx is cancelled, then shuts
-// down gracefully, letting in-flight requests finish.
+// Run listens on the configured address and serves until ctx is cancelled.
+// A bind error is returned before "listening" is logged.
 func (s *Server) Run(ctx context.Context) error {
+	ln, err := (&net.ListenConfig{}).Listen(ctx, "tcp", s.addr)
+	if err != nil {
+		return fmt.Errorf("web: listen %s: %w", s.addr, err)
+	}
+	return s.Serve(ctx, ln)
+}
+
+// Serve serves on ln until ctx is cancelled, then shuts down gracefully,
+// letting in-flight requests finish. It closes ln.
+func (s *Server) Serve(ctx context.Context, ln net.Listener) error {
 	if s.runs != nil {
-		// Runs started from here on stop when ctx is cancelled; Run waits
+		// Runs started from here on stop when ctx is cancelled; Serve waits
 		// for them (bounded) after the HTTP server has stopped. A run cut
 		// short stays "running" and can be resumed.
 		runCtx, cancel := context.WithCancel(ctx)
@@ -154,7 +171,6 @@ func (s *Server) Run(ctx context.Context) error {
 		}()
 	}
 	srv := &http.Server{
-		Addr:              s.addr,
 		Handler:           s,
 		ReadHeaderTimeout: readHeaderTimeout,
 		ReadTimeout:       readTimeout,
@@ -163,16 +179,17 @@ func (s *Server) Run(ctx context.Context) error {
 		MaxHeaderBytes:    maxHeaderBytes,
 		ErrorLog:          slog.NewLogLogger(s.log.Handler(), slog.LevelWarn),
 	}
+	addr := ln.Addr().String()
 	errc := make(chan error, 1)
-	go func() { errc <- srv.ListenAndServe() }()
-	s.log.InfoContext(ctx, "web: listening", "addr", s.addr)
+	go func() { errc <- srv.Serve(ln) }()
+	s.log.InfoContext(ctx, "web: listening", "addr", addr)
 
 	select {
 	case err := <-errc:
 		if errors.Is(err, http.ErrServerClosed) {
 			return nil
 		}
-		return fmt.Errorf("web: serve %s: %w", s.addr, err)
+		return fmt.Errorf("web: serve %s: %w", addr, err)
 	case <-ctx.Done():
 	}
 	shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), shutdownTimeout)
@@ -181,7 +198,7 @@ func (s *Server) Run(ctx context.Context) error {
 		return fmt.Errorf("web: shutdown: %w", err)
 	}
 	if err := <-errc; err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return fmt.Errorf("web: serve %s: %w", s.addr, err)
+		return fmt.Errorf("web: serve %s: %w", addr, err)
 	}
 	return nil
 }
