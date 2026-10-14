@@ -72,6 +72,12 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodPost, "/proposals/{id}/approve", checkerOnly, s.approvalsRoute(s.handleProposalApprove)},
 		{http.MethodPost, "/proposals/{id}/reject", checkerOnly, s.approvalsRoute(s.handleProposalReject)},
 
+		// Audit log and run metrics (CC-1005). They answer 501 until
+		// Options.Audit is set. Audit rows hold unmasked tool arguments, so
+		// the audit page is for checkers.
+		{http.MethodGet, "/audit", checkerOnly, s.auditRoute(s.handleAuditPage)},
+		{http.MethodGet, "/runs/{id}/metrics", anyRole, s.metricsRoute(s.handleRunMetrics)},
+
 		// JSON API (shared spec).
 		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},
 		{http.MethodGet, "/api/close-runs/{id}", anyRole, s.runsAPI(s.handleAPIRun)},
@@ -129,6 +135,7 @@ var homeActions = []homeAction{
 	{"approve-proposal", "Approve and post a proposal", http.MethodPost, "/api/proposals/{id}/approve"},
 	{"reject-proposal", "Reject a proposal", http.MethodPost, "/api/proposals/{id}/reject"},
 	{"approvals", "Review pending proposals", http.MethodGet, "/approvals"},
+	{"audit", "Audit log", http.MethodGet, "/audit"},
 }
 
 // handleHome shows the user's name, role and the actions their role allows.

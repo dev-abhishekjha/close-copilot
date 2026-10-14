@@ -5,6 +5,22 @@ templ Runs(p RunsPage) {
 	@Base(Layout{Title: "Close runs", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
 		<section class="card">
 			<h1>Close runs</h1>
+			if p.ShowSummary {
+				<div class="summary" id="runs-summary">
+					if p.Summary == nil {
+						<p>No finished runs yet.</p>
+					} else {
+						<p>
+							Last finished run:
+							<a class="summary-run" href={ templ.SafeURL(runURL(p.Summary.RunID)) }>{ p.Summary.Company } { p.Summary.Month }</a>.
+							Verified rate:
+							<a class="summary-verified" href={ templ.SafeURL(metricsURL(p.Summary.RunID)) }>{ p.Summary.VerifiedRate }</a>.
+							Open high-severity findings:
+							<a class="summary-high" href={ templ.SafeURL(findingsURL(p.Summary.RunID)) }>{ itoa(p.Summary.OpenHigh) }</a>.
+						</p>
+					}
+				</div>
+			}
 			if p.Error != "" {
 				<p class="error" role="alert">{ p.Error }</p>
 			}
