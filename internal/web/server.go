@@ -53,6 +53,9 @@ type Options struct {
 	// (CC-1004). Nil means not configured: they answer 501 after the role
 	// check.
 	Approvals ApprovalsBackend
+	// Audit backs the audit log page and the run metrics page (CC-1005).
+	// Nil means not configured: they answer 501 after the role check.
+	Audit AuditStore
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
@@ -86,6 +89,7 @@ type Server struct {
 	runs          *runsService     // nil when Options.Runs is nil
 	ask           AskBackend       // nil when Options.Ask is nil
 	approvals     ApprovalsBackend // nil when Options.Approvals is nil
+	audit         AuditStore       // nil when Options.Audit is nil
 	erpBase       string
 	limits        *apiLimits
 	logins        *loginLimiter
@@ -114,6 +118,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		erpBase:       opts.ERPBaseURL,
 		ask:           opts.Ask,
 		approvals:     opts.Approvals,
+		audit:         opts.Audit,
 		limits:        newAPILimits(opts),
 		logins:        newLoginLimiter(opts),
 	}

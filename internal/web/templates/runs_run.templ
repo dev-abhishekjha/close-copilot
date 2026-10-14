@@ -5,7 +5,7 @@ templ Run(p RunPage) {
 	@Base(Layout{Title: "Close run", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
 		<section class="card">
 			<h1>Close run: { p.Company } { p.Month }</h1>
-			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(findingsURL(p.Panel.ID)) }>Findings</a></p>
+			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(findingsURL(p.Panel.ID)) }>Findings</a> · <a href={ templ.SafeURL(metricsURL(p.Panel.ID)) }>Metrics</a></p>
 			@RunProgress(p.Panel)
 		</section>
 	}

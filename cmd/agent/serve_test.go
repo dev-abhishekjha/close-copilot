@@ -676,3 +676,61 @@ func TestAdaptApprovalErr(t *testing.T) {
 		t.Error("nil error adapted")
 	}
 }
+
+// serveAudit is a fixed web.AuditStore.
+type serveAudit struct{ rows []store.AuditLogEntry }
+
+func (a serveAudit) ListAuditPage(context.Context, store.AuditFilter) ([]store.AuditLogEntry, int64, error) {
+	return a.rows, 0, nil
+}
+
+func (serveAudit) ListAuditFacets(context.Context) (actors, servers, tools []string, err error) {
+	return []string{"ravi"}, []string{"approvals"}, []string{"proposal.approve"}, nil
+}
+
+func (serveAudit) RunsSummaryStats(context.Context) (store.LastRunStats, error) {
+	return store.LastRunStats{}, nil
+}
+
+func (serveAudit) RunMetricsByStep(context.Context, uuid.UUID) ([]store.StepUsage, error) {
+	return nil, nil
+}
+
+// TestServeAuditWired: the audit backend reaches the server, so a checker
+// sees /audit, and without it the page answers 501.
+func TestServeAuditWired(t *testing.T) {
+	srvr := "approvals"
+	tool := "proposal.approve"
+	be := serveBackends{audit: serveAudit{rows: []store.AuditLogEntry{
+		{ID: 1, At: time.Date(2026, 10, 1, 9, 0, 0, 0, time.UTC), Actor: "ravi", Server: &srvr, Tool: &tool, Args: []byte(`{"proposal":"p-1"}`)},
+	}}}
+	login := func(h http.Handler) jar {
+		j := jar{}
+		w := j.do(t, h, http.MethodGet, "/login", nil)
+		m := serveCSRF.FindStringSubmatch(w.Body.String())
+		if m == nil {
+			t.Fatal("no csrf field")
+		}
+		if w := j.do(t, h, http.MethodPost, "/login", url.Values{"csrf_token": {m[1]}, "username": {"ravi"}, "password": {servePassword}}); w.Code != http.StatusSeeOther {
+			t.Fatalf("login = %d", w.Code)
+		}
+		return j
+	}
+	for _, wired := range []bool{true, false} {
+		b := serveBackends{}
+		if wired {
+			b = be
+		}
+		srv, err := newServeServer(serveConfig(), approvalUsers(t), b, slog.New(slog.DiscardHandler))
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := login(srv).do(t, srv, http.MethodGet, "/audit", nil)
+		if wired && (w.Code != http.StatusOK || !strings.Contains(w.Body.String(), "proposal.approve") || !strings.Contains(w.Body.String(), "ravi")) {
+			t.Errorf("wired /audit = %d: %.200s", w.Code, w.Body)
+		}
+		if !wired && w.Code != http.StatusNotImplemented {
+			t.Errorf("unwired /audit = %d, want 501", w.Code)
+		}
+	}
+}

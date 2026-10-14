@@ -389,6 +389,20 @@ func (s *Server) renderRuns(w http.ResponseWriter, r *http.Request, status int, 
 			Findings: x.Findings, Cost: formatCost(x.CostUSD), Duration: runDuration(x.CloseRun),
 		})
 	}
+	if s.audit != nil {
+		page.ShowSummary = true
+		st, err := s.audit.RunsSummaryStats(ctx)
+		if err != nil {
+			s.serverError(w, r, false, err)
+			return
+		}
+		if st.Found {
+			page.Summary = &templates.SummaryCard{
+				RunID: st.RunID.String(), Company: st.CompanyID, Month: st.Month,
+				VerifiedRate: verifiedRate(st.Verified, st.Total), OpenHigh: st.OpenHigh,
+			}
+		}
+	}
 	s.render(w, r, status, templates.Runs(page))
 }
 

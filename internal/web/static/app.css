@@ -114,3 +114,15 @@ table.approvals table.lines { font-size: 0.9em; }
 table.approvals .decision form { margin-bottom: 0.5rem; }
 .own { font-style: italic; }
 .posted { font-weight: bold; }
+
+/* Audit log and run metrics (CC-1005) */
+.filters { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: end; margin-bottom: 1rem; }
+table.audit, table.steps { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+table.audit th, table.audit td, table.steps th, table.steps td {
+  border-top: 1px solid var(--border);
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+.summary { margin-bottom: 1rem; }
