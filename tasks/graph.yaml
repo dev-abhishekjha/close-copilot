@@ -1200,7 +1200,7 @@ tasks:
     owner: implementer
     risk: regulated
     human_review: true
-    depends_on: [CC-1003, CC-504b]
+    depends_on: [CC-1003, CC-504b, CC-1007]
     needs_erpnext: true
     files:
       - "internal/approvals/**"
@@ -1235,6 +1235,26 @@ tasks:
       - "internal/web/routes.go"
       - "internal/web/ask.go"
     check: "agent serve starts; viewer sees runs and a finding; /api/ask answers or refuses; web does not import frappe"
+
+  # CC-1007 is not in the tickets doc; see tasks/hardening.md (owner decision 2026-10-14: dedicated posting key before CC-1004).
+  - id: CC-1007
+    title: "Dedicated ERPNext posting key for the admin route"
+    phase: 4
+    owner: integration-engineer
+    risk: data-sensitive
+    human_review: true
+    depends_on: [CC-102, CC-504b]
+    needs_erpnext: true
+    files:
+      - "deploy/erpnext/api-users.sh"
+      - "deploy/erpnext/lib.sh"
+      - ".env.example"
+      - "internal/config/config.go"
+      - "internal/config/config_test.go"
+      - "cmd/mcp-books/main.go"
+      - "cmd/mcp-books/main_test.go"
+      - "cmd/mcp-books/posting_key_integration_test.go"
+    check: "Posting key refused on reads and on non-JE DocTypes; copilot-bot key never used by the admin tool"
 
   # ---- Phase 5 ----
   - id: CC-1101
