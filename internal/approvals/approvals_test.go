@@ -32,6 +32,10 @@ type fakeStore struct {
 	auditCtx  []ctxSeen // the ctx of each InsertAuditLog, as seen then
 	saves     int
 	createErr error
+	// findings is what WithProposalFindingLock reads; findingReads counts
+	// those reads.
+	findings     *fakeFindings
+	findingReads int
 }
 
 func newFakeStore(t *testing.T) *fakeStore {
@@ -109,6 +113,27 @@ func (s *fakeStore) WithProposalLock(ctx context.Context, id uuid.UUID, fn func(
 		s.mu.Unlock()
 	}
 	return nil
+}
+
+// WithProposalFindingLock reads the finding's status from s.findings while
+// the row lock is held, counting each read.
+func (s *fakeStore) WithProposalFindingLock(ctx context.Context, id uuid.UUID, fn func(context.Context, store.JournalProposal, store.FindingStatusFunc, func(context.Context, store.JournalProposal) error) error) error {
+	return s.WithProposalLock(ctx, id, func(ctx context.Context, p store.JournalProposal, save func(context.Context, store.JournalProposal) error) error {
+		read := func(context.Context) (string, bool, error) {
+			s.mu.Lock()
+			s.findingReads++
+			s.mu.Unlock()
+			if p.FindingID == nil || s.findings == nil {
+				return "", false, nil
+			}
+			f, ok := s.findings.findings[*p.FindingID]
+			if !ok {
+				return "", false, nil
+			}
+			return f.Status, true, nil
+		}
+		return fn(ctx, p, read, save)
+	})
 }
 
 func (s *fakeStore) InsertAuditLog(ctx context.Context, e store.AuditLogEntry) (int64, error) {
@@ -248,6 +273,7 @@ func newFixture(t *testing.T) *fixture {
 	st := newFakeStore(t)
 	run := store.CloseRun{ID: uuid.New(), CompanyID: "sharma", Month: "2026-08", Status: "done"}
 	ff := &fakeFindings{findings: map[uuid.UUID]store.Finding{}, runs: map[uuid.UUID]store.CloseRun{run.ID: run}}
+	st.findings = ff
 	poster := &fakePoster{st: st}
 	logs := &bytes.Buffer{}
 	svc := New(Deps{
@@ -644,65 +670,170 @@ func TestApprovePostFailureAndRetry(t *testing.T) {
 }
 
 // A proposal whose finding was dismissed or accepted after it was made is
-// refused, both when first approved and on the checker's retry: the poster
-// is never called and the row is unchanged.
+// refused when first approved: the poster is never called and the row is
+// unchanged. The finding's status is read under the proposal lock.
 func TestApproveFindingNotOpen(t *testing.T) {
 	const msg = "the finding is no longer open, so this entry can't be approved"
 	for _, status := range []string{"dismissed", "accepted", "needs_review", "missing"} {
-		for _, retry := range []bool{false, true} {
-			name := status + "/proposed"
-			if retry {
-				name = status + "/approved retry"
+		t.Run(status+"/proposed", func(t *testing.T) {
+			fx := newFixture(t)
+			id := fx.proposal(t)
+			fid := *fx.st.row(id).FindingID
+			setFindingStatus(fx, fid, status)
+			before, calls, saves, reads := fx.st.row(id), fx.poster.count(), fx.st.saves, fx.st.findingReads
+			_, err := fx.svc.Approve(t.Context(), "ravi", id)
+			var e *Error
+			if !errors.Is(err, ErrFindingNotOpen) || !errors.As(err, &e) || e.Code != "finding_not_open" || err.Error() != msg {
+				t.Fatalf("Approve: %v, want ErrFindingNotOpen", err)
 			}
-			t.Run(name, func(t *testing.T) {
-				fx := newFixture(t)
-				id := fx.proposal(t)
-				if retry {
-					// A failed first post leaves the row approved by ravi.
-					fx.poster.err = &Refusal{Code: "erp_unavailable"}
-					if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrPostFailed) {
-						t.Fatalf("first Approve: %v", err)
-					}
-					fx.poster.err = nil
-				}
-				fid := *fx.st.row(id).FindingID
-				if status == "missing" {
-					delete(fx.findings.findings, fid)
-				} else {
-					f := fx.findings.findings[fid]
-					f.Status = status
-					fx.findings.findings[fid] = f
-				}
-				before, calls, saves := fx.st.row(id), fx.poster.count(), fx.st.saves
-				_, err := fx.svc.Approve(t.Context(), "ravi", id)
-				var e *Error
-				if !errors.Is(err, ErrFindingNotOpen) || !errors.As(err, &e) || e.Code != "finding_not_open" || err.Error() != msg {
-					t.Fatalf("Approve: %v, want ErrFindingNotOpen", err)
-				}
-				if fx.poster.count() != calls {
-					t.Error("poster called for a finding that is not open")
-				}
-				after := fx.st.row(id)
-				if after.Status != before.Status || !samePtr(after.Checker, before.Checker) || !sameTime(after.DecidedAt, before.DecidedAt) || fx.st.saves != saves {
-					t.Errorf("row changed: %+v", after)
-				}
-				e2, args := fx.st.lastAudit(t)
-				if e2.Actor != "ravi" || *e2.Tool != ToolApprove || args["result"] != "refused:finding_not_open" {
-					t.Errorf("audit %+v %v", e2, args)
-				}
-				// Self-approval is still refused first.
-				if _, err := fx.svc.Approve(t.Context(), "asha", id); !errors.Is(err, ErrSelfApproval) {
-					t.Errorf("maker: %v, want ErrSelfApproval", err)
-				}
-				// Reject is unaffected.
-				if !retry {
-					if err := fx.svc.Reject(t.Context(), "ravi", id, "finding closed"); err != nil {
-						t.Errorf("Reject: %v", err)
-					}
-				}
-			})
-		}
+			if fx.st.findingReads != reads+1 {
+				t.Errorf("finding read %d times under the lock, want 1", fx.st.findingReads-reads)
+			}
+			if fx.poster.count() != calls {
+				t.Error("poster called for a finding that is not open")
+			}
+			after := fx.st.row(id)
+			if after.Status != before.Status || !samePtr(after.Checker, before.Checker) || !sameTime(after.DecidedAt, before.DecidedAt) || fx.st.saves != saves {
+				t.Errorf("row changed: %+v", after)
+			}
+			e2, args := fx.st.lastAudit(t)
+			if e2.Actor != "ravi" || *e2.Tool != ToolApprove || args["result"] != "refused:finding_not_open" {
+				t.Errorf("audit %+v %v", e2, args)
+			}
+			// Self-approval is still refused first, without reading the
+			// finding.
+			reads = fx.st.findingReads
+			if _, err := fx.svc.Approve(t.Context(), "asha", id); !errors.Is(err, ErrSelfApproval) {
+				t.Errorf("maker: %v, want ErrSelfApproval", err)
+			}
+			if fx.st.findingReads != reads {
+				t.Error("finding read before the self-approval refusal")
+			}
+			// Reject is unaffected.
+			if err := fx.svc.Reject(t.Context(), "ravi", id, "finding closed"); err != nil {
+				t.Errorf("Reject: %v", err)
+			}
+		})
 	}
+}
+
+// setFindingStatus changes the finding's status; "missing" deletes it.
+func setFindingStatus(fx *fixture, fid uuid.UUID, status string) {
+	if status == "missing" {
+		delete(fx.findings.findings, fid)
+		return
+	}
+	f := fx.findings.findings[fid]
+	f.Status = status
+	fx.findings.findings[fid] = f
+}
+
+// The recorded checker's retry of an approved proposal is not refused when
+// its finding has since left open, so the idempotent admin tool can
+// reconcile a post that already reached ERPNext. Another checker is still
+// refused, and the maker still can't approve.
+func TestApproveRetryAfterFindingClosed(t *testing.T) {
+	for _, status := range []string{"dismissed", "accepted", "needs_review", "missing"} {
+		t.Run(status, func(t *testing.T) {
+			fx := newFixture(t)
+			id := fx.proposal(t)
+			// A failed first post leaves the row approved by ravi.
+			fx.poster.err = &Refusal{Code: "erp_unavailable"}
+			if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrPostFailed) {
+				t.Fatalf("first Approve: %v", err)
+			}
+			fx.poster.err = nil
+			setFindingStatus(fx, *fx.st.row(id).FindingID, status)
+
+			// Self-approval first, then another checker: both refused
+			// without a post.
+			if _, err := fx.svc.Approve(t.Context(), "asha", id); !errors.Is(err, ErrSelfApproval) {
+				t.Errorf("maker: %v, want ErrSelfApproval", err)
+			}
+			_, err := fx.svc.Approve(t.Context(), "meera", id)
+			var e *Error
+			if !errors.Is(err, ErrNotPending) || !errors.As(err, &e) || e.Code != "other_checker" {
+				t.Errorf("other checker: %v, want ErrNotPending/other_checker", err)
+			}
+			if fx.poster.count() != 1 {
+				t.Fatalf("poster called %d times, want 1", fx.poster.count())
+			}
+
+			reads := fx.st.findingReads
+			r, err := fx.svc.Approve(t.Context(), "ravi", id)
+			if err != nil || r.Status != StatusPosted || r.ERPName == "" {
+				t.Fatalf("retry: %+v %v, want posted", r, err)
+			}
+			if fx.poster.count() != 2 {
+				t.Errorf("poster called %d times, want 2", fx.poster.count())
+			}
+			if fx.st.findingReads != reads {
+				t.Error("retry read the finding's status")
+			}
+			if row := fx.st.row(id); row.Status != StatusPosted || row.ERPName == nil || *row.ERPName != r.ERPName {
+				t.Errorf("row %+v, want posted as %s", row, r.ERPName)
+			}
+			if _, args := fx.st.lastAudit(t); args["result"] != "posted" {
+				t.Errorf("audit result %v, want posted", args["result"])
+			}
+		})
+	}
+}
+
+// An approved row is reconciled by its checker's retry even after the
+// finding was dismissed; another checker is refused; a first approval of a
+// dismissed finding is still refused without a post.
+func TestApproveDismissedReconcile(t *testing.T) {
+	t.Run("same checker retry posts", func(t *testing.T) {
+		fx := newFixture(t)
+		id := fx.proposal(t)
+		fx.poster.err = &Refusal{Code: "erp_unavailable"}
+		if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrPostFailed) {
+			t.Fatalf("first Approve: %v", err)
+		}
+		fx.poster.err = nil
+		setFindingStatus(fx, *fx.st.row(id).FindingID, "dismissed")
+		r, err := fx.svc.Approve(t.Context(), "ravi", id)
+		if err != nil || r.ERPName == "" || r.Status != StatusPosted {
+			t.Fatalf("retry: %+v %v", r, err)
+		}
+		if fx.poster.count() != 2 {
+			t.Errorf("poster called %d times, want 2", fx.poster.count())
+		}
+	})
+	t.Run("other checker refused", func(t *testing.T) {
+		fx := newFixture(t)
+		id := fx.proposal(t)
+		fx.poster.err = &Refusal{Code: "erp_unavailable"}
+		if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrPostFailed) {
+			t.Fatalf("first Approve: %v", err)
+		}
+		fx.poster.err = nil
+		setFindingStatus(fx, *fx.st.row(id).FindingID, "dismissed")
+		if _, err := fx.svc.Approve(t.Context(), "meera", id); !errors.Is(err, ErrNotPending) {
+			t.Errorf("other checker: %v, want ErrNotPending", err)
+		}
+		if fx.poster.count() != 1 {
+			t.Errorf("poster called %d times, want 1", fx.poster.count())
+		}
+		if row := fx.st.row(id); row.Status != StatusApproved {
+			t.Errorf("row %+v, want approved", row)
+		}
+	})
+	t.Run("first approval refused", func(t *testing.T) {
+		fx := newFixture(t)
+		id := fx.proposal(t)
+		setFindingStatus(fx, *fx.st.row(id).FindingID, "dismissed")
+		if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrFindingNotOpen) {
+			t.Errorf("Approve: %v, want ErrFindingNotOpen", err)
+		}
+		if fx.poster.count() != 0 {
+			t.Errorf("poster called %d times, want 0", fx.poster.count())
+		}
+		if row := fx.st.row(id); row.Status != StatusProposed || row.Checker != nil {
+			t.Errorf("row %+v, want proposed", row)
+		}
+	})
 }
 
 // A posted proposal stays idempotent after its finding is dismissed; a

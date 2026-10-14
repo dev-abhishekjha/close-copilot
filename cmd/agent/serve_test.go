@@ -144,6 +144,22 @@ func (s *serveStore) WithProposalLock(ctx context.Context, id uuid.UUID, fn func
 	})
 }
 
+func (s *serveStore) WithProposalFindingLock(ctx context.Context, id uuid.UUID, fn func(context.Context, store.JournalProposal, store.FindingStatusFunc, func(context.Context, store.JournalProposal) error) error) error {
+	return s.WithProposalLock(ctx, id, func(ctx context.Context, p store.JournalProposal, save func(context.Context, store.JournalProposal) error) error {
+		read := func(ctx context.Context) (string, bool, error) {
+			if p.FindingID == nil {
+				return "", false, nil
+			}
+			f, err := s.GetFinding(ctx, *p.FindingID)
+			if err != nil {
+				return "", false, nil
+			}
+			return f.Status, true, nil
+		}
+		return fn(ctx, p, read, save)
+	})
+}
+
 func serveUsers(t *testing.T) web.Users {
 	t.Helper()
 	h, err := bcrypt.GenerateFromPassword([]byte(servePassword), web.MinBcryptCost)

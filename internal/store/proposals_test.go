@@ -1,6 +1,7 @@
 package store
 
 import (
+	"context"
 	"testing"
 	"time"
 
@@ -65,5 +66,29 @@ func TestProposalListLimit(t *testing.T) {
 		if got := proposalListLimit(tc.in); got != tc.want {
 			t.Errorf("proposalListLimit(%d) = %d, want %d", tc.in, got, tc.want)
 		}
+	}
+}
+
+func TestWithProposalFindingLockRefusesBadArgs(t *testing.T) {
+	type fnT = func(context.Context, JournalProposal, FindingStatusFunc, func(context.Context, JournalProposal) error) error
+	noop := func(context.Context, JournalProposal, FindingStatusFunc, func(context.Context, JournalProposal) error) error {
+		return nil
+	}
+	var s Store // not open: any database call would panic on the nil pool
+	cases := []struct {
+		name string
+		id   uuid.UUID
+		fn   fnT
+	}{
+		{"nil fn", uuid.New(), nil},
+		{"nil id", uuid.Nil, noop},
+		{"store not open", uuid.New(), noop},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := s.WithProposalFindingLock(t.Context(), tc.id, tc.fn); err == nil {
+				t.Error("want an error")
+			}
+		})
 	}
 }

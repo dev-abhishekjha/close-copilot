@@ -34,6 +34,10 @@ var _ FindingsStore = (*store.Store)(nil)
 
 const maxReasonRunes = 500
 
+// liveProposalMsg refuses accept and dismiss of a finding with a live
+// journal proposal.
+const liveProposalMsg = "this finding has a live proposal, so it can't be accepted or dismissed"
+
 // findingsHTML answers 501 until both Options.Runs and Runs.Findings are
 // set; the role check has run by then.
 func (s *Server) findingsHTML(h http.HandlerFunc) http.Handler {
@@ -165,7 +169,9 @@ func (s *Server) renderFinding(w http.ResponseWriter, r *http.Request, status in
 		page.Proposal = s.proposalView(f.Proposal)
 	}
 	if p.user.Role == RoleMaker && !decided(f.Status) {
-		page.Actions.CanDecide = true
+		// A live proposal holds the finding: accept and dismiss wait until
+		// it is rejected (decideFinding refuses them too).
+		page.Actions.CanDecide = lerr == nil && !hasLive
 		page.Actions.CreateButton = s.approvals != nil && lerr == nil && !hasLive &&
 			f.Proposal != nil && f.Verified && f.Status == "open"
 	}
@@ -336,6 +342,18 @@ func (s *Server) decideFinding(w http.ResponseWriter, r *http.Request, to, tool 
 	}
 	if f.Status != "open" && f.Status != "needs_review" {
 		s.renderFinding(w, r, http.StatusConflict, p, f, run, "this finding is already "+f.Status, "")
+		return
+	}
+	// A finding with a live journal proposal (any status but rejected) can't
+	// be accepted or dismissed: the proposal decides it. A failed lookup
+	// refuses too.
+	_, hasLive, err := s.runs.b.Findings.GetProposalByFinding(r.Context(), f.ID)
+	if err != nil {
+		s.findingErr(w, r, err)
+		return
+	}
+	if hasLive {
+		s.renderFinding(w, r, http.StatusConflict, p, f, run, liveProposalMsg, "")
 		return
 	}
 	args := map[string]string{

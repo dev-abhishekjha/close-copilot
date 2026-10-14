@@ -218,4 +218,128 @@ func TestProposalsIntegration(t *testing.T) {
 			t.Errorf("%d rows for the finding, want 1", count)
 		}
 	})
+
+	// The first approval reads the finding's status under the proposal
+	// lock with FOR SHARE: a dismissal that starts after the read waits
+	// until the approval commits, and one committed before it is seen.
+	t.Run("finding status read blocks a dismissal until commit", func(t *testing.T) {
+		fid := liveFinding(t, st)
+		p := newProposal(fid, time.Now().UTC())
+		if _, err := st.CreateProposalFromFinding(ctx, p); err != nil {
+			t.Fatal(err)
+		}
+		read, release := make(chan struct{}), make(chan struct{})
+		var (
+			seen  string
+			found bool
+			errA  error
+		)
+		aDone := make(chan struct{})
+		go func() {
+			defer close(aDone)
+			errA = st.WithProposalFindingLock(ctx, p.ID, func(ctx context.Context, p store.JournalProposal, findingStatus store.FindingStatusFunc, save func(context.Context, store.JournalProposal) error) error {
+				var err error
+				seen, found, err = findingStatus(ctx)
+				close(read)
+				if err != nil {
+					return err
+				}
+				<-release
+				checker, now := "ravi", time.Now().UTC()
+				p.Status, p.Checker, p.DecidedAt = "approved", &checker, &now
+				return save(ctx, p)
+			})
+		}()
+		<-read
+		bDone := make(chan error, 1)
+		go func() { bDone <- st.SetFindingStatus(ctx, fid, "dismissed") }()
+		select {
+		case err := <-bDone:
+			close(release)
+			<-aDone
+			t.Fatalf("dismissal finished (%v) while the approval held the finding's share lock", err)
+		case <-time.After(500 * time.Millisecond):
+		}
+		close(release)
+		<-aDone
+		if errA != nil || seen != "open" || !found {
+			t.Fatalf("approval: saw %q found=%v err=%v, want open", seen, found, errA)
+		}
+		select {
+		case err := <-bDone:
+			if err != nil {
+				t.Fatalf("dismissal after commit: %v", err)
+			}
+		case <-time.After(10 * time.Second):
+			t.Fatal("dismissal still blocked after the approval committed")
+		}
+		got, err := st.GetJournalProposal(ctx, p.ID)
+		if err != nil || got.Status != "approved" {
+			t.Errorf("proposal %+v %v, want approved", got.Status, err)
+		}
+		f, err := st.GetFinding(ctx, fid)
+		if err != nil || f.Status != "dismissed" {
+			t.Errorf("finding %q %v, want dismissed", f.Status, err)
+		}
+	})
+
+	t.Run("a committed dismissal is seen under the lock", func(t *testing.T) {
+		fid := liveFinding(t, st)
+		p := newProposal(fid, time.Now().UTC())
+		if _, err := st.CreateProposalFromFinding(ctx, p); err != nil {
+			t.Fatal(err)
+		}
+		if err := st.SetFindingStatus(ctx, fid, "dismissed"); err != nil {
+			t.Fatal(err)
+		}
+		saved := false
+		err := st.WithProposalFindingLock(ctx, p.ID, func(ctx context.Context, p store.JournalProposal, findingStatus store.FindingStatusFunc, save func(context.Context, store.JournalProposal) error) error {
+			status, found, err := findingStatus(ctx)
+			if err != nil {
+				return err
+			}
+			if !found || status != "dismissed" {
+				t.Errorf("finding status %q found=%v, want dismissed", status, found)
+			}
+			if status != "open" {
+				return errors.New("finding not open")
+			}
+			saved = true
+			return save(ctx, p)
+		})
+		if err == nil || saved {
+			t.Errorf("approval of a dismissed finding: err=%v saved=%v", err, saved)
+		}
+		if got, _ := st.GetJournalProposal(ctx, p.ID); got.Status != "proposed" {
+			t.Errorf("proposal %s, want proposed", got.Status)
+		}
+	})
+
+	// A retry that doesn't read the finding holds no lock on it: a
+	// dismissal goes through while the proposal row is locked.
+	t.Run("no read, no finding lock", func(t *testing.T) {
+		fid := liveFinding(t, st)
+		p := newProposal(fid, time.Now().UTC())
+		if _, err := st.CreateProposalFromFinding(ctx, p); err != nil {
+			t.Fatal(err)
+		}
+		err := st.WithProposalFindingLock(ctx, p.ID, func(ctx context.Context, _ store.JournalProposal, _ store.FindingStatusFunc, _ func(context.Context, store.JournalProposal) error) error {
+			dctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+			return st.SetFindingStatus(dctx, fid, "dismissed")
+		})
+		if err != nil {
+			t.Fatalf("dismissal under the proposal lock: %v", err)
+		}
+	})
+
+	t.Run("finding lock of a missing proposal", func(t *testing.T) {
+		err := st.WithProposalFindingLock(ctx, uuid.New(), func(context.Context, store.JournalProposal, store.FindingStatusFunc, func(context.Context, store.JournalProposal) error) error {
+			t.Error("fn called for a missing proposal")
+			return nil
+		})
+		if !errors.Is(err, store.ErrNotFound) {
+			t.Errorf("err %v, want ErrNotFound", err)
+		}
+	})
 }

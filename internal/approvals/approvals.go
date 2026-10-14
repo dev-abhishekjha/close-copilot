@@ -128,6 +128,7 @@ type ProposalStore interface {
 	GetJournalProposal(ctx context.Context, id uuid.UUID) (store.JournalProposal, error)
 	ListProposalsByStatus(ctx context.Context, status string, limit int) ([]store.JournalProposal, error)
 	WithProposalLock(ctx context.Context, id uuid.UUID, fn func(ctx context.Context, p store.JournalProposal, save func(ctx context.Context, p store.JournalProposal) error) error) error
+	WithProposalFindingLock(ctx context.Context, id uuid.UUID, fn func(ctx context.Context, p store.JournalProposal, findingStatus store.FindingStatusFunc, save func(ctx context.Context, p store.JournalProposal) error) error) error
 	InsertAuditLog(ctx context.Context, e store.AuditLogEntry) (int64, error)
 }
 
@@ -279,7 +280,9 @@ func proposable(f store.Finding) error {
 // ERPNext through the admin tool. The maker can't approve their own
 // proposal. Approving a posted proposal returns its entry without posting
 // again; an approved one whose post failed may be retried only by its
-// checker.
+// checker. The first approval is refused when the proposal's finding is no
+// longer open; the checker's retry is not, so a post that already reached
+// ERPNext can be reconciled.
 func (s *Service) Approve(ctx context.Context, actor string, id uuid.UUID) (ApproveResult, error) {
 	checker := Canonical(actor)
 	if checker == "" {
@@ -297,38 +300,17 @@ func (s *Service) Approve(ctx context.Context, actor string, id uuid.UUID) (Appr
 }
 
 func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (ApproveResult, error) {
-	// Step 0, before the row lock: read the proposal and, when it could be
-	// posted by this checker, whether its finding is still open. The
-	// finding is read outside the lock so the lock is held only for the
-	// decision; the lock re-reads the row and decides again.
-	open, err := s.findingOpen(ctx, checker, id)
-	if err != nil {
-		return ApproveResult{}, err
-	}
 	var (
 		needPost bool
 		done     ApproveResult
 	)
-	// mayPost refuses a post for a finding that is no longer open. A
-	// proposal without a finding (an old row) is not checked.
-	mayPost := func(p store.JournalProposal) error {
-		if p.FindingID == nil {
-			return nil
-		}
-		if open == nil {
-			// The row moved into a postable state after step 0: refuse
-			// rather than post unchecked; a retry checks again.
-			return errNotPending
-		}
-		if !*open {
-			return errFindingNotOpen
-		}
-		return nil
-	}
 	// Step 1, under the row lock: decide and commit approved before any
 	// ERPNext traffic. The admin tool takes the same lock, so it must be
-	// released before the post. Self-approval is refused first.
-	err = s.deps.Store.WithProposalLock(ctx, id, func(ctx context.Context, p store.JournalProposal, save func(context.Context, store.JournalProposal) error) error {
+	// released before the post. Self-approval is refused first. The first
+	// approval reads the finding's status in the same transaction, under a
+	// share lock, so a dismissal can't slip in between the check and the
+	// commit of approved.
+	err := s.deps.Store.WithProposalFindingLock(ctx, id, func(ctx context.Context, p store.JournalProposal, findingStatus store.FindingStatusFunc, save func(context.Context, store.JournalProposal) error) error {
 		if Canonical(p.Maker) == checker {
 			return errSelf
 		}
@@ -337,7 +319,7 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 			done = ApproveResult{ProposalID: id, Status: StatusPosted, ERPName: deref(p.ERPName), AlreadyPosted: true}
 			return nil
 		case StatusProposed:
-			if err := mayPost(p); err != nil {
+			if err := findingOpen(ctx, p, findingStatus); err != nil {
 				return err
 			}
 			now := s.now()
@@ -346,11 +328,11 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 			needPost = true
 			return save(ctx, p)
 		case StatusApproved:
+			// The recorded checker's retry. The finding was open when the
+			// row was approved; it is not checked again, so the idempotent
+			// admin tool can reconcile a post that already reached ERPNext.
 			if p.Checker == nil || Canonical(*p.Checker) != checker {
 				return errOtherChecker
-			}
-			if err := mayPost(p); err != nil {
-				return err
 			}
 			needPost = true
 			return nil
@@ -402,38 +384,21 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 	return res, nil
 }
 
-// findingOpen reports whether the finding of proposal id is open, for a
-// proposal checker could post (proposed, or approved by checker). It
-// returns nil, without reading the finding, for any other proposal, one
-// without a finding, or one checker made (the lock refuses those); a
-// missing proposal is left to the lock too. A missing finding is not open.
-func (s *Service) findingOpen(ctx context.Context, checker string, id uuid.UUID) (*bool, error) {
-	p, err := s.deps.Store.GetJournalProposal(ctx, id)
+// findingOpen refuses the first approval of p when its finding is not
+// open; read reads the status within the proposal lock. A missing finding
+// is not open; a proposal without a finding (an old row) is not checked.
+func findingOpen(ctx context.Context, p store.JournalProposal, read store.FindingStatusFunc) error {
+	if p.FindingID == nil {
+		return nil
+	}
+	status, found, err := read(ctx)
 	if err != nil {
-		if errors.Is(err, store.ErrNotFound) {
-			return nil, nil
-		}
-		return nil, fmt.Errorf("approvals: approve %s: %w", id, err)
+		return fmt.Errorf("finding: %w", err)
 	}
-	if p.FindingID == nil || Canonical(p.Maker) == checker {
-		return nil, nil
+	if !found || status != "open" {
+		return errFindingNotOpen
 	}
-	switch {
-	case p.Status == StatusProposed:
-	case p.Status == StatusApproved && p.Checker != nil && Canonical(*p.Checker) == checker:
-	default:
-		return nil, nil
-	}
-	f, err := s.deps.Findings.GetFinding(ctx, *p.FindingID)
-	open := false
-	switch {
-	case err == nil:
-		open = f.Status == "open"
-	case errors.Is(err, store.ErrNotFound):
-	default:
-		return nil, fmt.Errorf("approvals: approve %s: finding: %w", id, err)
-	}
-	return &open, nil
+	return nil
 }
 
 // Reject records actor as the checker who rejected proposal id, with a
