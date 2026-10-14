@@ -232,6 +232,22 @@ func TestApproveAPI(t *testing.T) {
 	}
 }
 
+// A proposal whose finding is no longer open is refused with 409 and the
+// backend's fixed message, over JSON and over the form.
+func TestApproveFindingNotOpen(t *testing.T) {
+	const notOpen = "the finding is no longer open, so this entry can't be approved"
+	fa := &fakeApprovals{approveErr: &ApprovalError{Kind: ErrApprovalConflict, Message: notOpen}}
+	ts := approvalsServer(t, fa, nil)
+	w := ts.do(t, ts.as(RoleChecker, http.MethodPost, "/api/proposals/"+pid(1).String()+"/approve", "", ""))
+	if w.Code != http.StatusConflict || decodeJSON(t, w.Body.String())["error"] != notOpen {
+		t.Errorf("JSON = %d %s", w.Code, w.Body)
+	}
+	w = ts.do(t, formPost(ts, RoleChecker, "/proposals/"+pid(1).String()+"/approve", nil))
+	if w.Code != http.StatusConflict || !strings.Contains(w.Body.String(), "the finding is no longer open") {
+		t.Errorf("form = %d %s", w.Code, w.Body)
+	}
+}
+
 // A checker who made the proposal (their role changed since) is refused by
 // the backend with the fixed message, over JSON and over the form.
 func TestSelfApprovalMessage(t *testing.T) {

@@ -123,6 +123,7 @@ var approvalKinds = []struct{ from, to error }{
 	{approvals.ErrNotProposable, web.ErrApprovalConflict},
 	{approvals.ErrProposalExists, web.ErrApprovalConflict},
 	{approvals.ErrNotPending, web.ErrApprovalConflict},
+	{approvals.ErrFindingNotOpen, web.ErrApprovalConflict},
 	{approvals.ErrPostFailed, web.ErrApprovalPostFailed},
 }
 

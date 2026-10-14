@@ -29,6 +29,7 @@ type fakeStore struct {
 	lock      sync.Mutex // the row lock (one for all rows is enough here)
 	rows      map[uuid.UUID]store.JournalProposal
 	audits    []store.AuditLogEntry
+	auditCtx  []ctxSeen // the ctx of each InsertAuditLog, as seen then
 	saves     int
 	createErr error
 }
@@ -110,10 +111,11 @@ func (s *fakeStore) WithProposalLock(ctx context.Context, id uuid.UUID, fn func(
 	return nil
 }
 
-func (s *fakeStore) InsertAuditLog(_ context.Context, e store.AuditLogEntry) (int64, error) {
+func (s *fakeStore) InsertAuditLog(ctx context.Context, e store.AuditLogEntry) (int64, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.audits = append(s.audits, e)
+	s.auditCtx = append(s.auditCtx, seeCtx(ctx))
 	return int64(len(s.audits)), nil
 }
 
@@ -142,6 +144,21 @@ func (s *fakeStore) lastAudit(t *testing.T) (store.AuditLogEntry, map[string]any
 		t.Fatalf("audit args: %v", err)
 	}
 	return e, args
+}
+
+// ctxSeen is what a fake saw of a context when it was called.
+type ctxSeen struct {
+	err      error
+	deadline time.Time
+	has      bool
+	value    any
+}
+
+type ctxKey struct{}
+
+func seeCtx(ctx context.Context) ctxSeen {
+	dl, has := ctx.Deadline()
+	return ctxSeen{err: ctx.Err(), deadline: dl, has: has, value: ctx.Value(ctxKey{})}
 }
 
 func samePtr(a, b *string) bool {
@@ -186,13 +203,18 @@ type fakePoster struct {
 	mu    sync.Mutex
 	calls int
 	err   error
+	// onPost, when set, runs first with the ctx Post was given.
+	onPost func(ctx context.Context)
 }
 
-func (p *fakePoster) Post(_ context.Context, id uuid.UUID) (PostResult, error) {
+func (p *fakePoster) Post(ctx context.Context, id uuid.UUID) (PostResult, error) {
 	p.mu.Lock()
 	p.calls++
-	err := p.err
+	err, hook := p.err, p.onPost
 	p.mu.Unlock()
+	if hook != nil {
+		hook(ctx)
+	}
 	if err != nil {
 		return PostResult{}, err
 	}
@@ -305,6 +327,17 @@ func TestValidatePayload(t *testing.T) {
 		{"remark inner newline", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "a\nb"}, "invalid_remark"},
 		{"remark invalid utf8", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "a\xffb"}, "invalid_remark"},
 		{"too many lines", store.JournalPayload{PostingDate: "2026-08-31", Lines: make([]store.JournalLine, MaxPayloadLines+1)}, "invalid_lines"},
+		{"remark GSTIN token", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "charge for GSTIN_0a1b2c3d"}, "pseudonym_in_remark"},
+		{"remark PAN token", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_1a2b3c"}, "pseudonym_in_remark"},
+		{"remark PERSON token", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "paid to PERSON_abcdef012345."}, "pseudonym_in_remark"},
+		{"remark 64-hex token", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_" + strings.Repeat("f", 64)}, "pseudonym_in_remark"},
+		{"remark short hex tail", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_1a2b3"}, ""},
+		{"remark other prefix", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "TAN_1a2b3c"}, ""},
+		{"remark lower-case prefix", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "pan_1a2b3c"}, ""},
+		{"remark upper-case hex", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_1A2B3C"}, ""},
+		{"remark no leading boundary", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "XPAN_1a2b3c"}, ""},
+		{"remark no trailing boundary", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_1a2b3cz"}, ""},
+		{"remark 65-hex tail", store.JournalPayload{PostingDate: "2026-08-31", Lines: ok2, Remark: "PAN_" + strings.Repeat("f", 65)}, ""},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -318,6 +351,9 @@ func TestValidatePayload(t *testing.T) {
 			var e *Error
 			if !errors.As(err, &e) || !errors.Is(err, ErrInvalidProposal) || e.Code != tc.code {
 				t.Fatalf("ValidatePayload: %v, want %s (ErrInvalidProposal)", err, tc.code)
+			}
+			if tc.p.Remark != "" && strings.Contains(err.Error(), strings.TrimSpace(tc.p.Remark)) {
+				t.Errorf("message echoes the remark: %q", err.Error())
 			}
 		})
 	}
@@ -384,6 +420,7 @@ func TestProposeRefusals(t *testing.T) {
 		{"remark control", func(f *store.Finding) { f.Proposal.Payload.Remark = "charge\x1b[31m" }, ErrInvalidProposal, "invalid_remark"},
 		{"remark 501 runes", func(f *store.Finding) { f.Proposal.Payload.Remark = strings.Repeat("ç", 501) }, ErrInvalidProposal, "invalid_remark"},
 		{"unbalanced", func(f *store.Finding) { f.Proposal.Payload.Lines[1].CreditPaise = 1 }, ErrInvalidProposal, "unbalanced"},
+		{"remark pseudonym", func(f *store.Finding) { f.Proposal.Payload.Remark = "SMS charges, PERSON_1a2b3c4d" }, ErrInvalidProposal, "pseudonym_in_remark"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -603,6 +640,184 @@ func TestApprovePostFailureAndRetry(t *testing.T) {
 				t.Errorf("poster called %d times, want 2", fx.poster.count())
 			}
 		})
+	}
+}
+
+// A proposal whose finding was dismissed or accepted after it was made is
+// refused, both when first approved and on the checker's retry: the poster
+// is never called and the row is unchanged.
+func TestApproveFindingNotOpen(t *testing.T) {
+	const msg = "the finding is no longer open, so this entry can't be approved"
+	for _, status := range []string{"dismissed", "accepted", "needs_review", "missing"} {
+		for _, retry := range []bool{false, true} {
+			name := status + "/proposed"
+			if retry {
+				name = status + "/approved retry"
+			}
+			t.Run(name, func(t *testing.T) {
+				fx := newFixture(t)
+				id := fx.proposal(t)
+				if retry {
+					// A failed first post leaves the row approved by ravi.
+					fx.poster.err = &Refusal{Code: "erp_unavailable"}
+					if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrPostFailed) {
+						t.Fatalf("first Approve: %v", err)
+					}
+					fx.poster.err = nil
+				}
+				fid := *fx.st.row(id).FindingID
+				if status == "missing" {
+					delete(fx.findings.findings, fid)
+				} else {
+					f := fx.findings.findings[fid]
+					f.Status = status
+					fx.findings.findings[fid] = f
+				}
+				before, calls, saves := fx.st.row(id), fx.poster.count(), fx.st.saves
+				_, err := fx.svc.Approve(t.Context(), "ravi", id)
+				var e *Error
+				if !errors.Is(err, ErrFindingNotOpen) || !errors.As(err, &e) || e.Code != "finding_not_open" || err.Error() != msg {
+					t.Fatalf("Approve: %v, want ErrFindingNotOpen", err)
+				}
+				if fx.poster.count() != calls {
+					t.Error("poster called for a finding that is not open")
+				}
+				after := fx.st.row(id)
+				if after.Status != before.Status || !samePtr(after.Checker, before.Checker) || !sameTime(after.DecidedAt, before.DecidedAt) || fx.st.saves != saves {
+					t.Errorf("row changed: %+v", after)
+				}
+				e2, args := fx.st.lastAudit(t)
+				if e2.Actor != "ravi" || *e2.Tool != ToolApprove || args["result"] != "refused:finding_not_open" {
+					t.Errorf("audit %+v %v", e2, args)
+				}
+				// Self-approval is still refused first.
+				if _, err := fx.svc.Approve(t.Context(), "asha", id); !errors.Is(err, ErrSelfApproval) {
+					t.Errorf("maker: %v, want ErrSelfApproval", err)
+				}
+				// Reject is unaffected.
+				if !retry {
+					if err := fx.svc.Reject(t.Context(), "ravi", id, "finding closed"); err != nil {
+						t.Errorf("Reject: %v", err)
+					}
+				}
+			})
+		}
+	}
+}
+
+// A posted proposal stays idempotent after its finding is dismissed; a
+// rejected one stays not pending.
+func TestApproveFindingNotOpenTerminal(t *testing.T) {
+	dismiss := func(fx *fixture, id uuid.UUID) {
+		fid := *fx.st.row(id).FindingID
+		f := fx.findings.findings[fid]
+		f.Status = "dismissed"
+		fx.findings.findings[fid] = f
+	}
+	t.Run("posted", func(t *testing.T) {
+		fx := newFixture(t)
+		id := fx.proposal(t)
+		r1, err := fx.svc.Approve(t.Context(), "ravi", id)
+		if err != nil {
+			t.Fatal(err)
+		}
+		dismiss(fx, id)
+		r2, err := fx.svc.Approve(t.Context(), "meera", id)
+		if err != nil || r2.ERPName != r1.ERPName || !r2.AlreadyPosted {
+			t.Errorf("Approve posted: %+v %v, want %s already posted", r2, err, r1.ERPName)
+		}
+		if fx.poster.count() != 1 {
+			t.Errorf("poster called %d times, want 1", fx.poster.count())
+		}
+	})
+	t.Run("rejected", func(t *testing.T) {
+		fx := newFixture(t)
+		id := fx.proposal(t)
+		if err := fx.svc.Reject(t.Context(), "ravi", id, "no"); err != nil {
+			t.Fatal(err)
+		}
+		dismiss(fx, id)
+		if _, err := fx.svc.Approve(t.Context(), "ravi", id); !errors.Is(err, ErrNotPending) {
+			t.Errorf("Approve rejected: %v, want ErrNotPending", err)
+		}
+	})
+	t.Run("no finding", func(t *testing.T) {
+		fx := newFixture(t)
+		id := uuid.New()
+		fx.st.put(store.JournalProposal{ID: id, CompanyID: "sharma", Payload: balanced(), Status: StatusProposed, Maker: "asha"})
+		if r, err := fx.svc.Approve(t.Context(), "ravi", id); err != nil || r.Status != StatusPosted {
+			t.Errorf("Approve without a finding: %+v %v", r, err)
+		}
+	})
+}
+
+// Approve's post and every audit row outlive the request: a client that
+// goes away before or during the call still gets a post and an audit row.
+func TestApproveDetachedFromCancel(t *testing.T) {
+	for _, when := range []string{"before", "during post"} {
+		t.Run(when, func(t *testing.T) {
+			fx := newFixture(t)
+			id := fx.proposal(t)
+			ctx, cancel := context.WithCancel(context.WithValue(t.Context(), ctxKey{}, "req-1"))
+			defer cancel()
+			var seen ctxSeen
+			fx.poster.onPost = func(pctx context.Context) {
+				if when == "during post" {
+					cancel()
+				}
+				seen = seeCtx(pctx)
+			}
+			if when == "before" {
+				// The lock step runs on the request ctx; the fake store
+				// ignores it, so the post still runs.
+				cancel()
+			}
+			start := time.Now()
+			r, err := fx.svc.Approve(ctx, "ravi", id)
+			if err != nil || r.Status != StatusPosted {
+				t.Fatalf("Approve: %+v %v", r, err)
+			}
+			if seen.err != nil || !seen.has || seen.value != "req-1" {
+				t.Errorf("post ctx %+v", seen)
+			}
+			if d := seen.deadline.Sub(start); d < PostTimeout || d > postCallTimeout+time.Second {
+				t.Errorf("post deadline in %s, want just above %s", d, PostTimeout)
+			}
+			fx.st.mu.Lock()
+			actx := fx.st.auditCtx[len(fx.st.auditCtx)-1]
+			fx.st.mu.Unlock()
+			if actx.err != nil || !actx.has || actx.value != "req-1" {
+				t.Errorf("audit ctx %+v", actx)
+			}
+			if _, args := fx.st.lastAudit(t); args["result"] != "posted" {
+				t.Errorf("audit result %v", args["result"])
+			}
+		})
+	}
+}
+
+// Propose and Reject audit rows are written on a cancelled request too.
+func TestAuditDetachedFromCancel(t *testing.T) {
+	fx := newFixture(t)
+	id := fx.proposal(t)
+	ctx, cancel := context.WithCancel(context.WithValue(t.Context(), ctxKey{}, "req-2"))
+	cancel()
+	if err := fx.svc.Reject(ctx, "ravi", id, "no"); err != nil {
+		t.Fatalf("Reject: %v", err)
+	}
+	if _, err := fx.svc.Propose(ctx, "asha", fx.finding(nil)); err != nil {
+		t.Fatalf("Propose: %v", err)
+	}
+	fx.st.mu.Lock()
+	ctxs := append([]ctxSeen(nil), fx.st.auditCtx[1:]...)
+	fx.st.mu.Unlock()
+	if len(ctxs) != 2 {
+		t.Fatalf("%d audit rows, want 2", len(ctxs))
+	}
+	for i, actx := range ctxs {
+		if actx.err != nil || !actx.has || time.Until(actx.deadline) > auditTimeout || actx.value != "req-2" {
+			t.Errorf("audit %d ctx %+v", i, actx)
+		}
 	}
 }
 

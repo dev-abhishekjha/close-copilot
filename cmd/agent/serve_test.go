@@ -643,6 +643,7 @@ func TestAdaptApprovalErr(t *testing.T) {
 		{"not proposable", &approvals.Error{Kind: approvals.ErrNotProposable, Msg: "m"}, web.ErrApprovalConflict},
 		{"exists", &approvals.Error{Kind: approvals.ErrProposalExists, Msg: "m"}, web.ErrApprovalConflict},
 		{"not pending", &approvals.Error{Kind: approvals.ErrNotPending, Msg: "m"}, web.ErrApprovalConflict},
+		{"finding not open", &approvals.Error{Kind: approvals.ErrFindingNotOpen, Msg: approvals.ErrFindingNotOpen.Error(), Code: "finding_not_open"}, web.ErrApprovalConflict},
 		{"post failed", &approvals.Error{Kind: approvals.ErrPostFailed, Msg: "m", Code: "unbalanced"}, web.ErrApprovalPostFailed},
 	}
 	for _, tc := range cases {

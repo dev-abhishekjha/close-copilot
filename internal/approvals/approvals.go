@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"math"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -35,6 +36,16 @@ const (
 	pendingLimit = store.MaxProposalList
 )
 
+// Timeouts of the steps that must outlive the request: an audit row is
+// written, and a post runs to its end, even if the client goes away.
+const (
+	// auditTimeout bounds one audit_log insert.
+	auditTimeout = 5 * time.Second
+	// postCallTimeout bounds one Poster.Post call. It sits just above
+	// PostTimeout, so the poster's own deadline governs.
+	postCallTimeout = PostTimeout + 5*time.Second
+)
+
 // Audit names: every action writes one audit_log row with server
 // AuditServer and one of these tools.
 const (
@@ -50,7 +61,8 @@ const (
 // *Error whose Kind is one of these, so callers map it with errors.Is. The
 // web layer answers ErrNotFound with 404, ErrInvalidProposal and
 // ErrInvalidReason with 400, ErrSelfApproval with 403, ErrNotProposable,
-// ErrProposalExists and ErrNotPending with 409, and ErrPostFailed with 502.
+// ErrProposalExists, ErrNotPending and ErrFindingNotOpen with 409, and
+// ErrPostFailed with 502.
 var (
 	ErrNotFound        = errors.New("not found")
 	ErrInvalidProposal = errors.New("the proposed entry is invalid")
@@ -59,6 +71,7 @@ var (
 	ErrProposalExists  = errors.New("this finding already has a journal proposal")
 	ErrSelfApproval    = errors.New("you proposed this entry, so a different checker must approve it")
 	ErrNotPending      = errors.New("this proposal is not pending")
+	ErrFindingNotOpen  = errors.New("the finding is no longer open, so this entry can't be approved")
 	ErrPostFailed      = errors.New("posting to ERPNext failed")
 )
 
@@ -99,6 +112,7 @@ var (
 	errSelf            = refusal(ErrSelfApproval, "self_approval", "")
 	errNotPending      = refusal(ErrNotPending, "not_pending", "")
 	errOtherChecker    = refusal(ErrNotPending, "other_checker", "this proposal was already approved by another checker")
+	errFindingNotOpen  = refusal(ErrFindingNotOpen, "finding_not_open", "")
 	errReason          = refusal(ErrInvalidReason, "invalid_reason", "")
 	errNoActor         = errors.New("approvals: no authenticated user")
 )
@@ -283,14 +297,38 @@ func (s *Service) Approve(ctx context.Context, actor string, id uuid.UUID) (Appr
 }
 
 func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (ApproveResult, error) {
+	// Step 0, before the row lock: read the proposal and, when it could be
+	// posted by this checker, whether its finding is still open. The
+	// finding is read outside the lock so the lock is held only for the
+	// decision; the lock re-reads the row and decides again.
+	open, err := s.findingOpen(ctx, checker, id)
+	if err != nil {
+		return ApproveResult{}, err
+	}
 	var (
 		needPost bool
 		done     ApproveResult
 	)
+	// mayPost refuses a post for a finding that is no longer open. A
+	// proposal without a finding (an old row) is not checked.
+	mayPost := func(p store.JournalProposal) error {
+		if p.FindingID == nil {
+			return nil
+		}
+		if open == nil {
+			// The row moved into a postable state after step 0: refuse
+			// rather than post unchecked; a retry checks again.
+			return errNotPending
+		}
+		if !*open {
+			return errFindingNotOpen
+		}
+		return nil
+	}
 	// Step 1, under the row lock: decide and commit approved before any
 	// ERPNext traffic. The admin tool takes the same lock, so it must be
-	// released before the post.
-	err := s.deps.Store.WithProposalLock(ctx, id, func(ctx context.Context, p store.JournalProposal, save func(context.Context, store.JournalProposal) error) error {
+	// released before the post. Self-approval is refused first.
+	err = s.deps.Store.WithProposalLock(ctx, id, func(ctx context.Context, p store.JournalProposal, save func(context.Context, store.JournalProposal) error) error {
 		if Canonical(p.Maker) == checker {
 			return errSelf
 		}
@@ -299,6 +337,9 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 			done = ApproveResult{ProposalID: id, Status: StatusPosted, ERPName: deref(p.ERPName), AlreadyPosted: true}
 			return nil
 		case StatusProposed:
+			if err := mayPost(p); err != nil {
+				return err
+			}
 			now := s.now()
 			c := checker
 			p.Status, p.Checker, p.DecidedAt = StatusApproved, &c, &now
@@ -307,6 +348,9 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 		case StatusApproved:
 			if p.Checker == nil || Canonical(*p.Checker) != checker {
 				return errOtherChecker
+			}
+			if err := mayPost(p); err != nil {
+				return err
 			}
 			needPost = true
 			return nil
@@ -329,7 +373,11 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 	}
 
 	// Step 2: the admin tool posts, re-checking checker != maker under its
-	// own lock, and alone writes erp_name, posted_at and status posted.
+	// own lock, and alone writes erp_name, posted_at and status posted. The
+	// post and the re-read after it are detached from the request, so a
+	// client that goes away doesn't abandon a post half way.
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), postCallTimeout)
+	defer cancel()
 	out, err := s.deps.Poster.Post(ctx, id)
 	if err != nil {
 		var ref *Refusal
@@ -352,6 +400,40 @@ func (s *Service) approve(ctx context.Context, checker string, id uuid.UUID) (Ap
 		s.log().WarnContext(ctx, "approvals: proposal not posted after a successful post", "proposal_id", id.String(), "status", row.Status)
 	}
 	return res, nil
+}
+
+// findingOpen reports whether the finding of proposal id is open, for a
+// proposal checker could post (proposed, or approved by checker). It
+// returns nil, without reading the finding, for any other proposal, one
+// without a finding, or one checker made (the lock refuses those); a
+// missing proposal is left to the lock too. A missing finding is not open.
+func (s *Service) findingOpen(ctx context.Context, checker string, id uuid.UUID) (*bool, error) {
+	p, err := s.deps.Store.GetJournalProposal(ctx, id)
+	if err != nil {
+		if errors.Is(err, store.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("approvals: approve %s: %w", id, err)
+	}
+	if p.FindingID == nil || Canonical(p.Maker) == checker {
+		return nil, nil
+	}
+	switch {
+	case p.Status == StatusProposed:
+	case p.Status == StatusApproved && p.Checker != nil && Canonical(*p.Checker) == checker:
+	default:
+		return nil, nil
+	}
+	f, err := s.deps.Findings.GetFinding(ctx, *p.FindingID)
+	open := false
+	switch {
+	case err == nil:
+		open = f.Status == "open"
+	case errors.Is(err, store.ErrNotFound):
+	default:
+		return nil, fmt.Errorf("approvals: approve %s: finding: %w", id, err)
+	}
+	return &open, nil
 }
 
 // Reject records actor as the checker who rejected proposal id, with a
@@ -434,8 +516,11 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (store.JournalProposal,
 }
 
 // audit writes one audit_log row. A failed insert is logged, not returned:
-// the action itself already happened.
+// the action itself already happened. The insert is detached from the
+// request's cancellation, so a client that goes away still leaves a row.
 func (s *Service) audit(ctx context.Context, actor, tool string, id uuid.UUID, args map[string]any) {
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), auditTimeout)
+	defer cancel()
 	raw, err := json.Marshal(args)
 	if err != nil {
 		s.log().ErrorContext(ctx, "approvals: audit args", "action", tool, "proposal_id", id.String(), "err", err)
@@ -483,7 +568,12 @@ var (
 	errOverflow     = refusal(ErrInvalidProposal, "overflow", "the entry's totals are too large")
 	errRemark       = refusal(ErrInvalidProposal, "invalid_remark", "the remark must be at most 500 characters, without control characters")
 	errTooManyLines = refusal(ErrInvalidProposal, "invalid_lines", "the entry has too many lines")
+	errPseudonym    = refusal(ErrInvalidProposal, "pseudonym_in_remark", "the remark carries a pseudonym token; write it without one")
 )
+
+// pseudonymToken matches a pseudonym token (CC-710) such as PAN_1a2b3c. It
+// is a copy of internal/agent's pattern: approvals must not import agent.
+var pseudonymToken = regexp.MustCompile(`\b(?:GSTIN|PAN|PERSON)_[0-9a-f]{6,64}\b`)
 
 const (
 	// MaxPayloadLines caps the lines of one proposal.
@@ -496,7 +586,8 @@ const (
 // non-blank account (at most 140 runes, no control characters) and exactly
 // one positive debit or credit; debits equal credits and are non-zero
 // (int64 paise, overflow-checked); a trimmed remark of at most 500 runes
-// without control characters. Errors are *Error of kind
+// without control characters and without a pseudonym token (a model's
+// placeholder must never reach the ledger). Errors are *Error of kind
 // ErrInvalidProposal with a fixed message.
 func ValidatePayload(p store.JournalPayload) error {
 	d, err := time.Parse(dateLayout, p.PostingDate)
@@ -530,8 +621,12 @@ func ValidatePayload(p store.JournalPayload) error {
 	if debit == 0 || debit != credit {
 		return errUnbalanced
 	}
-	if validText(strings.TrimSpace(p.Remark), MaxRemarkRunes, false) != nil {
+	remark := strings.TrimSpace(p.Remark)
+	if validText(remark, MaxRemarkRunes, false) != nil {
 		return errRemark
+	}
+	if pseudonymToken.MatchString(remark) {
+		return errPseudonym
 	}
 	return nil
 }
