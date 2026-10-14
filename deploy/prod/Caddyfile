@@ -1,0 +1,17 @@
+# Automatic HTTPS (Let's Encrypt) for the demo domain. DEMO_DOMAIN comes from
+# the compose environment. Only the agent's web app is proxied; the MCP
+# servers (7001, 7002) and ERPNext are never reachable through caddy.
+{$DEMO_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+	}
+
+	reverse_proxy agent:8000
+}

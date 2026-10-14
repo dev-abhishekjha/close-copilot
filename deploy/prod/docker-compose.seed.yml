@@ -1,0 +1,21 @@
+# Temporary override for seeding on the VM (docs/deploy.md). Publishes the
+# Postgres, TEI and docling ports on 127.0.0.1 only so `make seed load ingest` run from a
+# checkout on the VM can reach them. Docker does not forward published ports
+# on an internal network, so each service also joins `edge`. TEI also joins `egress` and turns
+# HF_HUB_OFFLINE off, so the models download once into the tei-models volume. Never use it in
+# steady state, and never publish these ports on 0.0.0.0.
+services:
+  postgres:
+    ports: ["127.0.0.1:5432:5432"]
+    networks: {internal: null, edge: null}
+  tei-embed:
+    ports: ["127.0.0.1:8081:80"]
+    environment: {HF_HUB_OFFLINE: "0"}
+    networks: {internal: null, egress: null, edge: null}
+  tei-rerank:
+    ports: ["127.0.0.1:8082:80"]
+    environment: {HF_HUB_OFFLINE: "0"}
+    networks: {internal: null, egress: null, edge: null}
+  docling:
+    ports: ["127.0.0.1:5001:5001"]
+    networks: {internal: null, egress: null, edge: null}

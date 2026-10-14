@@ -1,0 +1,9 @@
+.git
+.env
+.env.*
+tmp
+results
+data
+.worktrees
+deploy/frappe_docker
+deploy/prod/.env.prod
