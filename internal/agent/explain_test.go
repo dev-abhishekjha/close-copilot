@@ -1358,3 +1358,90 @@ func TestExplainCitationsCapNeverSplitsIdentifier(t *testing.T) {
 		t.Errorf("DOCUMENTS %+v, want one capped passage", docs)
 	}
 }
+
+// ---- needs_review (CC-020) ----
+
+// TestExplainNeedsReviewPromptStatesCondition pins rule 4 in the system
+// block the model gets: it says when needs_review is true and when it is
+// false, so a finding whose evidence shows the problem and the fix is not
+// flagged for an advisory check or for empty DOCUMENTS, and a finding whose
+// evidence does not explain it still is.
+func TestExplainNeedsReviewPromptStatesCondition(t *testing.T) {
+	fx, model := newExplainFixture(t, answer(validArgs))
+	if _, err := fx.ex.Explain(t.Context(), fx.req); err != nil {
+		t.Fatalf("Explain: %v", err)
+	}
+	calls := model.Calls()
+	assertAllowlist(t, calls)
+	if len(calls[0].System) != 1 {
+		t.Fatalf("%d system blocks, want 1", len(calls[0].System))
+	}
+	// The rule is wrapped over lines; compare on single spaces.
+	system := strings.Join(strings.Fields(calls[0].System[0].Text), " ")
+	for _, want := range []string{
+		"needs_review says whether EVIDENCE explains the finding.",
+		"Set it to true, and say why, when EVIDENCE lacks the records the finding names, contradicts the finding, or does not show the cause",
+		"A doubt about whether EVIDENCE shows the cause is a reason for true.",
+		"Set it to false when EVIDENCE shows what the finding states and what to do, even if you also advise a check before posting.",
+		"Empty DOCUMENTS alone is not a reason for true.",
+		"needs_review: true or false, by rule 4.",
+	} {
+		if !strings.Contains(system, want) {
+			t.Errorf("system block lacks %q", want)
+		}
+	}
+	// The old, undefined rule is gone, and nothing tells the model to
+	// avoid the flag.
+	for _, bad := range []string{"If the evidence does not explain the finding, say so", "never set needs_review", "always false"} {
+		if strings.Contains(system, bad) {
+			t.Errorf("system block still holds %q", bad)
+		}
+	}
+}
+
+// TestExplainNeedsReviewFlagIsStored checks the model's flag reaches the
+// stored explanation artifact unchanged, both ways: a finding whose
+// evidence does not explain it can still be flagged.
+func TestExplainNeedsReviewFlagIsStored(t *testing.T) {
+	flagged := `{"explanation":"The bank debited ₹5.90 on 15 Sep 2026, but the evidence does not show why.",
+"suggested_action":"investigate","action_note":"Ask the bank what the debit is.","cited_amounts_paise":[590],"citations":[],
+"needs_review":true}`
+	for _, tc := range []struct {
+		name string
+		args string
+		want bool
+	}{
+		{"explained", validArgs, false},
+		{"not explained", flagged, true},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			fx, model := newExplainFixture(t, answer(tc.args))
+			res, err := fx.ex.Explain(t.Context(), fx.req)
+			if err != nil || res.Status != store.StepDone {
+				t.Fatalf("result %+v, %v", res, err)
+			}
+			assertAllowlist(t, model.Calls())
+			art := storedExplanation(t, fx.st, res)
+			if art.NeedsReview != tc.want {
+				t.Errorf("stored needs_review %v, want %v", art.NeedsReview, tc.want)
+			}
+			if tc.want && (art.Proposal != nil || art.SuggestedAction != checks.ActionInvestigate) {
+				t.Errorf("flagged artifact %+v", art)
+			}
+		})
+	}
+}
+
+// TestExplainNeedsReviewStillRequired keeps needs_review a required field:
+// an answer without it is malformed, retried once, then fails the step.
+func TestExplainNeedsReviewStillRequired(t *testing.T) {
+	missing := withField(t, "needs_review", "")
+	fx, model := newExplainFixture(t, answer(missing), answer(missing))
+	res, err := fx.ex.Explain(t.Context(), fx.req)
+	if err != nil {
+		t.Fatalf("Explain: %v", err)
+	}
+	if res.Status != store.StepFailed || !strings.Contains(res.Reason, "needs_review") || len(model.Calls()) != 2 {
+		t.Errorf("result %+v after %d calls", res, len(model.Calls()))
+	}
+}
