@@ -5,11 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"regexp"
 	"strings"
 
 	"github.com/abhishekjha/close-copilot/internal/agent"
 	"github.com/abhishekjha/close-copilot/internal/evals"
+	"github.com/abhishekjha/close-copilot/internal/faults"
 )
 
 // Subcommands.
@@ -54,6 +56,15 @@ explainer and verifier run through LLM_PROVIDER, the manifest records
 "agent": true and the models, and LLM_DAILY_BUDGET_USD caps the spend.
 COPILOT_FAULT must be unset.
 
+--faults 'erp:error=503:rate=0.1' (default from FAULTS; needs --replay)
+fails or delays that share of the replayed ERPNext (books) calls, drawn
+from --seed so a run repeats. The suite then runs twice: once clean into a
+temporary folder and once faulted into <results-dir> itself (not a
+<suite>/<timestamp> subfolder; it must be empty), so eval score <results-dir>
+works. The two scores, and any recall lost, go to --faults-out (default
+evals/faults/results.md). A faulted run that ends failed is an expected
+outcome and does not fail the command. Testing only: the agent never reads FAULTS.
+
 Bootstrap order for a suite's fixtures and baseline:
   1. make erp-reset seed load SUITE=<suite>
   2. make record-fixtures SUITE=<suite>
@@ -73,7 +84,20 @@ type command struct {
 	noise noiseFlags
 	// refusal is set for refusal.
 	refusal refusalFlags
+	// fault is set for run: the injected faults of --faults and --seed.
+	fault faultFlags
 }
+
+// faultFlags are eval run's fault-injection arguments (CC-1101).
+type faultFlags struct {
+	Specs []faults.Spec
+	Seed  int64
+	// Out is where the faults-off and faults-on scores are written.
+	Out string
+}
+
+// defaultFaultsOut is the file a fault run writes its scores to.
+const defaultFaultsOut = "evals/faults/results.md"
 
 // onlyList collects --only values; each may be comma-separated.
 type onlyList []string
@@ -158,6 +182,10 @@ func parseRunArgs(args []string, out io.Writer) (command, error) {
 	var only onlyList
 	var checks string
 	c := command{name: cmdRun}
+	var faultSpec string
+	fs.StringVar(&faultSpec, "faults", os.Getenv(faults.EnvFaults), "inject faults into the replayed ERPNext calls, e.g. erp:error=503:rate=0.1 (testing only; default from FAULTS)")
+	fs.Int64Var(&c.fault.Seed, "seed", 0, "seed of the --faults random source, so a run repeats")
+	fs.StringVar(&c.fault.Out, "faults-out", defaultFaultsOut, "file --faults writes its faults-off and faults-on scores to")
 	fs.StringVar(&c.flags.Suite, "suite", "", "suite name: evals/scenarios/<name>.yaml (required)")
 	fs.Var(&only, "only", "run only these months, company:YYYY-MM (repeatable or comma-separated)")
 	fs.StringVar(&c.flags.ModelFast, "model-fast", "", "override LLM_MODEL_FAST for this run only")
@@ -197,6 +225,12 @@ func parseRunArgs(args []string, out io.Writer) (command, error) {
 	}
 	c.flags.Checks = resolved
 	c.flags.Only = []string(only)
+	if c.fault.Specs, err = faults.Parse(faultSpec); err != nil {
+		return command{}, fmt.Errorf("eval run: --faults: %w", err)
+	}
+	if len(c.fault.Specs) > 0 && !c.flags.Replay {
+		return command{}, errors.New("eval run: --faults needs --replay: there is no ERPNext to fault in a live run")
+	}
 	return c, nil
 }
 

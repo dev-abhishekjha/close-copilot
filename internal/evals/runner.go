@@ -43,8 +43,13 @@ type Runner struct {
 	Reader RunReader
 
 	ResultsDir string
-	Config     ManifestConfig
-	Flags      Flags
+	// FlatDir writes the result files and manifest straight into ResultsDir
+	// (which must be missing, empty or an earlier flat run's) instead of ResultsDir/<suite>/<timestamp>.
+	// A fault run (CC-1101) uses it so `eval score <results-dir>` finds the
+	// manifest.
+	FlatDir bool
+	Config  ManifestConfig
+	Flags   Flags
 	// Agent records whether the explainer and verifier ran.
 	Agent  bool
 	Commit string
@@ -82,13 +87,9 @@ func (r *Runner) Run(ctx context.Context, suite Suite, months []SuiteMonth) (str
 		return "", Manifest{}, errors.New("evals: no months to run")
 	}
 	started := r.now()
-	dir := filepath.Join(r.ResultsDir, suite.Name, started.Format(TimestampLayout))
-	if err := os.MkdirAll(filepath.Dir(dir), 0o750); err != nil {
-		return "", Manifest{}, fmt.Errorf("evals: results folder: %w", err)
-	}
-	// Mkdir, not MkdirAll: an existing folder is another run's.
-	if err := os.Mkdir(dir, 0o750); err != nil {
-		return "", Manifest{}, fmt.Errorf("evals: results folder: %w", err)
+	dir, err := r.prepareDir(suite.Name, started)
+	if err != nil {
+		return "", Manifest{}, err
 	}
 
 	man := Manifest{
@@ -145,6 +146,35 @@ func (r *Runner) Run(ctx context.Context, suite Suite, months []SuiteMonth) (str
 		return dir, man, fmt.Errorf("%w: %d of %d: %v", ErrRunsFailed, len(failed), len(months), failed)
 	}
 	return dir, man, nil
+}
+
+// prepareDir creates the folder a run writes into.
+func (r *Runner) prepareDir(suiteName string, started time.Time) (string, error) {
+	if r.FlatDir {
+		dir := filepath.Clean(r.ResultsDir)
+		if err := os.MkdirAll(dir, 0o750); err != nil {
+			return "", fmt.Errorf("evals: results folder: %w", err)
+		}
+		entries, err := os.ReadDir(dir)
+		if err != nil {
+			return "", fmt.Errorf("evals: results folder: %w", err)
+		}
+		// A folder an earlier flat run wrote (it holds a manifest) is reused,
+		// its files overwritten, so the same command can run again.
+		if _, err := os.Stat(filepath.Join(dir, ManifestFile)); len(entries) > 0 && err != nil {
+			return "", fmt.Errorf("evals: results folder %s is not empty and holds no %s", dir, ManifestFile)
+		}
+		return dir, nil
+	}
+	dir := filepath.Join(r.ResultsDir, suiteName, started.Format(TimestampLayout))
+	if err := os.MkdirAll(filepath.Dir(dir), 0o750); err != nil {
+		return "", fmt.Errorf("evals: results folder: %w", err)
+	}
+	// Mkdir, not MkdirAll: an existing folder is another run's.
+	if err := os.Mkdir(dir, 0o750); err != nil {
+		return "", fmt.Errorf("evals: results folder: %w", err)
+	}
+	return dir, nil
 }
 
 // isFailed reports whether a month counts as failed: its run ended failed,
