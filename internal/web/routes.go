@@ -89,8 +89,16 @@ func (s *Server) wrap(rt route) http.Handler {
 	if rt.roles == nil {
 		return rt.handler
 	}
-	h := s.authenticate(s.csrfProtect(requireRole(rt.roles...)(rt.handler)))
-	if n, ok := routeBodyLimits[rt.method+" "+rt.path]; ok {
+	n, capped := routeBodyLimits[rt.method+" "+rt.path]
+	inner := requireRole(rt.roles...)(rt.handler)
+	if !capped {
+		// After the CSRF check, which reads a form body first.
+		inner = capAPIBody(inner)
+	}
+	inner = s.csrfProtect(inner)
+	// The per-user limiter runs after authenticate, on /api/* only.
+	h := s.authenticate(s.rateLimit(inner))
+	if capped {
 		h = capBody(n, h)
 	}
 	return h

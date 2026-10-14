@@ -333,6 +333,18 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 	next := r.PostFormValue("next")
 
+	// Refuse a locked IP or username before the bcrypt compare, with the
+	// same answer whether or not the user exists.
+	// begin reserves the attempt under one lock, so concurrent guesses
+	// cannot all pass before the first failure is counted.
+	allowed, wait, done := s.logins.begin(clientIP(r), name, s.now())
+	if !allowed {
+		s.refuse(w, r, wait, "login_locked")
+		return
+	}
+	success := false
+	defer func() { done(success) }()
+
 	users := s.users.Load()
 	u, known := users.Lookup(name)
 	hash := []byte(u.PasswordHash)
@@ -343,6 +355,9 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if s.bcryptHook != nil {
+		s.bcryptHook()
+	}
 	pwOK := len(password) <= maxPasswordLen && bcrypt.CompareHashAndPassword(hash, []byte(password)) == nil
 	if !known || !pwOK {
 		if info := requestInfoFrom(r.Context()); info != nil {
@@ -352,6 +367,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	success = true
 	cookie, _ := s.newSession(u)
 	http.SetCookie(w, cookie)
 	http.SetCookie(w, s.expired(s.loginCSRFCookieName(), "/login"))

@@ -25,5 +25,4 @@ import (
 	_ "go.opentelemetry.io/otel/sdk/trace"                              // CC-904: tracer provider
 	_ "go.opentelemetry.io/otel/trace"                                  // CC-904: span types
 	_ "golang.org/x/crypto/bcrypt"                                      // CC-1001: password hashes in config/users.yaml
-	_ "golang.org/x/time/rate"                                          // CC-1102: per-user rate limits
 )

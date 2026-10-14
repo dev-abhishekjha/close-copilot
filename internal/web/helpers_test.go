@@ -180,7 +180,12 @@ func newTestServer(t testing.TB, mods ...func(*Options)) *testServer {
 	f := testFixture(t)
 	clock := &fakeClock{t: time.Date(2026, 10, 1, 9, 0, 0, 0, time.UTC)}
 	logs := &syncBuffer{}
-	opts := Options{Addr: "127.0.0.1:0", SessionKey: config.NewSecret(testKey), Now: clock.Now}
+	opts := Options{
+		Addr: "127.0.0.1:0", SessionKey: config.NewSecret(testKey), Now: clock.Now,
+		// Roomy API buckets so tests that fire many requests on a frozen
+		// clock are not throttled; rate-limit tests override these.
+		APIRate: 1e6, APIBurst: 1e6, AskRate: 1e6, AskBurst: 1e6,
+	}
 	for _, m := range mods {
 		m(&opts)
 	}
