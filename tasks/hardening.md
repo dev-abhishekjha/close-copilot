@@ -427,6 +427,34 @@ CC-003 (module path and CODEOWNERS) is not a hardening ticket. Its approved spec
 
 **Files.** `internal/evals/refusal.go`, `internal/evals/refusal_test.go`, `internal/evals/score.go`, `internal/evals/report.go`, `cmd/eval/main.go`. Phase 3, eval-engineer, standard. Depends on CC-708 and CC-907.
 
+### CC-1006 · agent serve: wire the web server, the run starter and /api/ask
+
+**Goal.** One binary serves the web UI. `agent serve` starts the CC-1001 server with the CC-1002 runs pages, the CC-1003 finding pages and a real `POST /api/ask`, so a viewer can use the product in a browser.
+
+**Finding** (2026-10-14). No `cmd/` package imports `internal/web` (only analyzer test fixtures under `gates/` do). `cmd/agent` has `close`, `resume` and `mint-scope`; CC-1001's spec put the wiring out of scope and CC-707's files left out the `/api/ask` handler. `internal/web/routes.go:64` still maps `POST /api/ask` to `notImplemented`, which answers 501. `RunsBackend.Execute` and `FindingsStore` have no caller outside tests.
+
+**Subtasks**
+- `args.go`: add the `serve` subcommand (flags: `--config-dir`, `--results-dir` as `close` has them; the address comes from `APP_ADDR`).
+- `main.go`: build the store, the MCP registry, the workflow (`Workflow.ResumeClose` as `RunsBackend.Execute`) and the Asker (`agent.NewAsker`, `agent.AskRedactorFunc`); load `config/users.yaml`; call `web.NewServer(web.OptionsFromConfig(cfg), users, log)`; `net.Listen`, then `Serve` (see the CC-1001 notes: `Run` logs "listening" before the bind). Shut down on context cancel.
+- `internal/web/ask.go` and `routes.go`: replace the `/api/ask` stub with a handler that decodes `{company, month, question}`, validates the submitted `company` against `ListCompanies`, calls `Asker.Ask`, and returns the routed answer with citations or the router's fixed refusal or clarification text. Any `Route` error answers nothing. Map `ErrQuestionTooLong` to 400 and `ErrAskReroutes` to 429.
+- Tests: serve starts and answers `/healthz`; login as a viewer, runs list and one finding page render; `/api/ask` returns an answer for a `FakeProvider` fixture, a fixed refusal for an out-of-scope question, 400 for an over-long question, 401/403 without a session.
+
+**Acceptance**
+- `agent serve` starts on `APP_ADDR`, using `APP_SESSION_KEY` and `config/users.yaml`.
+- A viewer can log in and see the runs list and a finding.
+- `POST /api/ask` returns a routed answer or a fixed refusal.
+- Invariants hold: `internal/web` does not import `internal/frappe`, and the `agent` binary does not link the ERPNext client (a `go list -deps` test in `cmd/agent/deps_test.go`).
+
+**Owner decisions (2026-10-14)**
+- **API only.** CC-1006 adds no "ask a question" page. A UI ask page is a separate small follow-up.
+- **Company on `/api/ask`:** the handler validates the submitted `company` against `ListCompanies` and refuses an unknown one. `config/users.yaml` is not edited.
+- **Run inside the server process.** `RunsBackend.Execute` runs the close in `agent serve`. A separate worker is a Phase 5 option.
+- **Follow-up before CC-1201 (public deploy):** per-user company lists in `config/users.yaml` are the real tenant-isolation control. Until they exist, any signed-in user can ask about any listed company. The owner must decide them before CC-1201.
+
+**Files.** `cmd/agent/main.go`, `cmd/agent/args.go`, `cmd/agent/args_test.go`, `cmd/agent/deps_test.go`, `internal/web/routes.go`, `internal/web/ask.go`, `internal/web/ask_test.go`. Phase 4, implementer, data-sensitive. Depends on CC-1003 and CC-707. No ERPNext lock (unit tests use fakes; the browser walkthrough does need the seeded ERPNext through the MCP servers).
+
+---
+
 ## Notes for later specs
 
 

@@ -1220,6 +1220,22 @@ tasks:
       - "internal/web/templates/audit.templ"
     check: "Every demo action shown with its actor"
 
+  # CC-1006 is not in the tickets doc; see tasks/hardening.md (wiring gap found 2026-10-14).
+  - id: CC-1006
+    title: "agent serve: wire the web server, the run starter and /api/ask"
+    phase: 4
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [CC-1003, CC-707]
+    needs_erpnext: false
+    files:
+      - "cmd/agent/main.go"
+      - "cmd/agent/args.go"
+      - "internal/web/routes.go"
+      - "internal/web/ask.go"
+    check: "agent serve starts; viewer sees runs and a finding; /api/ask answers or refuses; web does not import frappe"
+
   # ---- Phase 5 ----
   - id: CC-1101
     title: "Resilience and fault injection"
