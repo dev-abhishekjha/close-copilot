@@ -110,8 +110,11 @@ const (
 	// shorten it, never lengthen it.
 	DefaultRunTimeout = 10 * time.Minute
 	// DefaultExplainParallel is how many findings are explained (and
-	// verified) at once.
-	DefaultExplainParallel = 4
+	// verified) at once. 8 (CC-1104): 16 explain calls through claude-cli at
+	// 8 at a time ended with no rate-limit or CLI error and no slower per
+	// call than at 4, and a run's findings are explained in one wave
+	// instead of two.
+	DefaultExplainParallel = 8
 	// DefaultRunTokenCap applies when the config carries no
 	// LLM_RUN_TOKEN_CAP.
 	DefaultRunTokenCap int64 = 200000

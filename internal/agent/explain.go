@@ -64,7 +64,10 @@ const (
 	maxProposalLines    = 20
 	maxRemarkRunes      = 200
 	maxAccountRunes     = 140
-	// maxRecordsPerRef caps the evidence records sent per snapshot.
+	// maxRecordsPerRef caps the evidence records sent per snapshot. Not
+	// lowered by CC-1104: a finding names at most 10 records per snapshot,
+	// and a ref that names none (variance, missing_accrual) needs the rows
+	// a lower cap would cut; the ask and investigate projections share it.
 	maxRecordsPerRef = 20
 	// maxEvidenceStringRunes caps every string in EVIDENCE and feedback.
 	maxEvidenceStringRunes = 500
@@ -727,7 +730,9 @@ func decodeSnapshot(content []byte) (snapshotContent, error) {
 }
 
 // projectEvidence is the EVIDENCE view of one snapshot: the records the
-// refs to sha name (at most maxRecordsPerRef), with every string capped.
+// refs to sha name (at most maxRecordsPerRef), trimmed (trimRecord), with
+// every string capped. Records are selected before they are trimmed, so a
+// record is matched by the same fields as before.
 func projectEvidence(s snapshotContent, sha string, refs []store.EvidenceRef) evidenceView {
 	var ids []string
 	for _, r := range refs {
@@ -745,14 +750,70 @@ func projectEvidence(s snapshotContent, sha string, refs []store.EvidenceRef) ev
 	if args, ok := capStrings(s.Args).(map[string]any); ok {
 		view.Args = args
 	}
+	company, _ := s.Args["company"].(string)
 	for i, r := range records {
 		if i == maxRecordsPerRef {
 			view.Omitted = len(records) - i
 			break
 		}
-		view.Records = append(view.Records, capStrings(r))
+		view.Records = append(view.Records, capStrings(trimRecord(r, company)))
 	}
 	return view
+}
+
+// derivedFields are record fields no explanation cites: a normalised copy
+// of a field the record already holds.
+var derivedFields = map[string]bool{"invoice_no_norm": true}
+
+// companyFields name the record's company, which FINDING and the
+// snapshot's args already carry.
+var companyFields = map[string]bool{"company_id": true, "Company": true, "company": true}
+
+// trimRecord drops what an explanation never cites before a record is
+// sent (CC-1104): fields with an empty value ("", null, [] or {}), derived
+// fields, and a company field equal to the snapshot's company, at any
+// depth. A money field (isMoneyKey) is never dropped, so every amount the
+// verifier traces stays; the record's string ids stay too, since only
+// empty and derived strings and the company name go.
+func trimRecord(v any, company string) any {
+	switch x := v.(type) {
+	case []any:
+		out := make([]any, len(x))
+		for i, e := range x {
+			out[i] = trimRecord(e, company)
+		}
+		return out
+	case map[string]any:
+		out := make(map[string]any, len(x))
+		for k, e := range x {
+			if !isMoneyKey(k) {
+				if derivedFields[k] || emptyValue(e) {
+					continue
+				}
+				if s, ok := e.(string); ok && companyFields[k] && company != "" && s == company {
+					continue
+				}
+			}
+			out[k] = trimRecord(e, company)
+		}
+		return out
+	}
+	return v
+}
+
+// emptyValue reports whether a decoded JSON value carries nothing.
+func emptyValue(v any) bool {
+	switch x := v.(type) {
+	case nil:
+		return true
+	case string:
+		return x == ""
+	case []any:
+		return len(x) == 0
+	case map[string]any:
+		return len(x) == 0
+	}
+	return false
 }
 
 // selectRecords returns the records of a tool result that the ids name:

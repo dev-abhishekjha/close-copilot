@@ -52,6 +52,8 @@ Per-finding figures divide the run totals by 13 findings. They are not comparabl
 
 **Decision:** keep RAG as the shipped path for cost, auditability and the verifier, but do not claim its citation accuracy is good: with top-3 retrieval on the current query (finding type, supplier, account) it cited an expected section in only 2 of 6 cases, while giving the model everything cited correctly in 6 of 6. The gap is a retrieval-quality finding for CC-1104 (a better query, more passages), not a reason to stuff the prompt, which does not scale past one company's documents and cannot be traced through the retrieval artifact. Main caveat: the whole-document arm saw the finding and evidence references but not the evidence payloads the explainer sees, it has no verifier, and the 6-case, one-month sample is small; I did not measure whether the expected section was inside the RAG arm's retrieved top-3.
 
+CC-1104 left the query unchanged; see "CC-1104: cost and latency" below for why.
+
 ## Benchmark 3: retrieval modes
 
 What was run: `. tmp/benchmarks/env.sh && go run ./tmp/benchmarks/recall > tmp/benchmarks/b3/recall.tsv` (a scratch loop copied from `TestIntegrationSearchRecall`, calling `Searcher.SearchMode` with k = 5 for each mode on the 60 queries of `evals/golden/retrieval.yaml`). A query is a hit when any expected (doc_id, section) is in the top 5. 54 queries have expectations; the 6 with `expect: []` (R55 to R60) are tenant-boundary queries, reported separately. Run twice; the two summaries were identical (`b3/recall.tsv`, `b3/recall-2.tsv`). Local Postgres with pgvector, TEI embed and rerank containers.
@@ -65,6 +67,8 @@ What was run: `. tmp/benchmarks/env.sh && go run ./tmp/benchmarks/recall > tmp/b
 Misses by key: R12 (policy) is missed in all three modes; R19 (finding type) in all three; R27 (finding type) and R52 (note) in vector and hybrid but found after rerank; R15 (policy) is found by vector and hybrid and lost by rerank. The 6 tenant-boundary queries each returned 5 hits, all from the asking company or the shared policy, so zero cross-company hits in every mode.
 
 **Decision:** keep hybrid plus rerank as the default (it is what `Search` runs), but the evidence for it is thin: one extra hit in 54 over vector only, and hybrid alone added nothing on this set. The tenant boundary is the result that matters and it holds in every mode. Main caveat: with a ceiling near 0.93 on 54 queries, one query is 1.9 points, so the three modes are not separable; a harder query set is needed before tuning (CC-1104) can claim a winner.
+
+CC-1104 did not tune the retrieval modes, as this result advises.
 
 ## Benchmark 4: fast model against strong model for explanations
 
@@ -84,3 +88,37 @@ Ranges: faithfulness 6 to 7 of 12 for haiku, 2 to 4 of 12 for sonnet, with no un
 ## What was chosen
 
 Run the deterministic workflow by default and keep the investigator opt-in: benchmark 1 measured its cost and time but not its accuracy, because the seeded data does not match the suite's ground truth. Keep retrieval-augmented explanations on hybrid plus rerank with haiku as the explainer and sonnet only on the third attempt: the tenant boundary held in all 60 queries and every mode, haiku matched or beat sonnet on faithfulness and the verifier at about a quarter of the cost, and stuffing the whole manual and contracts into the prompt is costlier in tokens and less auditable. The one result that argues against the current design is citation accuracy, 2 of 6 for retrieval against 6 of 6 for whole documents, and the retrieval recall numbers show the retriever finds the right section for 94 percent of hand-written queries, so the weakness is the query built from a finding, not the index. That is the first thing for CC-1104 to tune, against these numbers.
+
+## CC-1104: cost and latency
+
+What was run: `go run ./cmd/eval run --replay --suite suite-skeleton` then `go run ./cmd/eval score <dir> --compare evals/baseline.json`, four times on unchanged code (two baselines and two controls) and four times after the changes, with `LLM_PROVIDER=claude-cli`, haiku as the fast model and sonnet as the strong one. Each suite run is two close runs: sharma 2026-09 (6 findings) and the 2026-08 control (2 findings). Per-finding tokens come from `llm_calls`; p50 and p95 are over each suite run's two close runs, so p50 equals the mean. Raw outputs are in `tmp/reports/t2-*` and `results/suite-skeleton/20261014T1046*`, `20261014T1103*` to `20261014T1106*`. The prompt and concurrency changes were first tried as direct `claude -p` calls on one recorded explain prompt (14 to 16 calls per variant).
+
+Where the money goes: every model call in this suite is an explain call (verify, router, retrieve and investigate make none). Within a call, output dominates: 1,200 to 1,400 output tokens per finding, of which 400 to 950 are the model's thinking, against 2 uncached input tokens and about 2,800 cache-read tokens. The answer itself is 150 to 250 tokens.
+
+| Metric | Before (4 runs) | After (4 runs) |
+| --- | --- | --- |
+| Cost per close run, mean (USD) | 0.00315 to 0.00345 | 0.00280 to 0.00305 (3 runs); 0.00373 (first run after the prompt change, cold cache) |
+| Cost per close run, p95 (USD) | 0.00421 to 0.00474 | 0.00375 to 0.00410 (3 runs); 0.00469 (cold) |
+| Explain calls per suite run | 8 to 9 | 8 |
+| Input tokens per finding (uncached) | 2.0 to 2.3 | 2.0 |
+| Output tokens per finding | 1,373 to 1,422 | 1,198 to 1,322 |
+| Cache-read tokens per finding | 2,771 to 3,164 | 2,756 (1,710 cold) |
+| Cache-write tokens per finding | not recorded (`llm_calls` has no column) | not recorded; direct calls show about 385 warm and 2,100 cold |
+| Close run duration, p50 (ms) | 11,932 to 14,295 | 8,072 to 8,334 |
+| Close run duration, p95 (ms) | 15,848 to 19,988 | 8,620 to 9,390 |
+| Recall | 3/3 | 3/3 |
+| Precision | 8/8 | 8/8 |
+| Verified rate | 1/8 to 3/8 | 2/8 to 3/8 |
+
+`eval score --compare evals/baseline.json` reported no regressions for any of the eight runs. With the CI rules (`--max-p95-increase-pct 25 --max-cost-increase-pct 15 --min-latency-delta-ms 1000`), the only flag was a p95 latency rise on one before run (19,988 ms against a baseline of 15,197 ms); every after run passed, the cold one included (cost mean 0.00373 against 0.003285, 13.5 percent). `make eval-replay SUITE=suite-skeleton` was clean against the baseline.
+
+What moved, one line per change:
+
+- Explanation length in the prompt (`internal/agent/prompts/explain.txt`): the output field now says at most 500 characters; the schema and the validator still cap it at 600. The model aimed at 600 and overshot it on 6 of 14 direct calls, and each overshoot made the CLI's schema check send the answer back for another turn. At 500, 0 of 14 overshot (the longest was 571); mean cost per call fell from 0.000909 to 0.000722 USD and mean call time from 6.8 to 6.0 s. In the suite, output tokens per finding fell by 4 to 16 percent. Phrasing the target as sentences worked as well; stating a lower number with the 600 limit beside it raised thinking tokens, so the plain 500 was kept.
+- Explain concurrency (`DefaultExplainParallel`, 4 to 8): the 6-finding month is explained in one wave instead of two, which is almost all of the p95 drop (15.8 to 20.0 s down to 8.6 to 9.4 s). Sixteen direct calls at 8 at a time took 18 s of wall time with no rate-limit or CLI error and no slower calls than at 4, so 8 was kept. `SetLimit` still bounds the fan-out.
+- Evidence trimming (`projectEvidence`): records now leave out empty fields, `invoice_no_norm`, and a company field equal to the run's company. Money fields are never dropped, so the verifier traces the same amounts; a test checks that every named record and every traced amount survives. In this suite that is 2 fields per bank line, about 20 tokens of a 385-token user message, which is below the noise. The 20-record cap was kept: findings name at most 10 records per snapshot, and variance and missing_accrual refs that name none need the rows a lower cap would cut.
+- Prompt caching: no change needed. The cached system block (rules plus ACCOUNTS) is byte-identical across a run's findings, and tests check it at the request and at the Anthropic wire level (`cache_control` on the block). claude-cli caches on its own and reports it: every warm call read about 2,800 cached tokens. The `anthropic` provider was not run (no API key was asked for); whether the explain prefix reaches the API's minimum cacheable length for haiku is not measured.
+- Routing: no change. The explainer asks for the fast model on attempts 1 and 2 and the strong one from attempt 3, triage gets the fast model, and each call site has a test on the model it requests. Two points sit outside this ticket's files: `cmd/agent` gives the ask endpoint the strong model, and the investigator is not wired in `cmd/` yet; when it is, it should get `LLM_MODEL_STRONG`.
+- Retrieval query (optional): not changed. This suite has no `search_documents` fixtures, so DOCUMENTS is empty and a query change cannot be measured here for citation accuracy or cost.
+
+**Decision:** keep all three changes. With a warm cache, cost per close run fell in every after run (0.00280 to 0.00305 against 0.00315 to 0.00345 USD), and p95 duration fell in every after run (8.6 to 9.4 s against 15.8 to 20.0 s), with recall, precision and the verified rate inside the control's range. Most of the latency gain comes from the concurrency change and most of the cost gain from the shorter explanation target. Cost did not drop in all four after runs: the first run after the prompt change cost 0.00373 USD per close run, above every before run, because it wrote the new prompt to the cache. The concurrency change adds to that effect: at 8 at a time, a cold run's first wave writes the cache up to 8 times instead of 4 (about 0.0004 USD per extra write at haiku's rates). So a month-end run that starts on a cold cache can cost about as much as before, while still finishing in half the time. If cold runs turn out to be the norm in production, the next step is to start one explanation alone and let the rest follow it a second or two later, so they read its cache. Main caveat: these are 4 runs a side of an 8-finding suite on one company, and the cold-cache case was seen once.
