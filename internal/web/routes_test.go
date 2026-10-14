@@ -266,7 +266,7 @@ func TestViewerForbiddenOnMakerRoutes(t *testing.T) {
 func TestHomeActions(t *testing.T) {
 	viewerActions := []string{"view-run", "view-findings", "ask"}
 	makerActions := []string{"start-run", "propose-entry"}
-	checkerActions := []string{"approve-proposal", "reject-proposal", "approvals"}
+	checkerActions := []string{"approve-proposal", "reject-proposal", "approvals", "audit"}
 	tests := []struct {
 		role       Role
 		user       string

@@ -45,6 +45,7 @@ type serveBackends struct {
 	runs      *web.RunsBackend
 	ask       web.AskBackend
 	approvals web.ApprovalsBackend
+	audit     web.AuditStore
 }
 
 // newServeServer builds the web server on APP_ADDR and APP_SESSION_KEY.
@@ -56,6 +57,7 @@ func newServeServer(cfg config.Config, users web.Users, be serveBackends, log *s
 	opts.Runs = be.runs
 	opts.Ask = be.ask
 	opts.Approvals = be.approvals
+	opts.Audit = be.audit
 	return web.NewServer(opts, users, log)
 }
 
@@ -219,6 +221,7 @@ func serve(ctx context.Context, cfg config.Config, log *slog.Logger, cmd command
 	be := serveBackends{
 		runs:      &web.RunsBackend{Store: d.st, Execute: executeRun(wf), Findings: d.st},
 		approvals: newApprovals(cfg, d.st, log),
+		audit:     d.st,
 	}
 	if !cmd.noExplain {
 		asker, err := newAsker(cfg, log, cmd, d, model, key, names)

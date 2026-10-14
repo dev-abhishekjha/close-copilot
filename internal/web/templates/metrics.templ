@@ -1,0 +1,67 @@
+package templates
+
+// Metrics is the run metrics page: tokens by step, cost, duration, verified
+// rate and the trace ID.
+templ Metrics(p MetricsPage) {
+	@Base(Layout{Title: "Run metrics", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<section class="card" id="metrics">
+			<h1>Run metrics: { p.Company } { p.Month }</h1>
+			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(runURL(p.RunID)) }>Run</a> · <a href={ templ.SafeURL(findingsURL(p.RunID)) }>Findings</a></p>
+			<dl class="facts">
+				<dt>Status</dt>
+				<dd class="status">{ p.Status }</dd>
+				<dt>Duration</dt>
+				<dd class="duration">{ p.Duration }</dd>
+				<dt>Tokens</dt>
+				<dd class="tokens">
+					<span class="input">{ i64(p.Input) }</span> in,
+					<span class="output">{ i64(p.Output) }</span> out,
+					<span class="cache">{ i64(p.Cache) }</span> cache read
+				</dd>
+				<dt>Cost</dt>
+				<dd class="cost">{ p.Cost }</dd>
+				<dt>Verified rate</dt>
+				<dd class="verified-rate">{ p.VerifiedRate }</dd>
+				<dt>Trace</dt>
+				<dd class="trace">
+					if p.TraceID == "" {
+						none
+					} else {
+						<code>{ p.TraceID }</code>
+					}
+				</dd>
+			</dl>
+			<h2>Usage by step</h2>
+			if len(p.Steps) == 0 {
+				<p>No model calls recorded.</p>
+			} else {
+				<table class="steps">
+					<thead>
+						<tr>
+							<th>Step</th>
+							<th>Input</th>
+							<th>Output</th>
+							<th>Cache read</th>
+							<th>Cost</th>
+							<th>Calls</th>
+							<th>Latency (ms)</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, s := range p.Steps {
+							<tr data-step={ s.Kind }>
+								<td>{ s.Kind }</td>
+								<td class="input">{ i64(s.Input) }</td>
+								<td class="output">{ i64(s.Output) }</td>
+								<td class="cache">{ i64(s.Cache) }</td>
+								<td class="cost">{ s.Cost }</td>
+								<td class="calls">{ i64(s.Calls) }</td>
+								<td class="latency">{ i64(s.Latency) }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			}
+		</section>
+	}
+}

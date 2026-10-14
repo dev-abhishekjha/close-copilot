@@ -24,6 +24,10 @@ type RunsPage struct {
 	Month     string // form echo after an error
 	Error     string
 	Runs      []RunRow
+	// ShowSummary is true when the audit backend is set; Summary is nil
+	// when no run has finished.
+	ShowSummary bool
+	Summary     *SummaryCard
 }
 
 // TimelineStep is one state in the run's timeline.
@@ -110,3 +114,76 @@ func stepClass(s TimelineStep) string {
 	}
 	return "step"
 }
+
+// SummaryCard is the last finished run's headline on the runs page.
+type SummaryCard struct {
+	RunID        string
+	Company      string
+	Month        string
+	VerifiedRate string // "N of M (P%)" or "n/a"
+	OpenHigh     int
+}
+
+// AuditRow is one audit log entry. ArgsFull is the whole compact JSON,
+// shown in a <details>; ArgsShort is truncated.
+type AuditRow struct {
+	Time        string
+	Actor       string
+	Server      string
+	Tool        string
+	ArgsShort   string
+	ArgsFull    string
+	Truncated   bool
+	ResultCount string
+	Latency     string
+	Error       string
+}
+
+// AuditPage is the checker's audit log page.
+type AuditPage struct {
+	User      string
+	Role      string
+	CSRFToken string
+	Actors    []string // filter options
+	Servers   []string
+	Tools     []string
+	SelActor  string
+	SelServer string
+	SelTool   string
+	From      string // YYYY-MM-DD echo
+	To        string
+	Rows      []AuditRow
+	OlderURL  string // empty when there are no older rows
+}
+
+// StepRow is the usage of one step family on the metrics page.
+type StepRow struct {
+	Kind    string
+	Input   int64
+	Output  int64
+	Cache   int64
+	Cost    string
+	Calls   int64
+	Latency int64
+}
+
+// MetricsPage is the run metrics page.
+type MetricsPage struct {
+	User         string
+	Role         string
+	CSRFToken    string
+	RunID        string
+	Company      string
+	Month        string
+	Status       string
+	Duration     string
+	Input        int64
+	Output       int64
+	Cache        int64
+	Cost         string
+	Steps        []StepRow
+	VerifiedRate string
+	TraceID      string
+}
+
+func metricsURL(id string) string { return "/runs/" + id + "/metrics" }
