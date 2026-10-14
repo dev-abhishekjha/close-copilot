@@ -47,7 +47,7 @@ The components, the data flow of one close and the full MCP tool catalog are in 
 The numbers below come from `evals/baseline.json` as committed. All data is synthetic, and the errors were planted by this project's own seeder. A perfect score means the detectors find the error types this project defined. It says nothing about accuracy on a real company's books.
 
 - **Suites.** `suite-skeleton` has one company (`sharma`). It evaluates September 2026, which has 3 planted unrecorded bank charges, and uses August 2026 as a clean control month. `suite-v1` has two companies (`sharma`, `mehta`). It evaluates July to September 2026 for both, which hold 40 planted errors across 10 types, and uses sharma's June 2026 as the clean control. That makes 7 close runs.
-- **Tiers.** Tier 1 replays the tool responses recorded from the seeded ERPNext. It runs the checks and calls no model, and CI gates every relevant pull request on it. Tier 2 replays the same fixtures with the explainer and verifier on. It used `LLM_PROVIDER=claude-cli`, with `haiku` as the fast model and `sonnet` as the strong one. No recorded number used the Anthropic API provider.
+- **Tiers.** Tier 1 replays the tool responses recorded from the seeded ERPNext. It runs the checks and calls no model, and CI gates every relevant pull request on it. Tier 2 replays the same fixtures with the explainer and verifier on. It was recorded locally through `claude -p` (`LLM_PROVIDER=claude-cli`; the baseline file doesn't store the provider), with `haiku` as the fast model and `sonnet` as the strong one. No recorded number used the Anthropic API provider.
 
 ### Overall
 
@@ -189,7 +189,7 @@ What isn't built, isn't measured or is known to fail:
 - **No per-user company lists.** `config/users.yaml` gives roles but no company list, so every signed-in user can see every configured company.
 - **Pseudonymiser gaps.** The GSTIN and PAN patterns use word boundaries, so an identifier glued to other letters or digits, or written in lower case, is not masked. Evidence strings are cut to 500 characters before masking, so an identifier cut at the boundary can leak. Both must be fixed before any non-synthetic data.
 - **`MCP_SCOPE_KEY` length.** The servers refuse only an empty key, so a short key is accepted.
-- **Approval workflow edges (CC-1004 follow-ups).** A dismiss can race a propose-and-approve, which could leave a posted entry on a dismissed finding. A finding stays `open` after its entry posts. A proposal stuck at `approved` after a permanent post refusal needs manual SQL. The audit log and run-metrics pages (CC-1005) are not built.
+- **Approval workflow edges (CC-1004 follow-ups).** A dismiss can race a propose-and-approve, which could leave a posted entry on a dismissed finding. A finding stays `open` after its entry posts. A proposal stuck at `approved` after a permanent post refusal needs manual SQL.
 - **Verifier amount parsing.** Some chains of amounts in prose are not fully checked, such as `5,000-6000-7000`, `5,000/6000` and `₹500 and 600`.
 - **The laptop fixed-asset line** was listed as unproven on a live ERPNext. It now posts: the suite-v1 fixtures recorded from ERPNext hold the quarterly laptop bill on `Office Equipment` for sharma's July. No dedicated live test pins it.
 - **[docs/mcp.md](docs/mcp.md) is stale:** it lists two evidence tools and leaves out `search_documents`. The catalog in [docs/architecture.md](docs/architecture.md) is current.
