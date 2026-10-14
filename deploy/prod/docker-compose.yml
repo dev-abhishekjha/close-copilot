@@ -1,0 +1,200 @@
+# Close Copilot on one VM (CC-1201). Only caddy publishes ports (80, 443).
+#
+# Networks:
+#   edge     caddy only; the one network with a published port.
+#   internal `internal: true`, so containers on it have no route out. Every
+#            service is attached to it; ERPNext's services join it too.
+#   egress   outbound only. Attached to the services that must call out:
+#            agent (Anthropic, Langfuse Cloud), mcp-books and mcp-evidence
+#            (Langfuse Cloud spans). TEI has no egress: models are pre-pulled once
+#            (docs/deploy.md) and HF_HUB_OFFLINE=1. docling, under the
+#            `ingest` profile, keeps egress for its model downloads. Nothing publishes a port on it.
+#
+# Memory budget on 16 GB: ERPNext ~3 GB, Postgres ~0.3 GB, TEI ~1 GB, Go
+# services under 1 GB, docling ~2 GB and only under the `ingest` profile.
+# Traces go to Langfuse Cloud, not a local Langfuse. Stop ERPNext's
+# scheduler on the VM: `docker compose ... stop scheduler`.
+name: close-copilot-prod
+
+include:
+  - path:
+      - ../erpnext/docker-compose.yaml
+      - erpnext.override.yaml
+
+x-go-service: &go-service
+  image: close-copilot/app:prod
+  build:
+    context: ../..
+    dockerfile: deploy/prod/Dockerfile
+  restart: unless-stopped
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  networks: [internal, egress]
+
+services:
+  caddy:
+    image: caddy:2.10.2
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    security_opt: ["no-new-privileges:true"]
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DEMO_DOMAIN: ${DEMO_DOMAIN:?set DEMO_DOMAIN}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on: [agent]
+    networks: [edge, internal]
+
+  agent:
+    <<: *go-service
+    command: ["agent", "serve", "--results-dir", "/data/results", "--config-dir", "/app/config"]
+    environment:
+      APP_ADDR: ":8000"
+      APP_SESSION_KEY: ${APP_SESSION_KEY:?set APP_SESSION_KEY}
+      DATABASE_URL: postgres://copilot:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/copilot?sslmode=disable
+      BOOKS_MCP_URL: http://mcp-books:7001/mcp
+      EVIDENCE_MCP_URL: http://mcp-evidence:7002/mcp
+      MCP_TOKEN_AGENT: ${MCP_TOKEN_AGENT:?set MCP_TOKEN_AGENT}
+      MCP_TOKEN_ADMIN: ${MCP_TOKEN_ADMIN:?set MCP_TOKEN_ADMIN}
+      MCP_SCOPE_KEY: ${MCP_SCOPE_KEY:?set MCP_SCOPE_KEY}
+      PSEUDONYM_KEY: ${PSEUDONYM_KEY:?set PSEUDONYM_KEY}
+      LLM_PROVIDER: ${LLM_PROVIDER:-anthropic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY}
+      LLM_MODEL_FAST: ${LLM_MODEL_FAST:?set LLM_MODEL_FAST}
+      LLM_MODEL_STRONG: ${LLM_MODEL_STRONG:?set LLM_MODEL_STRONG}
+      LLM_DAILY_BUDGET_USD: ${LLM_DAILY_BUDGET_USD:-2.00}
+      LLM_RUN_TOKEN_CAP: ${LLM_RUN_TOKEN_CAP:-200000}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+      TRACE_PROMPTS: "false"
+    volumes:
+      - results:/data/results
+    tmpfs: [/tmp]
+    depends_on:
+      postgres: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      mcp-books: {condition: service_started}
+      mcp-evidence: {condition: service_started}
+
+  migrate:
+    image: close-copilot/app:prod
+    build:
+      context: ../..
+      dockerfile: deploy/prod/Dockerfile
+    command: ["goose", "-dir", "/app/migrations", "up"]
+    environment:
+      GOOSE_DRIVER: postgres
+      GOOSE_DBSTRING: postgres://copilot:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/copilot?sslmode=disable
+    restart: "no"
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [internal]
+
+  mcp-books:
+    <<: *go-service
+    command: ["mcp-books", "--transport", "http", "--addr", ":7001", "--companies", "/app/config/companies"]
+    environment:
+      ERP_BASE_URL: http://frontend:8080
+      ERP_SITE: ${ERP_SITE:-erp.localhost}
+      ERP_API_KEY: ${ERP_API_KEY:?set ERP_API_KEY}
+      ERP_API_SECRET: ${ERP_API_SECRET:?set ERP_API_SECRET}
+      # Only this process gets the poster keys.
+      ERP_POST_API_KEY: ${ERP_POST_API_KEY:?set ERP_POST_API_KEY}
+      ERP_POST_API_SECRET: ${ERP_POST_API_SECRET:?set ERP_POST_API_SECRET}
+      DATABASE_URL: postgres://copilot:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/copilot?sslmode=disable
+      MCP_TOKEN_AGENT: ${MCP_TOKEN_AGENT:?set MCP_TOKEN_AGENT}
+      MCP_TOKEN_ADMIN: ${MCP_TOKEN_ADMIN:?set MCP_TOKEN_ADMIN}
+      MCP_SCOPE_KEY: ${MCP_SCOPE_KEY:?set MCP_SCOPE_KEY}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+      TRACE_PROMPTS: "false"
+    tmpfs: [/tmp]
+    depends_on:
+      postgres: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+      frontend: {condition: service_started}
+
+  mcp-evidence:
+    <<: *go-service
+    command: ["mcp-evidence", "--transport", "http", "--addr", ":7002"]
+    environment:
+      DATABASE_URL: postgres://copilot:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@postgres:5432/copilot?sslmode=disable
+      MCP_TOKEN_AGENT: ${MCP_TOKEN_AGENT:?set MCP_TOKEN_AGENT}
+      MCP_SCOPE_KEY: ${MCP_SCOPE_KEY:?set MCP_SCOPE_KEY}
+      TEI_EMBED_URL: http://tei-embed:80
+      TEI_RERANK_URL: http://tei-rerank:80
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+      TRACE_PROMPTS: "false"
+    tmpfs: [/tmp]
+    depends_on:
+      postgres: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+
+  postgres:
+    image: pgvector/pgvector:0.8.1-pg17
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      POSTGRES_USER: copilot
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      POSTGRES_DB: copilot
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copilot -d copilot"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [internal]
+
+  tei-embed:
+    image: ghcr.io/huggingface/text-embeddings-inference:${TEI_IMAGE_TAG:-cpu-1.9}
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    command: ["--model-id", "BAAI/bge-small-en-v1.5"]
+    environment:
+      # Models are pre-pulled (docs/deploy.md step 3b); no egress at runtime.
+      HF_HUB_OFFLINE: ${TEI_HF_OFFLINE:-1}
+    volumes:
+      - tei-models:/data
+    networks: [internal]
+
+  tei-rerank:
+    image: ghcr.io/huggingface/text-embeddings-inference:${TEI_IMAGE_TAG:-cpu-1.9}
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    command: ["--model-id", "BAAI/bge-reranker-base"]
+    environment:
+      # Models are pre-pulled (docs/deploy.md step 3b); no egress at runtime.
+      HF_HUB_OFFLINE: ${TEI_HF_OFFLINE:-1}
+    volumes:
+      - tei-models:/data
+    networks: [internal]
+
+  # Only while ingesting: docker compose ... --profile ingest up -d docling
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:v1.37.0
+    profiles: ["ingest"]
+    security_opt: ["no-new-privileges:true"]
+    networks: [internal, egress]
+
+networks:
+  edge: {}
+  internal:
+    internal: true
+  egress: {}
+
+volumes:
+  pgdata:
+  tei-models:
+  results:
+  caddy-data:
+  caddy-config:

@@ -1,0 +1,20 @@
+# Applied on top of deploy/erpnext/docker-compose.yaml by the include in
+# docker-compose.yml. The generated file is not edited. This drops the
+# published port 8080 so only caddy is reachable from outside, makes
+# ERPNext's own network internal (no route out), and attaches the nginx
+# `frontend` to the prod `internal` network so mcp-books can reach it at
+# http://frontend:8080.
+services:
+  frontend:
+    ports: !reset []
+    networks:
+      default: null
+      internal: null
+
+networks:
+  default:
+    name: close-copilot-erpnext_default
+    internal: true
+  internal:
+    name: close-copilot-prod_internal
+    internal: true

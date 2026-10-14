@@ -1,0 +1,9 @@
+# Temporary override for the first ERPNext setup on the VM (docs/deploy.md):
+#   docker compose -f deploy/erpnext/docker-compose.yaml -f deploy/prod/erpnext.seed.yaml up -d
+# The generated file publishes 8080 on every interface, and Docker bypasses
+# ufw, so this binds it to 127.0.0.1 for the seeding commands that run on the
+# VM. Stop that stack before starting the prod stack.
+services:
+  frontend:
+    ports: !override
+      - "127.0.0.1:8080:8080"
