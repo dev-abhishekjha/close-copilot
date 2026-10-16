@@ -1416,6 +1416,32 @@ tasks:
       - "internal/web/design_test.go"
       - "internal/web/*_test.go"
     check: "Nav shows only routes the role may call; a forged context cookie falls back to the default; existing page tests pass"
+  - id: UI-03a
+    title: "Page stylesheet slots and shared component hooks"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/static/app.css"
+      - "internal/web/static/css/components.css"
+      - "internal/web/static/css/runs.css"
+      - "internal/web/static/css/finding.css"
+      - "internal/web/static/css/ask.css"
+      - "internal/web/design_test.go"
+      - "internal/web/templates/ui.go"
+      - "internal/web/templates/ui_basic.templ"
+      - "internal/web/templates/ui_basic_templ.go"
+      - "internal/web/templates/ui_data.templ"
+      - "internal/web/templates/ui_data_templ.go"
+      - "internal/web/templates/ui_overlay.templ"
+      - "internal/web/templates/ui_overlay_templ.go"
+      - "internal/web/templates/ui_test.go"
+      - "internal/web/templates/dev_components.templ"
+      - "internal/web/templates/dev_components_templ.go"
+    check: "New hooks are additive; existing component output unchanged; design test covers every css/*.css"
   - id: UI-04
     title: "Dashboard"
     phase: 6
@@ -1437,12 +1463,15 @@ tasks:
     owner: implementer
     risk: standard
     human_review: false
-    depends_on: [UI-03]
+    depends_on: [UI-03a]
     needs_erpnext: false
     files:
       - "internal/web/runs.go"
       - "internal/web/runs_test.go"
-      - "internal/web/templates/runs*"
+      - "internal/web/templates/runs*.templ"
+      - "internal/web/templates/runs*_templ.go"
+      - "internal/web/templates/runs_view.go"
+      - "internal/web/static/css/runs.css"
     check: "Start, watch progress and re-run from buttons; no URL editing"
   - id: UI-06
     title: "Findings: cross-run list, filters and bulk actions"
@@ -1463,12 +1492,15 @@ tasks:
     owner: implementer
     risk: standard
     human_review: false
-    depends_on: [UI-02]
+    depends_on: [UI-03a]
     needs_erpnext: false
     files:
       - "internal/web/finding.go"
       - "internal/web/finding_test.go"
-      - "internal/web/templates/finding*"
+      - "internal/web/templates/finding.templ"
+      - "internal/web/templates/finding_templ.go"
+      - "internal/web/templates/finding_view.go"
+      - "internal/web/static/css/finding.css"
     check: "Every finding type shows evidence, citations and a Propose entry button for makers"
   - id: UI-08
     title: "Ask page"
@@ -1476,12 +1508,20 @@ tasks:
     owner: implementer
     risk: standard
     human_review: false
-    depends_on: [UI-03]
+    depends_on: [UI-03a]
     needs_erpnext: false
     files:
+      - "internal/web/ask.go"
+      - "internal/web/ask_test.go"
       - "internal/web/ask_page.go"
       - "internal/web/ask_page_test.go"
-      - "internal/web/templates/ask*"
+      - "internal/web/ratelimit.go"
+      - "internal/web/ratelimit_test.go"
+      - "internal/web/routes.go"
+      - "internal/web/templates/ask*.templ"
+      - "internal/web/templates/ask*_templ.go"
+      - "internal/web/templates/ask_view.go"
+      - "internal/web/static/css/ask.css"
     check: "Ask from the page; answer, refusal and clarification states all render with citations"
   - id: UI-09
     title: "Proposals and approvals UI"
