@@ -22,7 +22,8 @@ type Repo struct {
 }
 
 // InFlightTicket is a ticket being built: named in tmp/current-task or on an
-// unmerged local branch cc-<n>-*. Files come from its spec, when one exists.
+// unmerged local branch cc-<n>-* or ui-<n>-*. Files come from its spec, when
+// one exists.
 type InFlightTicket struct {
 	ID      string
 	Sources []string
@@ -30,18 +31,19 @@ type InFlightTicket struct {
 }
 
 var (
-	doneSubject = regexp.MustCompile(`^(CC-[0-9]+[a-z]?):`)
-	branchName  = regexp.MustCompile(`^cc-([0-9]+[a-z]?)-.`)
+	doneSubject = regexp.MustCompile(`^((?:CC|UI)-[0-9]+[a-z]?):`)
+	branchName  = regexp.MustCompile(`^(cc|ui)-([0-9]+[a-z]?)-.`)
 )
 
 // TicketFromBranch derives the ticket ID from a branch name:
-// "cc-602-bank-rec" gives "CC-602". It returns "" for other names.
+// "cc-602-bank-rec" gives "CC-602" and "ui-01-design-tokens" gives "UI-01".
+// It returns "" for other names.
 func TicketFromBranch(branch string) string {
 	m := branchName.FindStringSubmatch(branch)
 	if m == nil {
 		return ""
 	}
-	return "CC-" + m[1]
+	return strings.ToUpper(m[1]) + "-" + m[2]
 }
 
 func (r Repo) logger() *slog.Logger {
@@ -72,9 +74,9 @@ func checkRef(ref string) error {
 }
 
 // Done returns the tickets that have a commit on base whose subject starts
-// with "CC-xxx:". Only base's first-parent history counts: the commits a
+// with "<ID>:" (CC-xxx or UI-xx). Only base's first-parent history counts: the commits a
 // --no-ff merge brings in are not themselves merged tickets, so the owner's
-// merge commit on main must carry the subject "CC-xxx: ...".
+// merge commit on main must carry the subject "<ID>: ...".
 func (r Repo) Done(ctx context.Context, base string) (map[string]bool, error) {
 	if err := checkRef(base); err != nil {
 		return nil, err
@@ -93,8 +95,8 @@ func (r Repo) Done(ctx context.Context, base string) (map[string]bool, error) {
 }
 
 // InFlight returns the tickets in progress: the one named in
-// tmp/current-task, and every local branch cc-<n>-* not merged into base
-// that carries specs/CC-<n>.md. Branches without a spec are skipped.
+// tmp/current-task, and every local branch cc-<n>-* or ui-<n>-* not merged
+// into base that carries specs/<ID>.md. Branches without a spec are skipped.
 func (r Repo) InFlight(ctx context.Context, base string) ([]InFlightTicket, error) {
 	if err := checkRef(base); err != nil {
 		return nil, err

@@ -265,6 +265,44 @@ func TestGuardHook(t *testing.T) {
 }
 
 // TestGuardHookIgnoresNonEdits: input without a file path is not judged.
+// TestGuardHookUITask: a UI-nn ticket in tmp/current-task binds edits to its
+// spec's files like a CC ticket, and malformed IDs still block every edit.
+func TestGuardHookUITask(t *testing.T) {
+	h := newHookEnv(t)
+	m := h.main.dir
+	writeFile(t, filepath.Join(m, "specs", "UI-01.md"), specWith(t, "UI-01", "web/tokens/**"))
+	writeFile(t, filepath.Join(m, "specs", "UI-02a.md"), specWith(t, "UI-02a", "web/app/**"))
+	cases := []struct {
+		name  string
+		task  string
+		path  string
+		block bool
+		msg   string
+	}{
+		{name: "UI-01 declared file is allowed", task: "UI-01", path: m + "/web/tokens/colors.css"},
+		{name: "UI-01 own spec is allowed", task: "UI-01", path: m + "/specs/UI-01.md"},
+		{name: "UI-01 undeclared file is blocked", task: "UI-01", path: m + "/internal/foo/x.go", block: true, msg: "not in UI-01"},
+		{name: "UI-01 another UI spec is blocked", task: "UI-01", path: m + "/specs/UI-02a.md", block: true, msg: "not in UI-01"},
+		{name: "UI-02a suffix ID is accepted", task: "UI-02a", path: m + "/web/app/x.ts"},
+		{name: "UI-02a undeclared file is blocked", task: "UI-02a", path: m + "/web/tokens/colors.css", block: true, msg: "not in UI-02a"},
+		{name: "CC-500 is unchanged", task: "CC-500", path: m + "/internal/foo/x.go"},
+		{name: "UI ticket without a spec is blocked", task: "UI-03", path: m + "/web/x.css", block: true, msg: "specs/UI-03.md is missing"},
+		{name: "ui-bogus is blocked", task: "ui-bogus", path: m + "/web/tokens/colors.css", block: true, msg: "not a ticket ID"},
+		{name: "UI- is blocked", task: "UI-", path: m + "/web/tokens/colors.css", block: true, msg: "not a ticket ID"},
+		{name: "lower-case ui-01 is blocked", task: "ui-01", path: m + "/web/tokens/colors.css", block: true, msg: "not a ticket ID"},
+		{name: "UI-01A is blocked", task: "UI-01A", path: m + "/web/tokens/colors.css", block: true, msg: "not a ticket ID"},
+		{name: "UX-01 is blocked", task: "UX-01", path: m + "/web/tokens/colors.css", block: true, msg: "not a ticket ID"},
+		{name: "UI-01/../CC-500 is blocked", task: "UI-01/../CC-500", path: m + "/internal/foo/x.go", block: true, msg: "not a ticket ID"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			h.setMainTask(tc.task)
+			code, stderr := h.run("", tc.path)
+			wantExit(t, code, stderr, tc.block, tc.msg)
+		})
+	}
+}
+
 func TestGuardHookIgnoresNonEdits(t *testing.T) {
 	h := newHookEnv(t)
 	h.setMainTask("CC-500")

@@ -73,7 +73,7 @@ jobs:
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p')"
+          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p; s/^ui-([0-9]+[a-z]?)-.+$/UI-\1/p')"
           echo "id=$id" >>"$GITHUB_OUTPUT"
       # Labels are read from the event payload at $GITHUB_EVENT_PATH.
       - name: protected paths (G1)

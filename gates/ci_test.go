@@ -2,6 +2,7 @@ package gates
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"slices"
@@ -371,6 +372,62 @@ func checkBaseRefGates(t *testing.T, where string, job ciJob, invoked map[string
 		}
 		for _, m := range gateCall.FindAllStringSubmatch(s.Run, -1) {
 			invoked[m[1]] = where
+		}
+	}
+}
+
+// TestWorkflowTicketIDUI runs the "ticket ID from branch name" sed line of
+// gates.yml and protected.yml with sh: both map cc-<n>-<slug> to CC-<n> and
+// ui-<n>-<slug> to UI-<n>, never upper-casing a suffix, and anything else to "".
+func TestWorkflowTicketIDUI(t *testing.T) {
+	if _, err := exec.LookPath("sh"); err != nil {
+		t.Skip("sh is not installed")
+	}
+	branches := []struct{ branch, want string }{
+		{"ui-01-design-tokens", "UI-01"},
+		{"ui-14b-x", "UI-14b"},
+		{"cc-504a-x", "CC-504a"},
+		{"cc-602-bank-rec", "CC-602"},
+		{"feature/ui-01-x", ""},
+		{"feature/cc-602-x", ""},
+		{"ui-01", ""},
+		{"UI-01-x", ""},
+		{"main", ""},
+	}
+	workflows := loadWorkflows(t)
+	for _, name := range []string{"gates.yml", "protected.yml"} {
+		w, ok := workflows[name]
+		if !ok {
+			t.Fatalf("no .github/workflows/%s", name)
+		}
+		var lines []string
+		for _, job := range w.Jobs {
+			for _, s := range job.Steps {
+				if s.Name != "ticket ID from branch name" {
+					continue
+				}
+				for line := range strings.SplitSeq(s.Run, "\n") {
+					if strings.Contains(line, "sed -nE") {
+						lines = append(lines, strings.TrimSpace(line))
+					}
+				}
+			}
+		}
+		if len(lines) != 1 {
+			t.Fatalf("%s: want one sed line in the ticket ID step, got %q", name, lines)
+		}
+		for _, b := range branches {
+			t.Run(name+"/"+b.branch, func(t *testing.T) {
+				cmd := exec.Command("sh", "-c", lines[0]+"\nprintf '%s' \"$id\"")
+				cmd.Env = append(os.Environ(), "HEAD_REF="+b.branch)
+				out, err := cmd.Output()
+				if err != nil {
+					t.Fatalf("sh: %v", err)
+				}
+				if got := string(out); got != b.want {
+					t.Errorf("ticket ID for %q = %q, want %q", b.branch, got, b.want)
+				}
+			})
 		}
 	}
 }

@@ -169,7 +169,7 @@ func RunReady(ctx context.Context, env Env, args []string) int {
 		return c.usage(err)
 	}
 	if len(pos) != 1 {
-		return c.usage(errors.New("want exactly one spec path: ready specs/CC-xxx.md [--base main]"))
+		return c.usage(errors.New("want exactly one spec path: ready specs/<ID>.md [--base main]"))
 	}
 	specPath := pos[0]
 	data, err := os.ReadFile(c.path(specPath)) //nolint:gosec // the path is the operator's command-line argument
@@ -214,13 +214,13 @@ func RunReady(ctx context.Context, env Env, args []string) int {
 // from HEAD locally.
 func RunDeclared(ctx context.Context, env Env, args []string) int {
 	c := newCommand(env, "declared", args)
-	specPath := c.fs.String("spec", "", "the ticket's spec, specs/CC-xxx.md (required)")
+	specPath := c.fs.String("spec", "", "the ticket's spec, specs/<ID>.md (required)")
 	pos, err := c.parse(args)
 	if err != nil {
 		return c.usage(err)
 	}
 	if len(pos) != 0 || *specPath == "" {
-		return c.usage(errors.New("usage: declared --spec specs/CC-xxx.md [--base main]"))
+		return c.usage(errors.New("usage: declared --spec specs/<ID>.md [--base main]"))
 	}
 	s, err := LoadSpec(c.path(*specPath))
 	if err != nil {
@@ -263,7 +263,7 @@ func RunDeclared(ctx context.Context, env Env, args []string) int {
 	default:
 		problems = append(problems, Problem{
 			Check:    "branch",
-			Message:  fmt.Sprintf("branch %q is not named for %s (want cc-%s-<slug>)", branch, s.ID, strings.ToLower(strings.TrimPrefix(s.ID, "CC-"))),
+			Message:  fmt.Sprintf("branch %q is not named for %s (want %s-<slug>)", branch, s.ID, strings.ToLower(s.ID)),
 			Evidence: "branch " + branch,
 		})
 	}

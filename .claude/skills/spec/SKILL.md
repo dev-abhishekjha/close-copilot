@@ -1,7 +1,7 @@
 ---
 name: spec
 description: "Design mode. Write specs/<ID>.md for one Close Copilot ticket from the tickets doc, the plan and tasks/graph.yaml, then run the G0 readiness check. Regulated specs stop for the owner's approval."
-argument-hint: CC-xxx
+argument-hint: <ID>
 arguments: [id]
 disable-model-invocation: true
 model: sonnet
@@ -15,7 +15,7 @@ You are the orchestrator in design mode. The spec is the only thing the worker w
 ## Gather
 
 1. `tasks/graph.yaml`: the entry for `$id` (phase, owner, risk, depends_on, needs_erpnext, files, check, phase_2_pass).
-2. `docs/implementation-tickets.md`: the section that starts `### $id ·` up to the next `### CC-`. Use `grep -n "^### $id " docs/implementation-tickets.md` to find it. Also read the shared-spec sections it refers to.
+2. For a `CC-` ID, `docs/implementation-tickets.md`: the section that starts `### $id ·` up to the next `### CC-`. Use `grep -n "^### $id " docs/implementation-tickets.md` to find it. Also read the shared-spec sections it refers to. For a `UI-` ID, the ticket text is the section for `$id` in `tasks/frontend-plan.md` (`grep -n "$id" tasks/frontend-plan.md`).
 3. `docs/orchestrated-implementation-plan.md`: the task-graph row for `$id`, and for regulated or data-sensitive tickets the matching guardrail rows.
 4. If `specs/$id.md` exists, update it instead of starting over.
 
@@ -32,8 +32,8 @@ You are the orchestrator in design mode. The spec is the only thing the worker w
 ## G0 readiness check (report each line as pass or fail)
 
 - Front matter parses and every template field is filled.
-- Every `depends_on` ticket is done (`git log main --format=%s | grep -E '^CC-xxx:'`).
-- No declared file overlaps a ticket that is in progress (`tmp/current-task` and open `cc-*` branches).
+- Every `depends_on` ticket is done (`git log main --format=%s | grep -E '^<ID>:'`).
+- No declared file overlaps a ticket that is in progress (`tmp/current-task` and open `cc-*` and `ui-*` branches).
 - Every acceptance line is a runnable command.
 - Context quotes what the worker needs and the Code map points at real `path:line` entries (spot-check two).
 - Regulated: `approved_by` is set.
