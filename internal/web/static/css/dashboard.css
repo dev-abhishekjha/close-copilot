@@ -1,1 +1,46 @@
-/* Dashboard (UI-04). */
+/* Dashboard (UI-04). Tokens only. */
+.dash { display: flex; flex-direction: column; gap: var(--space-6); min-width: 0; }
+.dash > * { min-width: 0; }
+.dash-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: var(--space-3); }
+.dash-tiles .ui-stat { height: 100%; box-sizing: border-box; }
+.dash-status-tile { display: contents; }
+.dash-chip { display: inline-flex; align-items: center; font-size: var(--text-base); }
+.dash-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+.dash-grid > * { min-width: 0; }
+@media (min-width: 64rem) {
+  .dash-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-grid-wide { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); }
+}
+.dash td.status::before { content: none; }
+.dash td.month, .dash td.status, .dash th { white-space: nowrap; }
+.dash td.started { min-width: 6rem; }
+.dash .ui-table-caption { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.dash-alert { margin: 0; padding: var(--space-3) var(--space-4); border: 1px solid var(--color-danger); border-radius: var(--radius-md); background: var(--color-danger-soft); }
+.dash-empty { margin: 0; color: var(--color-fg-muted); }
+.dash-more { margin: var(--space-3) 0 0; color: var(--color-fg-muted); font-size: var(--text-sm); }
+.dash-count { margin: 0 0 var(--space-3); }
+.dash-count strong { font-size: var(--text-xl); font-variant-numeric: tabular-nums; }
+.dash-items { list-style: none; margin: 0 0 var(--space-4); padding: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.dash-items a { overflow-wrap: anywhere; }
+.dash-bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.dash-bar { display: grid; grid-template-columns: 8rem 3rem minmax(0, 1fr); align-items: center; gap: var(--space-3); }
+.dash-bar-count { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; }
+.dash-meter { width: 100%; height: 0.75rem; border: 0; border-radius: var(--radius-pill); background: var(--color-surface-2); accent-color: var(--color-accent); }
+.dash-meter::-webkit-meter-bar { background: var(--color-surface-2); border: 0; border-radius: var(--radius-pill); height: 0.75rem; }
+.dash-meter::-webkit-meter-optimum-value, .dash-meter::-webkit-meter-suboptimum-value, .dash-meter::-webkit-meter-even-less-good-value { border-radius: var(--radius-pill); background: var(--color-accent); }
+.dash-meter-high::-webkit-meter-optimum-value, .dash-meter-high::-webkit-meter-suboptimum-value, .dash-meter-high::-webkit-meter-even-less-good-value { background: var(--color-sev-high); }
+.dash-meter-medium::-webkit-meter-optimum-value, .dash-meter-medium::-webkit-meter-suboptimum-value, .dash-meter-medium::-webkit-meter-even-less-good-value { background: var(--color-sev-med); }
+.dash-meter-low::-webkit-meter-optimum-value, .dash-meter-low::-webkit-meter-suboptimum-value, .dash-meter-low::-webkit-meter-even-less-good-value { background: var(--color-sev-low); }
+.dash-meter-high::-moz-meter-bar { background: var(--color-sev-high); }
+.dash-meter-medium::-moz-meter-bar { background: var(--color-sev-med); }
+.dash-meter-low::-moz-meter-bar { background: var(--color-sev-low); }
+.dash-actions { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: var(--space-3); }
+.dash-actions li { display: flex; align-items: center; min-height: 2rem; color: var(--color-fg-muted); }
+.dash-pages { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-border); }
+@media (max-width: 30rem) {
+  .dash-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-bar { grid-template-columns: 6.5rem 2rem minmax(0, 1fr); gap: var(--space-2); }
+  .dash-actions { grid-template-columns: 1fr; }
+}
+/* A wide table scrolls inside its card; it must not widen the page. */
+.dash .ui-table-wrap { width: 0; min-width: 100%; }
