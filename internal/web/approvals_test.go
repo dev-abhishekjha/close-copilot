@@ -516,3 +516,306 @@ func TestWantsJSON(t *testing.T) {
 		}
 	}
 }
+
+// --- UI-09: the restyled approvals page ---
+
+// uiProposal is a balanced two-line pending proposal.
+func uiProposal(n byte, status, maker string, checker *string) store.JournalProposal {
+	return store.JournalProposal{ID: pid(n), CompanyID: "sharma", Status: status, Maker: maker, Checker: checker,
+		CreatedAt: time.Date(2026, 9, 2, 10, 30, 0, 0, time.UTC),
+		Payload: store.JournalPayload{PostingDate: "2026-08-31", Lines: []store.JournalLine{
+			{Account: "Bank Charges - STPL", DebitPaise: 29500}, {Account: "HDFC Bank - STPL", CreditPaise: 29500},
+		}}}
+}
+
+// addChecker signs in a second checker, name, and returns its session.
+func addChecker(t *testing.T, ts *testServer, name string) (*http.Cookie, string) {
+	t.Helper()
+	u := User{Name: name, Role: RoleChecker, PasswordHash: ts.fix.byName["ravi"].PasswordHash}
+	if err := ts.SetUsers(ts.fix.with(t, &u)); err != nil {
+		t.Fatal(err)
+	}
+	return ts.newSession(u)
+}
+
+func getWith(t *testing.T, ts *testServer, ck *http.Cookie, path string) string {
+	t.Helper()
+	w := ts.do(t, req{method: http.MethodGet, path: path, cookies: []*http.Cookie{ck}})
+	if w.Code != http.StatusOK {
+		t.Fatalf("GET %s = %d", path, w.Code)
+	}
+	return w.Body.String()
+}
+
+// controlHooks are the strings that exist only when a decision control
+// for id is offered: the dialog openers, the dialogs and their forms.
+func controlHooks(id uuid.UUID, kind string) []string {
+	s := id.String()
+	return []string{`data-dialog-open="` + kind + `-` + s + `"`, `id="` + kind + `-` + s + `"`, `action="/proposals/` + s + `/` + kind + `"`}
+}
+
+// segment returns body from the first from up to and including the next to.
+func segment(t *testing.T, body, from, to string) string {
+	t.Helper()
+	i := strings.Index(body, from)
+	if i < 0 {
+		t.Fatalf("%q not in body", from)
+	}
+	j := strings.Index(body[i:], to)
+	if j < 0 {
+		t.Fatalf("%q not after %q", to, from)
+	}
+	return body[i : i+j+len(to)]
+}
+
+// buttonsWith returns every <button> start tag that contains attr.
+func buttonsWith(body, attr string) []string {
+	var out []string
+	for rest := body; ; {
+		i := strings.Index(rest, "<button")
+		if i < 0 {
+			return out
+		}
+		j := strings.Index(rest[i:], ">")
+		if j < 0 {
+			return out
+		}
+		if tag := rest[i : i+j+1]; strings.Contains(tag, attr) {
+			out = append(out, tag)
+		}
+		rest = rest[i+j+1:]
+	}
+}
+
+// wantOwnState checks the disabled own-proposal state for id: two disabled
+// buttons tied to the reason, the reason, and no control.
+func wantOwnState(t *testing.T, body string, id uuid.UUID) {
+	t.Helper()
+	own := `own-` + id.String()
+	wantAll(t, body, `id="`+own+`"`, "You proposed this; another checker must decide it.")
+	tags := buttonsWith(body, `aria-describedby="`+own+`"`)
+	if len(tags) != 2 {
+		t.Fatalf("own buttons for %s = %d, want 2", id, len(tags))
+	}
+	for _, tag := range tags {
+		if !strings.Contains(tag, " disabled") || !strings.Contains(tag, `aria-disabled="true"`) || strings.Contains(tag, "data-dialog-open") {
+			t.Errorf("own button not inert: %s", tag)
+		}
+	}
+	wantNone(t, body, append(controlHooks(id, "approve"), controlHooks(id, "reject")...)...)
+}
+
+func TestApprovalsUIButtonsByOwnership(t *testing.T) {
+	fa := &fakeApprovals{pending: []store.JournalProposal{uiProposal(1, "proposed", "asha", nil), uiProposal(2, "proposed", " RAVI ", nil)}}
+	ts := approvalsServer(t, fa, nil)
+	body := ts.get(t, RoleChecker, "/approvals").Body.String()
+
+	cases := []struct {
+		name          string
+		id            uuid.UUID
+		approve, deny bool
+		own           bool
+	}{
+		{"someone else's", pid(1), true, true, false},
+		{"own", pid(2), false, false, true},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			for kind, want := range map[string]bool{"approve": tc.approve, "reject": tc.deny} {
+				for _, h := range controlHooks(tc.id, kind) {
+					if got := strings.Contains(body, h); got != want {
+						t.Errorf("%s shown = %v, want %v", h, got, want)
+					}
+				}
+			}
+			if tc.own {
+				wantOwnState(t, body, tc.id)
+			} else {
+				wantNone(t, body, `id="own-`+tc.id.String()+`"`)
+			}
+		})
+	}
+	// The openers are the styled primary and danger buttons.
+	if tags := buttonsWith(body, `data-dialog-open="approve-`+pid(1).String()+`"`); len(tags) != 1 || !strings.Contains(tags[0], "ui-btn-primary") {
+		t.Errorf("approve opener %v", tags)
+	}
+	if tags := buttonsWith(body, `data-dialog-open="reject-`+pid(1).String()+`"`); len(tags) != 1 || !strings.Contains(tags[0], "ui-btn-danger") {
+		t.Errorf("reject opener %v", tags)
+	}
+}
+
+func TestApprovalsUIDialogs(t *testing.T) {
+	x := uiProposal(1, "proposed", "asha", nil)
+	x.CompanyID = "sharma & <b>co</b>"
+	x.Payload.Lines = append(x.Payload.Lines, store.JournalLine{Account: "GST - STPL", DebitPaise: 0})
+	fa := &fakeApprovals{pending: []store.JournalProposal{x}}
+	ts := approvalsServer(t, fa, nil)
+	ck, csrf := ts.session(RoleChecker)
+	body := getWith(t, ts, ck, "/approvals")
+	id := pid(1).String()
+
+	approve := segment(t, body, `id="approve-`+id+`"`, "</dialog>")
+	wantAll(t, approve,
+		"Post this journal entry to ERPNext for sharma &amp; &lt;b&gt;co&lt;/b&gt; on 2026-08-31? Total ₹295.00, 3 lines.",
+		`method="post"`, `action="/proposals/`+id+`/approve"`, `name="csrf_token" value="`+csrf+`"`, "Approve and post")
+	wantNone(t, approve, "<b>co</b>", `name="reason"`)
+
+	reject := segment(t, body, `id="reject-`+id+`"`, "</dialog>")
+	wantAll(t, reject, `action="/proposals/`+id+`/reject"`, `name="csrf_token" value="`+csrf+`"`,
+		`<textarea`, `name="reason"`, `required maxlength="500"`, `id="reason-`+id+`"`, `for="reason-`+id+`"`)
+
+	// One line reads "1 line".
+	one := uiProposal(2, "proposed", "asha", nil)
+	one.Payload.Lines = one.Payload.Lines[:1]
+	fa.pending = []store.JournalProposal{one}
+	wantAll(t, ts.get(t, RoleChecker, "/approvals").Body.String(), "Total ₹295.00, 1 line.", "Unbalanced: difference ₹295.00")
+}
+
+func TestApprovalsUIServerStillRefuses(t *testing.T) {
+	fa := &fakeApprovals{
+		pending:    []store.JournalProposal{uiProposal(2, "proposed", "ravi", nil)},
+		approveErr: &ApprovalError{Kind: ErrApprovalForbidden, Message: selfApprovalMsg},
+	}
+	ts := approvalsServer(t, fa, nil)
+	path := "/proposals/" + pid(2).String() + "/approve"
+
+	// The page shows only disabled buttons, but a forced post reaches the
+	// backend, which refuses it with the existing 403 and message.
+	wantOwnState(t, ts.get(t, RoleChecker, "/approvals").Body.String(), pid(2))
+	w := ts.do(t, formPost(ts, RoleChecker, path, nil))
+	if w.Code != http.StatusForbidden || !strings.Contains(w.Body.String(), selfApprovalMsg) || !strings.Contains(w.Body.String(), `role="alert"`) {
+		t.Errorf("forced own approve = %d %s", w.Code, w.Body)
+	}
+	if actors, ids := fa.calls(); len(actors) != 1 || actors[0] != "ravi" || ids[0] != pid(2) {
+		t.Fatalf("backend got %v %v", actors, ids)
+	}
+
+	// A maker or viewer is refused by the route table, before the backend.
+	for _, role := range []Role{RoleMaker, RoleViewer} {
+		for _, p := range []string{path, "/proposals/" + pid(2).String() + "/reject", "/api" + path} {
+			r := formPost(ts, role, p, url.Values{"reason": {"no"}})
+			if strings.HasPrefix(p, "/api/") {
+				r = ts.as(role, http.MethodPost, p, "", "application/json")
+			}
+			if w := ts.do(t, r); w.Code != http.StatusForbidden {
+				t.Errorf("%s POST %s = %d, want 403", role, p, w.Code)
+			}
+		}
+	}
+	if actors, _ := fa.calls(); len(actors) != 1 {
+		t.Errorf("backend called %d times, want 1", len(actors))
+	}
+}
+
+func TestApprovalsUIRoles(t *testing.T) {
+	ts := approvalsServer(t, &fakeApprovals{}, nil)
+	cases := []struct {
+		name string
+		r    req
+		want int
+	}{
+		{"checker", ts.as(RoleChecker, http.MethodGet, "/approvals", "", ""), http.StatusOK},
+		{"maker", ts.as(RoleMaker, http.MethodGet, "/approvals", "", ""), http.StatusForbidden},
+		{"viewer", ts.as(RoleViewer, http.MethodGet, "/approvals", "", ""), http.StatusForbidden},
+		{"anonymous", req{method: http.MethodGet, path: "/approvals"}, http.StatusSeeOther},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			w := ts.do(t, tc.r)
+			if w.Code != tc.want {
+				t.Errorf("= %d, want %d", w.Code, tc.want)
+			}
+			if tc.want != http.StatusOK && strings.Contains(w.Body.String(), "Pending proposals") {
+				t.Error("refused page leaks the list")
+			}
+		})
+	}
+}
+
+func TestApprovalsUIPostedAndErrors(t *testing.T) {
+	fa := &fakeApprovals{pending: []store.JournalProposal{uiProposal(3, "proposed", "asha", nil)}}
+	ts := approvalsServer(t, fa, nil)
+	w := ts.do(t, formPost(ts, RoleChecker, "/proposals/"+pid(1).String()+"/approve", nil))
+	if w.Code != http.StatusSeeOther {
+		t.Fatalf("approve = %d", w.Code)
+	}
+	body := ts.get(t, RoleChecker, w.Header().Get("Location")).Body.String()
+	notice := segment(t, body, `class="posted approvals-posted" role="status"`, "</div>")
+	wantAll(t, notice, "posted as journal entry", `href="/proposals/`+pid(1).String()+`"`, pid(1).String()[:8],
+		`href="`+erpTest+`/app/journal-entry/ACC-JV-2026-00007" rel="noopener noreferrer" target="_blank"`, "ACC-JV-2026-00007")
+
+	for _, tc := range []struct {
+		name, path string
+		fa         *fakeApprovals
+		code       int
+		msg        string
+	}{
+		{"approve conflict", "/approve", &fakeApprovals{approveErr: &ApprovalError{Kind: ErrApprovalConflict, Message: "the finding is no longer open, so this entry can't be approved"}},
+			http.StatusConflict, "the finding is no longer open, so this entry can&#39;t be approved"},
+		{"post failed", "/approve", &fakeApprovals{approveErr: &ApprovalError{Kind: ErrApprovalPostFailed, Message: "posting to ERPNext was refused: unbalanced"}},
+			http.StatusBadGateway, "posting to ERPNext was refused: unbalanced"},
+		{"reject invalid", "/reject", &fakeApprovals{rejectErr: &ApprovalError{Kind: ErrApprovalInvalid, Message: "a reason is required"}},
+			http.StatusBadRequest, "a reason is required"},
+		{"internal", "/approve", &fakeApprovals{approveErr: errors.New("db down: secret detail")}, http.StatusInternalServerError, "internal error"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			ts := approvalsServer(t, tc.fa, nil)
+			w := ts.do(t, formPost(ts, RoleChecker, "/proposals/"+pid(1).String()+tc.path, url.Values{"reason": {"x"}}))
+			if w.Code != tc.code {
+				t.Fatalf("= %d, want %d", w.Code, tc.code)
+			}
+			alert := segment(t, w.Body.String(), `class="error approvals-alert" role="alert"`, "</div>")
+			wantAll(t, alert, tc.msg)
+			wantAll(t, w.Body.String(), `id="approvals"`)
+			wantNone(t, w.Body.String(), "secret detail")
+		})
+	}
+}
+
+func TestApprovalsUIEscaping(t *testing.T) {
+	const evil = `<img src=x onerror=alert(1)>`
+	const esc = `&lt;img src=x onerror=alert(1)&gt;`
+	x := uiProposal(1, "proposed", "asha"+evil, nil)
+	x.CompanyID, x.Payload.Remark, x.Payload.PostingDate = "co"+evil, "remark"+evil, "2026-08-31"+evil
+	x.Payload.Lines[0].Account = "acct" + evil
+	ravi := "ravi" + evil
+	y := uiProposal(2, "approved", "asha", &ravi)
+	fa := &fakeApprovals{pending: []store.JournalProposal{x, y}}
+	body := approvalsServer(t, fa, nil).get(t, RoleChecker, "/approvals").Body.String()
+	wantNone(t, body, evil, "<img")
+	for _, s := range []string{"co", "remark", "acct", "asha", "approved, posting failed; retry by ravi"} {
+		wantAll(t, body, s+esc)
+	}
+	wantAll(t, body, "for co"+esc+" on 2026-08-31"+esc+"?")
+}
+
+func TestApprovalsUIRetryRow(t *testing.T) {
+	ravi, meera := "Ravi", "ravi"
+	fa := &fakeApprovals{pending: []store.JournalProposal{
+		uiProposal(3, "approved", "asha", &ravi),
+		uiProposal(4, "approved", "meera", &meera),
+	}}
+	ts := approvalsServer(t, fa, nil)
+	note := "approved, posting failed; retry by Ravi"
+
+	// The recorded checker gets Approve only.
+	body := ts.get(t, RoleChecker, "/approvals").Body.String()
+	wantAll(t, body, note)
+	wantAll(t, body, controlHooks(pid(3), "approve")...)
+	wantNone(t, body, controlHooks(pid(3), "reject")...)
+
+	// Another checker sees the note and no control; the checker who made
+	// pid(4) sees only its disabled state.
+	ck, _ := addChecker(t, ts, "meera")
+	body = getWith(t, ts, ck, "/approvals")
+	wantAll(t, body, note, "approved, posting failed; retry by ravi")
+	wantNone(t, body, append(controlHooks(pid(3), "approve"), controlHooks(pid(3), "reject")...)...)
+	wantNone(t, body, `id="own-`+pid(3).String()+`"`)
+	wantOwnState(t, body, pid(4))
+}
+
+func TestApprovalsUIEmpty(t *testing.T) {
+	body := approvalsServer(t, &fakeApprovals{}, nil).get(t, RoleChecker, "/approvals").Body.String()
+	wantAll(t, body, "Pending proposals", `id="approvals"`, `class="ui-empty"`, "No proposals are waiting for a checker.")
+	wantNone(t, body, "table approvals", "<dialog")
+}

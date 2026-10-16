@@ -351,7 +351,7 @@ func (s *Server) renderApprovals(w http.ResponseWriter, r *http.Request, status 
 	}
 	if posted != uuid.Nil {
 		if x, err := s.approvals.Get(ctx, posted); err == nil && x.Status == "posted" && x.ERPName != nil {
-			page.Posted = &templates.PostedNotice{ProposalID: shortID(x.ID), ERPName: *x.ERPName}
+			page.Posted = &templates.PostedNotice{ProposalID: shortID(x.ID), ERPName: *x.ERPName, ID: x.ID.String()}
 			if link, ok := erpURL(s.erpBase, "journal-entry", *x.ERPName); ok {
 				page.Posted.ERPLink = link
 			}
@@ -381,6 +381,9 @@ func (s *Server) approvalRow(x store.JournalProposal, me string) templates.Appro
 		row.Lines = append(row.Lines, templates.ProposalLine{Account: l.Account, Debit: l.DebitPaise.Format(), Credit: l.CreditPaise.Format()})
 	}
 	row.Total = money.Paise(debit).Format()
+	// The totals line and balance notice come from the finding page's view.
+	pv := s.proposalView(&x)
+	row.TotalCredit, row.Balanced, row.Difference = pv.TotalCredit, pv.Balanced, pv.Difference
 	row.Own = canonicalName(x.Maker) == me
 	checker := ""
 	if x.Checker != nil {

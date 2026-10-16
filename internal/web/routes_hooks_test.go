@@ -29,8 +29,8 @@ func TestRouteHooksEmpty(t *testing.T) {
 	s := &Server{}
 	hooks := map[string]func() []route{
 		"dashboard": s.dashboardRoutes, "findingsList": s.findingsListRoutes,
-		"proposals": s.proposalsRoutes, "documents": s.documentsRoutes,
-		"system": s.systemRoutes, "audit": s.auditRoutes,
+		"documents": s.documentsRoutes,
+		"system":    s.systemRoutes, "audit": s.auditRoutes,
 	}
 	for name, h := range hooks {
 		if got := h(); len(got) != 0 {

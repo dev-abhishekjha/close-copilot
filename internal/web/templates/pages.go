@@ -83,6 +83,7 @@ type PostedNotice struct {
 	ProposalID string
 	ERPName    string
 	ERPLink    string // empty when not linkable
+	ID         string // the full proposal id, for the link to its page (UI-09)
 }
 
 // ApprovalRow is one pending proposal. Own, CanApprove and CanReject only
@@ -95,6 +96,28 @@ type ApprovalRow struct {
 	Own                               bool
 	CanApprove                        bool
 	CanReject                         bool
+	// TotalCredit, Balanced and Difference are the entry's totals line and
+	// balance notice (UI-09); Total is the debit total.
+	TotalCredit string
+	Balanced    bool
+	Difference  string // empty when balanced
+}
+
+// ProposalPage is one journal proposal and who did what to it (UI-09).
+// Row carries the decision controls exactly as approvalRow computes them;
+// ShowControls is false unless the viewer is a checker and the proposal is
+// still awaiting a decision. The server enforces every rule.
+type ProposalPage struct {
+	User         string
+	Role         string
+	CSRFToken    string
+	Row          ApprovalRow
+	Entry        ProposalView
+	Checker      string // empty until decided
+	Timeline     []TimelineEntry
+	ShowControls bool
+	BackHref     string // empty for no back link
+	BackLabel    string
 }
 
 func approveURL(id string) string { return "/proposals/" + id + "/approve" }
