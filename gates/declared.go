@@ -10,14 +10,14 @@ import (
 // alwaysAllowed may change on any ticket's branch, besides its own spec.
 var alwaysAllowed = []string{"go.mod", "go.sum"}
 
-// specGlob matches every ticket spec, compared in lower case.
-const specGlob = "specs/cc-*.md"
+// specGlobs match every ticket spec of each series, compared in lower case.
+var specGlobs = []string{"specs/cc-*.md", "specs/ui-*.md"}
 
 // DeclaredProblems returns one problem per changed file that matches none of
 // the spec's files globs. go.mod, go.sum and specs/<ID>.md are always
-// allowed. Another ticket's spec (specs/CC-*.md, in any case) is never
-// allowed, whatever the globs say. An invalid glob in the spec is an error:
-// G0 should have caught it.
+// allowed. Another ticket's spec (specs/CC-*.md or specs/UI-*.md, in any
+// case) is never allowed, whatever the globs say. An invalid glob in the spec
+// is an error: G0 should have caught it.
 func DeclaredProblems(s Spec, changed []string) ([]Problem, error) {
 	for _, f := range s.Files {
 		if err := ValidatePattern(f); err != nil {
@@ -30,7 +30,7 @@ func DeclaredProblems(s Spec, changed []string) ([]Problem, error) {
 		if f == own || slices.Contains(alwaysAllowed, f) {
 			continue
 		}
-		isSpec, err := Match(specGlob, strings.ToLower(f))
+		isSpec, err := MatchAny(specGlobs, strings.ToLower(f))
 		if err != nil {
 			return nil, err
 		}

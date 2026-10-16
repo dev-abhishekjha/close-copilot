@@ -178,19 +178,27 @@ func ReadyTasks(g Graph, done, inFlight map[string]bool) []Task {
 	return out
 }
 
-var idParts = regexp.MustCompile(`^CC-([0-9]+)(.*)$`)
+var idParts = regexp.MustCompile(`^(CC|UI)-([0-9]+)(.*)$`)
 
-// CompareIDs orders ticket IDs by number, then suffix: CC-101 < CC-504 <
-// CC-504a < CC-1001.
+// CompareIDs orders ticket IDs by series (CC before UI), then number, then
+// suffix: CC-101 < CC-504 < CC-504a < CC-1001 < UI-01 < UI-02. IDs that are
+// equal in all three (UI-1 and UI-01) and IDs that don't parse fall back to
+// strings.Compare, so the order is total.
 func CompareIDs(a, b string) int {
 	ma, mb := idParts.FindStringSubmatch(a), idParts.FindStringSubmatch(b)
 	if ma == nil || mb == nil {
 		return strings.Compare(a, b)
 	}
-	na, _ := strconv.Atoi(ma[1])
-	nb, _ := strconv.Atoi(mb[1])
+	if c := strings.Compare(ma[1], mb[1]); c != 0 {
+		return c
+	}
+	na, _ := strconv.Atoi(ma[2])
+	nb, _ := strconv.Atoi(mb[2])
 	if c := cmp.Compare(na, nb); c != 0 {
 		return c
 	}
-	return strings.Compare(ma[2], mb[2])
+	if c := strings.Compare(ma[3], mb[3]); c != 0 {
+		return c
+	}
+	return strings.Compare(a, b)
 }

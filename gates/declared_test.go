@@ -257,6 +257,59 @@ func TestDeclaredSpecGlobsCannotAllowOtherSpecs(t *testing.T) {
 	}
 }
 
+// TestDeclaredUISpec: the UI series' specs are guarded like CC specs. A UI
+// branch may change its own specs/UI-01.md; no branch may change another
+// ticket's specs/UI-*.md (in any case), even when its globs cover specs/**.
+func TestDeclaredUISpec(t *testing.T) {
+	tests := []struct {
+		name     string
+		branch   string
+		id       string
+		write    []string // extra files changed on the branch
+		wantCode int
+		evidence []string
+	}{
+		{name: "own UI spec allowed", branch: "ui-01-design-tokens", id: "UI-01", wantCode: ExitPass},
+		{name: "own UI spec with specs/** allowed", branch: "ui-01-design-tokens", id: "UI-01", write: []string{"specs/notes.md"}, wantCode: ExitPass},
+		{
+			name: "another UI spec refused", branch: "ui-01-design-tokens", id: "UI-01",
+			write: []string{"specs/UI-02.md", "specs/ui-03.md", "specs/Ui-04.md"}, wantCode: ExitFail,
+			evidence: []string{"specs/UI-02.md", "specs/Ui-04.md", "specs/ui-03.md"},
+		},
+		{
+			name: "CC spec refused on a UI branch", branch: "ui-01-design-tokens", id: "UI-01",
+			write: []string{"specs/CC-500.md"}, wantCode: ExitFail, evidence: []string{"specs/CC-500.md"},
+		},
+		{
+			name: "UI spec refused on a CC branch", branch: "cc-500-foo", id: "CC-500",
+			write: []string{"specs/UI-01.md"}, wantCode: ExitFail, evidence: []string{"specs/UI-01.md"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := newTestRepo(t)
+			r.git("checkout", "-q", "-b", tt.branch)
+			r.write("specs/"+tt.id+".md", specWith(t, tt.id, "specs/**", "web/**"))
+			r.commit(tt.id + ": spec")
+			for _, f := range tt.write {
+				r.write(f, "x\n")
+			}
+			res := r.runCmd(RunDeclared, nil, "--spec", "specs/"+tt.id+".md", "--base", "main")
+			if res.code != tt.wantCode {
+				t.Fatalf("exit %d, want %d\n%s%s", res.code, tt.wantCode, res.stdout, res.stderr)
+			}
+			if got := evidence(res.report); !slices.Equal(got, tt.evidence) {
+				t.Errorf("blocking evidence = %v, want %v", got, tt.evidence)
+			}
+			for _, c := range checks(res.report) {
+				if c != "spec" {
+					t.Errorf("check = %q, want spec", c)
+				}
+			}
+		})
+	}
+}
+
 func TestDeclaredSpecPinnedOnBase(t *testing.T) {
 	tests := []struct {
 		name     string

@@ -58,10 +58,10 @@ jobs:
         env:
           HEAD_REF: ${{ github.head_ref }}
         run: |
-          # cc-602-bank-rec -> CC-602
-          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p')"
+          # cc-602-bank-rec -> CC-602, ui-01-design-tokens -> UI-01
+          id="$(printf '%s' "$HEAD_REF" | sed -nE 's/^cc-([0-9]+[a-z]?)-.+$/CC-\1/p; s/^ui-([0-9]+[a-z]?)-.+$/UI-\1/p')"
           if [ -z "$id" ]; then
-            echo "::error::branch '$HEAD_REF' is not named cc-<n>-<slug>"
+            echo "::error::branch '$HEAD_REF' is not named cc-<n>-<slug> or ui-<n>-<slug>"
             exit 1
           fi
           echo "id=$id" >>"$GITHUB_OUTPUT"

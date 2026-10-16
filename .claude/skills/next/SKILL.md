@@ -8,13 +8,13 @@ allowed-tools: Read Grep Bash(git log *) Bash(git branch *)
 
 # What can be built next
 
-## State from git (a ticket is done when main has a commit starting `CC-xxx:`)
+## State from git (a ticket is done when main has a commit starting `<ID>:`, as `CC-602:` or `UI-01:`)
 
 Done:
-!`git log main --format=%s 2>/dev/null | grep -oE '^CC-[0-9]+[ab]?' | sort -u | tr '\n' ' ' || true`
+!`git log main --format=%s 2>/dev/null | grep -oE '^(CC|UI)-[0-9]+[a-z]?' | sort -u | tr '\n' ' ' || true`
 
 Open ticket branches:
-!`git branch --list 'cc-*' --format='%(refname:short)' 2>/dev/null || true`
+!`git branch --list 'cc-*' 'ui-*' --format='%(refname:short)' 2>/dev/null || true`
 
 Build in progress:
 !`cat tmp/current-task 2>/dev/null || echo none`

@@ -169,3 +169,55 @@ func TestCommandLine(t *testing.T) {
 		t.Errorf("CommandLine = %s, want %s", got, want)
 	}
 }
+
+// TestBranchProblemUI: a UI ticket's branch is ui-<n>-<slug>, and the branch
+// problem names the lower-case ID of the spec's series.
+func TestBranchProblemUI(t *testing.T) {
+	uiRepo := func(t *testing.T) *testRepo {
+		t.Helper()
+		r := newTestRepo(t)
+		r.git("checkout", "-q", "-b", "ui-01-design-tokens")
+		r.write("specs/UI-01.md", specWith(t, "UI-01", "web/tokens/**"))
+		r.commit("UI-01: spec")
+		r.write("web/tokens/tokens.css", ":root {}\n")
+		r.commit("UI-01: tokens")
+		return r
+	}
+	tests := []struct {
+		name     string
+		repo     func(*testing.T) *testRepo
+		spec     string
+		head     string // GITHUB_HEAD_REF, "" for the checked-out branch
+		wantCode int
+		message  string // substring of the branch problem
+	}{
+		{name: "own UI branch passes", repo: uiRepo, spec: "specs/UI-01.md", wantCode: ExitPass},
+		{name: "own UI head ref passes", repo: uiRepo, spec: "specs/UI-01.md", head: "ui-01-design-tokens", wantCode: ExitPass},
+		{name: "another UI ticket fails", repo: uiRepo, spec: "specs/UI-01.md", head: "ui-02-x", wantCode: ExitFail, message: "(want ui-01-<slug>)"},
+		{name: "CC branch for a UI spec fails", repo: uiRepo, spec: "specs/UI-01.md", head: "cc-01-x", wantCode: ExitFail, message: "(want ui-01-<slug>)"},
+		{name: "upper-case UI branch fails", repo: uiRepo, spec: "specs/UI-01.md", head: "UI-01-x", wantCode: ExitFail, message: "(want ui-01-<slug>)"},
+		{name: "UI branch for a CC spec fails", repo: onTicketBranch, spec: "specs/CC-500.md", head: "ui-500-foo", wantCode: ExitFail, message: "(want cc-500-<slug>)"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := tt.repo(t)
+			var env map[string]string
+			if tt.head != "" {
+				env = map[string]string{"GITHUB_HEAD_REF": tt.head}
+			}
+			res := r.runCmd(RunDeclared, env, "--spec", tt.spec, "--base", "main")
+			if res.code != tt.wantCode {
+				t.Fatalf("exit %d, want %d\nstdout: %s\nstderr: %s", res.code, tt.wantCode, res.stdout, res.stderr)
+			}
+			if tt.message == "" {
+				return
+			}
+			if res.report == nil || len(res.report.Blocking) != 1 || res.report.Blocking[0].Check != "branch" {
+				t.Fatalf("report = %+v, want one branch problem", res.report)
+			}
+			if b := res.report.Blocking[0]; !strings.Contains(b.Message, tt.message) || b.Evidence != "branch "+tt.head {
+				t.Errorf("branch problem = %+v, want message containing %q", b, tt.message)
+			}
+		})
+	}
+}

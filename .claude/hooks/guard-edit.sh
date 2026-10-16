@@ -300,7 +300,7 @@ if ! id="$(tr -d '[:space:]' <"$task_file")"; then
   block "could not read tmp/current-task; refusing the edit."
 fi
 [ -n "$id" ] || exit 0
-[[ "$id" =~ ^CC-[0-9]+[a-z]?$ ]] || block "tmp/current-task holds $id, which is not a ticket ID."
+[[ "$id" =~ ^(CC|UI)-[0-9]+[a-z]?$ ]] || block "tmp/current-task holds $id, which is not a ticket ID."
 
 # The spec as committed binds, so editing the working copy (say, adding
 # "**" to files:) widens nothing. Before the spec commit, HEAD lacks it and

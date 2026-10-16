@@ -264,3 +264,46 @@ func TestInFlightAndDone(t *testing.T) {
 		t.Error("Done accepted a ref that git would read as an option")
 	}
 }
+
+func TestInFlightAndDoneUI(t *testing.T) {
+	r := newTestRepo(t)
+	r.branchWithSpec("ui-02-open", "UI-02", "web/app/**")
+	r.branchWithSpec("cc-777-open", "CC-777", "internal/bar/**")
+	r.branchWithSpec("ui-01-design-tokens", "UI-01", "web/tokens/**")
+	r.git("merge", "-q", "--no-ff", "-m", "UI-01: merge ui-01-design-tokens", "ui-01-design-tokens")
+	// A UI branch without its spec is skipped, as for CC branches.
+	r.git("checkout", "-q", "-b", "ui-03-nospec")
+	r.write("z.go", "package z\n")
+	r.commit("UI-03: no spec")
+	r.git("checkout", "-q", "main")
+	r.write("specs/UI-04.md", specWith(t, "UI-04", "web/admin/**"))
+	r.write("tmp/current-task", "UI-04\n")
+
+	repo := Repo{Dir: r.dir}
+	ctx := context.Background()
+	done, err := repo.Done(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !done["CC-101"] || !done["UI-01"] || done["UI-02"] || done["UI-03"] || len(done) != 2 {
+		t.Errorf("Done = %v, want CC-101 and UI-01", done)
+	}
+
+	got, err := repo.InFlight(ctx, "main")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var ids []string
+	for _, ticket := range got {
+		ids = append(ids, ticket.ID)
+	}
+	if want := []string{"CC-777", "UI-02", "UI-04"}; !slices.Equal(ids, want) {
+		t.Fatalf("InFlight IDs = %v, want %v", ids, want)
+	}
+	if !slices.Equal(got[1].Files, []string{"web/app/**"}) || !slices.Equal(got[1].Sources, []string{"branch ui-02-open"}) {
+		t.Errorf("UI-02 = %+v", got[1])
+	}
+	if !slices.Equal(got[2].Files, []string{"web/admin/**"}) || !slices.Equal(got[2].Sources, []string{"tmp/current-task"}) {
+		t.Errorf("UI-04 = %+v", got[2])
+	}
+}

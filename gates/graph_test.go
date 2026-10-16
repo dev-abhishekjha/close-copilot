@@ -122,3 +122,52 @@ func TestTicketFromBranch(t *testing.T) {
 		}
 	}
 }
+
+func TestCompareIDsUI(t *testing.T) {
+	tests := []struct {
+		a, b string
+		want int
+	}{
+		{"UI-01", "UI-02", -1},
+		{"UI-09", "UI-10", -1},
+		{"UI-02", "UI-01", 1},
+		{"UI-01", "UI-01a", -1},
+		{"UI-01", "UI-01", 0},
+		{"CC-1001", "UI-01", -1},
+		{"UI-01", "CC-1001", 1},
+		{"CC-1", "UI-1", -1},
+		// Numeric order differs from string order: strings.Compare fails these.
+		{"UI-9", "UI-10", -1},
+		{"UI-10", "UI-9", 1},
+		{"UI-2a", "UI-10", -1},
+		// Equal series, number and suffix: strings.Compare keeps the order total.
+		{"UI-01", "UI-1", -1},
+		{"UI-1", "UI-01", 1},
+		{"ui-01", "UI-01", 1},
+	}
+	for _, tt := range tests {
+		if got := CompareIDs(tt.a, tt.b); got != tt.want {
+			t.Errorf("CompareIDs(%q, %q) = %d, want %d", tt.a, tt.b, got, tt.want)
+		}
+	}
+}
+
+func TestTicketFromBranchUI(t *testing.T) {
+	tests := map[string]string{
+		"ui-01-design-tokens": "UI-01",
+		"ui-09-x":             "UI-09",
+		"ui-14b-x":            "UI-14b",
+		"cc-602-bank-rec":     "CC-602",
+		"cc-504a-x":           "CC-504a",
+		"ui-01":               "",
+		"ui-bogus-x":          "",
+		"UI-01-x":             "",
+		"xui-01-x":            "",
+		"feature/ui-01-x":     "",
+	}
+	for branch, want := range tests {
+		if got := TicketFromBranch(branch); got != want {
+			t.Errorf("TicketFromBranch(%q) = %q, want %q", branch, got, want)
+		}
+	}
+}

@@ -1,7 +1,7 @@
 ---
 name: build
 description: "Orchestrate one Close Copilot ticket end to end - G0 readiness, worktree branch, delegate to the owner subagent, run the gate ladder, retry with failure reports, security review, commit, merge to main through the merge queue."
-argument-hint: CC-xxx
+argument-hint: <ID>
 arguments: [id]
 disable-model-invocation: true
 model: sonnet
@@ -37,7 +37,7 @@ The guard hook finds the checkout that holds each edited file, so each worktree'
 
 ## 2. Worktree and branch
 
-- `git fetch`, then `git worktree add -b cc-<number>-<short-slug> .worktrees/cc-<number>-<short-slug> main`.
+- `git fetch`, then `git worktree add -b <lower-case ID>-<short-slug> .worktrees/<lower-case ID>-<short-slug> main` (`cc-602-bank-rec`, `ui-01-design-tokens`).
 - In the worktree: `mkdir -p tmp/reports`, write `$id` into its `tmp/current-task`, and commit the spec (`$id: spec`).
 - Every command for this ticket runs in the worktree (`cd` with an absolute path, or `git -C`). Give the worker the worktree's absolute path.
 
