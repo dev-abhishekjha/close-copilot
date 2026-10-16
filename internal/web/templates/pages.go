@@ -17,12 +17,15 @@ const (
 )
 
 // Layout is the base page. CSRFToken, when set, is sent by htmx on every
-// request through hx-headers.
+// request through hx-headers. User, Role and CSRFToken are kept for pages
+// drawn without the app shell; when the request carries a ShellData, its
+// values win. Crumbs is the optional breadcrumb trail for the shell's top bar.
 type Layout struct {
 	Title     string
 	User      string
 	Role      string
 	CSRFToken string
+	Crumbs    []Crumb
 }
 
 // LoginPage is the login form.
@@ -32,20 +35,29 @@ type LoginPage struct {
 	Error     string
 }
 
-// Action is one action the home page offers the user.
+// Action is one action the home page offers the user. Href, when set, is
+// the UI page for it; Method and Path name the route that decided whether it
+// is shown and are not displayed.
 type Action struct {
 	ID     string
 	Label  string
 	Method string
 	Path   string
+	Href   string
+}
+
+// Destination is a page the home page links to as a button.
+type Destination struct {
+	Label, Href, Icon string
 }
 
 // HomePage is the signed-in landing page.
 type HomePage struct {
-	User      string
-	Role      string
-	CSRFToken string
-	Actions   []Action
+	User         string
+	Role         string
+	CSRFToken    string
+	Actions      []Action
+	Destinations []Destination
 }
 
 // csrfHeaders is the hx-headers JSON carrying the CSRF token.

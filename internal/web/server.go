@@ -15,6 +15,7 @@ import (
 	"github.com/a-h/templ"
 
 	"github.com/abhishekjha/close-copilot/internal/config"
+	"github.com/abhishekjha/close-copilot/internal/web/templates"
 )
 
 // HTTP server timeouts.
@@ -96,7 +97,8 @@ type Server struct {
 	devComponents bool
 	limits        *apiLimits
 	logins        *loginLimiter
-	bcryptHook    func() // tests only: called before each login password compare
+	bcryptHook    func()       // tests only: called before each login password compare
+	companies     companyCache // the shell's company list (UI-03)
 }
 
 // NewServer builds the server. It refuses a session key shorter than 32
@@ -233,11 +235,18 @@ func (s *Server) Serve(ctx context.Context, ln net.Listener) error {
 	return nil
 }
 
-// render writes a templ component as HTML.
+// render writes a templ component as HTML. A signed-in request gets the app
+// shell (UI-03): its data is built only if templates.Base asks for it, so a
+// fragment costs nothing extra. A request with no principal gets none.
 func (s *Server) render(w http.ResponseWriter, r *http.Request, status int, c templ.Component) {
+	ctx := r.Context()
+	if p := principalFrom(ctx); p != nil {
+		req := r
+		ctx = templates.WithShellFunc(ctx, func() templates.ShellData { return s.shellData(req, p) })
+	}
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	w.WriteHeader(status)
-	if err := c.Render(r.Context(), w); err != nil {
+	if err := c.Render(ctx, w); err != nil {
 		s.log.ErrorContext(r.Context(), "web: render", "path", r.URL.Path, "err", err)
 	}
 }

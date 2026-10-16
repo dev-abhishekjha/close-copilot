@@ -1,39 +1,62 @@
 package templates
 
 // Base is the shared page shell: strict-CSP friendly (no inline script or
-// style), htmx pinned with SRI, and the CSRF token in hx-headers.
+// style), htmx pinned with SRI, and the CSRF token in hx-headers. A request
+// whose context carries a ShellData (a signed-in user, UI-03) gets the app
+// frame with the sidebar and top bar; any other request (the login page,
+// errors before authentication) gets the plain frame.
 templ Base(l Layout) {
 	<!DOCTYPE html>
 	<html lang="en">
-		<head>
-			<meta charset="utf-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<meta name="htmx-config" content={ htmxConfig }/>
-			<title>{ l.Title } · Close Copilot</title>
-			<link rel="stylesheet" href="/static/app.css"/>
-			<script src={ htmxSrc } integrity={ htmxIntegrity } crossorigin="anonymous" defer></script>
-		</head>
-		<body
-			if l.CSRFToken != "" {
-				hx-headers={ csrfHeaders(l.CSRFToken) }
-			}
-		>
-			<header class="topbar">
-				<span class="brand">Close Copilot</span>
-				if l.User != "" {
-					<span class="who">
-						<span class="user">{ l.User }</span>
-						<span class="role" data-role={ l.Role }>{ l.Role }</span>
-						<form method="post" action="/logout" class="inline">
-							<input type="hidden" name="csrf_token" value={ l.CSRFToken }/>
-							<button type="submit">Sign out</button>
-						</form>
-					</span>
-				}
-			</header>
-			<main>
+		if sd, ok := ShellFrom(ctx); ok {
+			@head(l, true)
+			@shellBody(l, sd) {
 				{ children... }
-			</main>
-		</body>
+			}
+		} else {
+			@head(l, false)
+			@plainBody(l) {
+				{ children... }
+			}
+		}
 	</html>
+}
+
+templ head(l Layout, shell bool) {
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1"/>
+		<meta name="htmx-config" content={ htmxConfig }/>
+		<title>{ l.Title } · Close Copilot</title>
+		<link rel="stylesheet" href="/static/app.css"/>
+		<script src={ htmxSrc } integrity={ htmxIntegrity } crossorigin="anonymous" defer></script>
+		if shell {
+			<script src="/static/js/ui.js" defer></script>
+		}
+	</head>
+}
+
+templ plainBody(l Layout) {
+	<body
+		if l.CSRFToken != "" {
+			hx-headers={ csrfHeaders(l.CSRFToken) }
+		}
+	>
+		<header class="topbar">
+			<span class="brand">Close Copilot</span>
+			if l.User != "" {
+				<span class="who">
+					<span class="user">{ l.User }</span>
+					<span class="role" data-role={ l.Role }>{ l.Role }</span>
+					<form method="post" action="/logout" class="inline">
+						<input type="hidden" name="csrf_token" value={ l.CSRFToken }/>
+						<button type="submit">Sign out</button>
+					</form>
+				</span>
+			}
+		</header>
+		<main>
+			{ children... }
+		</main>
+	</body>
 }

@@ -741,7 +741,7 @@ func TestRunsEscaping(t *testing.T) {
 		if strings.Contains(body, "<script>alert") {
 			t.Errorf("%s: raw script from data", p)
 		}
-		if n := strings.Count(body, "<script"); n > 1 || (n == 1 && !strings.Contains(body, `<script src="/static/htmx.min.js"`)) {
+		if n := strings.Count(body, "<script"); n > 2 || unexpectedScripts(body) != 0 {
 			t.Errorf("%s: unexpected <script tags (%d)", p, n)
 		}
 		if strings.Contains(body, "javascript:") && !strings.Contains(body, "&lt;") {
