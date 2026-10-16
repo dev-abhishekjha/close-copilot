@@ -80,6 +80,11 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodGet, "/audit", checkerOnly, s.auditRoute(s.handleAuditPage)},
 		{http.MethodGet, "/runs/{id}/metrics", anyRole, s.metricsRoute(s.handleRunMetrics)},
 
+		// Ask page (UI-08): a twin of POST /api/ask. POST /ask shares the
+		// API's ask rate-limit bucket. 501 page until Options.Ask and Runs.
+		{http.MethodGet, "/ask", anyRole, s.askHTML(s.handleAskPage)},
+		{http.MethodPost, "/ask", anyRole, s.askHTML(s.handleAskForm)},
+
 		// JSON API (shared spec).
 		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},
 		{http.MethodGet, "/api/close-runs/{id}", anyRole, s.runsAPI(s.handleAPIRun)},

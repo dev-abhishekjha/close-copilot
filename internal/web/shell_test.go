@@ -127,9 +127,9 @@ func TestShellNavByRole(t *testing.T) {
 		role Role
 		want []string
 	}{
-		{RoleViewer, []string{"/", "/runs"}},
-		{RoleMaker, []string{"/", "/runs"}},
-		{RoleChecker, []string{"/", "/runs", "/approvals", "/audit"}},
+		{RoleViewer, []string{"/", "/runs", "/ask"}},
+		{RoleMaker, []string{"/", "/runs", "/ask"}},
+		{RoleChecker, []string{"/", "/runs", "/ask", "/approvals", "/audit"}},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.role), func(t *testing.T) {
@@ -165,7 +165,7 @@ func TestShellNavByRole(t *testing.T) {
 }
 
 func TestShellNavOmitsUnroutedPages(t *testing.T) {
-	unrouted := []string{"/findings", "/ask", "/proposals", "/documents", "/system"}
+	unrouted := []string{"/findings", "/proposals", "/documents", "/system"}
 	ts := newTestServer(t)
 	ck, _ := ts.session(RoleChecker)
 	nav := mainNav(t, okBody(t, ts, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}}))
@@ -184,8 +184,8 @@ func TestShellNavOmitsUnroutedPages(t *testing.T) {
 		role       Role
 		want, deny []string
 	}{
-		{RoleViewer, []string{"/findings"}, []string{"/system", "/ask", "/proposals", "/documents"}},
-		{RoleChecker, []string{"/findings", "/system"}, []string{"/ask", "/proposals", "/documents"}},
+		{RoleViewer, []string{"/findings"}, []string{"/system", "/proposals", "/documents"}},
+		{RoleChecker, []string{"/findings", "/system"}, []string{"/proposals", "/documents"}},
 	} {
 		ck, _ := ts.session(tt.role)
 		nav := mainNav(t, okBody(t, ts, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}}))
