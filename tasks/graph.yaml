@@ -1396,13 +1396,23 @@ tasks:
     depends_on: [UI-02]
     needs_erpnext: false
     files:
-      - "internal/web/templates/**"
+      - "internal/web/templates/layout.templ"
+      - "internal/web/templates/layout_templ.go"
+      - "internal/web/templates/pages.go"
+      - "internal/web/templates/shell.templ"
+      - "internal/web/templates/shell_templ.go"
+      - "internal/web/templates/shell.go"
+      - "internal/web/templates/home.templ"
+      - "internal/web/templates/home_templ.go"
+      - "internal/web/static/app.css"
       - "internal/web/static/css/shell.css"
       - "internal/web/shell.go"
       - "internal/web/shell_test.go"
       - "internal/web/routes.go"
       - "internal/web/server.go"
-    check: "Nav shows only routes the role may call; viewer never sees maker or checker links"
+      - "internal/web/runs.go"
+      - "internal/web/*_test.go"
+    check: "Nav shows only routes the role may call; a forged context cookie falls back to the default; existing page tests pass"
   - id: UI-04
     title: "Dashboard"
     phase: 6
