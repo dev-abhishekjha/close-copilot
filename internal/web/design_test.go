@@ -271,7 +271,15 @@ func TestDesignLegacyClassesStyled(t *testing.T) {
 			}
 		}
 	}
-	css := readStatic(t, "css/legacy.css") + readStatic(t, "css/base.css") + readStatic(t, "css/components.css") + readStatic(t, "css/shell.css")
+	cssFiles, err := fs.Glob(staticFiles, "static/css/*.css")
+	if err != nil || len(cssFiles) == 0 {
+		t.Fatalf("glob stylesheets: %v (%d files)", err, len(cssFiles))
+	}
+	var cssAll strings.Builder
+	for _, f := range cssFiles {
+		cssAll.WriteString(readStatic(t, strings.TrimPrefix(f, "static/")))
+	}
+	css := cssAll.String()
 	var missing []string
 	for c := range classes {
 		if strings.Contains(css, "."+c) {

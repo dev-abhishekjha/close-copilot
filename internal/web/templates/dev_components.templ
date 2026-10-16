@@ -93,7 +93,7 @@ templ DevComponents(p DevComponentsPage) {
 				Caption: "Findings",
 				Columns: []Column{{Label: "Title", SortHref: "?sort=title", Sorted: "asc"}, {Label: "Amount", Align: "right"}},
 				Rows: []Row{
-					{Cells: []Cell{{Text: "Bank charge", Href: "/findings/1"}, {Text: "1,180.00", Num: true}}},
+					{Cells: []Cell{{Text: "Bank charge", Href: "/findings/1"}, {Text: "1,180.00", Num: true, Class: "amount"}}},
 					{Cells: []Cell{{Text: "Duplicate"}, {Text: "450.00", Num: true}}},
 				},
 			})
@@ -102,6 +102,16 @@ templ DevComponents(p DevComponentsPage) {
 				Columns:    []Column{{Label: "Title"}, {Label: "Amount", Align: "right"}},
 				EmptyTitle: "No findings",
 				EmptyBody:  "Nothing matched the filters.",
+			})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-header">
+			<h2 id="dev-header">PageHeader and Facts</h2>
+			@PageHeader(PageHeaderProps{Title: "Run 12", Subtitle: "Sharma Traders, 2026-09"})
+			@PageHeader(PageHeaderProps{Title: "Finding 3", Actions: devAction()})
+			@Facts([]Fact{
+				{Label: "Company", Value: "Sharma Traders"},
+				{Label: "Month", Value: "2026-09"},
+				{Label: "Status", Content: StatusChip("open")},
 			})
 		</section>
 		<section class="ui-dev-section" aria-labelledby="dev-tabs">
@@ -115,7 +125,7 @@ templ DevComponents(p DevComponentsPage) {
 		<section class="ui-dev-section" aria-labelledby="dev-stepper">
 			<h2 id="dev-stepper">Stepper</h2>
 			@Stepper([]Step{
-				{Label: "Checks", Detail: "Finished", State: "done"},
+				{Label: "Checks", Detail: "Finished", State: "done", Key: "checks"},
 				{Label: "Explain", Detail: "In progress", State: "active"},
 				{Label: "Verify", State: "pending"},
 				{Label: "Approve", Detail: "Blocked", State: "failed"},

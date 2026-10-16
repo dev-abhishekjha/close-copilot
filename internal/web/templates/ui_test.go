@@ -240,6 +240,11 @@ func TestUIEscaping(t *testing.T) {
 			"Select":      SelectField(FieldProps{ID: x, Name: x, Label: x, Value: x, Hint: x, Error: x, Options: []Option{{x, x}}, Attrs: attrs}),
 			"Textarea":    TextareaField(FieldProps{ID: x, Name: x, Label: x, Value: x, Hint: x, Error: x, Placeholder: x, Attrs: attrs}),
 			"Empty":       EmptyState(EmptyProps{Icon: x, Title: x, Body: x, Action: &ButtonProps{Label: x, Href: x}}),
+			"StepKey":     Stepper([]Step{{Label: "a", Key: x}}),
+			"CellClass":   DataTable(TableProps{Columns: []Column{{Label: "a"}}, Rows: []Row{{Cells: []Cell{{Text: "a", Class: x}}}}}),
+			"ConfirmX":    ConfirmModal(ConfirmProps{ID: "d", Extra: Facts([]Fact{{Label: x, Value: x}})}),
+			"PageHeader":  PageHeader(PageHeaderProps{Title: x, Subtitle: x}),
+			"Facts":       Facts([]Fact{{Label: x, Value: x}}),
 		}
 		for name, c := range cases {
 			h := render(t, c)
@@ -261,4 +266,72 @@ func TestUIEscaping(t *testing.T) {
 	wantNone(t, "attrs dropped", h, "onclick")
 	h = render(t, Button(ButtonProps{Label: "x", Attrs: templ.Attributes{"class": "evil", "style": "x", "hx-on:click": "y", "ONCLICK": "z"}}))
 	wantNone(t, "attrs reserved", h, "evil", "style=", "hx-on", "ONCLICK", "z")
+}
+
+func TestUIHooksStepKey(t *testing.T) {
+	h := render(t, Stepper([]Step{{Label: "a", Key: "checks"}, {Label: "b"}}))
+	wantAll(t, "key", h, `data-step="checks"`)
+	if n := strings.Count(h, "data-step"); n != 1 {
+		t.Errorf("data-step count = %d, want 1", n)
+	}
+	h = render(t, Stepper([]Step{{Label: "a", Key: `"><script>x</script>`}}))
+	wantNone(t, "hostile key", h, "<script", `"><script`)
+}
+
+func TestUIHooksCellClass(t *testing.T) {
+	tests := []struct {
+		name, class string
+		want        bool
+	}{
+		{"valid", "amount", true},
+		{"multi", "status ok-1", true},
+		{"attr break", `onclick" x`, false},
+		{"uppercase", "Amount", false},
+		{"empty", "", false},
+		{"too long", "a" + strings.Repeat("b", 64), false},
+		{"leading digit", "1a", false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			h := render(t, DataTable(TableProps{Columns: []Column{{Label: "a"}}, Rows: []Row{{Cells: []Cell{{Text: "v", Class: tc.class}}}}}))
+			if tc.want {
+				wantAll(t, tc.name, h, `<td class="`+tc.class+`"`)
+				return
+			}
+			wantNone(t, tc.name, h, "onclick", "Amount", "bbbbbbbb")
+		})
+	}
+	h := render(t, DataTable(TableProps{Columns: []Column{{Label: "a", Align: "right"}}, Rows: []Row{{Cells: []Cell{{Text: "v", Num: true, Class: "amount"}}}}}))
+	wantAll(t, "merged", h, `class="ui-num ui-align-right amount"`)
+}
+
+func TestUIHooksConfirmExtra(t *testing.T) {
+	base := ConfirmProps{ID: "d", Title: "T", Body: "BODYTEXT", Action: "/x", CSRFToken: "tok"}
+	withExtra := base
+	withExtra.Extra = TextareaField(FieldProps{ID: "why", Name: "reason", Label: "EXTRAMARK", Required: true})
+	h := render(t, ConfirmModal(withExtra))
+	b, e, a := strings.Index(h, "BODYTEXT"), strings.Index(h, "EXTRAMARK"), strings.Index(h, "ui-dialog-actions")
+	f := strings.Index(h, "</form>")
+	if b < 0 || e < 0 || a < 0 || f < 0 || b >= e || e >= a || a >= f {
+		t.Errorf("order wrong: body=%d extra=%d actions=%d form end=%d in:\n%s", b, e, a, f, h)
+	}
+	wantAll(t, "form parts", h, `name="csrf_token"`, `data-dialog-close`)
+	plain := render(t, ConfirmModal(base))
+	wantNone(t, "no extra", plain, "EXTRAMARK", "<textarea")
+	want := `<p class="ui-dialog-body" id="d-body">BODYTEXT</p><input type="hidden" name="csrf_token"`
+	wantAll(t, "unchanged", plain, want)
+}
+
+func TestUIHooksPageHeaderFacts(t *testing.T) {
+	h := render(t, PageHeader(PageHeaderProps{Title: "Run <1>"}))
+	if n := strings.Count(h, "<h1"); n != 1 {
+		t.Errorf("h1 count = %d", n)
+	}
+	wantAll(t, "title escaped", h, "Run &lt;1&gt;", `class="ui-page-header"`)
+	wantNone(t, "optional", h, "ui-page-subtitle", "ui-page-actions")
+	h = render(t, PageHeader(PageHeaderProps{Title: "T", Subtitle: "Sub", Actions: Button(ButtonProps{Label: "Go"})}))
+	wantAll(t, "full", h, "ui-page-subtitle", "Sub", "ui-page-actions", "Go")
+	h = render(t, Facts([]Fact{{Label: "A", Value: "v1"}, {Label: "B", Value: "ignored", Content: StatusChip("open")}}))
+	wantAll(t, "facts", h, `<dl class="ui-facts">`, "<dt>A</dt>", "v1", "Open")
+	wantNone(t, "content replaces value", h, "ignored")
 }

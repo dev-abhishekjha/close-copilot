@@ -39,6 +39,9 @@ templ ConfirmModal(p ConfirmProps) {
 		<form class="ui-dialog-form" method={ formMethod(p.Method) } action={ templ.URL(p.Action) }>
 			<h2 class="ui-dialog-title" id={ p.ID + "-title" }>{ p.Title }</h2>
 			<p class="ui-dialog-body" id={ p.ID + "-body" }>{ p.Body }</p>
+			if p.Extra != nil {
+				@p.Extra
+			}
 			<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
 			for _, k := range sortedKeys(p.Fields) {
 				<input type="hidden" name={ k } value={ p.Fields[k] }/>

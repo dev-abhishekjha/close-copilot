@@ -310,7 +310,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 				Caption: "Findings",
 				Columns: []Column{{Label: "Title", SortHref: "?sort=title", Sorted: "asc"}, {Label: "Amount", Align: "right"}},
 				Rows: []Row{
-					{Cells: []Cell{{Text: "Bank charge", Href: "/findings/1"}, {Text: "1,180.00", Num: true}}},
+					{Cells: []Cell{{Text: "Bank charge", Href: "/findings/1"}, {Text: "1,180.00", Num: true, Class: "amount"}}},
 					{Cells: []Cell{{Text: "Duplicate"}, {Text: "450.00", Num: true}}},
 				},
 			}).Render(ctx, templ_7745c5c3_Buffer)
@@ -326,7 +326,27 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-tabs\"><h2 id=\"dev-tabs\">Tabs</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-header\"><h2 id=\"dev-header\">PageHeader and Facts</h2>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = PageHeader(PageHeaderProps{Title: "Run 12", Subtitle: "Sharma Traders, 2026-09"}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = PageHeader(PageHeaderProps{Title: "Finding 3", Actions: devAction()}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = Facts([]Fact{
+				{Label: "Company", Value: "Sharma Traders"},
+				{Label: "Month", Value: "2026-09"},
+				{Label: "Status", Content: StatusChip("open")},
+			}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-tabs\"><h2 id=\"dev-tabs\">Tabs</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -338,12 +358,12 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-stepper\"><h2 id=\"dev-stepper\">Stepper</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-stepper\"><h2 id=\"dev-stepper\">Stepper</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			templ_7745c5c3_Err = Stepper([]Step{
-				{Label: "Checks", Detail: "Finished", State: "done"},
+				{Label: "Checks", Detail: "Finished", State: "done", Key: "checks"},
 				{Label: "Explain", Detail: "In progress", State: "active"},
 				{Label: "Verify", State: "pending"},
 				{Label: "Approve", Detail: "Blocked", State: "failed"},
@@ -351,7 +371,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-timeline\"><h2 id=\"dev-timeline\">Timeline</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-timeline\"><h2 id=\"dev-timeline\">Timeline</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -362,7 +382,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-toast\"><h2 id=\"dev-toast\">Toast</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-toast\"><h2 id=\"dev-toast\">Toast</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -382,7 +402,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-modal\"><h2 id=\"dev-modal\">ConfirmModal</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-modal\"><h2 id=\"dev-modal\">ConfirmModal</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -398,7 +418,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-field\"><h2 id=\"dev-field\">Field</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-field\"><h2 id=\"dev-field\">Field</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -418,7 +438,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-empty\"><h2 id=\"dev-empty\">EmptyState</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-empty\"><h2 id=\"dev-empty\">EmptyState</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -426,7 +446,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-skeleton\"><h2 id=\"dev-skeleton\">Skeleton</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</section><section class=\"ui-dev-section\" aria-labelledby=\"dev-skeleton\"><h2 id=\"dev-skeleton\">Skeleton</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -438,7 +458,7 @@ func DevComponents(p DevComponentsPage) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

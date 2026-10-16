@@ -207,3 +207,38 @@ templ SkeletonTable(rows, cols int) {
 		<span class="visually-hidden">Loading</span>
 	</div>
 }
+
+// PageHeader is the page's one <h1> with an optional subtitle and actions.
+templ PageHeader(p PageHeaderProps) {
+	<header class="ui-page-header">
+		<div class="ui-page-header-text">
+			<h1 class="ui-page-title">{ p.Title }</h1>
+			if p.Subtitle != "" {
+				<p class="ui-page-subtitle">{ p.Subtitle }</p>
+			}
+		</div>
+		if p.Actions != nil {
+			<div class="ui-page-actions">
+				@p.Actions
+			</div>
+		}
+	</header>
+}
+
+// Facts renders label/value pairs as a description list.
+templ Facts(items []Fact) {
+	<dl class="ui-facts">
+		for _, f := range items {
+			<div class="ui-fact">
+				<dt>{ f.Label }</dt>
+				<dd>
+					if f.Content != nil {
+						@f.Content
+					} else {
+						{ f.Value }
+					}
+				</dd>
+			</div>
+		}
+	</dl>
+}
