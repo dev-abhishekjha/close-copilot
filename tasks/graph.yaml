@@ -1330,7 +1330,8 @@ tasks:
     needs_erpnext: false
     files:
       - "gates/git.go"
-      - "gates/git_test.go"
+      - "gates/ci_test.go"
+      - "gates/ready_test.go"
       - "gates/graph.go"
       - "gates/graph_test.go"
       - "gates/cli.go"
@@ -1340,6 +1341,8 @@ tasks:
       - "gates/hook_test.go"
       - ".claude/hooks/guard-edit.sh"
       - ".claude/skills/next/SKILL.md"
+      - ".claude/skills/build/SKILL.md"
+      - ".claude/skills/spec/SKILL.md"
       - ".github/workflows/gates.yml"
       - ".github/workflows/protected.yml"
     check: "A UI-01 branch, commit subject, spec and tmp/current-task pass the gates and the guard hook; CC-nnn behaviour unchanged"
