@@ -1404,6 +1404,8 @@ tasks:
       - "internal/web/templates/shell.go"
       - "internal/web/templates/home.templ"
       - "internal/web/templates/home_templ.go"
+      - "internal/web/templates/dev_components.templ"
+      - "internal/web/templates/dev_components_templ.go"
       - "internal/web/static/app.css"
       - "internal/web/static/css/shell.css"
       - "internal/web/shell.go"
@@ -1411,6 +1413,7 @@ tasks:
       - "internal/web/routes.go"
       - "internal/web/server.go"
       - "internal/web/runs.go"
+      - "internal/web/design_test.go"
       - "internal/web/*_test.go"
     check: "Nav shows only routes the role may call; a forged context cookie falls back to the default; existing page tests pass"
   - id: UI-04
