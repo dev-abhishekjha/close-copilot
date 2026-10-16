@@ -1346,3 +1346,203 @@ tasks:
       - ".github/workflows/gates.yml"
       - ".github/workflows/protected.yml"
     check: "A UI-01 branch, commit subject, spec and tmp/current-task pass the gates and the guard hook; CC-nnn behaviour unchanged"
+
+  # ---- Phase 6: Product UI (tasks/frontend-plan.md; files are refined in each ticket's spec) ----
+  - id: UI-01
+    title: "Design tokens, stylesheet rewrite, self-hosted font and icon sprite"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [CC-021]
+    needs_erpnext: false
+    files:
+      - "internal/web/static/app.css"
+      - "internal/web/static/css/**"
+      - "internal/web/static/fonts/**"
+      - "internal/web/static/icons.svg"
+      - "internal/web/mime.go"
+      - "internal/web/design_test.go"
+    check: "Tokens meet WCAG AA in light and dark; existing pages render unchanged in structure; CSP unchanged"
+  - id: UI-02
+    title: "Component library in templ"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-01]
+    needs_erpnext: false
+    files:
+      - "internal/web/templates/**"
+      - "internal/web/static/css/components.css"
+      - "internal/web/devcomponents.go"
+      - "internal/web/devcomponents_test.go"
+      - "internal/web/routes.go"
+    check: "Every component renders in the /dev/components page; templ output committed"
+  - id: UI-03
+    title: "App shell: sidebar, top bar, context bar, role-aware nav"
+    phase: 6
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [UI-02]
+    needs_erpnext: false
+    files:
+      - "internal/web/templates/**"
+      - "internal/web/static/css/shell.css"
+      - "internal/web/shell.go"
+      - "internal/web/shell_test.go"
+      - "internal/web/routes.go"
+      - "internal/web/server.go"
+    check: "Nav shows only routes the role may call; viewer never sees maker or checker links"
+  - id: UI-04
+    title: "Dashboard"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/dashboard.go"
+      - "internal/web/dashboard_test.go"
+      - "internal/web/templates/dashboard*.templ"
+      - "internal/web/templates/dashboard*_templ.go"
+      - "internal/store/dashboard*.go"
+    check: "Dashboard shows last run per company, severity counts and what is waiting on the user"
+  - id: UI-05
+    title: "Close runs rework: start modal, status chips, live stepper, re-run"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/runs.go"
+      - "internal/web/runs_test.go"
+      - "internal/web/templates/runs*"
+    check: "Start, watch progress and re-run from buttons; no URL editing"
+  - id: UI-06
+    title: "Findings: cross-run list, filters and bulk actions"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/findings_list.go"
+      - "internal/web/findings_list_test.go"
+      - "internal/web/templates/findings_list*"
+    check: "Filter by severity, type, status, verified; bulk accept and dismiss for makers"
+  - id: UI-07
+    title: "Finding detail rework with side-by-side and Propose entry"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-02]
+    needs_erpnext: false
+    files:
+      - "internal/web/finding.go"
+      - "internal/web/finding_test.go"
+      - "internal/web/templates/finding*"
+    check: "Every finding type shows evidence, citations and a Propose entry button for makers"
+  - id: UI-08
+    title: "Ask page"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/ask_page.go"
+      - "internal/web/ask_page_test.go"
+      - "internal/web/templates/ask*"
+    check: "Ask from the page; answer, refusal and clarification states all render with citations"
+  - id: UI-09
+    title: "Proposals and approvals UI"
+    phase: 6
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: [UI-07]
+    needs_erpnext: false
+    files:
+      - "internal/web/approvals.go"
+      - "internal/web/approvals_test.go"
+      - "internal/web/proposals.go"
+      - "internal/web/proposals_test.go"
+      - "internal/web/templates/approvals*"
+      - "internal/web/templates/proposals*"
+    check: "Maker proposes, checker approves from buttons; self-approval shown disabled with the reason"
+  - id: UI-10
+    title: "Audit and metrics rework with charts and CSV export"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-02]
+    needs_erpnext: false
+    files:
+      - "internal/web/audit.go"
+      - "internal/web/audit_test.go"
+      - "internal/web/metrics.go"
+      - "internal/web/metrics_test.go"
+      - "internal/web/templates/audit*"
+      - "internal/web/templates/metrics*"
+    check: "Filters as chips, CSV export, server-rendered SVG charts"
+  - id: UI-11
+    title: "Documents browser"
+    phase: 6
+    owner: implementer
+    risk: data-sensitive
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/documents.go"
+      - "internal/web/documents_test.go"
+      - "internal/web/templates/documents*"
+      - "internal/retrieval/list*.go"
+    check: "Company filter inside the SQL; document text escaped and never sent to a model"
+  - id: UI-12
+    title: "System status page and health indicator"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/system.go"
+      - "internal/web/system_test.go"
+      - "internal/web/templates/system*"
+    check: "Postgres, ERPNext, model provider and budget shown; no secrets"
+  - id: UI-13
+    title: "Command palette, keyboard shortcuts, toasts"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03]
+    needs_erpnext: false
+    files:
+      - "internal/web/static/js/**"
+      - "internal/web/templates/**"
+      - "internal/web/palette_test.go"
+    check: "Ctrl+K opens the palette; only same-origin script, CSP unchanged"
+  - id: UI-14
+    title: "Accessibility, responsive pass and end-to-end tests"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-04, UI-05, UI-06, UI-07, UI-08, UI-09, UI-10, UI-11, UI-12, UI-13]
+    needs_erpnext: false
+    files:
+      - "internal/web/**"
+      - "e2e/**"
+    check: "Viewer, maker and checker walkthroughs pass; no CSP violations in the console"

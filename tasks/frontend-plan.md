@@ -113,3 +113,38 @@ Phase placement: a new **Phase 6 · Product UI** (UI-01 to UI-14), after Gate F,
 ## 9. Harness ticket CC-021 (prerequisite)
 
 Not in `docs/implementation-tickets.md`. The build harness accepts only `CC-<n>[a-z]` ticket IDs in the guard hook, the gates code, `/next` and two CI workflows. CC-021 teaches all of them `UI-<n>` (branch `ui-01-<slug>`, commit subject `UI-01: ...`, spec `specs/UI-01.md`) with tests, so the UI series can run on the normal `/spec` and `/build` path. The owner approved touching the protected `gates/**`, `.claude/**` and `.github/**` paths for it on 2026-10-16. Regulated: `ticket-reviewer` and G5 run before the merge. Every UI ticket depends on CC-021.
+
+## 10. Ticket text (UI series)
+
+`/spec UI-nn` reads its ticket from this section. The table in section 6 is the summary; the entries here are the contract.
+
+### UI-01 · Design tokens, stylesheet rewrite, self-hosted font and icon sprite
+
+**Goal:** one design system in CSS that every later UI ticket builds on: tokens, a base layer, restyled existing pages, a self-hosted font and an icon sprite, all within the current strict CSP.
+
+**Subtasks:**
+- Tokens (colour, spacing, type, radius, shadow, z-index, focus ring) for light and dark, with a `data-theme` override.
+- Split the stylesheet: `app.css` imports `css/tokens.css`, `css/base.css` and `css/legacy.css`.
+- Restyle every class the current templates use onto the tokens, keeping class names.
+- Self-hosted Inter (variable, latin and latin-ext for the rupee sign) under `/static/fonts/`, with a system-font fallback.
+- SVG icon sprite `/static/icons.svg` with the icon set later tickets need.
+- Serve `.woff2` as `font/woff2`.
+- A test that parses the tokens and enforces WCAG AA contrast.
+
+**Acceptance:** `make check` green; every token pair meets AA in light and dark; the page markup and all existing web tests are unchanged; no `style=` attribute, no external URL, and the CSP constant is untouched.
+
+### UI-02 · Component library in templ
+
+**Goal:** the shared building blocks, each a templ component with a class contract in `css/components.css`, shown on a `/dev/components` page.
+
+**Subtasks:** button (primary, secondary, danger, ghost, loading, disabled), status chip, severity badge, verified badge, card, stat tile, data table (head, sort links, empty row), tabs, stepper, timeline, toast, confirm modal (native `<dialog>`, no inline script), form field with error text, empty state, skeleton, icon helper for the sprite. The dev page is registered only when a `DevComponents` option is set, never in production wiring.
+
+**Acceptance:** every component renders in a test with escaped input; the dev page needs a session; `make generate` leaves no diff.
+
+### UI-03 · App shell: sidebar, top bar, context bar, role-aware nav
+
+**Goal:** a signed-in frame around every page, with navigation built from the route table so a role only sees links it may follow.
+
+**Subtasks:** `AppShell` replacing `Base` for signed-in pages (login keeps its own), sidebar from a nav table checked with `allows()`, top bar with the company and month context (cookie, validated against the configured companies and `YYYY-MM`), breadcrumbs, skip link, current-page highlight, replace the home page's API-path list with real links and quick actions.
+
+**Acceptance:** viewer, maker and checker each get exactly their links (table-driven test over the route table); a forged context cookie falls back to the default; existing page tests still pass; regulated because it touches `routes.go` role wiring.
