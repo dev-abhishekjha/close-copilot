@@ -1318,3 +1318,28 @@ tasks:
       - "docs/**"
       - "adr/**"
     check: "A reader can explain the system from the README"
+
+  # CC-021 is not in the tickets doc; see tasks/frontend-plan.md section 9 (owner decision 2026-10-16: separate UI-nn ticket series).
+  - id: CC-021
+    title: "Harness: accept UI-nn ticket IDs"
+    phase: 6
+    owner: implementer
+    risk: regulated
+    human_review: true
+    depends_on: []
+    needs_erpnext: false
+    files:
+      - "gates/git.go"
+      - "gates/git_test.go"
+      - "gates/graph.go"
+      - "gates/graph_test.go"
+      - "gates/cli.go"
+      - "gates/cli_test.go"
+      - "gates/declared.go"
+      - "gates/declared_test.go"
+      - "gates/hook_test.go"
+      - ".claude/hooks/guard-edit.sh"
+      - ".claude/skills/next/SKILL.md"
+      - ".github/workflows/gates.yml"
+      - ".github/workflows/protected.yml"
+    check: "A UI-01 branch, commit subject, spec and tmp/current-task pass the gates and the guard hook; CC-nnn behaviour unchanged"
