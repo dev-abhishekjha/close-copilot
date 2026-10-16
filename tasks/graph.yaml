@@ -1374,12 +1374,19 @@ tasks:
     depends_on: [UI-01]
     needs_erpnext: false
     files:
-      - "internal/web/templates/**"
+      - "internal/web/templates/ui*.templ"
+      - "internal/web/templates/ui*.go"
+      - "internal/web/templates/dev_components.templ"
+      - "internal/web/templates/dev_components_templ.go"
+      - "internal/web/static/app.css"
       - "internal/web/static/css/components.css"
+      - "internal/web/static/js/ui.js"
       - "internal/web/devcomponents.go"
       - "internal/web/devcomponents_test.go"
       - "internal/web/routes.go"
-    check: "Every component renders in the /dev/components page; templ output committed"
+      - "internal/web/server.go"
+      - "internal/web/design_test.go"
+    check: "Every component renders in tests with escaped input; the dev page needs a session and is off by default; templ output committed"
   - id: UI-03
     title: "App shell: sidebar, top bar, context bar, role-aware nav"
     phase: 6
