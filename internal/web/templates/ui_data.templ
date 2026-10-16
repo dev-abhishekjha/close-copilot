@@ -91,6 +91,9 @@ templ Stepper(steps []Step) {
 		for i, s := range steps {
 			<li
 				class={ "ui-step ui-step-" + stepState(s.State) }
+				if s.Key != "" {
+					data-step={ s.Key }
+				}
 				if stepState(s.State) == "active" {
 					aria-current="step"
 				}

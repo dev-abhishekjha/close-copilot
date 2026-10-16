@@ -1,6 +1,7 @@
 package templates
 
 import (
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -55,6 +56,7 @@ type Cell struct {
 	Href    string
 	Num     bool
 	Content templ.Component
+	Class   string // extra class(es) on the <td>; dropped unless it matches cellExtraClass
 }
 
 // Row is one DataTable row.
@@ -90,6 +92,7 @@ type TabsProps struct {
 // Step is one Stepper step. State is done, active, pending or failed.
 type Step struct {
 	Label, Detail, State string
+	Key                  string // optional data-step hook
 }
 
 // TimelineEntry is one Timeline item. Time is formatted by the caller.
@@ -102,6 +105,7 @@ type ConfirmProps struct {
 	ID, Title, Body, Method, Action, CSRFToken string
 	Confirm                                    ButtonProps
 	Fields                                     map[string]string
+	Extra                                      templ.Component // rendered after the body, before the buttons
 }
 
 // Option is one SelectField option.
@@ -265,7 +269,19 @@ func cellClass(cols []Column, i int, c Cell) string {
 	if a := colAlign(cols, i); a != "" {
 		cls = strings.TrimSpace(cls + " ui-align-" + a)
 	}
+	if x := cellExtra(c.Class); x != "" {
+		cls = strings.TrimSpace(cls + " " + x)
+	}
 	return cls
+}
+
+var cellExtraClass = regexp.MustCompile(`^[a-z][a-z0-9_ -]{0,63}$`)
+
+func cellExtra(s string) string {
+	if cellExtraClass.MatchString(s) {
+		return s
+	}
+	return ""
 }
 
 func ariaSort(s string) string {
@@ -380,4 +396,16 @@ func count(n, def, limit int) int {
 		return def
 	}
 	return min(n, limit)
+}
+
+// PageHeaderProps describes PageHeader.
+type PageHeaderProps struct {
+	Title, Subtitle string
+	Actions         templ.Component
+}
+
+// Fact is one label/value pair of Facts. Content replaces Value when set.
+type Fact struct {
+	Label, Value string
+	Content      templ.Component
 }
