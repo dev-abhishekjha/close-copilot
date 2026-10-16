@@ -1442,20 +1442,51 @@ tasks:
       - "internal/web/templates/dev_components.templ"
       - "internal/web/templates/dev_components_templ.go"
     check: "New hooks are additive; existing component output unchanged; design test covers every css/*.css"
+  - id: UI-03b
+    title: "Route hooks, page stylesheet slots and the partial chip"
+    phase: 6
+    owner: implementer
+    risk: standard
+    human_review: false
+    depends_on: [UI-03a, UI-08]
+    needs_erpnext: false
+    files:
+      - "internal/web/routes.go"
+      - "internal/web/home.go"
+      - "internal/web/routes_dashboard.go"
+      - "internal/web/routes_findings.go"
+      - "internal/web/routes_proposals.go"
+      - "internal/web/routes_documents.go"
+      - "internal/web/routes_system.go"
+      - "internal/web/routes_audit.go"
+      - "internal/web/routes_hooks_test.go"
+      - "internal/web/static/app.css"
+      - "internal/web/static/css/dashboard.css"
+      - "internal/web/static/css/findings-list.css"
+      - "internal/web/static/css/proposals.css"
+      - "internal/web/static/css/audit.css"
+      - "internal/web/static/css/documents.css"
+      - "internal/web/static/css/system.css"
+      - "internal/web/templates/ui.go"
+      - "internal/web/templates/ui_test.go"
+    check: "Route table unchanged; handleHome moved without behaviour change; partial status renders a labelled chip"
   - id: UI-04
     title: "Dashboard"
     phase: 6
     owner: implementer
     risk: standard
     human_review: false
-    depends_on: [UI-03]
+    depends_on: [UI-03b]
     needs_erpnext: false
     files:
-      - "internal/web/dashboard.go"
+      - "internal/web/home.go"
       - "internal/web/dashboard_test.go"
-      - "internal/web/templates/dashboard*.templ"
-      - "internal/web/templates/dashboard*_templ.go"
-      - "internal/store/dashboard*.go"
+      - "internal/web/templates/home.templ"
+      - "internal/web/templates/home_templ.go"
+      - "internal/web/templates/dashboard_view.go"
+      - "internal/web/static/css/dashboard.css"
+      - "internal/web/routes_test.go"
+      - "internal/web/shell_test.go"
     check: "Dashboard shows last run per company, severity counts and what is waiting on the user"
   - id: UI-05
     title: "Close runs rework: start modal, status chips, live stepper, re-run"
@@ -1477,14 +1508,20 @@ tasks:
     title: "Findings: cross-run list, filters and bulk actions"
     phase: 6
     owner: implementer
-    risk: standard
+    risk: data-sensitive
     human_review: false
-    depends_on: [UI-03]
+    depends_on: [UI-03b]
     needs_erpnext: false
     files:
+      - "internal/web/finding.go"
+      - "internal/web/finding_test.go"
       - "internal/web/findings_list.go"
       - "internal/web/findings_list_test.go"
-      - "internal/web/templates/findings_list*"
+      - "internal/web/routes_findings.go"
+      - "internal/web/templates/findings_list.templ"
+      - "internal/web/templates/findings_list_templ.go"
+      - "internal/web/templates/findings_list_view.go"
+      - "internal/web/static/css/findings-list.css"
     check: "Filter by severity, type, status, verified; bulk accept and dismiss for makers"
   - id: UI-07
     title: "Finding detail rework with side-by-side and Propose entry"
@@ -1530,16 +1567,21 @@ tasks:
     owner: implementer
     risk: regulated
     human_review: true
-    depends_on: [UI-07]
+    depends_on: [UI-03b]
     needs_erpnext: false
     files:
       - "internal/web/approvals.go"
       - "internal/web/approvals_test.go"
       - "internal/web/proposals.go"
       - "internal/web/proposals_test.go"
-      - "internal/web/templates/approvals*"
-      - "internal/web/templates/proposals*"
-    check: "Maker proposes, checker approves from buttons; self-approval shown disabled with the reason"
+      - "internal/web/routes_proposals.go"
+      - "internal/web/templates/pages.go"
+      - "internal/web/templates/approvals.templ"
+      - "internal/web/templates/approvals_templ.go"
+      - "internal/web/templates/proposal.templ"
+      - "internal/web/templates/proposal_templ.go"
+      - "internal/web/static/css/proposals.css"
+    check: "A checker approves or rejects from dialogs; a maker sees their own proposal disabled with the reason; the proposal page shows who did what and when"
   - id: UI-10
     title: "Audit and metrics rework with charts and CSV export"
     phase: 6
