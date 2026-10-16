@@ -1361,6 +1361,7 @@ tasks:
       - "internal/web/static/css/**"
       - "internal/web/static/fonts/**"
       - "internal/web/static/icons.svg"
+      - "internal/web/static/LICENSES.txt"
       - "internal/web/mime.go"
       - "internal/web/design_test.go"
     check: "Tokens meet WCAG AA in light and dark; existing pages render unchanged in structure; CSP unchanged"
