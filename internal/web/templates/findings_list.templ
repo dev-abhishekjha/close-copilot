@@ -1,0 +1,94 @@
+package templates
+
+// FindingsList is the findings of the selected company and month, with
+// filters, sorting, paging and (for makers) bulk accept.
+templ FindingsList(p FindingsListPage) {
+	@Base(Layout{Title: "Findings", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		@PageHeader(PageHeaderProps{Title: "Findings", Subtitle: runTitle(p.Company, p.Month)})
+		if p.Error != "" {
+			<p class="findings-alert error" role="alert">{ p.Error }</p>
+		}
+		if p.Result != nil {
+			@bulkResult(*p.Result)
+		}
+		if !p.HasRun {
+			@EmptyState(EmptyProps{Icon: "search", Title: p.emptyTitle(), Body: "Findings appear here once a close has run.", Action: startAction(p)})
+		} else {
+			@Tabs(TabsProps{Label: "Status", Items: p.Tabs})
+			<form method="get" action="/findings" class="filters">
+				for _, h := range p.Hidden {
+					<input type="hidden" name={ h.Name } value={ h.Value }/>
+				}
+				@SelectField(FieldProps{ID: "severity", Name: "severity", Label: "Severity", Value: p.SelSev, Options: p.severityOptions()})
+				@SelectField(FieldProps{ID: "type", Name: "type", Label: "Type", Value: p.SelType, Options: filterOptions(p.Types)})
+				@SelectField(FieldProps{ID: "verified", Name: "verified", Label: "Verified", Value: p.SelVer, Options: p.verifiedOptions()})
+				@Field(FieldProps{ID: "q", Name: "q", Label: "Title contains", Type: "search", Value: p.Query, Attrs: qAttrs()})
+				@Button(ButtonProps{Label: "Filter", Type: "submit", Variant: "secondary", Icon: "filter"})
+			</form>
+			if p.CanBulk {
+				<form method="post" action="/findings/accept-selected" class="bulk-form">
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<input type="hidden" name="company" value={ p.Company }/>
+					<input type="hidden" name="month" value={ p.Month }/>
+					<input type="hidden" name="return" value={ p.ReturnURL }/>
+					<div class="bulk-bar">
+						@Button(ButtonProps{Label: "Mark selected accepted", Type: "submit", Variant: "primary", Icon: "check"})
+						<span class="findings-muted">Tick open or needs-review findings. Each is accepted on its own, with the usual checks.</span>
+					</div>
+					@listTable(p)
+				</form>
+			} else {
+				@listTable(p)
+			}
+			@pager(p)
+		}
+	}
+}
+
+templ listTable(p FindingsListPage) {
+	<div class="findings-table">
+		@DataTable(TableProps{
+			Caption:    "Findings",
+			Columns:    p.columns(),
+			Rows:       listTableRows(p),
+			EmptyTitle: "No findings match",
+			EmptyBody:  "Change the filters or pick another status.",
+		})
+	</div>
+}
+
+templ pager(p FindingsListPage) {
+	if p.Showing != "" {
+		<nav class="findings-pager" aria-label="Pages">
+			<p class="findings-muted">{ p.Showing }</p>
+			<span class="findings-pager-links">
+				if p.PrevURL != "" {
+					@Button(ButtonProps{Label: "Previous", Href: p.PrevURL, Variant: "ghost", Size: "sm"})
+				}
+				if p.NextURL != "" {
+					@Button(ButtonProps{Label: "Next", Href: p.NextURL, Variant: "ghost", Size: "sm"})
+				}
+			</span>
+		</nav>
+	}
+}
+
+templ selectBox(id, title string) {
+	<input type="checkbox" class="findings-select" name="ids" value={ id } aria-label={ "Select " + title }/>
+}
+
+templ bulkResult(r BulkResult) {
+	@Card(CardProps{ID: "bulk-result", Title: "Bulk accept result", Tone: resultTone(r)}) {
+		<div role="status">
+			<p>{ itoa(r.Accepted) } accepted</p>
+			if len(r.Refused) > 0 {
+				<p>{ itoa(len(r.Refused)) } not accepted</p>
+				<ul class="findings-refused">
+					for _, x := range r.Refused {
+						<li>{ x.Title }: { x.Reason }</li>
+					}
+				</ul>
+			}
+		</div>
+	}
+}

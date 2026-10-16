@@ -28,7 +28,7 @@ func readSrc(t *testing.T, name string) string {
 func TestRouteHooksEmpty(t *testing.T) {
 	s := &Server{}
 	hooks := map[string]func() []route{
-		"dashboard": s.dashboardRoutes, "findingsList": s.findingsListRoutes,
+		"dashboard": s.dashboardRoutes,
 		"proposals": s.proposalsRoutes, "documents": s.documentsRoutes,
 		"system": s.systemRoutes, "audit": s.auditRoutes,
 	}
