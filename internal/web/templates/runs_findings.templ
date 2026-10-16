@@ -3,73 +3,23 @@ package templates
 // RunFindings is the findings list of one run, with type and status filters.
 templ RunFindings(p FindingsPage) {
 	@Base(Layout{Title: "Findings", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card">
-			<h1>Findings: { p.Company } { p.Month }</h1>
-			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(runURL(p.RunID)) }>Run status</a></p>
-			<form method="get" action={ templ.SafeURL(findingsURL(p.RunID)) } class="filters">
-				<label>
-					Type
-					<select name="type">
-						<option value="">All</option>
-						for _, t := range p.Types {
-							<option value={ t } selected?={ t == p.SelType }>{ t }</option>
-						}
-					</select>
-				</label>
-				<label>
-					Status
-					<select name="status">
-						<option value="">All</option>
-						for _, s := range p.Statuses {
-							<option value={ s } selected?={ s == p.SelStatus }>{ s }</option>
-						}
-					</select>
-				</label>
-				<button type="submit">Filter</button>
-			</form>
-			if len(p.Rows) == 0 {
-				<p>No findings.</p>
-			} else {
-				<table class="findings">
-					<thead>
-						<tr>
-							<th>Severity</th>
-							<th>Type</th>
-							<th>Title</th>
-							<th>Amount</th>
-							<th>Status</th>
-							<th>Verified</th>
-							<th>Detail</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, r := range p.Rows {
-							@findingRow(r, false)
-							for _, n := range r.Nested {
-								@findingRow(n, true)
-							}
-						}
-					</tbody>
-				</table>
-			}
-		</section>
+		@PageHeader(PageHeaderProps{Title: "Findings: " + runTitle(p.Company, p.Month), Actions: findingsActions(p)})
+		<form method="get" action={ templ.SafeURL(findingsURL(p.RunID)) } class="filters">
+			@SelectField(FieldProps{ID: "type", Name: "type", Label: "Type", Value: p.SelType, Options: filterOptions(p.Types)})
+			@SelectField(FieldProps{ID: "status", Name: "status", Label: "Status", Value: p.SelStatus, Options: filterOptions(p.Statuses)})
+			@Button(ButtonProps{Label: "Filter", Type: "submit", Variant: "secondary", Icon: "filter"})
+		</form>
+		if len(p.Rows) == 0 {
+			@EmptyState(EmptyProps{Icon: "search", Title: "No findings match", Body: "Change the filters or start another close."})
+		} else {
+			<div class="findings-table">
+				@DataTable(TableProps{Caption: "Findings", Columns: findingColumns, Rows: findingTableRows(p.Rows)})
+			</div>
+		}
 	}
 }
 
-templ findingRow(r FindingRow, nested bool) {
-	<tr data-finding={ r.ID } data-severity={ r.Severity } class={ rowClass(nested) }>
-		<td class="severity">{ r.Severity }</td>
-		<td class="type">{ r.Type }</td>
-		<td class="title">{ r.Title }</td>
-		<td class="amount">{ r.Amount }</td>
-		<td class="status">{ r.Status }</td>
-		<td class="verified">
-			if r.Verified {
-				<span class="badge verified">verified</span>
-			} else {
-				<span class="badge unverified">unverified</span>
-			}
-		</td>
-		<td class="detail"><a href={ templ.SafeURL(findingURL(r.ID)) }>Details</a></td>
-	</tr>
+templ findingsActions(p FindingsPage) {
+	@Button(ButtonProps{Label: "All runs", Href: "/runs", Variant: "ghost"})
+	@Button(ButtonProps{Label: "Run status", Href: runURL(p.RunID), Variant: "secondary"})
 }

@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -397,8 +399,8 @@ func TestRunsPageList(t *testing.T) {
 	}
 	for _, want := range []string{
 		`href="/runs/` + runID(1).String() + `"`, `href="/runs/` + runID(2).String() + `"`,
-		`<td class="findings">7</td>`, `<td class="cost">$1.2346</td>`, `<td class="duration">2m30s</td>`,
-		`<td class="duration"></td>`, `acme`, `2026-08`, store.RunDone, store.RunRunning,
+		`findings">7</td>`, `cost">$1.2346</td>`, `duration">2m30s</td>`,
+		`duration"></td>`, `acme`, `2026-08`, store.RunDone, store.RunRunning,
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("runs page lacks %q", want)
@@ -447,7 +449,7 @@ func TestRunProgress(t *testing.T) {
 		}
 	}
 	w := ts.get(t, RoleViewer, "/runs/"+running.String()+"/progress")
-	for _, want := range []string{`data-step="running" class="step current"`, `data-step="queued" class="step"`,
+	for _, want := range []string{`ui-step-active" data-step="running" aria-current="step"`, `ui-step-done" data-step="queued"`,
 		`data-type="variance">variance: 2<`, `data-type="unrecorded_bank_charge">unrecorded_bank_charge: 1<`,
 		`class="input">1200<`, `class="output">340<`, `class="cache">56<`, `$0.0123`} {
 		if !strings.Contains(w.Body.String(), want) {
@@ -487,9 +489,9 @@ func TestRunFindingsTable(t *testing.T) {
 	ts := runsServer(t, fs, nil)
 	body := ts.get(t, RoleChecker, "/runs/"+rid.String()+"/findings").Body.String()
 
-	for _, want := range []string{"<th>Severity</th>", "<th>Type</th>", "<th>Title</th>", "<th>Amount</th>", "<th>Status</th>", "<th>Verified</th>",
-		`<td class="amount">₹1,23,456.78</td>`, `<td class="amount"></td>`, `badge verified">verified<`, `badge unverified">unverified<`,
-		`<td class="status">needs_review</td>`, `<td class="title">title unrecorded_bank_charge1</td>`} {
+	for _, want := range []string{">Severity</th>", ">Type</th>", ">Title</th>", ">Amount</th>", ">Status</th>", ">Verified</th>",
+		`amount">₹1,23,456.78</td>`, `amount"></td>`, `ui-verified"`, `>Verified</span>`, `ui-unverified"`, `>Unverified</span>`,
+		`<td class="status"><span class="ui-chip ui-chip-neutral">`, `<span>needs_review</span>`, `<td class="title">title unrecorded_bank_charge1</td>`} {
 		if !strings.Contains(body, want) {
 			t.Errorf("findings page lacks %q", want)
 		}
@@ -808,5 +810,312 @@ func TestRunsShutdown(t *testing.T) {
 	}
 	if !strings.Contains(ts.logs.String(), "context canceled") {
 		t.Errorf("executor's error not logged: %v", errors.New(ts.logs.String()))
+	}
+}
+
+// --- UI-05: restyled runs pages ---
+
+var hiddenInputRE = regexp.MustCompile(`<input type="hidden" name="([^"]+)" value="([^"]*)"`)
+
+// runsUIBody returns the body of GET path as the cookie's user.
+func runsUIBody(t testing.TB, ts *testServer, ck *http.Cookie, path string) string {
+	t.Helper()
+	w := ts.do(t, req{method: http.MethodGet, path: path, cookies: []*http.Cookie{ck}})
+	if w.Code != http.StatusOK {
+		t.Fatalf("GET %s = %d", path, w.Code)
+	}
+	return w.Body.String()
+}
+
+func countRE(t testing.TB, pat, body string) int {
+	t.Helper()
+	return len(regexp.MustCompile(pat).FindAllString(body, -1))
+}
+
+func TestRunsUIStartCard(t *testing.T) {
+	ts := runsServer(t, newFakeRunsStore(), nil)
+	ck, csrf := ts.session(RoleMaker)
+	body := runsUIBody(t, ts, ck, "/runs?company=globex&month=2026-07")
+	form := between(t, body, `<form method="post" action="/runs" class="start-run">`, "</form>")
+	for _, want := range []string{`name="csrf_token" value="` + csrf + `"`, `<select class="ui-input" id="company" name="company"`,
+		`<option value="globex" selected>`, `name="month" value="2026-07"`, `type="month"`, `pattern="\d{4}-(0[1-9]|1[0-2])"`,
+		`placeholder="YYYY-MM"`, `type="submit"`, `Start close`} {
+		if !strings.Contains(form, want) {
+			t.Errorf("start form lacks %q: %s", want, form)
+		}
+	}
+	for _, role := range []Role{RoleViewer, RoleChecker} {
+		ck, _ := ts.session(role)
+		b := runsUIBody(t, ts, ck, "/runs")
+		if strings.Contains(b, "start-run") || strings.Contains(b, "Start close") {
+			t.Errorf("%s sees the start card", role)
+		}
+	}
+}
+
+func TestRunsUIListChips(t *testing.T) {
+	fs := newFakeRunsStore()
+	t0 := time.Date(2026, 9, 1, 9, 0, 0, 0, time.UTC)
+	hostile := `<script>alert(1)</script>`
+	fs.list = []store.RunSummary{
+		{CloseRun: store.CloseRun{ID: runID(1), CompanyID: hostile, Month: "2026-09", Status: store.RunDone, StartedAt: &t0}, Findings: 3},
+		{CloseRun: store.CloseRun{ID: runID(2), CompanyID: "acme", Month: "2026-08", Status: store.RunRunning, StartedAt: &t0}},
+		{CloseRun: store.CloseRun{ID: runID(3), CompanyID: "acme", Month: "2026-07", Status: store.RunFailed}},
+	}
+	ts := runsServer(t, fs, nil)
+	ck, _ := ts.session(RoleViewer)
+	body := runsUIBody(t, ts, ck, "/runs")
+	for _, want := range []string{`class="ui-chip ui-chip-ok"`, `<span>Done</span>`, `<span>Running</span>`, `<span>Failed</span>`,
+		`data-run="` + runID(1).String() + `"`, `<caption class="ui-table-caption">Close runs</caption>`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("list lacks %q", want)
+		}
+	}
+	if strings.Contains(body, hostile) || !strings.Contains(body, "&lt;script&gt;alert(1)&lt;/script&gt;") {
+		t.Error("hostile company name not escaped")
+	}
+	fs.mu.Lock()
+	fs.list = nil
+	fs.mu.Unlock()
+	body = runsUIBody(t, ts, ck, "/runs")
+	if !strings.Contains(body, `class="ui-empty"`) || !strings.Contains(body, "No runs yet") || strings.Contains(body, "ui-table") {
+		t.Errorf("empty list not an empty state: %s", body)
+	}
+	mk, _ := ts.session(RoleMaker)
+	if b := runsUIBody(t, ts, mk, "/runs"); !strings.Contains(b, `class="start-run"`) || !strings.Contains(b, "No runs yet") {
+		t.Error("maker with no runs lacks the start card or empty state")
+	}
+}
+
+func TestRunsUIRerunButton(t *testing.T) {
+	fs := newFakeRunsStore()
+	ids := map[string]uuid.UUID{}
+	for i, st := range []string{store.RunQueued, store.RunRunning, store.RunDone, store.RunPartial, store.RunFailed} {
+		id := runID(byte(i + 1))
+		ids[st] = id
+		fs.put(store.CloseRun{ID: id, CompanyID: "acme", Month: "2026-09", Status: st})
+	}
+	ts := runsServer(t, fs, nil)
+	tests := []struct {
+		role   Role
+		status string
+		want   bool
+	}{
+		{RoleMaker, store.RunQueued, false}, {RoleMaker, store.RunRunning, false},
+		{RoleMaker, store.RunDone, true}, {RoleMaker, store.RunPartial, true}, {RoleMaker, store.RunFailed, true},
+		{RoleViewer, store.RunDone, false}, {RoleViewer, store.RunFailed, false},
+		{RoleChecker, store.RunDone, false}, {RoleChecker, store.RunPartial, false},
+	}
+	for _, tt := range tests {
+		t.Run(string(tt.role)+"/"+tt.status, func(t *testing.T) {
+			ck, csrf := ts.session(tt.role)
+			body := runsUIBody(t, ts, ck, "/runs/"+ids[tt.status].String())
+			if got := strings.Contains(body, "Run again"); got != tt.want {
+				t.Fatalf("Run again shown = %v, want %v", got, tt.want)
+			}
+			if !tt.want {
+				return
+			}
+			form := between(t, body, `<form method="post" action="/runs" class="runs-rerun">`, "</form>")
+			got := map[string]string{}
+			for _, m := range hiddenInputRE.FindAllStringSubmatch(form, -1) {
+				got[m[1]] = m[2]
+			}
+			want := map[string]string{"company": "acme", "month": "2026-09", "csrf_token": csrf}
+			if !maps.Equal(got, want) {
+				t.Errorf("rerun fields = %v, want %v", got, want)
+			}
+			if !strings.Contains(form, `type="submit"`) {
+				t.Error("rerun form has no submit button")
+			}
+		})
+	}
+}
+
+func TestRunsUIRerunPosts(t *testing.T) {
+	fs := newFakeRunsStore()
+	fs.put(store.CloseRun{ID: runID(1), CompanyID: "acme", Month: "2026-09", Status: store.RunDone})
+	gate := make(chan struct{})
+	started := make(chan struct{}, 2)
+	ts := runsServer(t, fs, func(context.Context, uuid.UUID) error { started <- struct{}{}; <-gate; return nil })
+	ck, _ := ts.session(RoleMaker)
+	form := between(t, runsUIBody(t, ts, ck, "/runs/"+runID(1).String()), `<form method="post" action="/runs" class="runs-rerun">`, "</form>")
+	vals := url.Values{}
+	for _, m := range hiddenInputRE.FindAllStringSubmatch(form, -1) {
+		vals.Set(m[1], m[2])
+	}
+	post := func() *httptest.ResponseRecorder {
+		return ts.do(t, req{method: http.MethodPost, path: "/runs", body: vals.Encode(),
+			contentType: "application/x-www-form-urlencoded", cookies: []*http.Cookie{ck}})
+	}
+	w := post()
+	if w.Code != http.StatusSeeOther || !strings.HasPrefix(w.Header().Get("Location"), "/runs/") {
+		t.Fatalf("rerun = %d %q", w.Code, w.Header().Get("Location"))
+	}
+	<-started
+	w = post()
+	if w.Code != http.StatusConflict || !strings.Contains(w.Body.String(), `class="start-run"`) || !strings.Contains(w.Body.String(), `role="alert"`) {
+		t.Errorf("second rerun = %d, want the 409 page with the start card and alert: %s", w.Code, w.Body)
+	}
+	close(gate)
+	waitIdle(t, ts)
+}
+
+func TestRunsUIStepper(t *testing.T) {
+	fs := newFakeRunsStore()
+	msg := "<b>boom</b>"
+	statuses := []string{store.RunQueued, store.RunRunning, store.RunDone, store.RunPartial, store.RunFailed}
+	for i, st := range statuses {
+		r := store.CloseRun{ID: runID(byte(i + 1)), CompanyID: "acme", Month: "2026-09", Status: st}
+		if st == store.RunFailed {
+			r.Error = &msg
+		}
+		fs.put(r)
+	}
+	ts := runsServer(t, fs, nil)
+	ck, _ := ts.session(RoleViewer)
+	tests := []struct {
+		status string
+		steps  []string // data-step values in order
+		state  string   // class of the last step
+		poll   bool
+	}{
+		{store.RunQueued, []string{"queued", "running", "done"}, "ui-step-pending", true},
+		{store.RunRunning, []string{"queued", "running", "done"}, "ui-step-pending", true},
+		{store.RunDone, []string{"queued", "running", "done"}, "ui-step-done", false},
+		{store.RunPartial, []string{"queued", "running", "partial"}, "ui-step-done", false},
+		{store.RunFailed, []string{"queued", "running", "failed"}, "ui-step-failed", false},
+	}
+	for i, tt := range tests {
+		t.Run(tt.status, func(t *testing.T) {
+			path := "/runs/" + runID(byte(i+1)).String()
+			for _, p := range []string{path, path + "/progress"} {
+				body := runsUIBody(t, ts, ck, p)
+				var got []string
+				for _, m := range regexp.MustCompile(`<li class="ui-step [^"]*" data-step="([a-z]+)"`).FindAllStringSubmatch(body, -1) {
+					got = append(got, m[1])
+				}
+				if !slices.Equal(got, tt.steps) {
+					t.Errorf("%s steps = %v, want %v", p, got, tt.steps)
+				}
+				if !strings.Contains(body, `class="ui-step `+tt.state+`" data-step="`+tt.steps[2]+`"`) {
+					t.Errorf("%s last step is not %s", p, tt.state)
+				}
+				if polls := strings.Contains(body, `hx-trigger="every 2s"`); polls != tt.poll {
+					t.Errorf("%s polls = %v, want %v", p, polls, tt.poll)
+				}
+				if status := strings.Contains(body, `role="status"`); status != tt.poll {
+					t.Errorf("%s role=status = %v, want %v", p, status, tt.poll)
+				}
+				if strings.Contains(body, "aria-live") {
+					t.Errorf("%s has aria-live on the replaced fragment", p)
+				}
+				if tt.status == store.RunFailed {
+					if strings.Contains(body, "<b>boom") || !strings.Contains(body, "&lt;b&gt;boom&lt;/b&gt;") || !strings.Contains(body, `<p class="error">`) {
+						t.Errorf("%s error not shown escaped", p)
+					}
+					if !strings.Contains(body, "ui-tone-danger") {
+						t.Errorf("%s error not in a danger card", p)
+					}
+				}
+			}
+		})
+	}
+}
+
+func TestRunsUIFindingsTable(t *testing.T) {
+	fs := newFakeRunsStore()
+	rid := runID(1)
+	parent := finding(rid, 1, "missing_accrual", "high", paise(500), "open")
+	parent.Verified = true
+	child := finding(rid, 2, "variance", "low", nil, "open")
+	child.Keys = map[string]string{"related": fid(1).String()}
+	other := finding(rid, 3, "wrong_period_posting", "medium", nil, "dismissed")
+	fs.put(store.CloseRun{ID: rid, CompanyID: "acme", Month: "2026-09", Status: store.RunDone}, parent, child, other)
+	ts := runsServer(t, fs, nil)
+	ck, _ := ts.session(RoleChecker)
+	base := "/runs/" + rid.String() + "/findings"
+	body := runsUIBody(t, ts, ck, base)
+	for _, want := range []string{`<span>High</span>`, `<span>Medium</span>`, `<span>Low</span>`, `<span>Open</span>`, `<span>Dismissed</span>`,
+		`>Verified</span>`, `>Unverified</span>`, `<td class="ui-num ui-align-right amount">`, `class="filters"`, `<select class="ui-input" id="type" name="type"`,
+		`<select class="ui-input" id="status" name="status"`, `data-severity="high"`, `<td class="title nested-title">`, `<td class="title">`,
+		`<caption class="ui-table-caption">Findings</caption>`, `href="/findings/` + fid(1).String() + `"`} {
+		if !strings.Contains(body, want) {
+			t.Errorf("findings table lacks %q", want)
+		}
+	}
+	if n := strings.Count(body, "data-finding="); n != 3 {
+		t.Errorf("rows = %d, want 3", n)
+	}
+	if n := strings.Count(body, "data-nested="); n != 1 {
+		t.Errorf("nested rows = %d, want 1", n)
+	}
+	for _, c := range []string{"severity", "type", "title", "amount", "status", "verified", "detail"} {
+		if countRE(t, `<td class="[^"]*\b`+c+`\b`, body) != 3 {
+			t.Errorf("td.%s count != 3", c)
+		}
+	}
+	filtered := runsUIBody(t, ts, ck, base+"?type=missing_accrual")
+	if !strings.Contains(filtered, `<option value="missing_accrual" selected>`) || strings.Count(filtered, "data-finding=") != 2 {
+		t.Errorf("type filter not applied: %d rows", strings.Count(filtered, "data-finding="))
+	}
+	if b := runsUIBody(t, ts, ck, base+"?status=dismissed&type=variance"); !strings.Contains(b, "No findings match") {
+		t.Error("empty filter result not an empty state")
+	}
+}
+
+func TestRunsUIEscaping(t *testing.T) {
+	fs := newFakeRunsStore()
+	rid := runID(1)
+	xss := `"><img src=x onerror=alert(1)>`
+	msg := xss + "err"
+	f := finding(rid, 1, "missing_accrual", "high", nil, "open")
+	f.Title = xss + "title"
+	fs.put(store.CloseRun{ID: rid, CompanyID: xss + "co", Month: xss + "mo", Status: store.RunFailed, Error: &msg}, f)
+	fs.list = []store.RunSummary{{CloseRun: store.CloseRun{ID: rid, CompanyID: xss + "co", Month: xss + "mo", Status: store.RunFailed}}}
+	ts := runsServer(t, fs, nil)
+	for _, role := range []Role{RoleMaker, RoleViewer} {
+		ck, _ := ts.session(role)
+		for _, p := range []string{"/runs", "/runs/" + rid.String(), "/runs/" + rid.String() + "/progress", "/runs/" + rid.String() + "/findings"} {
+			body := runsUIBody(t, ts, ck, p)
+			if strings.Contains(body, "<img src=x") || strings.Contains(body, `"><img`) {
+				t.Errorf("%s %s: hostile string appears raw", role, p)
+			}
+		}
+	}
+	// A hostile month echoed after a failed start is escaped inside the form value.
+	form := url.Values{"company": {"acme"}, "month": {xss}}
+	w := ts.do(t, ts.as(RoleMaker, http.MethodPost, "/runs", form.Encode(), "application/x-www-form-urlencoded"))
+	if w.Code != http.StatusBadRequest || strings.Contains(w.Body.String(), "<img src=x") {
+		t.Errorf("hostile month: %d, raw=%v", w.Code, strings.Contains(w.Body.String(), "<img src=x"))
+	}
+}
+
+func TestRunsUIAccessible(t *testing.T) {
+	fs := newFakeRunsStore()
+	rid := runID(1)
+	run := runID(2)
+	fs.put(store.CloseRun{ID: rid, CompanyID: "acme", Month: "2026-09", Status: store.RunDone}, finding(rid, 1, "missing_accrual", "high", nil, "open"))
+	fs.put(store.CloseRun{ID: run, CompanyID: "acme", Month: "2026-08", Status: store.RunRunning})
+	fs.list = []store.RunSummary{{CloseRun: store.CloseRun{ID: rid, CompanyID: "acme", Month: "2026-09", Status: store.RunDone}, Findings: 1}}
+	ts := runsServer(t, fs, nil)
+	ck, _ := ts.session(RoleMaker)
+	for _, p := range []string{"/runs", "/runs/" + rid.String(), "/runs/" + run.String(), "/runs/" + rid.String() + "/findings"} {
+		body := runsUIBody(t, ts, ck, p)
+		if n := strings.Count(body, "<h1"); n != 1 {
+			t.Errorf("%s has %d <h1>", p, n)
+		}
+		for _, tbl := range regexp.MustCompile(`<div class="ui-table-wrap"[^>]*>`).FindAllString(body, -1) {
+			if !strings.Contains(tbl, `aria-label="`) {
+				t.Errorf("%s: table region unlabelled: %s", p, tbl)
+			}
+		}
+		if strings.Contains(body, "<table") && !strings.Contains(body, "<caption") {
+			t.Errorf("%s: table without caption", p)
+		}
+	}
+	body := runsUIBody(t, ts, ck, "/runs/"+run.String())
+	if n := strings.Count(body, `aria-current="step"`); n != 1 || !strings.Contains(body, `data-step="running" aria-current="step"`) {
+		t.Errorf("current step marks = %d, want 1 on the running step", n)
 	}
 }
