@@ -412,7 +412,20 @@ func (s *Server) handleRunsPage(w http.ResponseWriter, r *http.Request) {
 		unauthorized(w, r)
 		return
 	}
-	s.renderRuns(w, r, http.StatusOK, p, "", "", "")
+	// The start form's prefill: the query's values, else the shell context.
+	// templ escapes them; the start handler validates what is posted.
+	q := r.URL.Query()
+	company, month := q.Get("company"), q.Get("month")
+	if company == "" || month == "" {
+		cc, cm := s.contextFor(r)
+		if company == "" {
+			company = cc
+		}
+		if month == "" {
+			month = cm
+		}
+	}
+	s.renderRuns(w, r, http.StatusOK, p, company, month, "")
 }
 
 func (s *Server) handleRunsStartForm(w http.ResponseWriter, r *http.Request) {

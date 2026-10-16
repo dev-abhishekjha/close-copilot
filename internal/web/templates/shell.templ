@@ -1,0 +1,97 @@
+package templates
+
+// shellBody is the signed-in frame (UI-03): a skip link, the sidebar with
+// the role's navigation, the top bar with breadcrumbs, the company and month
+// context form, the user and sign-out, then the page in <main>. The nav is
+// drawn once; on narrow screens shell.css folds it behind the <details>
+// toggle, on wide screens it shows it as the sidebar. No script is needed.
+templ shellBody(l Layout, sd ShellData) {
+	<body
+		if sd.CSRFToken != "" {
+			hx-headers={ csrfHeaders(sd.CSRFToken) }
+		}
+	>
+		<a class="skip-link" href="#main">Skip to content</a>
+		<div class="shell">
+			<aside class="shell-side">
+				<a class="brand" href="/">Close Copilot</a>
+				<details class="shell-menu">
+					<summary class="shell-menu-toggle">
+						@Icon("menu", "")
+						<span>Menu</span>
+					</summary>
+					<nav class="shell-nav" aria-label="Main">
+						for _, g := range sd.Nav {
+							<div class="shell-group">
+								<h2 class="shell-group-title">{ g.Title }</h2>
+								<ul class="shell-links">
+									for _, it := range g.Items {
+										<li>
+											<a
+												class="shell-link"
+												href={ templ.SafeURL(it.Href) }
+												if it.Current {
+													aria-current="page"
+												}
+											>
+												@Icon(it.Icon, "")
+												<span>{ it.Label }</span>
+											</a>
+										</li>
+									}
+								</ul>
+							</div>
+						}
+					</nav>
+				</details>
+			</aside>
+			<header class="topbar shell-top">
+				if len(l.Crumbs) > 0 {
+					<nav class="crumbs" aria-label="Breadcrumb">
+						<ol>
+							for _, c := range l.Crumbs {
+								<li>
+									if c.Href != "" {
+										<a href={ templ.URL(c.Href) }>{ c.Label }</a>
+									} else {
+										<span aria-current="page">{ c.Label }</span>
+									}
+								</li>
+							}
+						</ol>
+					</nav>
+				}
+				<form method="post" action="/context" class="shell-context" aria-label="Company and month">
+					<input type="hidden" name="csrf_token" value={ sd.CSRFToken }/>
+					<input type="hidden" name="next" value={ sd.Path }/>
+					if len(sd.Companies) > 0 {
+						<label class="shell-field">
+							<span class="shell-field-label">Company</span>
+							<select name="company">
+								for _, c := range sd.Companies {
+									<option value={ c } selected?={ c == sd.Company }>{ c }</option>
+								}
+							</select>
+						</label>
+					}
+					<label class="shell-field">
+						<span class="shell-field-label">Month</span>
+						<input type="month" name="month" value={ sd.Month } placeholder="YYYY-MM" pattern="\d{4}-(0[1-9]|1[0-2])" required/>
+					</label>
+					@Button(ButtonProps{Label: "Apply", Type: "submit", Variant: "secondary", Size: "sm"})
+				</form>
+				<span class="who">
+					<span class="user">{ sd.User }</span>
+					<span class="role" data-role={ sd.Role }>{ sd.Role }</span>
+					<form method="post" action="/logout" class="inline">
+						<input type="hidden" name="csrf_token" value={ sd.CSRFToken }/>
+						<button type="submit">Sign out</button>
+					</form>
+				</span>
+			</header>
+			<main id="main" tabindex="-1">
+				{ children... }
+			</main>
+		</div>
+	</body>
+}

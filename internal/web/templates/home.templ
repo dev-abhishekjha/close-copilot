@@ -1,13 +1,20 @@
 package templates
 
 // Home is the signed-in landing page. It lists only the actions the user's
-// role may take; the server's middleware is still the authority.
+// role may take and links to the pages for them; the server's middleware is
+// still the authority. The UI-04 dashboard replaces it.
 templ Home(p HomePage) {
 	@Base(Layout{Title: "Home", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
 		<section class="card">
 			<h1>Welcome, { p.User }</h1>
 			<p>You are signed in as <strong class="role-name">{ p.Role }</strong>.</p>
-			<p><a class="nav-link" href="/runs">Close runs</a></p>
+			if len(p.Destinations) > 0 {
+				<div class="home-links">
+					for _, d := range p.Destinations {
+						@Button(ButtonProps{Label: d.Label, Href: d.Href, Icon: d.Icon, Variant: "secondary"})
+					}
+				</div>
+			}
 			<h2>What you can do</h2>
 			if len(p.Actions) == 0 {
 				<p>No actions are available to your role.</p>
@@ -15,8 +22,11 @@ templ Home(p HomePage) {
 				<ul class="actions">
 					for _, a := range p.Actions {
 						<li data-action={ a.ID }>
-							<span class="label">{ a.Label }</span>
-							<code>{ a.Method } { a.Path }</code>
+							if a.Href != "" {
+								<a class="label" href={ templ.SafeURL(a.Href) }>{ a.Label }</a>
+							} else {
+								<span class="label">{ a.Label }</span>
+							}
 						</li>
 					}
 				</ul>

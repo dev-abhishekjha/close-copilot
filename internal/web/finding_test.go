@@ -659,8 +659,8 @@ func TestFindingEscaping(t *testing.T) {
 
 	body := page(t, ts, RoleMaker, x.ID)
 	wantNone(t, body, "<script>", `href="javascript:`, `src="javascript:`, "<b>")
-	if n := strings.Count(body, "<script"); n != 1 { // only the layout's htmx tag
-		t.Errorf("%d <script tags, want 1", n)
+	if n := strings.Count(body, "<script"); n != 2 || !strings.Contains(body, uiJSTag) || !htmxTagRE.MatchString(body) { // only the layout's htmx and ui.js tags
+		t.Errorf("%d <script tags, want the htmx and ui.js tags only", n)
 	}
 	wantAll(t, body, "&lt;script&gt;alert(1)&lt;/script&gt;", "**bold**")
 

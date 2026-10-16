@@ -49,6 +49,8 @@ func (s *Server) routeTable(static http.Handler) []route {
 		// Pages.
 		{http.MethodGet, "/{$}", anyRole, http.HandlerFunc(s.handleHome)},
 		{http.MethodPost, "/logout", anyRole, http.HandlerFunc(s.handleLogout)},
+		// The shell's company and month context (UI-03): a preference cookie.
+		{http.MethodPost, "/context", anyRole, http.HandlerFunc(s.handleContext)},
 		// Any other GET needs a session before it learns the page is
 		// missing, so anonymous callers can't map the site.
 		{http.MethodGet, "/", anyRole, http.NotFoundHandler()},
@@ -125,21 +127,23 @@ func (s *Server) allows(role Role, method, path string) bool {
 }
 
 // homeAction is an action the home page may offer. Whether it is shown is
-// decided by the same route table the middleware enforces.
+// decided by the same route table the middleware enforces. href is the UI
+// page for it, empty when there is none yet; it is linked only when the
+// role may GET it.
 type homeAction struct {
-	id, label, method, path string
+	id, label, method, path, href string
 }
 
 var homeActions = []homeAction{
-	{"view-run", "View a close run's status", http.MethodGet, "/api/close-runs/{id}"},
-	{"view-findings", "Review a run's findings", http.MethodGet, "/api/close-runs/{id}/findings"},
-	{"ask", "Ask a question about the books", http.MethodPost, "/api/ask"},
-	{"start-run", "Start a close run", http.MethodPost, "/api/close-runs"},
-	{"propose-entry", "Propose a journal entry for a finding", http.MethodPost, "/api/findings/{id}/proposals"},
-	{"approve-proposal", "Approve and post a proposal", http.MethodPost, "/api/proposals/{id}/approve"},
-	{"reject-proposal", "Reject a proposal", http.MethodPost, "/api/proposals/{id}/reject"},
-	{"approvals", "Review pending proposals", http.MethodGet, "/approvals"},
-	{"audit", "Audit log", http.MethodGet, "/audit"},
+	{"view-run", "View a close run's status", http.MethodGet, "/api/close-runs/{id}", "/runs"},
+	{"view-findings", "Review a run's findings", http.MethodGet, "/api/close-runs/{id}/findings", "/runs"},
+	{"ask", "Ask a question about the books", http.MethodPost, "/api/ask", ""},
+	{"start-run", "Start a close run", http.MethodPost, "/api/close-runs", "/runs"},
+	{"propose-entry", "Propose a journal entry for a finding", http.MethodPost, "/api/findings/{id}/proposals", ""},
+	{"approve-proposal", "Approve and post a proposal", http.MethodPost, "/api/proposals/{id}/approve", ""},
+	{"reject-proposal", "Reject a proposal", http.MethodPost, "/api/proposals/{id}/reject", ""},
+	{"approvals", "Review pending proposals", http.MethodGet, "/approvals", "/approvals"},
+	{"audit", "Audit log", http.MethodGet, "/audit", "/audit"},
 }
 
 // handleHome shows the user's name, role and the actions their role allows.
@@ -152,15 +156,21 @@ func (s *Server) handleHome(w http.ResponseWriter, r *http.Request) {
 	}
 	var actions []templates.Action
 	for _, a := range homeActions {
-		if s.allows(p.user.Role, a.method, a.path) {
-			actions = append(actions, templates.Action{ID: a.id, Label: a.label, Method: a.method, Path: a.path})
+		if !s.allows(p.user.Role, a.method, a.path) {
+			continue
 		}
+		act := templates.Action{ID: a.id, Label: a.label, Method: a.method, Path: a.path}
+		if a.href != "" && s.allows(p.user.Role, http.MethodGet, a.href) {
+			act.Href = a.href
+		}
+		actions = append(actions, act)
 	}
 	s.render(w, r, http.StatusOK, templates.Home(templates.HomePage{
-		User:      p.user.Name,
-		Role:      string(p.user.Role),
-		CSRFToken: p.csrf,
-		Actions:   actions,
+		User:         p.user.Name,
+		Role:         string(p.user.Role),
+		CSRFToken:    p.csrf,
+		Actions:      actions,
+		Destinations: s.homeDestinations(p.user.Role),
 	}))
 }
 
