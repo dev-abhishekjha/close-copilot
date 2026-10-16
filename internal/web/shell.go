@@ -2,6 +2,7 @@ package web
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"net/url"
 	"slices"
@@ -40,10 +41,12 @@ var navTable = []navEntry{
 
 // Context cookie and company cache limits.
 const (
-	ctxCookieName      = "cc_ctx"
-	ctxCookieMaxAge    = 365 * 24 * 3600
-	maxCtxCookieLen    = 512
-	companyCacheMaxAge = 30 * time.Second
+	ctxCookieName       = "cc_ctx"
+	ctxCookieMaxAge     = 365 * 24 * 3600
+	maxCtxCookieLen     = 512
+	companyCacheMaxAge  = 30 * time.Second // refresh interval after a success
+	companyRetryAfter   = 5 * time.Second  // refresh interval after a failure
+	companyFetchTimeout = 2 * time.Second  // bound on one ListCompanies call
 )
 
 // navFor returns the sidebar groups role may follow, in table order, with
@@ -101,42 +104,94 @@ func (s *Server) shellData(r *http.Request, p *principal) templates.ShellData {
 	}
 }
 
-// companyCache holds the company ids the shell offers, for
-// companyCacheMaxAge. It only ever holds ids read from the store.
+// companyCache holds the company ids the shell offers. It only ever holds
+// ids read from the store. The mutex guards the fields only; it is never held
+// while the store is called.
 type companyCache struct {
-	mu      sync.Mutex
-	ids     []string
-	fetched time.Time
-	tried   bool
+	mu       sync.Mutex
+	ids      []string
+	checked  time.Time // when the last refresh ended
+	next     time.Time // when the next refresh is due
+	tried    bool      // a refresh has ended at least once
+	inflight bool      // a refresh is running
+	failing  bool      // the last refresh failed (logged once per episode)
+	// timeout bounds one ListCompanies call; zero means companyFetchTimeout.
+	// Tests raise it so a slow runner can't time a fetch out under them.
+	timeout time.Duration
 }
 
-// shellCompanies returns the company ids, from the cache when it is fresh.
-// A failed refresh keeps the last list (none if there never was one), logs
-// once, and is retried after companyCacheMaxAge. Nil when the runs backend is
-// not configured.
-func (s *Server) shellCompanies(ctx context.Context) []string {
+// shellCompanies returns a copy of the company ids, refreshing them when they
+// are due: companyCacheMaxAge after a success, companyRetryAfter after a
+// failure, or at once if the clock went backwards. One caller refreshes, with
+// its own deadline and detached from its request, so a client that leaves
+// mid-render can't fail the refresh; every other caller meanwhile gets the
+// current list (empty when cold) without waiting. A failed refresh keeps the
+// last list and is logged once per run of failures. Nil when the runs backend
+// is not configured.
+func (s *Server) shellCompanies(ctx context.Context) (ids []string) {
 	if s.runs == nil {
 		return nil
 	}
 	c := &s.companies
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	now := s.now()
-	if c.tried && !now.Before(c.fetched) && now.Sub(c.fetched) < companyCacheMaxAge {
-		return slices.Clone(c.ids)
+	due := !c.tried || now.Before(c.checked) || !now.Before(c.next)
+	if !due || c.inflight {
+		ids = slices.Clone(c.ids)
+		c.mu.Unlock()
+		return ids
 	}
-	c.tried, c.fetched = true, now
-	cs, err := s.runs.b.Store.ListCompanies(ctx)
+	c.inflight = true
+	c.mu.Unlock()
+
+	// err stays set if ListCompanies panics, so the flag is still cleared.
+	err := errors.New("web: company refresh did not finish")
+	defer func() {
+		c.mu.Lock()
+		defer c.mu.Unlock()
+		c.inflight = false
+		now := s.now()
+		c.tried, c.checked = true, now
+		if err != nil {
+			c.next = now.Add(companyRetryAfter)
+			if !c.failing {
+				s.log.WarnContext(ctx, "web: list companies for the shell", "err", err, "stale", len(c.ids))
+			}
+			c.failing = true
+			ids = slices.Clone(c.ids)
+			return
+		}
+		c.failing = false
+		c.ids = ids
+		c.next = now.Add(companyCacheMaxAge)
+		ids = slices.Clone(ids)
+	}()
+	ids, err = s.fetchCompanies(ctx)
+	return ids
+}
+
+// fetchTimeout is the bound on one ListCompanies call.
+func (c *companyCache) fetchTimeout() time.Duration {
+	if c.timeout > 0 {
+		return c.timeout
+	}
+	return companyFetchTimeout
+}
+
+// fetchCompanies reads the company ids from the store, bounded by the
+// cache's fetch timeout and not cancelled with the request.
+func (s *Server) fetchCompanies(ctx context.Context) ([]string, error) {
+	fctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), s.companies.fetchTimeout())
+	defer cancel()
+	cs, err := s.runs.b.Store.ListCompanies(fctx)
 	if err != nil {
-		s.log.WarnContext(ctx, "web: list companies for the shell", "err", err, "stale", len(c.ids))
-		return slices.Clone(c.ids)
+		return nil, err
 	}
 	ids := make([]string, 0, len(cs))
 	for _, x := range cs {
 		ids = append(ids, x.ID)
 	}
-	c.ids = ids
-	return slices.Clone(ids)
+	return ids, nil
 }
 
 // contextFor returns the validated company and month for r: the cc_ctx
@@ -151,12 +206,7 @@ func (s *Server) contextFor(r *http.Request) (company, month string) {
 // YYYY-MM; each falls back on its own to the first company (empty when
 // there is none) and the previous calendar month in UTC.
 func (s *Server) resolveContext(r *http.Request, companies []string) (company, month string) {
-	var q url.Values
-	if ck, err := r.Cookie(ctxCookieName); err == nil && len(ck.Value) <= maxCtxCookieLen {
-		if v, err := url.ParseQuery(ck.Value); err == nil {
-			q = v
-		}
-	}
+	q := ctxCookieValues(r)
 	company, month = q.Get("company"), q.Get("month")
 	if !validCompany(company, companies) {
 		company = ""
@@ -168,6 +218,20 @@ func (s *Server) resolveContext(r *http.Request, companies []string) (company, m
 		month = previousMonth(s.now())
 	}
 	return company, month
+}
+
+// ctxCookieValues parses the cc_ctx cookie; nil when it is missing,
+// oversized or malformed.
+func ctxCookieValues(r *http.Request) url.Values {
+	ck, err := r.Cookie(ctxCookieName)
+	if err != nil || len(ck.Value) > maxCtxCookieLen {
+		return nil
+	}
+	q, err := url.ParseQuery(ck.Value)
+	if err != nil {
+		return nil
+	}
+	return q
 }
 
 func validCompany(c string, companies []string) bool {
@@ -193,6 +257,14 @@ func (s *Server) handleContext(w http.ResponseWriter, r *http.Request) {
 	}
 	companies := s.shellCompanies(r.Context())
 	company, month := s.resolveContext(r, companies)
+	if len(companies) == 0 {
+		// No list to check against (cold cache or store failure): keep the
+		// company already stored rather than overwrite it with "". The
+		// posted value is never taken without a list.
+		if c := ctxCookieValues(r).Get("company"); len(c) <= maxCompanyLen {
+			company = c
+		}
+	}
 	if c := r.PostFormValue("company"); validCompany(c, companies) {
 		company = c
 	}

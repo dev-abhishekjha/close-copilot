@@ -578,10 +578,15 @@ func TestShellCompaniesCached(t *testing.T) {
 	if form := shellForm(t, body); !strings.Contains(form, `<option value="acme" selected>`) || !strings.Contains(form, `<option value="globex">`) {
 		t.Errorf("error after a load: stale list not served: %s", form)
 	}
-	ts.clock.Set(start.Add(70 * time.Second))
+	ts.clock.Set(start.Add(66 * time.Second))
 	view()
 	if n := cs.count(); n != 3 {
 		t.Errorf("a failed refresh is retried at once: %d calls, want 3", n)
+	}
+	ts.clock.Set(start.Add(67 * time.Second))
+	view()
+	if n := cs.count(); n != 4 {
+		t.Errorf("a failed refresh is not retried after 5s: %d calls, want 4", n)
 	}
 	if n := strings.Count(ts.logs.String(), "list companies for the shell"); n != 1 {
 		t.Errorf("failure logged %d times, want 1", n)
@@ -606,6 +611,382 @@ func TestShellCompaniesCached(t *testing.T) {
 	}
 	if got := ts.shellCompanies(context.Background()); len(got) == 0 || got[0] != "acme" {
 		t.Errorf("cache mutated through a returned slice: %v", got)
+	}
+}
+
+// blockingRunsStore's ListCompanies waits until released (or its context
+// ends) and records the context it was given.
+type blockingRunsStore struct {
+	*fakeRunsStore
+	entered chan struct{}
+	release chan struct{}
+	mu      sync.Mutex
+	calls   int
+	ctxErrs []error         // ctx.Err() seen after each release
+	budgets []time.Duration // time left to each call's deadline (-1: none)
+}
+
+func newBlockingRunsStore() *blockingRunsStore {
+	return &blockingRunsStore{fakeRunsStore: newFakeRunsStore(), entered: make(chan struct{}, 8), release: make(chan struct{})}
+}
+
+func (b *blockingRunsStore) ListCompanies(ctx context.Context) ([]store.Company, error) {
+	budget := time.Duration(-1)
+	if dl, ok := ctx.Deadline(); ok {
+		budget = time.Until(dl)
+	}
+	b.mu.Lock()
+	b.calls++
+	b.budgets = append(b.budgets, budget)
+	b.mu.Unlock()
+	b.entered <- struct{}{}
+	select {
+	case <-b.release:
+	case <-ctx.Done():
+	}
+	b.mu.Lock()
+	b.ctxErrs = append(b.ctxErrs, ctx.Err())
+	b.mu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	return b.fakeRunsStore.ListCompanies(ctx)
+}
+
+func (b *blockingRunsStore) count() int {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.calls
+}
+
+// releaseStore lets one blocked ListCompanies return; it fails instead of
+// hanging if nothing is waiting.
+func releaseStore(t *testing.T, b *blockingRunsStore) {
+	t.Helper()
+	select {
+	case b.release <- struct{}{}:
+	case <-time.After(5 * time.Second):
+		t.Fatal("no ListCompanies call waiting to be released")
+	}
+}
+
+func waitEntered(t *testing.T, b *blockingRunsStore) {
+	t.Helper()
+	select {
+	case <-b.entered:
+	case <-time.After(5 * time.Second):
+		t.Fatal("ListCompanies was not called")
+	}
+}
+
+// within runs f and fails if it does not return within d.
+func within[T any](t *testing.T, d time.Duration, what string, f func() T) T {
+	t.Helper()
+	ch := make(chan T, 1)
+	go func() { ch <- f() }()
+	select {
+	case v := <-ch:
+		return v
+	case <-time.After(d):
+		t.Fatalf("%s blocked for more than %s", what, d)
+		var zero T
+		return zero
+	}
+}
+
+func TestShellCompaniesRefreshDoesNotBlock(t *testing.T) {
+	bs := newBlockingRunsStore()
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: bs, Execute: noopExec} })
+	ts.companies.timeout = 30 * time.Second // a slow runner must not time the fetch out
+	ck, _ := ts.session(RoleViewer)
+	view := func() *httptest.ResponseRecorder {
+		return ts.do(t, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}})
+	}
+
+	for _, phase := range []struct {
+		name      string
+		advance   time.Duration
+		wantStale bool
+	}{
+		{"cold", 0, false},
+		{"stale", 31 * time.Second, true},
+	} {
+		t.Run(phase.name, func(t *testing.T) {
+			ts.clock.Set(ts.clock.Now().Add(phase.advance))
+			first := make(chan *httptest.ResponseRecorder, 1)
+			go func() { first <- view() }()
+			waitEntered(t, bs)
+
+			// A second render while the refresh hangs answers at once.
+			w := within(t, time.Second, "a render during a refresh", view)
+			if w.Code != http.StatusOK {
+				t.Fatalf("second render = %d", w.Code)
+			}
+			form := shellForm(t, w.Body.String())
+			if got := strings.Contains(form, `<option value="acme"`); got != phase.wantStale {
+				t.Errorf("second render shows the list = %v, want %v: %s", got, phase.wantStale, form)
+			}
+			if n, want := bs.count(), map[bool]int{false: 1, true: 2}[phase.wantStale]; n != want {
+				t.Errorf("%d ListCompanies calls; a waiting render started another", n)
+			}
+
+			// The refresh completes once the store answers, and is used.
+			releaseStore(t, bs)
+			fw := <-first
+			if !strings.Contains(shellForm(t, fw.Body.String()), `<option value="acme" selected>`) {
+				t.Errorf("refreshing render lacks the list: %s", shellForm(t, fw.Body.String()))
+			}
+			after := within(t, time.Second, "a render after the refresh", view)
+			if !strings.Contains(shellForm(t, after.Body.String()), `<option value="acme" selected>`) {
+				t.Errorf("render after the refresh lacks the list")
+			}
+		})
+	}
+	if n := bs.count(); n != 2 {
+		t.Errorf("%d ListCompanies calls, want 2", n)
+	}
+	bs.mu.Lock()
+	defer bs.mu.Unlock()
+	for i, b := range bs.budgets {
+		if b <= 0 || b > ts.companies.fetchTimeout() {
+			t.Errorf("call %d: deadline in %s, want within %s", i, b, ts.companies.fetchTimeout())
+		}
+	}
+}
+
+func TestShellCompaniesCancelledRequest(t *testing.T) {
+	bs := newBlockingRunsStore()
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: bs, Execute: noopExec} })
+	ts.companies.timeout = 30 * time.Second // a slow runner must not time the fetch out
+
+	ctx, cancel := context.WithCancel(context.Background())
+	got := make(chan []string, 1)
+	go func() { got <- ts.shellCompanies(ctx) }()
+	waitEntered(t, bs)
+	cancel() // the user leaves mid-render
+	releaseStore(t, bs)
+	if ids := <-got; !slices.Equal(ids, []string{"acme", "globex"}) {
+		t.Errorf("refresh for a cancelled request = %v, want the list", ids)
+	}
+	bs.mu.Lock()
+	if bs.ctxErrs[0] != nil {
+		t.Errorf("the store saw the request's cancellation: %v", bs.ctxErrs[0])
+	}
+	bs.mu.Unlock()
+
+	// A request already cancelled when the refresh is due still refreshes,
+	// and the next due refresh runs too.
+	ts.clock.Set(ts.clock.Now().Add(31 * time.Second))
+	got2 := make(chan []string, 1)
+	go func() { got2 <- ts.shellCompanies(ctx) }()
+	waitEntered(t, bs)
+	releaseStore(t, bs)
+	if ids := <-got2; !slices.Equal(ids, []string{"acme", "globex"}) {
+		t.Errorf("refresh from a cancelled ctx = %v", ids)
+	}
+	ts.clock.Set(ts.clock.Now().Add(31 * time.Second))
+	go func() { got2 <- ts.shellCompanies(context.Background()) }()
+	waitEntered(t, bs)
+	releaseStore(t, bs)
+	<-got2
+	if n := bs.count(); n != 3 {
+		t.Errorf("%d refreshes, want 3: a cancelled request stopped refreshing", n)
+	}
+	if strings.Contains(ts.logs.String(), "list companies for the shell") {
+		t.Errorf("a cancelled request logged a failure: %s", ts.logs.String())
+	}
+}
+
+func TestShellCompaniesRetryAfterError(t *testing.T) {
+	cs := &countingRunsStore{fakeRunsStore: newFakeRunsStore(), err: errors.New("db down")}
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: cs, Execute: noopExec} })
+	start := ts.clock.Now()
+	at := func(d time.Duration) []string {
+		ts.clock.Set(start.Add(d))
+		return ts.shellCompanies(context.Background())
+	}
+	logs := func() int { return strings.Count(ts.logs.String(), "list companies for the shell") }
+
+	if ids := at(0); len(ids) != 0 || cs.count() != 1 {
+		t.Fatalf("cold failure: %v, %d calls", ids, cs.count())
+	}
+	if at(4 * time.Second); cs.count() != 1 {
+		t.Errorf("retried before 5s: %d calls", cs.count())
+	}
+	if at(5 * time.Second); cs.count() != 2 {
+		t.Errorf("not retried after 5s: %d calls, want 2", cs.count())
+	}
+	if n := logs(); n != 1 {
+		t.Errorf("one failure episode logged %d times, want 1", n)
+	}
+	cs.fail(nil)
+	if ids := at(10 * time.Second); !slices.Equal(ids, []string{"acme", "globex"}) || cs.count() != 3 {
+		t.Errorf("recovery: %v, %d calls", ids, cs.count())
+	}
+	// After a success the interval is 30s again.
+	if at(39 * time.Second); cs.count() != 3 {
+		t.Errorf("refreshed before 30s after a success: %d calls", cs.count())
+	}
+	// A new failure is a new episode: logged again, stale list served.
+	cs.fail(errors.New("db down again"))
+	if ids := at(40 * time.Second); !slices.Equal(ids, []string{"acme", "globex"}) || cs.count() != 4 {
+		t.Errorf("new failure: %v, %d calls", ids, cs.count())
+	}
+	if n := logs(); n != 2 {
+		t.Errorf("two failure episodes logged %d times, want 2", n)
+	}
+	// A clock that goes backwards makes the cache due at once.
+	cs.fail(nil)
+	if at(41 * time.Second); cs.count() != 4 {
+		t.Errorf("retried before 5s: %d calls", cs.count())
+	}
+	if at(20 * time.Second); cs.count() != 5 {
+		t.Errorf("backwards clock: %d calls, want 5", cs.count())
+	}
+	if strings.Contains(ts.logs.String(), "acme") || strings.Contains(ts.logs.String(), "globex") {
+		t.Error("log carries company ids")
+	}
+}
+
+// deadlineRunsStore records the time left to each call's deadline.
+type deadlineRunsStore struct {
+	*fakeRunsStore
+	mu      sync.Mutex
+	budgets []time.Duration // -1: no deadline
+}
+
+func (d *deadlineRunsStore) ListCompanies(ctx context.Context) ([]store.Company, error) {
+	budget := time.Duration(-1)
+	if dl, ok := ctx.Deadline(); ok {
+		budget = time.Until(dl)
+	}
+	d.mu.Lock()
+	d.budgets = append(d.budgets, budget)
+	d.mu.Unlock()
+	return d.fakeRunsStore.ListCompanies(ctx)
+}
+
+func TestShellCompaniesFetchDeadline(t *testing.T) {
+	if companyFetchTimeout != 2*time.Second {
+		t.Errorf("companyFetchTimeout = %s, want 2s", companyFetchTimeout)
+	}
+	ds := &deadlineRunsStore{fakeRunsStore: newFakeRunsStore()}
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: ds, Execute: noopExec} })
+	if got := ts.companies.fetchTimeout(); got != companyFetchTimeout {
+		t.Errorf("default fetch timeout = %s, want %s", got, companyFetchTimeout)
+	}
+	ck, _ := ts.session(RoleViewer)
+	start := ts.clock.Now()
+	for i := range 3 {
+		ts.clock.Set(start.Add(time.Duration(i) * 31 * time.Second))
+		okBody(t, ts, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}})
+	}
+	ds.mu.Lock()
+	defer ds.mu.Unlock()
+	if len(ds.budgets) != 3 {
+		t.Fatalf("%d store calls, want 3", len(ds.budgets))
+	}
+	for i, b := range ds.budgets {
+		if b <= 0 || b > companyFetchTimeout {
+			t.Errorf("call %d: deadline in %s, want within %s", i, b, companyFetchTimeout)
+		}
+	}
+}
+
+// panickingRunsStore panics on its first ListCompanies call only.
+type panickingRunsStore struct {
+	*fakeRunsStore
+	mu    sync.Mutex
+	calls int
+}
+
+func (p *panickingRunsStore) ListCompanies(ctx context.Context) ([]store.Company, error) {
+	p.mu.Lock()
+	p.calls++
+	n := p.calls
+	p.mu.Unlock()
+	if n == 1 {
+		panic("store exploded")
+	}
+	return p.fakeRunsStore.ListCompanies(ctx)
+}
+
+func TestShellCompaniesPanic(t *testing.T) {
+	ps := &panickingRunsStore{fakeRunsStore: newFakeRunsStore()}
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: ps, Execute: noopExec} })
+	call := func() (ids []string, panicked any) {
+		defer func() { panicked = recover() }()
+		return ts.shellCompanies(context.Background()), nil
+	}
+	if _, p := call(); p != "store exploded" {
+		t.Fatalf("panic not propagated: recovered %v", p)
+	}
+	// The in-flight flag was cleared and the panic counts as a failure: no
+	// retry before 5s, a refresh once it is due.
+	start := ts.clock.Now()
+	ts.clock.Set(start.Add(4 * time.Second))
+	if ids, p := call(); p != nil || len(ids) != 0 {
+		t.Errorf("before the retry: %v %v", ids, p)
+	}
+	ts.clock.Set(start.Add(5 * time.Second))
+	if ids, p := call(); p != nil || !slices.Equal(ids, []string{"acme", "globex"}) {
+		t.Errorf("after the panic the next due call = %v %v, want the list", ids, p)
+	}
+	ps.mu.Lock()
+	defer ps.mu.Unlock()
+	if ps.calls != 2 {
+		t.Errorf("%d store calls, want 2", ps.calls)
+	}
+}
+
+func TestShellContextKeepsCompanyWhenListEmpty(t *testing.T) {
+	cs := &countingRunsStore{fakeRunsStore: newFakeRunsStore(), err: errors.New("db down")}
+	ts := newTestServer(t, func(o *Options) { o.Runs = &RunsBackend{Store: cs, Execute: noopExec} })
+	cookie := func(c, m string) *http.Cookie {
+		return &http.Cookie{Name: ctxCookieName, Value: url.Values{"company": {c}, "month": {m}}.Encode()}
+	}
+	post := func(fields url.Values, extra ...*http.Cookie) url.Values {
+		t.Helper()
+		rq := formPost(ts, RoleViewer, "/context", fields)
+		rq.cookies = append(rq.cookies, extra...)
+		w := ts.do(t, rq)
+		if w.Code != http.StatusSeeOther {
+			t.Fatalf("POST /context = %d", w.Code)
+		}
+		c := responseCookie(t, w, ctxCookieName)
+		if c == nil {
+			t.Fatal("no cookie")
+		}
+		v, err := url.ParseQuery(c.Value)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return v
+	}
+
+	// Cold cache, store failing: the stored company survives a month change,
+	// and the posted company is not taken without a list to check it.
+	v := post(url.Values{"company": {"evilcorp"}, "month": {"2026-03"}}, cookie("globex", "2026-07"))
+	if v.Get("company") != "globex" || v.Get("month") != "2026-03" {
+		t.Errorf("cold cache: cookie = %v, want globex 2026-03", v)
+	}
+	if v := post(url.Values{"company": {"evilcorp"}, "month": {"2026-03"}}); v.Get("company") != "" {
+		t.Errorf("cold cache, no cookie: company = %q, want empty", v.Get("company"))
+	}
+	long := strings.Repeat("g", maxCompanyLen+1)
+	if v := post(url.Values{"month": {"2026-03"}}, cookie(long, "2026-07")); v.Get("company") != "" {
+		t.Errorf("cold cache: an over-long stored company was kept")
+	}
+
+	// With a list again, the posted unknown company is still dropped and the
+	// stored one checked against the list.
+	cs.fail(nil)
+	ts.clock.Set(ts.clock.Now().Add(5 * time.Second))
+	if v := post(url.Values{"company": {"evilcorp"}, "month": {"2026-04"}}, cookie("globex", "2026-07")); v.Get("company") != "globex" || v.Get("month") != "2026-04" {
+		t.Errorf("with a list: cookie = %v, want globex 2026-04", v)
+	}
+	if v := post(url.Values{"company": {"evilcorp"}}, cookie("unknownco", "2026-07")); v.Get("company") != "acme" {
+		t.Errorf("with a list: an unknown stored company = %q, want the default acme", v.Get("company"))
 	}
 }
 
