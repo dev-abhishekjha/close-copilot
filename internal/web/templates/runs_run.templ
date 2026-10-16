@@ -3,11 +3,23 @@ package templates
 // Run is the run page: the progress panel (polling until the run ends).
 templ Run(p RunPage) {
 	@Base(Layout{Title: "Close run", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card">
-			<h1>Close run: { p.Company } { p.Month }</h1>
-			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(findingsURL(p.Panel.ID)) }>Findings</a> · <a href={ templ.SafeURL(metricsURL(p.Panel.ID)) }>Metrics</a></p>
-			@RunProgress(p.Panel)
-		</section>
+		@PageHeader(PageHeaderProps{Title: runTitle(p.Company, p.Month), Subtitle: "Close run", Actions: runActions(p)})
+		@RunProgress(p.Panel)
+	}
+}
+
+templ runActions(p RunPage) {
+	@StatusChip(p.Panel.Status)
+	@Button(ButtonProps{Label: "All runs", Href: "/runs", Variant: "ghost"})
+	@Button(ButtonProps{Label: "Findings", Href: findingsURL(p.Panel.ID), Variant: "secondary"})
+	@Button(ButtonProps{Label: "Metrics", Href: metricsURL(p.Panel.ID), Variant: "secondary"})
+	if p.CanStart && finished(p.Panel.Status) {
+		<form method="post" action="/runs" class="runs-rerun">
+			<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+			<input type="hidden" name="company" value={ p.Company }/>
+			<input type="hidden" name="month" value={ p.Month }/>
+			@Button(ButtonProps{Label: "Run again", Type: "submit", Icon: "refresh"})
+		</form>
 	}
 }
 
@@ -16,6 +28,7 @@ templ Run(p RunPage) {
 templ RunProgress(p RunPanel) {
 	<div
 		id="run-progress"
+		class="runs-progress"
 		data-status={ p.Status }
 		if p.Polling {
 			hx-get={ progressURL(p.ID) }
@@ -23,26 +36,46 @@ templ RunProgress(p RunPanel) {
 			hx-swap="outerHTML"
 		}
 	>
-		<ol class="timeline">
-			for _, s := range p.Timeline {
-				<li data-step={ s.Status } class={ stepClass(s) }>{ s.Status }</li>
+		@Card(CardProps{Title: "Progress"}) {
+			@Stepper(progressSteps(p.Status))
+			if p.Polling {
+				<p class="runs-muted" role="status">Current step: { currentStepLabel(p.Status) }</p>
 			}
-		</ol>
-		if p.Error != "" {
-			<p class="error">{ p.Error }</p>
 		}
-		<p class="duration">Duration: { p.Duration }</p>
-		<p class="tokens">
-			Tokens: <span class="input">{ i64(p.InputTokens) }</span> in,
-			<span class="output">{ i64(p.OutputTokens) }</span> out,
-			<span class="cache">{ i64(p.CacheReadTokens) }</span> cache read.
-			Cost: <span class="cost">{ p.Cost }</span>
-		</p>
-		<h2>Findings: { itoa(p.Total) }</h2>
+		if p.Error != "" {
+			@Card(CardProps{Title: "Run error", Tone: "danger"}) {
+				<p class="error">{ p.Error }</p>
+			}
+		}
+		<div class="runs-stats">
+			@StatTile(StatProps{Label: "Findings", Value: itoa(p.Total)})
+			<div class="ui-stat">
+				<span class="ui-stat-label">Duration</span>
+				<span class="ui-stat-value"><span class="duration">{ p.Duration }</span></span>
+			</div>
+		</div>
+		<div class="tokens runs-stats">
+			<div class="ui-stat">
+				<span class="ui-stat-label">Input tokens</span>
+				<span class="ui-stat-value"><span class="input">{ i64(p.InputTokens) }</span></span>
+			</div>
+			<div class="ui-stat">
+				<span class="ui-stat-label">Output tokens</span>
+				<span class="ui-stat-value"><span class="output">{ i64(p.OutputTokens) }</span></span>
+			</div>
+			<div class="ui-stat">
+				<span class="ui-stat-label">Cache read tokens</span>
+				<span class="ui-stat-value"><span class="cache">{ i64(p.CacheReadTokens) }</span></span>
+			</div>
+			<div class="ui-stat">
+				<span class="ui-stat-label">Cost</span>
+				<span class="ui-stat-value"><span class="cost">{ p.Cost }</span></span>
+			</div>
+		</div>
 		if len(p.Counts) > 0 {
 			<ul class="counts">
 				for _, c := range p.Counts {
-					<li data-type={ c.Type }>{ c.Type }: { itoa(c.Count) }</li>
+					<li class="ui-chip ui-chip-neutral" data-type={ c.Type }>{ c.Type }: { itoa(c.Count) }</li>
 				}
 			</ul>
 		}
