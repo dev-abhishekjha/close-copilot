@@ -1,0 +1,131 @@
+package templates
+
+// Ask is the Ask page: a form twin of POST /api/ask and the answer below it.
+templ Ask(p AskPage) {
+	@Base(Layout{Title: "Ask", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		@PageHeader(PageHeaderProps{
+			Title:    "Ask the books",
+			Subtitle: "Answers come from the verified ledger evidence for the selected company and month.",
+		})
+		if p.NotConfigured {
+			@EmptyState(EmptyProps{Icon: "info", Title: "Ask is not set up on this server", Body: "Ask your administrator to enable it."})
+		} else {
+			if p.Error != "" {
+				<div class="ask-alert" role="alert" id="ask-error">
+					@Icon("alert", "")
+					<span>{ p.Error }</span>
+				</div>
+			}
+			@Card(CardProps{ID: "ask-form-card", Title: "Question"}) {
+				<form method="post" action="/ask" class="ask-form">
+					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+					<div class="ask-row">
+						@SelectField(FieldProps{ID: "ask-company", Name: "company", Label: "Company", Value: p.Company, Options: p.Companies, Required: true})
+						@Field(FieldProps{
+							ID: "ask-month", Name: "month", Label: "Month", Type: "month", Value: p.Month, Placeholder: "YYYY-MM", Required: true,
+							Attrs: map[string]any{"pattern": askMonthPattern()},
+						})
+					</div>
+					@TextareaField(FieldProps{
+						ID: "ask-question", Name: "question", Label: "Question", Value: p.Question, Hint: "Max 400 characters", Required: true,
+						Attrs: map[string]any{"maxlength": "400"},
+					})
+					<div class="ask-actions">
+						@Button(ButtonProps{Label: "Ask", Type: "submit", Variant: "primary"})
+					</div>
+				</form>
+				if len(p.Suggestions) > 0 {
+					<div class="ask-suggestions">
+						<p class="ask-suggestions-title">Try one of these</p>
+						<ul>
+							for _, q := range p.Suggestions {
+								<li><a href={ askSuggestionURL(q) }>{ q }</a></li>
+							}
+						</ul>
+					</div>
+				}
+			}
+			if p.Result != nil {
+				<div id="ask-result" class="ask-result">
+					@askResult(*p.Result)
+				</div>
+			}
+		}
+	}
+}
+
+templ askResult(r AskResult) {
+	switch r.Action {
+		case "answer":
+			@Card(CardProps{Title: "Answer", Actions: VerifiedBadge(r.Verified)}) {
+				<div class="ask-answer">{ r.Text }</div>
+			}
+			if r.NeedsReview {
+				@Card(CardProps{ID: "ask-review", Tone: "warn", Title: "Needs review"}) {
+					<p>Needs review: this answer could not be fully verified.</p>
+					if len(r.Violations) > 0 {
+						<ul class="ask-violations">
+							for _, v := range r.Violations {
+								<li>
+									<span class="ask-code">{ v.Code }</span>
+									if v.Field != "" {
+										<span>{ v.Field }</span>
+									}
+									if v.Amount != "" {
+										<span class="ask-amount">{ v.Amount }</span>
+									}
+									if v.Detail != "" {
+										<span>{ v.Detail }</span>
+									}
+								</li>
+							}
+						</ul>
+					}
+				}
+			}
+			if len(r.Citations) > 0 {
+				@Card(CardProps{Title: "Citations"}) {
+					<ul class="ask-citations">
+						for _, c := range r.Citations {
+							<li>{ c.DocID } · { c.Section }</li>
+						}
+					</ul>
+				}
+			}
+			<details class="ask-checked">
+				<summary>How this was checked</summary>
+				<h3>Evidence</h3>
+				if len(r.EvidenceIDs) == 0 {
+					<p>No evidence ids.</p>
+				} else {
+					<ul>
+						for _, id := range r.EvidenceIDs {
+							<li><code>{ id }</code></li>
+						}
+					</ul>
+				}
+				<h3>Steps</h3>
+				if len(r.StepRefs) == 0 {
+					<p>No step references.</p>
+				} else {
+					<ul>
+						for _, id := range r.StepRefs {
+							<li><code>{ id }</code></li>
+						}
+					</ul>
+				}
+			</details>
+		case "refuse":
+			@Card(CardProps{Title: "Not answered", Tone: "default"}) {
+				<div class="ask-answer">{ r.Text }</div>
+			}
+		case "clarify":
+			@Card(CardProps{Title: "A question first", Tone: "info"}) {
+				<div class="ask-answer">{ r.Text }</div>
+			}
+		default:
+			@Card(CardProps{}) {
+				<p>No answer was produced.</p>
+			}
+	}
+}

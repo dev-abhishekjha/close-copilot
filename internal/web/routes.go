@@ -33,6 +33,8 @@ var routeBodyLimits = map[string]int64{
 	http.MethodPost + " /api/findings/{id}/proposals": approvalsBodyLimit,
 	http.MethodPost + " /api/proposals/{id}/approve":  approvalsBodyLimit,
 	http.MethodPost + " /api/proposals/{id}/reject":   approvalsBodyLimit,
+	// The Ask form gets the same cap as POST /api/ask (capAPIBody).
+	http.MethodPost + " /ask": maxAPIBody,
 }
 
 // routeTable is every route the server serves with its minimum role. The
@@ -79,6 +81,11 @@ func (s *Server) routeTable(static http.Handler) []route {
 		// the audit page is for checkers.
 		{http.MethodGet, "/audit", checkerOnly, s.auditRoute(s.handleAuditPage)},
 		{http.MethodGet, "/runs/{id}/metrics", anyRole, s.metricsRoute(s.handleRunMetrics)},
+
+		// Ask page (UI-08): a twin of POST /api/ask. POST /ask shares the
+		// API's ask rate-limit bucket. 501 page until Options.Ask and Runs.
+		{http.MethodGet, "/ask", anyRole, s.askHTML(s.handleAskPage)},
+		{http.MethodPost, "/ask", anyRole, s.askHTML(s.handleAskForm)},
 
 		// JSON API (shared spec).
 		{http.MethodPost, "/api/close-runs", makerOnly, s.runsAPI(s.handleAPIStartRun)},

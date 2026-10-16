@@ -142,6 +142,10 @@ func (s *Server) refuse(w http.ResponseWriter, r *http.Request, wait time.Durati
 	if info := requestInfoFrom(r.Context()); info != nil {
 		info.event = event
 	}
+	if p := principalFrom(r.Context()); p != nil && askRateLimited(r) {
+		s.refuseAskPage(w, r, p, wait)
+		return
+	}
 	w.Header().Set("Retry-After", retryAfterSeconds(wait))
 	if isAPI(r) {
 		writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": rateLimitMsg})
@@ -152,16 +156,19 @@ func (s *Server) refuse(w http.ResponseWriter, r *http.Request, wait time.Durati
 
 // rateLimit throttles /api/* per authenticated user name, the same key for
 // cookie and bearer callers. It runs after authenticate; other paths (pages,
-// htmx polling) pass untouched. POST /api/ask has its own tighter bucket.
+// htmx polling) pass untouched. POST /api/ask has its own tighter bucket, and
+// POST /ask (the Ask page's form) draws from that same bucket under the same
+// key, so the form and the API share one allowance.
 func (s *Server) rateLimit(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		p := principalFrom(r.Context())
-		if p == nil || !isAPI(r) {
+		form := askRateLimited(r)
+		if p == nil || (!isAPI(r) && !form) {
 			next.ServeHTTP(w, r)
 			return
 		}
 		set := s.limits.general
-		if r.Method == http.MethodPost && r.URL.Path == "/api/ask" {
+		if form || (r.Method == http.MethodPost && r.URL.Path == "/api/ask") {
 			set = s.limits.ask
 		}
 		if ok, wait := set.allow(p.user.Name, s.now()); !ok {

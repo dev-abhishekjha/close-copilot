@@ -92,6 +92,58 @@ func (s *Server) askAPI(h http.HandlerFunc) http.Handler {
 	})
 }
 
+// askFailure is a refused or failed ask: the status and the fixed message
+// both the JSON API and the form page show. err is set only for a 500 and is
+// logged by the caller; it never carries the question.
+type askFailure struct {
+	status int
+	msg    string
+	err    error
+}
+
+// runAsk is the one path to the model for POST /api/ask and POST /ask: the
+// same validation, the same company check, the same backend call and the same
+// error mapping. question is trimmed here.
+func (s *Server) runAsk(ctx context.Context, company, month, question string) (AskOutput, *askFailure) {
+	if !monthRE.MatchString(month) {
+		return AskOutput{}, &askFailure{status: http.StatusBadRequest, msg: "month must be YYYY-MM"}
+	}
+	question = strings.TrimSpace(question)
+	if question == "" {
+		return AskOutput{}, &askFailure{status: http.StatusBadRequest, msg: "question must not be empty"}
+	}
+	companies, err := s.runs.b.Store.ListCompanies(ctx)
+	if err != nil {
+		return AskOutput{}, &askFailure{status: http.StatusInternalServerError, msg: "internal error", err: err}
+	}
+	if !slices.ContainsFunc(companies, func(c store.Company) bool { return c.ID == company }) {
+		return AskOutput{}, &askFailure{status: http.StatusBadRequest, msg: "unknown company"}
+	}
+	ctx, cancel := context.WithTimeout(ctx, askTimeout)
+	defer cancel()
+	out, err := s.ask.Ask(ctx, AskInput{Company: company, Month: month, Question: question})
+	switch {
+	case err == nil:
+	case errors.Is(err, ErrQuestionTooLong):
+		return AskOutput{}, &askFailure{status: http.StatusBadRequest, msg: "question is too long"}
+	case errors.Is(err, ErrTooManyAsks):
+		return AskOutput{}, &askFailure{status: http.StatusTooManyRequests, msg: "too many attempts for this question"}
+	default:
+		// A deadline or cancellation also lands here: nothing is answered.
+		return AskOutput{}, &askFailure{status: http.StatusInternalServerError, msg: "internal error", err: err}
+	}
+	if out.Citations == nil {
+		out.Citations = []store.Citation{}
+	}
+	if out.EvidenceIDs == nil {
+		out.EvidenceIDs = []string{}
+	}
+	if out.StepRefs == nil {
+		out.StepRefs = []string{}
+	}
+	return out, nil
+}
+
 // handleAPIAsk answers POST /api/ask.
 //
 // Until per-user company lists exist (an owner decision before CC-1201),
@@ -104,48 +156,14 @@ func (s *Server) handleAPIAsk(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "body must be one JSON object with company, month and question"})
 		return
 	}
-	if !monthRE.MatchString(in.Month) {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "month must be YYYY-MM"})
+	out, fail := s.runAsk(r.Context(), in.Company, in.Month, in.Question)
+	if fail != nil {
+		if fail.err != nil {
+			s.askError(w, r, fail.err)
+			return
+		}
+		writeJSON(w, fail.status, map[string]string{"error": fail.msg})
 		return
-	}
-	question := strings.TrimSpace(in.Question)
-	if question == "" {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "question must not be empty"})
-		return
-	}
-	companies, err := s.runs.b.Store.ListCompanies(r.Context())
-	if err != nil {
-		s.askError(w, r, err)
-		return
-	}
-	if !slices.ContainsFunc(companies, func(c store.Company) bool { return c.ID == in.Company }) {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "unknown company"})
-		return
-	}
-	ctx, cancel := context.WithTimeout(r.Context(), askTimeout)
-	defer cancel()
-	out, err := s.ask.Ask(ctx, AskInput{Company: in.Company, Month: in.Month, Question: question})
-	switch {
-	case err == nil:
-	case errors.Is(err, ErrQuestionTooLong):
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "question is too long"})
-		return
-	case errors.Is(err, ErrTooManyAsks):
-		writeJSON(w, http.StatusTooManyRequests, map[string]string{"error": "too many attempts for this question"})
-		return
-	default:
-		// A deadline or cancellation also lands here: nothing is answered.
-		s.askError(w, r, err)
-		return
-	}
-	if out.Citations == nil {
-		out.Citations = []store.Citation{}
-	}
-	if out.EvidenceIDs == nil {
-		out.EvidenceIDs = []string{}
-	}
-	if out.StepRefs == nil {
-		out.StepRefs = []string{}
 	}
 	writeJSON(w, http.StatusOK, out)
 }
