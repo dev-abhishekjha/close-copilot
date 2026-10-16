@@ -1,36 +1,166 @@
 package templates
 
-// Home is the signed-in landing page. It lists only the actions the user's
-// role may take and links to the pages for them; the server's middleware is
-// still the authority. The UI-04 dashboard replaces it.
-templ Home(p HomePage) {
-	@Base(Layout{Title: "Home", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card">
-			<h1>Welcome, { p.User }</h1>
-			<p>You are signed in as <strong class="role-name">{ p.Role }</strong>.</p>
-			if len(p.Destinations) > 0 {
-				<div class="home-links">
-					for _, d := range p.Destinations {
-						@Button(ButtonProps{Label: d.Label, Href: d.Href, Icon: d.Icon, Variant: "secondary"})
-					}
-				</div>
-			}
-			<h2>What you can do</h2>
-			if len(p.Actions) == 0 {
-				<p>No actions are available to your role.</p>
-			} else {
-				<ul class="actions">
-					for _, a := range p.Actions {
-						<li data-action={ a.ID }>
-							if a.Href != "" {
-								<a class="label" href={ templ.SafeURL(a.Href) }>{ a.Label }</a>
-							} else {
-								<span class="label">{ a.Label }</span>
-							}
+// Home is the signed-in landing page (UI-04): where the selected close
+// stands, the latest run per company, what waits on the user and the quick
+// actions their role allows. The server's middleware is still the authority.
+templ Home(v DashboardView) {
+	@Base(Layout{Title: "Dashboard", User: v.User, Role: v.Role, CSRFToken: v.CSRFToken}) {
+		@PageHeader(PageHeaderProps{Title: "Dashboard", Subtitle: dashSubtitle(v), Actions: dashHeaderActions(v)})
+		<div class="dash">
+			@dashContext(v)
+			<div class="dash-grid dash-grid-wide">
+				@dashLatest(v.Latest)
+				@dashWaiting(v.Waiting)
+			</div>
+			@dashQuick(v.Actions, v.Pages)
+		</div>
+	}
+}
+
+templ dashActionButtons(v DashboardView) {
+	if v.StartHref != "" {
+		@Button(ButtonProps{Label: "Start a close", Href: v.StartHref, Icon: "play"})
+	}
+	if v.AskHref != "" {
+		@Button(ButtonProps{Label: "Ask a question", Href: v.AskHref, Icon: "message", Variant: "secondary"})
+	}
+}
+
+templ dashContext(v DashboardView) {
+	switch {
+		case v.Context.Off:
+			@EmptyState(EmptyProps{Icon: "info", Title: "Close runs are not configured on this server"})
+		case v.Context.Err != "":
+			<p class="error dash-alert" role="alert">{ v.Context.Err }</p>
+		case v.Context.NoCompany:
+			@EmptyState(EmptyProps{Icon: "info", Title: "No company yet", Body: "A company appears here once it has a run or is configured."})
+		case !v.Context.HasRun:
+			@dashNoRun(v)
+		default:
+			@dashRun(v.Context)
+	}
+}
+
+templ dashNoRun(v DashboardView) {
+	if v.StartHref != "" {
+		@EmptyState(EmptyProps{Icon: "play", Title: "No close run for " + dashSubtitle(v) + " yet", Body: "Start a close to find what needs attention.", Action: &ButtonProps{Label: "Start a close", Href: v.StartHref, Icon: "play"}})
+	} else {
+		@EmptyState(EmptyProps{Icon: "play", Title: "No close run for " + dashSubtitle(v) + " yet", Body: "A maker can start a close."})
+	}
+}
+
+templ dashRun(c DashContext) {
+	<div class="dash-tiles" id="dash-context">
+		@dashStatusTile(c)
+		if c.FindingsErr == "" {
+			@StatTile(StatProps{Label: "Findings", Value: itoa(c.Total), Href: dashFindingsHref(c)})
+			@StatTile(StatProps{Label: "High severity", Value: itoa(c.High), Tone: dashStatTone(c.High, "danger")})
+			@StatTile(StatProps{Label: "Needs review", Value: itoa(c.NeedsReview), Tone: dashStatTone(c.NeedsReview, "warn")})
+			@StatTile(StatProps{Label: "Unverified", Value: itoa(c.Unverified), Tone: dashStatTone(c.Unverified, "warn")})
+		}
+	</div>
+	if c.FindingsErr != "" {
+		<p class="error dash-alert" role="alert">{ c.FindingsErr }</p>
+	} else {
+		<div class="dash-grid">
+			@Card(CardProps{ID: "dash-severity", Title: "Findings by severity"}) {
+				<ul class="dash-bars">
+					for _, b := range c.Severity {
+						<li class="dash-bar" data-severity={ b.Severity }>
+							@SeverityBadge(b.Severity)
+							<span class="dash-bar-count">{ itoa(b.Count) }</span>
+							<meter class={ "dash-meter dash-meter-" + b.Severity } min="0" max={ itoa(b.Max) } value={ itoa(b.Count) }>{ itoa(b.Count) }</meter>
 						</li>
 					}
 				</ul>
 			}
-		</section>
+			@Card(CardProps{ID: "dash-status", Title: "By status"}) {
+				@DataTable(TableProps{Caption: "Findings by status", Columns: dashStatusColumns, Rows: dashStatusRows(c.Statuses), Dense: true})
+			}
+		</div>
+	}
+}
+
+templ dashStatusTile(c DashContext) {
+	<div class="dash-status-tile">
+		if c.RunHref != "" {
+			<a class="ui-stat ui-stat-link" href={ c.RunHref }>
+				<span class="ui-stat-label">Status</span>
+				<span class="ui-stat-value dash-chip">@StatusChip(c.Status)</span>
+			</a>
+		} else {
+			<div class="ui-stat">
+				<span class="ui-stat-label">Status</span>
+				<span class="ui-stat-value dash-chip">@StatusChip(c.Status)</span>
+			</div>
+		}
+	</div>
+}
+
+templ dashLatest(l DashLatest) {
+	@Card(CardProps{ID: "dash-latest", Title: "Latest run per company"}) {
+		switch {
+			case l.Off:
+				@EmptyState(EmptyProps{Icon: "info", Title: "Close runs are not configured on this server"})
+			case l.Err != "":
+				<p class="error dash-alert" role="alert">{ l.Err }</p>
+			default:
+				@DataTable(TableProps{Caption: "Latest run per company", Columns: dashLatestColumns, Rows: dashLatestRows(l.Rows), EmptyTitle: "No companies yet"})
+				if l.More > 0 {
+					<p class="dash-more">and { itoa(l.More) } more</p>
+				}
+		}
+	}
+}
+
+templ dashWaiting(w DashWaiting) {
+	@Card(CardProps{ID: "dash-waiting", Title: "Waiting on you"}) {
+		switch {
+			case w.Off:
+				@EmptyState(EmptyProps{Icon: "info", Title: "Close runs are not configured on this server"})
+			case w.Err != "":
+				<p class="error dash-alert" role="alert">{ w.Err }</p>
+			case w.Kind == "viewer":
+				<p class="dash-empty">Nothing is waiting on you</p>
+			case w.Count == 0:
+				<p class="dash-empty">Nothing is waiting on you</p>
+			default:
+				<p class="dash-count"><strong>{ itoa(w.Count) }</strong> { dashWaitingNoun(w) }</p>
+				<ul class="dash-items">
+					for _, it := range w.Items {
+						<li><a href={ templ.SafeURL(it.Href) }>{ it.Label }</a></li>
+					}
+				</ul>
+				if w.ViewAll != "" {
+					@Button(ButtonProps{Label: w.ViewAllLabel, Href: w.ViewAll, Variant: "secondary", Size: "sm"})
+				}
+		}
+	}
+}
+
+templ dashQuick(actions []Action, pages []Destination) {
+	@Card(CardProps{ID: "dash-quick", Title: "Quick actions"}) {
+		if len(actions) == 0 {
+			<p class="dash-empty">No actions are available to your role.</p>
+		} else {
+			<ul class="actions dash-actions">
+				for _, a := range actions {
+					<li data-action={ a.ID }>
+						if a.Href != "" {
+							@Button(ButtonProps{Label: a.Label, Href: a.Href, Variant: "secondary", Size: "sm"})
+						} else {
+							<span class="label">{ a.Label }</span>
+						}
+					</li>
+				}
+			</ul>
+		}
+		if len(pages) > 0 {
+			<nav class="dash-pages" aria-label="Pages">
+				for _, d := range pages {
+					@Button(ButtonProps{Label: d.Label, Href: d.Href, Icon: d.Icon, Variant: "ghost", Size: "sm"})
+				}
+			</nav>
+		}
 	}
 }
