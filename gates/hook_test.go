@@ -264,7 +264,6 @@ func TestGuardHook(t *testing.T) {
 	}
 }
 
-// TestGuardHookIgnoresNonEdits: input without a file path is not judged.
 // TestGuardHookUITask: a UI-nn ticket in tmp/current-task binds edits to its
 // spec's files like a CC ticket, and malformed IDs still block every edit.
 func TestGuardHookUITask(t *testing.T) {
@@ -303,6 +302,7 @@ func TestGuardHookUITask(t *testing.T) {
 	}
 }
 
+// TestGuardHookIgnoresNonEdits: input without a file path is not judged.
 func TestGuardHookIgnoresNonEdits(t *testing.T) {
 	h := newHookEnv(t)
 	h.setMainTask("CC-500")

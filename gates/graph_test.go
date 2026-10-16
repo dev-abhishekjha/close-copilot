@@ -136,6 +136,10 @@ func TestCompareIDsUI(t *testing.T) {
 		{"CC-1001", "UI-01", -1},
 		{"UI-01", "CC-1001", 1},
 		{"CC-1", "UI-1", -1},
+		// Numeric order differs from string order: strings.Compare fails these.
+		{"UI-9", "UI-10", -1},
+		{"UI-10", "UI-9", 1},
+		{"UI-2a", "UI-10", -1},
 		// Equal series, number and suffix: strings.Compare keeps the order total.
 		{"UI-01", "UI-1", -1},
 		{"UI-1", "UI-01", 1},

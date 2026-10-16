@@ -289,7 +289,7 @@ func RunDeclared(ctx context.Context, env Env, args []string) int {
 }
 
 // RunProtected is G1's protected-path check:
-// `protected [--base main] [--labels a,b] [--approved-sha <sha>] [--task CC-xxx] [--report path]`.
+// `protected [--base main] [--labels a,b] [--approved-sha <sha>] [--task <ID>] [--report path]`.
 // Labels come from --labels and, in CI, from $GITHUB_EVENT_PATH. A
 // protected change passes only with the approved label and an approved SHA
 // equal to HEAD: the approval covers exactly the commit the owner reviewed.
