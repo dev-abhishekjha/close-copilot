@@ -218,7 +218,7 @@ func TestFindingPage(t *testing.T) {
 	ts := findingsServer(t, ff)
 
 	body := page(t, ts, RoleViewer, x.ID)
-	wantAll(t, body, "unrecorded_bank_charge", "high", "₹1,23,456.78", "open", `badge verified">verified<`,
+	wantAll(t, body, "unrecorded_bank_charge", "high", "₹1,23,456.78", "open", `ui-verified`, "Verified",
 		`href="/runs/`+runID(1).String()+`/findings"`, "acme 2026-09", "no explanation yet")
 	last := -1
 	for _, id := range []string{`id="header"`, `id="explanation"`, `id="citations"`, `id="evidence"`, `id="actions"`} {
@@ -230,7 +230,7 @@ func TestFindingPage(t *testing.T) {
 	}
 	wantNone(t, body, `id="review"`, `id="trail"`, `id="proposal"`)
 
-	if b := page(t, ts, RoleViewer, fid(2)); !strings.Contains(b, `<dd class="amount"></dd>`) {
+	if b := page(t, ts, RoleViewer, fid(2)); !strings.Contains(b, `<span class="amount ui-num"></span>`) {
 		t.Error("nil amount should render empty")
 	}
 
@@ -397,9 +397,9 @@ func TestFindingTrail(t *testing.T) {
 	}())
 	ts := findingsServer(t, ff)
 	body := page(t, ts, RoleViewer, x.ID)
-	wantAll(t, body, `id="trail"`, `<code>books.get_account_history</code> <code>{&#34;company&#34;:&#34;acme&#34;}</code> rows: 2`,
-		"<code>books.list_recurring_suppliers</code>", "rows: n/a")
-	if strings.Index(body, "books.get_account_history</code>") > strings.Index(body, "books.list_recurring_suppliers</code>") {
+	wantAll(t, body, `id="trail"`, `>books.get_account_history<`, `{&#34;company&#34;:&#34;acme&#34;} · rows: 2`,
+		">books.list_recurring_suppliers<", "rows: n/a")
+	if strings.Index(body, ">books.get_account_history<") > strings.Index(body, ">books.list_recurring_suppliers<") {
 		t.Error("trail not in call order")
 	}
 	wantAll(t, body, `id="evidence"`, "snapshot not stored")
@@ -733,4 +733,186 @@ func TestFindingLiveProposalBlocksDecision(t *testing.T) {
 			t.Errorf("accept = %d status %s audits %d", w.Code, ff.status(x.ID), ff.auditCount())
 		}
 	})
+}
+
+const hostile = `<script>alert(1)</script>"><img src=x onerror=alert(1)>`
+const hostileEsc = "&lt;script&gt;alert(1)&lt;/script&gt;"
+
+func TestFindingUIHeader(t *testing.T) {
+	tests := []struct {
+		sev, status string
+		verified    bool
+		wants       []string
+	}{
+		{"high", "open", true, []string{"High", "Open", "Verified", `data-severity="high"`}},
+		{"medium", "needs_review", false, []string{"Medium", "needs_review", "Unverified", `data-severity="medium"`}},
+		{"low", "accepted", false, []string{"Low", "Accepted", "Unverified"}},
+		{"high", "dismissed", true, []string{"Dismissed", "Verified"}},
+	}
+	for _, tc := range tests {
+		t.Run(tc.sev+"/"+tc.status, func(t *testing.T) {
+			ff := newFakeFindings()
+			x := fnd(1, "variance", tc.status)
+			x.Severity, x.Verified = tc.sev, tc.verified
+			x = ff.put(x)
+			body := page(t, findingsServer(t, ff), RoleViewer, x.ID)
+			wantAll(t, body, tc.wants...)
+			if n := strings.Count(body, "<h1"); n != 1 {
+				t.Errorf("%d <h1>, want 1", n)
+			}
+		})
+	}
+	ff := newFakeFindings()
+	x := fnd(2, "variance", "open")
+	x.Title = hostile
+	x = ff.put(x)
+	body := page(t, findingsServer(t, ff), RoleViewer, x.ID)
+	wantAll(t, body, hostileEsc)
+	wantNone(t, body, "<script>alert", "<img src=x")
+	if n := strings.Count(body, "<h1"); n != 1 {
+		t.Errorf("%d <h1>, want 1", n)
+	}
+}
+
+func TestFindingUISideBySide(t *testing.T) {
+	ff := newFakeFindings()
+	a := fnd(1, "unrecorded_bank_charge", "open")
+	a.Verified, a.Proposal = true, uiPreview()
+	a.Evidence = []store.EvidenceRef{ref("evidence", "list_bank_lines", ff.snap("s", "evidence", "list_bank_lines", []any{map[string]any{"txn_id": "BT-1"}}), "BT-1")}
+	a = ff.put(a)
+	b := ff.put(fnd(2, "variance", "open"))
+	ts := approvalsServer(t, &fakeApprovals{}, ff)
+
+	body := page(t, ts, RoleMaker, a.ID)
+	g := strings.Index(body, `class="finding-grid"`)
+	ev, pr := strings.Index(body, `id="evidence"`), strings.Index(body, `id="proposal"`)
+	if g < 0 || ev < g || pr < ev {
+		t.Errorf("grid %d evidence %d proposal %d out of order", g, ev, pr)
+	}
+	wantAll(t, body, "Proposed entry", "Propose entry", `action="/findings/`+a.ID.String()+`/proposals"`)
+	wantNone(t, page(t, ts, RoleViewer, a.ID), "Propose entry", "/proposals")
+	wantNone(t, page(t, ts, RoleChecker, a.ID), "Propose entry", "/proposals")
+
+	body = page(t, ts, RoleMaker, b.ID)
+	wantAll(t, body, "No entry proposed yet", `id="evidence"`)
+	wantNone(t, body, `id="proposal"`, "Propose entry")
+}
+
+func TestFindingUIEvidenceLinks(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "unmatched_ledger_entry", "open")
+	x.Evidence = []store.EvidenceRef{
+		ref("books", "list_gl_entries", ff.snap("b", "books", "list_gl_entries", []any{map[string]any{"name": "GL-1", "voucher_type": "Journal Entry", "voucher_no": "JV-1"}})),
+		ref("books", "list_payments", ff.snap("c", "books", "list_payments", []any{map[string]any{"name": "javascript:alert(1)", "party": "javascript:alert(1)"}})),
+	}
+	x = ff.put(x)
+	body := page(t, findingsServer(t, ff), RoleViewer, x.ID)
+	wantAll(t, body, `href="`+erpTest+`/app/journal-entry/JV-1" rel="noopener noreferrer" target="_blank"`, ">Source<")
+	wantNone(t, body, `href="javascript:`)
+	if n := strings.Count(body, `target="_blank"`); n != 2 { // the hostile name is path-escaped under the ERPNext base, never a bare javascript: href
+		t.Errorf("%d external links, want 2", n)
+	}
+}
+
+func TestFindingUIActionsByRole(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "unrecorded_bank_charge", "open")
+	x.Verified, x.Proposal = true, uiPreview()
+	x = ff.put(x)
+	ts := approvalsServer(t, &fakeApprovals{}, ff)
+	id := x.ID.String()
+
+	body := page(t, ts, RoleMaker, x.ID)
+	wantAll(t, body, "Propose entry", "Mark accepted", ">Dismiss<", `action="/findings/`+id+`/accept"`,
+		`action="/findings/`+id+`/dismiss"`, `action="/findings/`+id+`/proposals"`, `name="csrf_token"`, `data-dialog-open="dismiss-dialog"`)
+	if n := strings.Count(body, `name="csrf_token"`); n < 4 {
+		t.Errorf("%d csrf fields, want one per form", n)
+	}
+	for _, r := range []Role{RoleViewer, RoleChecker} {
+		b := page(t, ts, r, x.ID)
+		wantAll(t, b, "Status: open")
+		wantNone(t, b, "Propose entry", "Mark accepted", ">Dismiss<", "<dialog", `name="reason"`, `/accept"`, `/dismiss"`)
+	}
+}
+
+func TestFindingUIDismissDialog(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "variance", "open")
+	x.Title = hostile
+	amt := paise(12345678)
+	x.AmountPaise = amt
+	x = ff.put(x)
+	ts := findingsServer(t, ff)
+	body := page(t, ts, RoleMaker, x.ID)
+	d := body[strings.Index(body, "<dialog"):]
+	d = d[:strings.Index(d, "</dialog>")]
+	wantAll(t, d, `action="/findings/`+x.ID.String()+`/dismiss"`, `name="reason"`, "required", `maxlength="500"`, hostileEsc, "₹1,23,456.78", `name="csrf_token"`)
+	wantNone(t, d, "<script>", "<img src=x")
+
+	w := ts.do(t, formPost(ts, RoleMaker, "/findings/"+x.ID.String()+"/dismiss", url.Values{"reason": {hostile + "\x07"}}))
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("dismiss = %d", w.Code)
+	}
+	b := w.Body.String()
+	wantAll(t, b, `role="alert"`, "&lt;script&gt;alert(1)&lt;/script&gt;&#34;&gt;&lt;img src=x onerror=alert(1)&gt;")
+	wantNone(t, b, "<script>alert", "<img src=x")
+}
+
+func TestFindingUITrailTimeline(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "variance", "open")
+	x.Keys = map[string]string{"resolution": "explained"}
+	x.Evidence = []store.EvidenceRef{
+		ref("books", "get_account_history", ff.snap("a", "books", "get_account_history", []any{map[string]any{"month": "2026-08"}, map[string]any{"month": "2026-09"}})),
+		ref("books", "list_recurring_suppliers", ""),
+	}
+	x = ff.put(x)
+	body := page(t, findingsServer(t, ff), RoleViewer, x.ID)
+	i, j := strings.Index(body, ">books.get_account_history<"), strings.Index(body, ">books.list_recurring_suppliers<")
+	if i < 0 || j < i || !strings.Contains(body, "ui-timeline") {
+		t.Fatalf("timeline order %d %d", i, j)
+	}
+	wantAll(t, body, "rows: 2", "rows: n/a", `id="trail"`)
+	if n := strings.Count(body[strings.Index(body, `id="trail"`):strings.Index(body, `id="actions"`)], "<li"); n != 2 {
+		t.Errorf("%d trail entries, want 2", n)
+	}
+}
+
+func TestFindingUIUnbalanced(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "variance", "open")
+	x.Proposal = &store.JournalProposal{Status: "proposed", Maker: "asha", Payload: store.JournalPayload{PostingDate: "2026-09-30",
+		Lines: []store.JournalLine{{Account: "A", DebitPaise: money.Paise(10000)}, {Account: "B", CreditPaise: money.Paise(7550)}}}}
+	x = ff.put(x)
+	body := page(t, findingsServer(t, ff), RoleViewer, x.ID)
+	wantAll(t, body, `class="error finding-balance"`, "Unbalanced: difference ₹24.50", `class="totals"`)
+	wantNone(t, body, `class="balanced`)
+}
+
+func TestFindingUIEscaping(t *testing.T) {
+	ff := newFakeFindings()
+	x := fnd(1, "suspicious_instruction_text", "needs_review")
+	x.Title = hostile
+	x.Explanation, x.Action = ptr(hostile), ptr(hostile)
+	x.Citations = []store.Citation{{DocID: hostile, Section: hostile}}
+	x.Evidence = []store.EvidenceRef{{Server: "evidence", Tool: "list_gstr2b_entries", Args: json.RawMessage(`{"q":"<script>alert(1)</script>"}`),
+		Artifact: ff.snap("e", "evidence", "list_gstr2b_entries", []any{map[string]any{"invoice_no": "I1", "supplier_name": hostile}})}}
+	x.Proposal = &store.JournalProposal{Status: "proposed", Maker: hostile, Payload: store.JournalPayload{PostingDate: "2026-09-30", Remark: hostile,
+		Lines: []store.JournalLine{{Account: hostile, DebitPaise: money.Paise(100)}, {Account: "B", CreditPaise: money.Paise(100)}}}}
+	x.Keys = map[string]string{"resolution": "r"}
+	x = ff.put(x)
+	body := page(t, findingsServer(t, ff), RoleMaker, x.ID)
+	wantAll(t, body, hostileEsc)
+	wantNone(t, body, "<script>alert", "<img src=x", `href="javascript:`)
+	if n := strings.Count(body, "<script"); n != 2 {
+		t.Errorf("%d <script tags, want the layout's 2", n)
+	}
+}
+
+func ptr[T any](v T) *T { return &v }
+
+func uiPreview() *store.JournalProposal {
+	return &store.JournalProposal{CompanyID: "acme", Status: "proposed", Payload: store.JournalPayload{
+		PostingDate: "2026-09-30", Lines: []store.JournalLine{{Account: "A", DebitPaise: 100}, {Account: "B", CreditPaise: 100}},
+	}}
 }

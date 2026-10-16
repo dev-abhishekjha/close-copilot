@@ -492,7 +492,7 @@ func (s *Server) handleRunPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	s.render(w, r, http.StatusOK, templates.Run(templates.RunPage{
-		User: p.user.Name, Role: string(p.user.Role), CSRFToken: p.csrf,
+		User: p.user.Name, Role: string(p.user.Role), CSRFToken: p.csrf, CanStart: p.user.Role == RoleMaker,
 		Company: run.CompanyID, Month: run.Month, Panel: s.panel(run, fs),
 	}))
 }

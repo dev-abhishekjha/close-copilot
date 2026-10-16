@@ -1,1 +1,34 @@
-/* Runs pages (UI-05). */
+/* Runs pages (UI-05). Tokens only. */
+.start-run { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); margin: 0; }
+.start-run .ui-field { flex: 1 1 12rem; min-width: 0; }
+.start-run .ui-btn { flex: 0 0 auto; }
+.runs-alert { margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-danger); border-radius: var(--radius-md); background: var(--color-danger-soft); }
+.runs-muted { color: var(--color-fg-muted); margin: var(--space-3) 0 0; }
+.runs-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: var(--space-3); margin: var(--space-4) 0; }
+.runs-stat { position: relative; }
+.runs-stat-text { font-size: var(--text-md); overflow-wrap: anywhere; }
+.runs-stat-text a { color: inherit; text-decoration: none; }
+.runs-stat-text a::after { content: ""; position: absolute; inset: 0; }
+.runs-stat:hover { border-color: var(--color-accent); }
+.runs-rerun { display: inline-flex; margin: 0; }
+.runs-progress > * + * { margin-top: var(--space-4); }
+.runs-progress .runs-stats { margin: 0; }
+.runs-progress .runs-stats + .runs-stats { margin-top: var(--space-3); }
+.counts { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-4) 0 0; padding: 0; }
+.runs-table, .findings-table { margin-top: var(--space-4); }
+.filters .ui-field { flex: 0 1 14rem; min-width: 0; }
+.findings-table td.severity { background: transparent; color: inherit; }
+.findings-table td.nested-title { padding-left: var(--space-6); }
+.findings-table tr[data-nested] { background: var(--color-surface-2); }
+@media (max-width: 30rem) {
+  .start-run .ui-btn { width: 100%; }
+}
+.start-run .ui-label { display: block; }
+.start-run .ui-field, .filters .ui-field { margin-bottom: 0; }
+form.filters { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+.runs-table td.status::before, .findings-table td.status::before { content: none; }
+.runs-table td { white-space: nowrap; }
+.findings-table td.amount, .findings-table td.status, .findings-table td.verified, .findings-table td.severity, .findings-table td.detail { white-space: nowrap; }
+.findings-table td.type, .findings-table td.title { overflow-wrap: anywhere; min-width: 7rem; }
+.findings-table td { padding-inline: var(--space-2); }
+.findings-table th { padding-inline: var(--space-2); }

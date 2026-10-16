@@ -1,6 +1,10 @@
 package templates
 
-import "strconv"
+import (
+	"strconv"
+
+	"github.com/a-h/templ"
+)
 
 // RunRow is one row of the past-runs table.
 type RunRow struct {
@@ -63,6 +67,7 @@ type RunPage struct {
 	User      string
 	Role      string
 	CSRFToken string
+	CanStart  bool // maker: the Re-run button is shown on a finished run
 	Company   string
 	Month     string
 	Panel     RunPanel
@@ -102,18 +107,6 @@ func findingsURL(id string) string { return "/runs/" + id + "/findings" }
 
 func itoa(n int) string  { return strconv.Itoa(n) }
 func i64(n int64) string { return strconv.FormatInt(n, 10) }
-func rowClass(nested bool) string {
-	if nested {
-		return "finding nested"
-	}
-	return "finding"
-}
-func stepClass(s TimelineStep) string {
-	if s.Current {
-		return "step current"
-	}
-	return "step"
-}
 
 // SummaryCard is the last finished run's headline on the runs page.
 type SummaryCard struct {
@@ -187,3 +180,119 @@ type MetricsPage struct {
 }
 
 func metricsURL(id string) string { return "/runs/" + id + "/metrics" }
+
+// finished reports whether a run status is terminal.
+func finished(status string) bool {
+	return status == "done" || status == "partial" || status == "failed"
+}
+
+func companyOptions(cs []string) []Option {
+	out := make([]Option, 0, len(cs))
+	for _, c := range cs {
+		out = append(out, Option{Value: c, Label: c})
+	}
+	return out
+}
+
+// filterOptions is the "All" option followed by the given values.
+func filterOptions(vals []string) []Option {
+	out := make([]Option, 0, len(vals)+1)
+	out = append(out, Option{Value: "", Label: "All"})
+	for _, v := range vals {
+		out = append(out, Option{Value: v, Label: v})
+	}
+	return out
+}
+
+const monthPattern = `\d{4}-(0[1-9]|1[0-2])`
+
+func runTitle(company, month string) string { return company + " " + month }
+
+var runColumns = []Column{
+	{Label: "Company"}, {Label: "Month"}, {Label: "Status"},
+	{Label: "Findings", Align: "right"}, {Label: "Cost", Align: "right"}, {Label: "Duration", Align: "right"},
+}
+
+func runRows(runs []RunRow) []Row {
+	rows := make([]Row, 0, len(runs))
+	for _, r := range runs {
+		rows = append(rows, Row{
+			Attrs: templ.Attributes{"data-run": r.ID, "data-status": r.Status},
+			Cells: []Cell{
+				{Text: r.Company, Href: runURL(r.ID)},
+				{Text: r.Month},
+				{Content: StatusChip(r.Status), Class: "status"},
+				{Text: itoa(r.Findings), Num: true, Class: "findings"},
+				{Text: r.Cost, Num: true, Class: "cost"},
+				{Text: r.Duration, Num: true, Class: "duration"},
+			},
+		})
+	}
+	return rows
+}
+
+// progressSteps maps a run status onto the real lifecycle: queued, running,
+// then one final step named for the terminal status.
+func progressSteps(status string) []Step {
+	queued, running := Step{Label: "Queued", Key: "queued"}, Step{Label: "Running", Key: "running"}
+	final := Step{Label: "Done", Key: "done", State: "pending"}
+	switch status {
+	case "queued":
+		queued.State, running.State = "active", "pending"
+	case "running":
+		queued.State, running.State = "done", "active"
+	default:
+		queued.State, running.State = "done", "done"
+		if finished(status) {
+			final.Key = status
+			final.Label = map[string]string{"done": "Done", "partial": "Partial", "failed": "Failed"}[status]
+			final.State = "done"
+			if status == "failed" {
+				final.State = "failed"
+			}
+		}
+	}
+	return []Step{queued, running, final}
+}
+
+func currentStepLabel(status string) string {
+	for _, s := range progressSteps(status) {
+		if s.State == "active" {
+			return s.Label
+		}
+	}
+	return status
+}
+
+var findingColumns = []Column{
+	{Label: "Severity"}, {Label: "Type"}, {Label: "Title"}, {Label: "Amount", Align: "right"},
+	{Label: "Status"}, {Label: "Verified"}, {Label: "Detail"},
+}
+
+func findingTableRows(rows []FindingRow) []Row {
+	var out []Row
+	add := func(r FindingRow, nested bool) {
+		attrs := templ.Attributes{"data-finding": r.ID, "data-severity": r.Severity}
+		title := "title"
+		if nested {
+			attrs["data-nested"] = "true"
+			title = "title nested-title"
+		}
+		out = append(out, Row{Attrs: attrs, Cells: []Cell{
+			{Content: SeverityBadge(r.Severity), Class: "severity"},
+			{Text: r.Type, Class: "type"},
+			{Text: r.Title, Class: title},
+			{Text: r.Amount, Num: true, Class: "amount"},
+			{Content: StatusChip(r.Status), Class: "status"},
+			{Content: VerifiedBadge(r.Verified), Class: "verified"},
+			{Text: "Details", Href: findingURL(r.ID), Class: "detail"},
+		}})
+	}
+	for _, r := range rows {
+		add(r, false)
+		for _, n := range r.Nested {
+			add(n, true)
+		}
+	}
+	return out
+}

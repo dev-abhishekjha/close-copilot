@@ -1,75 +1,67 @@
 package templates
 
-// Runs is the runs page: a start form for makers and the past runs.
+
+// Runs is the runs page: a start card for makers, a summary and the past runs.
 templ Runs(p RunsPage) {
 	@Base(Layout{Title: "Close runs", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card">
-			<h1>Close runs</h1>
-			if p.ShowSummary {
-				<div class="summary" id="runs-summary">
-					if p.Summary == nil {
-						<p>No finished runs yet.</p>
-					} else {
-						<p>
-							Last finished run:
-							<a class="summary-run" href={ templ.SafeURL(runURL(p.Summary.RunID)) }>{ p.Summary.Company } { p.Summary.Month }</a>.
-							Verified rate:
-							<a class="summary-verified" href={ templ.SafeURL(metricsURL(p.Summary.RunID)) }>{ p.Summary.VerifiedRate }</a>.
-							Open high-severity findings:
-							<a class="summary-high" href={ templ.SafeURL(findingsURL(p.Summary.RunID)) }>{ itoa(p.Summary.OpenHigh) }</a>.
-						</p>
-					}
-				</div>
+		@PageHeader(PageHeaderProps{Title: "Close runs"})
+		if p.Error != "" {
+			<p class="error runs-alert" role="alert">{ p.Error }</p>
+		}
+		if p.CanStart {
+			@Card(CardProps{ID: "start-close", Title: "Start a close"}) {
+				@startForm(p)
 			}
-			if p.Error != "" {
-				<p class="error" role="alert">{ p.Error }</p>
-			}
-			if p.CanStart {
-				<form method="post" action="/runs" class="start-run">
-					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-					<label>
-						Company
-						<select name="company">
-							for _, c := range p.Companies {
-								<option value={ c } selected?={ c == p.Company }>{ c }</option>
-							}
-						</select>
-					</label>
-					<label>
-						Month
-						<input type="text" name="month" value={ p.Month } placeholder="YYYY-MM" pattern="\d{4}-(0[1-9]|1[0-2])" required/>
-					</label>
-					<button type="submit">Start close</button>
-				</form>
-			}
-			if len(p.Runs) == 0 {
-				<p>No runs yet.</p>
-			} else {
-				<table class="runs">
-					<thead>
-						<tr>
-							<th>Company</th>
-							<th>Month</th>
-							<th>Status</th>
-							<th>Findings</th>
-							<th>Cost</th>
-							<th>Duration</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, r := range p.Runs {
-							<tr data-run={ r.ID }>
-								<td><a href={ templ.SafeURL(runURL(r.ID)) }>{ r.Company }</a></td>
-								<td>{ r.Month }</td>
-								<td class="status">{ r.Status }</td>
-								<td class="findings">{ itoa(r.Findings) }</td>
-								<td class="cost">{ r.Cost }</td>
-								<td class="duration">{ r.Duration }</td>
-							</tr>
-						}
-					</tbody>
-				</table>
-			}
-		</section>
+		}
+		if p.ShowSummary {
+			@runsSummary(p.Summary)
+		}
+		if len(p.Runs) == 0 {
+			@EmptyState(EmptyProps{Icon: "play", Title: "No runs yet", Body: emptyRunsBody(p.CanStart)})
+		} else {
+			<div class="runs-table">
+				@DataTable(TableProps{Caption: "Close runs", Columns: runColumns, Rows: runRows(p.Runs)})
+			</div>
+		}
 	}
+}
+
+func emptyRunsBody(canStart bool) string {
+	if canStart {
+		return "Pick a company and month above to start the first close."
+	}
+	return "A maker can start a close from this page."
+}
+
+templ startForm(p RunsPage) {
+	<form method="post" action="/runs" class="start-run">
+		<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+		@SelectField(FieldProps{ID: "company", Name: "company", Label: "Company", Value: p.Company, Options: companyOptions(p.Companies)})
+		<div class="ui-field">
+			<label class="ui-label" for="month">Month <span class="ui-req" aria-hidden="true">*</span></label>
+			<input class="ui-input" id="month" name="month" value={ p.Month } type="month" placeholder="YYYY-MM" pattern={ monthPattern } required/>
+		</div>
+		@Button(ButtonProps{Label: "Start close", Type: "submit", Icon: "play"})
+	</form>
+}
+
+templ runsSummary(s *SummaryCard) {
+	<div class="runs-stats" id="runs-summary">
+		if s == nil {
+			<p class="runs-muted">No finished runs yet.</p>
+		} else {
+			<div class="ui-stat runs-stat">
+				<span class="ui-stat-label">Last finished run</span>
+				<span class="ui-stat-value runs-stat-text"><a class="summary-run" href={ templ.SafeURL(runURL(s.RunID)) }>{ s.Company } { s.Month }</a></span>
+			</div>
+			<div class="ui-stat runs-stat">
+				<span class="ui-stat-label">Verified rate</span>
+				<span class="ui-stat-value runs-stat-text"><a class="summary-verified" href={ templ.SafeURL(metricsURL(s.RunID)) }>{ s.VerifiedRate }</a></span>
+			</div>
+			<div class="ui-stat runs-stat">
+				<span class="ui-stat-label">Open high-severity findings</span>
+				<span class="ui-stat-value runs-stat-text"><a class="summary-high" href={ templ.SafeURL(findingsURL(s.RunID)) }>{ itoa(s.OpenHigh) }</a></span>
+			</div>
+		}
+	</div>
 }
