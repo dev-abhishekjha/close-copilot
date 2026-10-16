@@ -3,31 +3,16 @@ package templates
 // Finding is the finding detail page.
 templ Finding(p FindingPage) {
 	@Base(Layout{Title: "Finding", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card" id="header" data-severity={ p.Severity }>
-			<p><a href={ templ.SafeURL(findingsURL(p.RunID)) }>Back to findings</a> · { p.Company } { p.Month }</p>
-			<h1>{ p.Title }</h1>
-			<dl class="facts">
-				<dt>Type</dt>
-				<dd class="type">{ p.Type }</dd>
-				<dt>Severity</dt>
-				<dd class="severity">{ p.Severity }</dd>
-				<dt>Amount</dt>
-				<dd class="amount">{ p.Amount }</dd>
-				<dt>Status</dt>
-				<dd class="status">{ p.Status }</dd>
-				<dt>Verified</dt>
-				<dd>
-					if p.Verified {
-						<span class="badge verified">verified</span>
-					} else {
-						<span class="badge unverified">unverified</span>
-					}
-				</dd>
-			</dl>
+		<section id="header" class="finding-header" data-severity={ p.Severity }>
+			@PageHeader(PageHeaderProps{
+				Title:    p.Title,
+				Subtitle: p.Company + " " + p.Month,
+				Actions:  backLink(p),
+			})
+			@Facts(findingFacts(p))
 		</section>
 		if p.Review != nil {
-			<section class="card banner" id="review">
-				<h2>Needs review</h2>
+			@Card(CardProps{ID: "review", Title: "Needs review", Tone: "warn"}) {
 				if len(p.Review.Reasons) == 0 {
 					<p>{ p.Review.Fallback }</p>
 				} else {
@@ -37,21 +22,19 @@ templ Finding(p FindingPage) {
 						}
 					</ul>
 				}
-			</section>
+			}
 		}
-		<section class="card" id="explanation">
-			<h2>Explanation</h2>
+		@Card(CardProps{ID: "explanation", Title: "Explanation"}) {
 			if p.HasExplanation {
 				<p class="explanation">{ p.Explanation }</p>
-				<p class="action"><strong>Suggested action:</strong> { p.Action }</p>
+				<p class="action finding-action"><strong>Suggested action:</strong> { p.Action }</p>
 			} else {
-				<p>no explanation yet</p>
+				<p class="finding-none">no explanation yet</p>
 			}
-		</section>
-		<section class="card" id="citations">
-			<h2>Citations</h2>
+		}
+		@Card(CardProps{ID: "citations", Title: "Citations"}) {
 			if len(p.Citations) == 0 {
-				<p>No citations.</p>
+				<p class="finding-none">No citations.</p>
 			}
 			for _, c := range p.Citations {
 				<details>
@@ -60,61 +43,94 @@ templ Finding(p FindingPage) {
 					<p>snippet not stored on the finding</p>
 				</details>
 			}
-		</section>
-		<section class="card" id="evidence">
-			<h2>Evidence</h2>
-			if len(p.Evidence) == 0 {
-				<p>No evidence recorded.</p>
-			}
-			for _, b := range p.Evidence {
-				@evidenceBlock(b)
-			}
-		</section>
-		if p.HasTrail {
-			<section class="card" id="trail">
-				<h2>Investigation trail</h2>
-				<ol>
-					for _, t := range p.Trail {
-						<li><code>{ t.Call }</code> <code>{ t.Args }</code> rows: { t.Rows }</li>
+		}
+		<div class="finding-grid">
+			<div class="finding-col">
+				@Card(CardProps{ID: "evidence", Title: "Evidence"}) {
+					if len(p.Evidence) == 0 {
+						<p class="finding-none">No evidence recorded.</p>
 					}
-				</ol>
-			</section>
+					for _, b := range p.Evidence {
+						@evidenceBlock(b)
+					}
+				}
+			</div>
+			<div class="finding-col">
+				if p.Proposal != nil {
+					@Card(CardProps{ID: "proposal", Title: "Proposed entry", Actions: StatusChip(p.Proposal.Status)}) {
+						@proposalView(*p.Proposal)
+					}
+				} else {
+					@Card(CardProps{ID: "propose", Title: "Proposed entry"}) {
+						@EmptyState(EmptyProps{Icon: "file-text", Title: "No entry proposed yet", Body: "A maker can propose a journal entry that would fix this finding."})
+						if p.Actions.CanDecide && p.Actions.CreateButton {
+							@proposeForm(p)
+						}
+					}
+				}
+			</div>
+		</div>
+		if p.HasTrail {
+			@Card(CardProps{ID: "trail", Title: "Investigation trail"}) {
+				@Timeline(trailEntries(p.Trail))
+			}
 		}
-		if p.Proposal != nil {
-			<section class="card" id="proposal">
-				<h2>Proposal</h2>
-				@proposalView(*p.Proposal)
-			</section>
-		}
-		<section class="card" id="actions">
-			<h2>Actions</h2>
+		@Card(CardProps{ID: "actions", Title: "Actions"}) {
 			if p.Actions.Error != "" {
 				<p class="error" role="alert">{ p.Actions.Error }</p>
 			}
 			if p.Actions.CanDecide {
-				if p.Actions.CreateButton {
-					<form method="post" action={ templ.SafeURL(proposalsURL(p.ID)) }>
+				<div class="finding-actions">
+					if p.Proposal != nil && p.Actions.CreateButton {
+						@proposeForm(p)
+					}
+					<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/accept") }>
 						<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-						<button type="submit">Create proposal</button>
+						@Button(ButtonProps{Label: "Mark accepted", Variant: "secondary", Type: "submit"})
 					</form>
-				}
-				<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/accept") }>
-					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-					<button type="submit">Mark accepted</button>
-				</form>
-				<form method="post" action={ templ.SafeURL(findingURL(p.ID) + "/dismiss") }>
-					<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-					<label>
-						Reason
-						<textarea name="reason" required maxlength="500" rows="3">{ p.Actions.Reason }</textarea>
-					</label>
-					<button type="submit">Dismiss</button>
-				</form>
+					@OpenDialogButton(ButtonProps{Label: "Dismiss", Variant: "danger"}, "dismiss-dialog")
+				</div>
+				@ConfirmModal(ConfirmProps{
+					ID:        "dismiss-dialog",
+					Title:     "Dismiss this finding?",
+					Body:      dismissBody(p),
+					Method:    "post",
+					Action:    findingURL(p.ID) + "/dismiss",
+					CSRFToken: p.CSRFToken,
+					Confirm:   ButtonProps{Label: "Dismiss", Variant: "danger"},
+					Extra:     dismissReason(p),
+				})
 			} else {
 				<p>Status: { p.Status }</p>
 			}
-		</section>
+		}
 	}
+}
+
+templ backLink(p FindingPage) {
+	@Button(ButtonProps{Label: "Back to findings", Variant: "ghost", Size: "sm", Href: findingsURL(p.RunID), Icon: "chevron-right"})
+}
+
+templ proposeForm(p FindingPage) {
+	<form method="post" action={ templ.SafeURL(proposalsURL(p.ID)) }>
+		<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+		@Button(ButtonProps{Label: "Propose entry", Variant: "primary", Type: "submit"})
+	</form>
+}
+
+templ dismissReason(p FindingPage) {
+	@TextareaField(FieldProps{
+		ID:       "dismiss-reason",
+		Name:     "reason",
+		Label:    "Reason",
+		Value:    p.Actions.Reason,
+		Required: true,
+		Attrs:    dismissFieldAttrs(),
+	})
+}
+
+templ sourceLink(c EvidenceCell) {
+	<a href={ templ.SafeURL(c.Link) } rel="noopener noreferrer" target="_blank">{ c.Text }</a>
 }
 
 templ evidenceBlock(b EvidenceBlock) {
@@ -128,36 +144,9 @@ templ evidenceBlock(b EvidenceBlock) {
 			<p class="note">{ b.Note }</p>
 		}
 		if len(b.Rows) > 0 {
-			<table class="evidence">
-				<thead>
-					<tr>
-						for _, c := range b.Columns {
-							<th>{ c }</th>
-						}
-						if b.HasSource {
-							<th>Source</th>
-						}
-					</tr>
-				</thead>
-				<tbody>
-					for _, r := range b.Rows {
-						<tr>
-							for _, c := range r.Cells {
-								<td>{ c }</td>
-							}
-							if b.HasSource {
-								<td>
-									if r.Source.Link != "" {
-										<a href={ templ.SafeURL(r.Source.Link) } rel="noopener noreferrer" target="_blank">{ r.Source.Text }</a>
-									} else {
-										{ r.Source.Text }
-									}
-								</td>
-							}
-						</tr>
-					}
-				</tbody>
-			</table>
+			<div class="evidence">
+				@DataTable(evidenceTable(b))
+			</div>
 		}
 		if b.More > 0 {
 			<p class="note">{ itoa(b.More) } more not shown</p>
@@ -166,35 +155,37 @@ templ evidenceBlock(b EvidenceBlock) {
 }
 
 templ proposalView(v ProposalView) {
-	<p>Status: { v.Status } · Maker: { v.Maker } · Posting date: { v.PostingDate }</p>
-	<p>{ v.Remark }</p>
-	<table class="evidence">
-		<thead>
-			<tr>
-				<th>Account</th>
-				<th>Debit</th>
-				<th>Credit</th>
-			</tr>
-		</thead>
-		<tbody>
-			for _, l := range v.Lines {
+	<p class="finding-meta">Status: { v.Status } · Maker: { v.Maker } · Posting date: { v.PostingDate }</p>
+	<p class="finding-remark">{ v.Remark }</p>
+	<div class="ui-table-wrap" tabindex="0" role="region" aria-label="Proposed journal lines">
+		<table class="ui-table proposal-lines">
+			<thead>
 				<tr>
-					<td>{ l.Account }</td>
-					<td>{ l.Debit }</td>
-					<td>{ l.Credit }</td>
+					<th scope="col">Account</th>
+					<th scope="col" class="ui-align-right">Debit</th>
+					<th scope="col" class="ui-align-right">Credit</th>
 				</tr>
-			}
-			<tr class="totals">
-				<th>Total</th>
-				<th>{ v.TotalDebit }</th>
-				<th>{ v.TotalCredit }</th>
-			</tr>
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				for _, l := range v.Lines {
+					<tr>
+						<td>{ l.Account }</td>
+						<td class="ui-num ui-align-right">{ l.Debit }</td>
+						<td class="ui-num ui-align-right">{ l.Credit }</td>
+					</tr>
+				}
+				<tr class="totals">
+					<th scope="row">Total</th>
+					<th class="ui-num ui-align-right">{ v.TotalDebit }</th>
+					<th class="ui-num ui-align-right">{ v.TotalCredit }</th>
+				</tr>
+			</tbody>
+		</table>
+	</div>
 	if v.Balanced {
-		<p class="balanced">Balanced</p>
+		<p class="balanced finding-balance">Balanced</p>
 	} else {
-		<p class="error">Unbalanced: difference { v.Difference }</p>
+		<p class="error finding-balance" role="alert">Unbalanced: difference { v.Difference }</p>
 	}
 	if v.ERPName != "" {
 		<p>
