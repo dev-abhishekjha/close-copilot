@@ -69,7 +69,7 @@ func TestUIComponentButton(t *testing.T) {
 }
 
 func TestUIComponentBadges(t *testing.T) {
-	for _, s := range []string{"queued", "running", "done", "failed", "open", "accepted", "dismissed", "proposed", "approved", "rejected", "posted"} {
+	for _, s := range []string{"queued", "running", "done", "failed", "open", "accepted", "dismissed", "proposed", "approved", "rejected", "posted", "partial"} {
 		h := render(t, StatusChip(s))
 		wantAll(t, s, h, "ui-chip", strings.ToUpper(s[:1])+s[1:])
 	}
@@ -334,4 +334,9 @@ func TestUIHooksPageHeaderFacts(t *testing.T) {
 	h = render(t, Facts([]Fact{{Label: "A", Value: "v1"}, {Label: "B", Value: "ignored", Content: StatusChip("open")}}))
 	wantAll(t, "facts", h, `<dl class="ui-facts">`, "<dt>A</dt>", "v1", "Open")
 	wantNone(t, "content replaces value", h, "ignored")
+}
+
+func TestUIChipPartial(t *testing.T) {
+	h := render(t, StatusChip("partial"))
+	wantAll(t, "partial", h, "ui-chip-warn", ">Partial<", "<svg")
 }

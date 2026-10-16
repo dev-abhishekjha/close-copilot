@@ -212,6 +212,7 @@ var statusChips = map[string]chip{
 	"approved":  {"ok", "check-circle", "Approved"},
 	"rejected":  {"danger", "x", "Rejected"},
 	"posted":    {"ok", "check", "Posted"},
+	"partial":   {"warn", "alert", "Partial"},
 }
 
 func statusChip(s string) chip {
