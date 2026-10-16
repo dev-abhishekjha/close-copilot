@@ -1,1 +1,33 @@
-/* Finding detail page (UI-07). */
+/* Finding detail page (UI-07). Tokens only. */
+.finding-header { margin-bottom: var(--space-4); }
+.finding-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  align-items: start;
+}
+.finding-col { min-width: 0; }
+@media (max-width: 56rem) {
+  .finding-grid { grid-template-columns: minmax(0, 1fr); }
+}
+.finding-header .amount { display: inline-block; text-align: right; font-variant-numeric: tabular-nums; }
+.finding-action { margin-top: var(--space-3); }
+.finding-none { color: var(--color-fg-muted); }
+.finding-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.finding-actions form { margin: 0; }
+.finding-balance { margin-top: var(--space-3); font-weight: 600; }
+.finding-balance.balanced { color: var(--color-ok); }
+.finding-balance.error { color: var(--color-danger); }
+.evidence-block + .evidence-block { margin-top: var(--space-4); }
+.evidence-block h3 { overflow-wrap: anywhere; }
+.proposal-lines tr.totals th { border-top: 2px solid var(--color-border-strong); }
+#citations details { margin-bottom: var(--space-2); }
+.finding-meta { color: var(--color-fg-muted); font-size: var(--text-sm); }
+.finding-remark { overflow-wrap: anywhere; }
+/* The block heading is already visible; keep the caption for assistive tech only. */
+.evidence .ui-table-caption {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0;
+}
+.evidence td.nowrap { white-space: nowrap; }
+.evidence td:not(.nowrap) { min-width: 12rem; }
