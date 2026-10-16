@@ -1,0 +1,209 @@
+package templates
+
+// Icon draws a symbol from the sprite. An empty label hides it from
+// assistive technology; unknown names render nothing.
+templ Icon(name, label string) {
+	if knownIcons[name] {
+		if label == "" {
+			<svg class="ui-icon" aria-hidden="true" focusable="false"><use href={ iconHref(name) }></use></svg>
+		} else {
+			<svg class="ui-icon" role="img" aria-label={ label } focusable="false"><use href={ iconHref(name) }></use></svg>
+		}
+	}
+}
+
+templ buttonInner(p ButtonProps) {
+	if p.Loading {
+		<span class="ui-spinner" aria-hidden="true"></span>
+	} else if p.Icon != "" {
+		@Icon(p.Icon, "")
+	}
+	if !p.IconOnly {
+		<span class="ui-btn-label">{ p.Label }</span>
+	}
+}
+
+// Button renders a <button>, or an <a> when Href is set.
+templ Button(p ButtonProps) {
+	if p.Href != "" {
+		<a
+			class={ buttonClass(p) }
+			if !buttonInert(p) {
+				href={ p.Href }
+			}
+			if p.IconOnly {
+				aria-label={ p.Label }
+			}
+			if buttonInert(p) {
+				aria-disabled="true"
+			}
+			if p.Loading {
+				aria-busy="true"
+			}
+			{ safeAttrs(p.Attrs)... }
+		>
+			@buttonInner(p)
+		</a>
+	} else {
+		<button
+			class={ buttonClass(p) }
+			type={ buttonType(p) }
+			if p.IconOnly {
+				aria-label={ p.Label }
+			}
+			if buttonInert(p) {
+				disabled
+			}
+			if p.Loading {
+				aria-busy="true"
+			}
+			{ safeAttrs(p.Attrs)... }
+		>
+			@buttonInner(p)
+		</button>
+	}
+}
+
+// OpenDialogButton is a Button that opens the <dialog> with the given id.
+templ OpenDialogButton(p ButtonProps, dialogID string) {
+	@Button(dialogButton(p, dialogID))
+}
+
+// StatusChip shows a run, finding or proposal state.
+templ StatusChip(status string) {
+	<span class={ "ui-chip ui-chip-" + statusChip(status).class }>
+		@Icon(statusChip(status).icon, "")
+		<span>{ statusChip(status).label }</span>
+	</span>
+}
+
+// SeverityBadge shows a finding severity as text and an icon.
+templ SeverityBadge(sev string) {
+	<span class={ "ui-chip ui-sev-" + severityChip(sev).class }>
+		@Icon(severityChip(sev).icon, "")
+		<span>{ severityChip(sev).label }</span>
+	</span>
+}
+
+// VerifiedBadge shows whether the verifier traced the numbers.
+templ VerifiedBadge(verified bool) {
+	if verified {
+		<span class="ui-chip ui-chip-ok ui-verified">
+			@Icon("check-circle", "")
+			<span>Verified</span>
+		</span>
+	} else {
+		<span class="ui-chip ui-chip-neutral ui-unverified">
+			@Icon("info", "")
+			<span>Unverified</span>
+		</span>
+	}
+}
+
+// Card is a titled section. Children are its body.
+templ Card(p CardProps) {
+	<section
+		class={ "ui-card " + toneClass(p.Tone) }
+		if cardID(p) != "" {
+			id={ p.ID }
+		}
+		if cardTitleID(p) != "" && p.Title != "" {
+			aria-labelledby={ cardTitleID(p) }
+		}
+	>
+		if p.Title != "" || p.Subtitle != "" || p.Actions != nil {
+			<header class="ui-card-head">
+				<div class="ui-card-heading">
+					if p.Title != "" {
+						<h2
+							class="ui-card-title"
+							if cardTitleID(p) != "" {
+								id={ cardTitleID(p) }
+							}
+						>{ p.Title }</h2>
+					}
+					if p.Subtitle != "" {
+						<p class="ui-card-subtitle">{ p.Subtitle }</p>
+					}
+				</div>
+				if p.Actions != nil {
+					<div class="ui-card-actions">
+						@p.Actions
+					</div>
+				}
+			</header>
+		}
+		<div class="ui-card-body">
+			{ children... }
+		</div>
+	</section>
+}
+
+templ statBody(p StatProps) {
+	<span class="ui-stat-label">{ p.Label }</span>
+	<span class="ui-stat-value">{ p.Value }</span>
+	if p.Hint != "" {
+		<span class="ui-stat-hint">{ p.Hint }</span>
+	}
+}
+
+// StatTile is one headline number; with Href the whole tile is a link.
+templ StatTile(p StatProps) {
+	if p.Href != "" {
+		<a class={ "ui-stat ui-stat-link " + toneClass(p.Tone) } href={ p.Href }>
+			@statBody(p)
+		</a>
+	} else {
+		<div class={ "ui-stat " + toneClass(p.Tone) }>
+			@statBody(p)
+		</div>
+	}
+}
+
+// EmptyState explains why a list is empty and offers the next step.
+templ EmptyState(p EmptyProps) {
+	<div class="ui-empty">
+		if p.Icon != "" {
+			@Icon(p.Icon, "")
+		}
+		if p.Title != "" {
+			<p class="ui-empty-title">{ p.Title }</p>
+		}
+		if p.Body != "" {
+			<p class="ui-empty-body">{ p.Body }</p>
+		}
+		if p.Action != nil {
+			@Button(*p.Action)
+		}
+	</div>
+}
+
+// Skeleton is a block of shimmering text lines.
+templ Skeleton(lines int) {
+	<div class="ui-skeleton" aria-busy="true">
+		<div aria-hidden="true">
+			for i := range count(lines, 3, 50) {
+				<span class="ui-skeleton-line" data-line={ tabCount(i) }></span>
+			}
+		</div>
+		<span class="visually-hidden">Loading</span>
+	</div>
+}
+
+// SkeletonTable is a placeholder for a table while it loads.
+templ SkeletonTable(rows, cols int) {
+	<div class="ui-skeleton" aria-busy="true">
+		<table class="ui-skeleton-table" aria-hidden="true">
+			<tbody>
+				for range count(rows, 3, 50) {
+					<tr>
+						for range count(cols, 3, 50) {
+							<td><span class="ui-skeleton-line"></span></td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+		<span class="visually-hidden">Loading</span>
+	</div>
+}

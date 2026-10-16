@@ -1,0 +1,134 @@
+package templates
+
+// DataTable is a server-driven table: sorting is by link, never by script.
+templ DataTable(p TableProps) {
+	<div class="ui-table-wrap" tabindex="0" role="region" aria-label={ tableLabel(p) }>
+		<table
+			class="ui-table"
+			if p.Dense {
+				data-dense="true"
+			}
+		>
+			if p.Caption != "" {
+				<caption class="ui-table-caption">{ p.Caption }</caption>
+			}
+			<thead>
+				<tr>
+					for _, c := range p.Columns {
+						<th
+							scope="col"
+							class={ thClass(c) }
+							if ariaSort(c.Sorted) != "" {
+								aria-sort={ ariaSort(c.Sorted) }
+							}
+						>
+							if c.SortHref != "" {
+								<a class="ui-sort" href={ c.SortHref }>
+									{ c.Label }
+									if c.Sorted == "asc" {
+										@Icon("chevron-down", "")
+									}
+								</a>
+							} else {
+								{ c.Label }
+							}
+						</th>
+					}
+				</tr>
+			</thead>
+			<tbody>
+				if len(p.Rows) == 0 {
+					<tr>
+						<td colspan={ colspan(p.Columns) }>
+							@EmptyState(EmptyProps{Icon: "search", Title: emptyTitle(p), Body: p.EmptyBody})
+						</td>
+					</tr>
+				}
+				for _, r := range p.Rows {
+					<tr { safeAttrs(r.Attrs)... }>
+						for i, c := range r.Cells {
+							<td class={ cellClass(p.Columns, i, c) }>
+								if c.Content != nil {
+									@c.Content
+								} else if c.Href != "" {
+									<a href={ c.Href }>{ c.Text }</a>
+								} else {
+									{ c.Text }
+								}
+							</td>
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+// Tabs is a row of links with the current one marked; it is not an ARIA
+// tablist, so it works with htmx boost and plain navigation.
+templ Tabs(p TabsProps) {
+	<nav class="ui-tabs" aria-label={ p.Label }>
+		for _, t := range p.Items {
+			<a
+				class="ui-tab"
+				href={ t.Href }
+				if t.Current {
+					aria-current="page"
+				}
+			>
+				<span>{ t.Label }</span>
+				if t.Count > 0 {
+					<span class="ui-tab-count">{ tabCount(t.Count) }</span>
+				}
+			</a>
+		}
+	</nav>
+}
+
+// Stepper lists the stages of a process.
+templ Stepper(steps []Step) {
+	<ol class="ui-stepper">
+		for i, s := range steps {
+			<li
+				class={ "ui-step ui-step-" + stepState(s.State) }
+				if stepState(s.State) == "active" {
+					aria-current="step"
+				}
+			>
+				<span class="ui-step-marker" aria-hidden="true">{ tabCount(i + 1) }</span>
+				<span class="ui-step-text">
+					<span class="ui-step-label">{ s.Label }</span>
+					if s.Detail != "" {
+						<span class="ui-step-detail">{ s.Detail }</span>
+					}
+					<span class="visually-hidden">{ stepText(s.State) }</span>
+				</span>
+			</li>
+		}
+	</ol>
+}
+
+// Timeline lists events newest-first or oldest-first, as the caller orders them.
+templ Timeline(items []TimelineEntry) {
+	<ol class="ui-timeline">
+		for _, e := range items {
+			<li class={ "ui-timeline-item ui-step-" + timelineState(e.State) }>
+				<div class="ui-timeline-head">
+					<span class="ui-timeline-title">{ e.Title }</span>
+					if e.Actor != "" {
+						<span class="ui-timeline-actor">{ e.Actor }</span>
+					}
+					if e.Time != "" {
+						<time class="ui-timeline-time">{ e.Time }</time>
+					}
+				</div>
+				if e.Detail != "" {
+					<p class="ui-timeline-detail">{ e.Detail }</p>
+				}
+				if e.State != "" {
+					<span class="visually-hidden">{ stepText(e.State) }</span>
+				}
+			</li>
+		}
+	</ol>
+}
