@@ -1517,6 +1517,7 @@ tasks:
       - "internal/web/ask_page_test.go"
       - "internal/web/ratelimit.go"
       - "internal/web/ratelimit_test.go"
+      - "internal/web/shell_test.go"
       - "internal/web/routes.go"
       - "internal/web/templates/ask*.templ"
       - "internal/web/templates/ask*_templ.go"
