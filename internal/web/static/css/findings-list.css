@@ -1,1 +1,12 @@
-/* Findings list (UI-06). */
+/* Findings list (UI-06). Tokens only. */
+.bulk-form { margin: 0; }
+.bulk-bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin: var(--space-4) 0 0; }
+.findings-muted { color: var(--color-fg-muted); margin: 0; font-size: var(--text-sm); }
+.findings-alert { margin: 0 0 var(--space-4); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-danger); border-radius: var(--radius-md); background: var(--color-danger-soft); }
+.findings-refused { margin: var(--space-2) 0 0; padding-left: var(--space-5); overflow-wrap: anywhere; }
+#bulk-result { margin: 0 0 var(--space-4); }
+.ui-tabs + form.filters { margin-top: var(--space-4); }
+.findings-select { width: 1.125rem; height: 1.125rem; accent-color: var(--color-accent); cursor: pointer; }
+.findings-table td.select, .findings-table th:first-child { width: 1%; text-align: center; }
+.findings-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-4); }
+.findings-pager-links { display: inline-flex; gap: var(--space-2); }
