@@ -1,0 +1,162 @@
+package templates
+
+// ToastRegion is the live region toasts are added to. Put it once in a page.
+templ ToastRegion() {
+	<div id="ui-toasts" class="ui-toasts" role="status" aria-live="polite"></div>
+}
+
+templ toastBody(kind, message string) {
+	<div class={ "ui-toast ui-toast-" + toastKind(kind) } data-toast data-kind={ toastKind(kind) }>
+		@Icon(toastIcon(kind), "")
+		<span class="ui-toast-message">{ message }</span>
+		<button type="button" class="ui-toast-close" data-toast-dismiss aria-label="Dismiss">
+			@Icon("x", "")
+		</button>
+	</div>
+}
+
+// Toast is one dismissible message (success, error or info).
+templ Toast(kind, message string) {
+	@toastBody(kind, message)
+}
+
+// ToastOOB is a Toast an htmx response can append to the toast region.
+templ ToastOOB(kind, message string) {
+	<div hx-swap-oob="beforeend:#ui-toasts">
+		@toastBody(kind, message)
+	</div>
+}
+
+// ConfirmModal is a native <dialog> with a POST form. Open it with
+// OpenDialogButton. Callers restate amounts and accounts in Body.
+templ ConfirmModal(p ConfirmProps) {
+	<dialog
+		class="ui-dialog"
+		id={ p.ID }
+		aria-labelledby={ p.ID + "-title" }
+		aria-describedby={ p.ID + "-body" }
+	>
+		<form class="ui-dialog-form" method={ formMethod(p.Method) } action={ templ.URL(p.Action) }>
+			<h2 class="ui-dialog-title" id={ p.ID + "-title" }>{ p.Title }</h2>
+			<p class="ui-dialog-body" id={ p.ID + "-body" }>{ p.Body }</p>
+			<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
+			for _, k := range sortedKeys(p.Fields) {
+				<input type="hidden" name={ k } value={ p.Fields[k] }/>
+			}
+			<div class="ui-dialog-actions">
+				<button type="button" class="ui-btn ui-btn-secondary ui-btn-md" data-dialog-close>
+					<span class="ui-btn-label">Cancel</span>
+				</button>
+				@Button(confirmButton(p))
+			</div>
+		</form>
+	</dialog>
+}
+
+templ fieldLabel(p FieldProps) {
+	<label class="ui-label" for={ fieldID(p) }>
+		{ p.Label }
+		if p.Required {
+			<span class="ui-req" aria-hidden="true">*</span>
+		}
+	</label>
+}
+
+templ fieldNotes(p FieldProps) {
+	if p.Hint != "" {
+		<p class="ui-hint" id={ hintID(p) }>{ p.Hint }</p>
+	}
+	if p.Error != "" {
+		<p class="ui-error" id={ errorID(p) } role="alert">
+			@Icon("alert", "")
+			<span>{ p.Error }</span>
+		</p>
+	}
+}
+
+// Field is a labelled text-like input.
+templ Field(p FieldProps) {
+	<div class="ui-field">
+		@fieldLabel(p)
+		<input
+			class="ui-input"
+			id={ fieldID(p) }
+			name={ p.Name }
+			type={ inputType(p.Type) }
+			value={ p.Value }
+			if p.Placeholder != "" {
+				placeholder={ p.Placeholder }
+			}
+			if p.Required {
+				required
+			}
+			if p.Error != "" {
+				aria-invalid="true"
+			}
+			if describedBy(p) != "" {
+				aria-describedby={ describedBy(p) }
+			}
+			{ safeAttrs(p.Attrs)... }
+		/>
+		@fieldNotes(p)
+	</div>
+}
+
+// SelectField is a labelled <select>; Value picks the selected option.
+templ SelectField(p FieldProps) {
+	<div class="ui-field">
+		@fieldLabel(p)
+		<select
+			class="ui-input"
+			id={ fieldID(p) }
+			name={ p.Name }
+			if p.Required {
+				required
+			}
+			if p.Error != "" {
+				aria-invalid="true"
+			}
+			if describedBy(p) != "" {
+				aria-describedby={ describedBy(p) }
+			}
+			{ safeAttrs(p.Attrs)... }
+		>
+			for _, o := range p.Options {
+				<option
+					value={ o.Value }
+					if o.Value == p.Value {
+						selected
+					}
+				>{ o.Label }</option>
+			}
+		</select>
+		@fieldNotes(p)
+	</div>
+}
+
+// TextareaField is a labelled <textarea>.
+templ TextareaField(p FieldProps) {
+	<div class="ui-field">
+		@fieldLabel(p)
+		<textarea
+			class="ui-input"
+			id={ fieldID(p) }
+			name={ p.Name }
+			rows="4"
+			if p.Placeholder != "" {
+				placeholder={ p.Placeholder }
+			}
+			if p.Required {
+				required
+			}
+			if p.Error != "" {
+				aria-invalid="true"
+			}
+			if describedBy(p) != "" {
+				aria-describedby={ describedBy(p) }
+			}
+			{ safeAttrs(p.Attrs)... }
+		>{ p.Value }</textarea>
+		@fieldNotes(p)
+	</div>
+}

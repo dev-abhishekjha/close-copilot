@@ -39,7 +39,7 @@ var routeBodyLimits = map[string]int64{
 // API rows come from the shared HTTP API spec; rows owned by later tickets
 // answer 501 after the role check so the role matrix is testable now.
 func (s *Server) routeTable(static http.Handler) []route {
-	return []route{
+	rows := []route{
 		// Public.
 		{http.MethodGet, "/healthz", nil, http.HandlerFunc(handleHealthz)},
 		{http.MethodGet, "/login", nil, http.HandlerFunc(s.handleLoginForm)},
@@ -87,6 +87,10 @@ func (s *Server) routeTable(static http.Handler) []route {
 		{http.MethodPost, "/api/proposals/{id}/reject", checkerOnly, s.approvalsRoute(s.handleProposalReject)},
 		{http.MethodPost, "/api/ask", anyRole, s.askAPI(s.handleAPIAsk)},
 	}
+	if s.devComponents {
+		rows = append(rows, route{http.MethodGet, "/dev/components", anyRole, http.HandlerFunc(s.handleDevComponents)})
+	}
+	return rows
 }
 
 // wrap puts a route's handler behind authentication, the CSRF check and its

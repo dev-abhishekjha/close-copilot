@@ -271,7 +271,7 @@ func TestDesignLegacyClassesStyled(t *testing.T) {
 			}
 		}
 	}
-	css := readStatic(t, "css/legacy.css") + readStatic(t, "css/base.css")
+	css := readStatic(t, "css/legacy.css") + readStatic(t, "css/base.css") + readStatic(t, "css/components.css")
 	var missing []string
 	for c := range classes {
 		if strings.Contains(css, "."+c) {

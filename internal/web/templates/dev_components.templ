@@ -1,0 +1,169 @@
+package templates
+
+// DevComponentsPage is the data for the component gallery.
+type DevComponentsPage struct {
+	User      string
+	Role      string
+	CSRFToken string
+}
+
+templ devSample(text string) {
+	<p>{ text }</p>
+}
+
+// DevComponents shows every shared component and variant. The server routes
+// it only when Options.DevComponents is set.
+templ DevComponents(p DevComponentsPage) {
+	@Base(Layout{Title: "Components", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<h1>Components</h1>
+		<section class="ui-dev-section" aria-labelledby="dev-icon">
+			<h2 id="dev-icon">Icon</h2>
+			<div class="ui-dev-row">
+				@Icon("home", "Home")
+				@Icon("alert", "")
+				@Icon("check-circle", "Done")
+				@Icon("search", "")
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-button">
+			<h2 id="dev-button">Button</h2>
+			<div class="ui-dev-row">
+				@Button(ButtonProps{Label: "Primary", Variant: "primary"})
+				@Button(ButtonProps{Label: "Secondary", Variant: "secondary"})
+				@Button(ButtonProps{Label: "Danger", Variant: "danger"})
+				@Button(ButtonProps{Label: "Ghost", Variant: "ghost"})
+				@Button(ButtonProps{Label: "Small", Size: "sm"})
+				@Button(ButtonProps{Label: "With icon", Icon: "plus"})
+				@Button(ButtonProps{Label: "Add", Icon: "plus", IconOnly: true})
+			</div>
+			<div class="ui-dev-row">
+				@Button(ButtonProps{Label: "Disabled", Disabled: true})
+				@Button(ButtonProps{Label: "Loading", Loading: true})
+				@Button(ButtonProps{Label: "Link button", Href: "/runs", Variant: "secondary"})
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-status">
+			<h2 id="dev-status">StatusChip</h2>
+			<div class="ui-dev-row">
+				for _, s := range []string{"queued", "running", "done", "failed", "open", "accepted", "dismissed", "proposed", "approved", "rejected", "posted", "other"} {
+					@StatusChip(s)
+				}
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-severity">
+			<h2 id="dev-severity">SeverityBadge</h2>
+			<div class="ui-dev-row">
+				@SeverityBadge("high")
+				@SeverityBadge("medium")
+				@SeverityBadge("low")
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-verified">
+			<h2 id="dev-verified">VerifiedBadge</h2>
+			<div class="ui-dev-row">
+				@VerifiedBadge(true)
+				@VerifiedBadge(false)
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-card">
+			<h2 id="dev-card">Card</h2>
+			@Card(CardProps{ID: "dev-card-default", Title: "Default card", Subtitle: "With a subtitle", Actions: devAction()}) {
+				@devSample("Card body")
+			}
+			@Card(CardProps{ID: "dev-card-danger", Title: "Danger card", Tone: "danger"}) {
+				@devSample("Something needs attention")
+			}
+			@Card(CardProps{ID: "dev-card-warn", Title: "Warning card", Tone: "warn"}) {
+				@devSample("Check this")
+			}
+			@Card(CardProps{ID: "dev-card-info", Title: "Info card", Tone: "info"}) {
+				@devSample("For your information")
+			}
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-stat">
+			<h2 id="dev-stat">StatTile</h2>
+			<div class="ui-dev-row">
+				@StatTile(StatProps{Label: "Open findings", Value: "12", Hint: "3 high"})
+				@StatTile(StatProps{Label: "Runs", Value: "4", Href: "/runs", Tone: "info"})
+			</div>
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-table">
+			<h2 id="dev-table">DataTable</h2>
+			@DataTable(TableProps{
+				Caption: "Findings",
+				Columns: []Column{{Label: "Title", SortHref: "?sort=title", Sorted: "asc"}, {Label: "Amount", Align: "right"}},
+				Rows: []Row{
+					{Cells: []Cell{{Text: "Bank charge", Href: "/findings/1"}, {Text: "1,180.00", Num: true}}},
+					{Cells: []Cell{{Text: "Duplicate"}, {Text: "450.00", Num: true}}},
+				},
+			})
+			@DataTable(TableProps{
+				Caption:    "Empty table",
+				Columns:    []Column{{Label: "Title"}, {Label: "Amount", Align: "right"}},
+				EmptyTitle: "No findings",
+				EmptyBody:  "Nothing matched the filters.",
+			})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-tabs">
+			<h2 id="dev-tabs">Tabs</h2>
+			@Tabs(TabsProps{Label: "Sample tabs", Items: []Tab{
+				{Label: "Overview", Href: "/dev/components", Current: true},
+				{Label: "Findings", Href: "/dev/components?tab=findings", Count: 12},
+				{Label: "Audit", Href: "/dev/components?tab=audit"},
+			}})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-stepper">
+			<h2 id="dev-stepper">Stepper</h2>
+			@Stepper([]Step{
+				{Label: "Checks", Detail: "Finished", State: "done"},
+				{Label: "Explain", Detail: "In progress", State: "active"},
+				{Label: "Verify", State: "pending"},
+				{Label: "Approve", Detail: "Blocked", State: "failed"},
+			})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-timeline">
+			<h2 id="dev-timeline">Timeline</h2>
+			@Timeline([]TimelineEntry{
+				{Title: "Proposed", Actor: "maker", Time: "2026-10-01 09:00", Detail: "Write off the charge", State: "done"},
+				{Title: "Awaiting check", Actor: "checker", State: "active"},
+			})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-toast">
+			<h2 id="dev-toast">Toast</h2>
+			@ToastRegion()
+			@Toast("success", "Saved")
+			@Toast("error", "Could not save")
+			@Toast("info", "Heads up")
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-modal">
+			<h2 id="dev-modal">ConfirmModal</h2>
+			@OpenDialogButton(ButtonProps{Label: "Open confirm", Variant: "secondary"}, "dev-confirm")
+			@ConfirmModal(ConfirmProps{
+				ID: "dev-confirm", Title: "Approve proposal?", Body: "Post 1,180.00 to Bank Charges.",
+				Method: "post", Action: "/dev/components", CSRFToken: p.CSRFToken,
+				Confirm: ButtonProps{Label: "Approve"}, Fields: map[string]string{"proposal_id": "demo"},
+			})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-field">
+			<h2 id="dev-field">Field</h2>
+			@Field(FieldProps{ID: "dev-name", Name: "name", Label: "Name", Hint: "As on the invoice", Required: true})
+			@Field(FieldProps{ID: "dev-email", Name: "email", Label: "Email", Type: "email", Value: "x", Error: "Enter a valid email"})
+			@SelectField(FieldProps{ID: "dev-month", Name: "month", Label: "Month", Value: "2026-09", Options: []Option{{Value: "2026-08", Label: "August"}, {Value: "2026-09", Label: "September"}}})
+			@TextareaField(FieldProps{ID: "dev-note", Name: "note", Label: "Note", Hint: "Optional"})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-empty">
+			<h2 id="dev-empty">EmptyState</h2>
+			@EmptyState(EmptyProps{Icon: "search", Title: "No runs yet", Body: "Start a close run to see it here.", Action: &ButtonProps{Label: "Start a run", Href: "/runs"}})
+		</section>
+		<section class="ui-dev-section" aria-labelledby="dev-skeleton">
+			<h2 id="dev-skeleton">Skeleton</h2>
+			@Skeleton(3)
+			@SkeletonTable(3, 3)
+		</section>
+		<script src="/static/js/ui.js" defer></script>
+	}
+}
+
+templ devAction() {
+	@Button(ButtonProps{Label: "Action", Variant: "secondary", Size: "sm"})
+}

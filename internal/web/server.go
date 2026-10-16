@@ -59,6 +59,8 @@ type Options struct {
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
+	// DevComponents serves /dev/components; never set by production wiring.
+	DevComponents bool
 
 	// Rate limits (CC-1102). Zero means the default: API 5 requests a
 	// second per user, burst 10; ask 1 a second, burst 3; 10 failed logins
@@ -91,6 +93,7 @@ type Server struct {
 	approvals     ApprovalsBackend // nil when Options.Approvals is nil
 	audit         AuditStore       // nil when Options.Audit is nil
 	erpBase       string
+	devComponents bool
 	limits        *apiLimits
 	logins        *loginLimiter
 	bcryptHook    func() // tests only: called before each login password compare
@@ -116,6 +119,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		secureCookies: !opts.InsecureCookies,
 		now:           opts.Now,
 		erpBase:       opts.ERPBaseURL,
+		devComponents: opts.DevComponents,
 		ask:           opts.Ask,
 		approvals:     opts.Approvals,
 		audit:         opts.Audit,
