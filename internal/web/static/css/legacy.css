@@ -1,0 +1,161 @@
+/* Page classes used by the current templates, restyled onto tokens (UI-01).
+   Later tickets replace these with components and shrink this file. */
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+.brand { font-weight: 600; letter-spacing: -0.01em; }
+.who { display: flex; gap: var(--space-3); align-items: center; }
+.user { color: var(--color-fg-muted); }
+.role {
+  padding: 0.1rem var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-fg-muted);
+  font-size: var(--text-xs);
+}
+
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+}
+.card.narrow { max-width: 24rem; margin: 0 auto; }
+.card.banner { border-color: var(--color-danger); background: var(--color-danger-soft); }
+.banner { border-color: var(--color-danger); background: var(--color-danger-soft); }
+
+.error { color: var(--color-danger); }
+.note { color: var(--color-fg-muted); }
+.nav-link { font-weight: 500; }
+
+.actions { list-style: none; padding: 0; margin: 0; }
+.actions li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.actions code, .action code { color: var(--color-fg-muted); }
+.action { font-weight: 500; }
+
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--space-1) var(--space-4); }
+.facts dt { color: var(--color-fg-muted); }
+.facts dd { margin: 0; }
+
+.evidence-block { margin-bottom: var(--space-6); overflow-x: auto; }
+table.evidence { width: 100%; font-size: var(--text-sm); }
+table.evidence th, table.evidence td {
+  border: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+table.evidence thead th { background: var(--color-surface-2); }
+table.evidence tr.totals th, table.evidence tr.totals td { background: var(--color-surface-2); font-weight: 600; }
+
+table.approvals { width: 100%; }
+table.approvals > tbody > tr > td {
+  vertical-align: top;
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-2);
+}
+table.approvals table.lines { font-size: var(--text-sm); }
+table.approvals .decision form { margin-bottom: var(--space-2); }
+.own { font-style: italic; }
+.posted { font-weight: 600; color: var(--color-ok); }
+
+.filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: end; margin-bottom: var(--space-4); }
+table.audit, table.steps { width: 100%; font-size: var(--text-sm); }
+table.audit th, table.audit td, table.steps th, table.steps td {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-1) var(--space-2);
+  text-align: left;
+  vertical-align: top;
+  word-break: break-word;
+}
+
+.summary { margin-bottom: var(--space-4); }
+.summary-run, .summary-high, .summary-verified { font-weight: 500; }
+.summary-high { color: var(--color-sev-high); }
+.summary-verified { color: var(--color-ok); }
+
+table.runs, table.findings { width: 100%; }
+table.runs th, table.runs td, table.findings th, table.findings td, .runs td, .findings td {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-2);
+  text-align: left;
+  vertical-align: top;
+}
+.start-run { margin-bottom: var(--space-4); }
+form.start-run { flex-direction: row; flex-wrap: wrap; align-items: flex-end; gap: var(--space-4); }
+form.start-run label { display: flex; flex-direction: column; gap: var(--space-1); }
+.start-run button { align-self: flex-end; }
+.timeline { list-style: none; padding: 0; margin: 0; }
+.timeline > * { padding: var(--space-2) 0; border-bottom: 1px solid var(--color-border); }
+.trace { font-family: var(--font-mono); font-size: var(--text-sm); color: var(--color-fg-muted); }
+
+/* Badges and chips. The words are printed in the markup; colour only reinforces them. */
+.badge, dd.severity, dd.status, span.status {
+  display: inline-block;
+  padding: 0.05rem var(--space-2);
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  border: 1px solid currentColor;
+  background: var(--color-surface-2);
+  color: var(--color-fg-muted);
+}
+.badge.verified { color: var(--color-ok); background: var(--color-ok-soft); }
+.badge.unverified { color: var(--color-warn); background: var(--color-warn-soft); border-style: dashed; }
+.verified { color: var(--color-ok); }
+
+[data-severity="high"] .severity, .severity[data-severity="high"] { color: var(--color-sev-high); background: var(--color-sev-high-soft); }
+[data-severity="medium"] .severity, [data-severity="med"] .severity { color: var(--color-sev-med); background: var(--color-sev-med-soft); }
+[data-severity="low"] .severity, .severity[data-severity="low"] { color: var(--color-sev-low); background: var(--color-sev-low-soft); }
+tr[data-severity="high"] { box-shadow: inset 3px 0 0 var(--color-sev-high); }
+tr[data-severity="medium"] { box-shadow: inset 3px 0 0 var(--color-sev-med); }
+tr[data-severity="low"] { box-shadow: inset 3px 0 0 var(--color-sev-low); }
+
+/* Run progress: the step text is printed; colour and a leading mark reinforce it. */
+#run-progress[data-status="failed"] .error { font-weight: 600; }
+.step { padding-left: var(--space-3); border-left: 3px solid var(--color-border-strong); color: var(--color-fg-muted); }
+.step.current { border-left-color: var(--color-info); color: var(--color-fg); font-weight: 600; }
+.step[data-step="done"], .step[data-step="succeeded"], .step[data-step="ok"] { border-left-color: var(--color-ok); }
+.step[data-step="failed"], .step[data-step="error"] { border-left-color: var(--color-danger); color: var(--color-danger); }
+.finding.nested { background: var(--color-surface-2); }
+
+[data-role="checker"] .role, .role[data-role="checker"] { color: var(--color-info); background: var(--color-info-soft); }
+[data-role="admin"] .role, .role[data-role="admin"] { color: var(--color-accent); background: var(--color-accent-soft); }
+
+/* Layout fixes from the visual pass. */
+.facts dd.severity, .facts dd.status { justify-self: start; }
+.card + .card, .banner + .card, .card + .banner { margin-top: var(--space-4); }
+
+/* Status in table cells: plain text with a small leading dot, no layout change. */
+td.status::before {
+  content: "";
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-right: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.topbar button {
+  background: var(--color-surface);
+  color: var(--color-fg);
+  border-color: var(--color-border-strong);
+}
+.topbar button:hover { background: var(--color-surface-2); }
+td.severity { background: transparent; font-weight: 600; }
