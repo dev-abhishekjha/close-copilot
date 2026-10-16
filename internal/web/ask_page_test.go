@@ -450,3 +450,87 @@ func TestAskPageNoStore(t *testing.T) {
 		t.Error("the page remembers the last ask")
 	}
 }
+
+func TestAskPageBodyLimit(t *testing.T) {
+	fa := &fakeAsk{out: AskOutput{Action: "answer", Answer: "ok"}}
+	ts := askServer(t, fa)
+	big := askFormBody("acme", "2026-09", strings.Repeat("x", maxAPIBody+1))
+	// With the token in the header, the body is not parsed by the CSRF check;
+	// the handler sees an unreadable form, so it asks nothing.
+	w := postAskRaw(t, ts, big, true)
+	if w.Code == http.StatusOK || w.Code < 400 {
+		t.Errorf("oversized form with header token = %d, want an error", w.Code)
+	} else {
+		t.Logf("oversized form with header token = %d", w.Code)
+	}
+	// With the token in the body, the CSRF check cannot read it: 403.
+	w = postAskRaw(t, ts, big, false)
+	if w.Code != http.StatusForbidden {
+		t.Errorf("oversized form with body token = %d, want 403", w.Code)
+	}
+	if fa.count() != 0 {
+		t.Errorf("backend called %d times for an oversized body", fa.count())
+	}
+	if w := postAsk(t, ts, RoleViewer, "acme", "2026-09", strings.Repeat("x", 300)); w.Code != http.StatusOK || fa.count() != 1 {
+		t.Errorf("normal post = %d, calls %d", w.Code, fa.count())
+	}
+}
+
+func postAskRaw(t testing.TB, ts *testServer, body string, headerToken bool) *httptest.ResponseRecorder {
+	t.Helper()
+	ck, csrf := ts.session(RoleViewer)
+	rq := req{method: http.MethodPost, path: "/ask", contentType: formCT, cookies: []*http.Cookie{ck}}
+	if headerToken {
+		rq.body = body
+		rq.header = map[string]string{csrfHeaderName: csrf}
+	} else {
+		rq.body = "csrf_token=" + url.QueryEscape(csrf) + "&" + body
+	}
+	return ts.do(t, rq)
+}
+
+func TestAskPageRateLimitEchoGate(t *testing.T) {
+	const q = "echo-gate <b>question</b>"
+	fa := &fakeAsk{out: AskOutput{Action: "answer", Answer: "ok"}}
+	ts := newTestServer(t, func(o *Options) {
+		o.Runs = &RunsBackend{Store: newFakeRunsStore(), Execute: func(context.Context, uuid.UUID) error { return nil }}
+		o.Ask = fa
+		o.AskRate, o.AskBurst = 0.001, 1
+	})
+	ck, csrf := ts.session(RoleViewer)
+	post := func(token string, hdr map[string]string) *httptest.ResponseRecorder {
+		return ts.do(t, req{method: http.MethodPost, path: "/ask", contentType: formCT, cookies: []*http.Cookie{ck}, header: hdr,
+			body: askFormBody("acme", "2026-09", q) + "&csrf_token=" + url.QueryEscape(token)})
+	}
+	if w := post(csrf, nil); w.Code != http.StatusOK {
+		t.Fatalf("first post = %d", w.Code)
+	}
+	tests := []struct {
+		name  string
+		token string
+		hdr   map[string]string
+		echo  bool
+	}{
+		{"wrong token", "nope", nil, false},
+		{"cross-site", csrf, map[string]string{"Sec-Fetch-Site": "cross-site"}, false},
+		{"valid", csrf, map[string]string{"Sec-Fetch-Site": "same-origin"}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := post(tt.token, tt.hdr)
+			if w.Code != http.StatusTooManyRequests {
+				t.Fatalf("status = %d, want 429", w.Code)
+			}
+			body := w.Body.String()
+			if strings.Contains(body, "<b>question</b>") {
+				t.Error("question echoed unescaped")
+			}
+			if got := strings.Contains(body, "echo-gate &lt;b&gt;question&lt;/b&gt;"); got != tt.echo {
+				t.Errorf("question echoed = %v, want %v", got, tt.echo)
+			}
+		})
+	}
+	if fa.count() != 1 {
+		t.Errorf("backend calls = %d, want 1", fa.count())
+	}
+}

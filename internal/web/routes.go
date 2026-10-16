@@ -33,6 +33,8 @@ var routeBodyLimits = map[string]int64{
 	http.MethodPost + " /api/findings/{id}/proposals": approvalsBodyLimit,
 	http.MethodPost + " /api/proposals/{id}/approve":  approvalsBodyLimit,
 	http.MethodPost + " /api/proposals/{id}/reject":   approvalsBodyLimit,
+	// The Ask form gets the same cap as POST /api/ask (capAPIBody).
+	http.MethodPost + " /ask": maxAPIBody,
 }
 
 // routeTable is every route the server serves with its minimum role. The
