@@ -32,6 +32,7 @@ type ShellData struct {
 	Companies             []string // empty when the runs backend is not configured
 	Company, Month        string   // the validated context
 	Path                  string   // request path, for the context form's "next"
+	Health                string   // ok, down, unknown, or "" when the server has no status backend
 }
 
 type shellKey struct{}

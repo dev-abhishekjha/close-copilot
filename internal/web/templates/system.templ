@@ -1,0 +1,47 @@
+package templates
+
+// System is the read-only status page: a card per service and the daily
+// model budget. It shows fixed words and numbers only.
+templ System(p SystemPage) {
+	@Base(Layout{Title: "System", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		@PageHeader(PageHeaderProps{
+			Title:    "System",
+			Subtitle: "Read-only health of the services this app depends on.",
+		})
+		if p.NotConfigured {
+			@EmptyState(EmptyProps{Icon: "info", Title: "System status is not set up on this server", Body: "Ask your administrator to enable it."})
+		} else {
+			<div class="system-grid">
+				for _, r := range p.Rows {
+					@Card(CardProps{ID: r.ID, Title: r.Title, Actions: systemChip(r.Status)}) {
+						<p class="system-text">{ r.Text }</p>
+						if len(r.Facts) > 0 {
+							@Facts(r.Facts)
+						}
+					}
+				}
+				@Card(CardProps{ID: "system-budget", Title: "Daily model budget", Tone: p.Budget.Tone, Actions: systemChip(p.Budget.Status)}) {
+					<p class="system-text">{ p.Budget.Text }</p>
+					if p.Budget.Spent != "" {
+						@StatTile(StatProps{Label: "Spent today (UTC)", Value: p.Budget.Spent, Hint: budgetHint(p.Budget), Tone: p.Budget.Tone})
+					}
+				}
+			</div>
+			<p class="system-footer">
+				if p.Checked != "" {
+					<span>Checked { p.Checked }</span>
+				} else {
+					<span>Not checked yet</span>
+				}
+				<a href="/system?refresh=1">Check again</a>
+			</p>
+		}
+	}
+}
+
+templ systemChip(status string) {
+	<span class={ "ui-chip ui-chip-" + systemChipFor(status).class }>
+		@Icon(systemChipFor(status).icon, "")
+		<span>{ systemChipFor(status).label }</span>
+	</span>
+}

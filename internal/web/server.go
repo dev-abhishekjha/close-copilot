@@ -9,6 +9,7 @@ import (
 	"log/slog"
 	"net"
 	"net/http"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -57,6 +58,10 @@ type Options struct {
 	// Audit backs the audit log page and the run metrics page (CC-1005).
 	// Nil means not configured: they answer 501 after the role check.
 	Audit AuditStore
+	// System backs the System page and the top bar's health dot (UI-12).
+	// Nil means not configured: GET /system answers 501 after the role
+	// check and the shell shows no dot.
+	System *SystemOptions
 	// ERPBaseURL is ERP_BASE_URL, the base of the links to ERPNext pages.
 	// Empty or not an http(s) URL with a host means no links.
 	ERPBaseURL string
@@ -99,6 +104,8 @@ type Server struct {
 	logins        *loginLimiter
 	bcryptHook    func()       // tests only: called before each login password compare
 	companies     companyCache // the shell's company list (UI-03)
+	system        *SystemOptions
+	sysCache      systemCache // the last status check (UI-12)
 }
 
 // NewServer builds the server. It refuses a session key shorter than 32
@@ -135,6 +142,13 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		s.now = time.Now
 	}
 	s.users.Store(&users)
+	if opts.System != nil {
+		if opts.System.Backend == nil {
+			return nil, errors.New("web: system options need a backend")
+		}
+		sys := *opts.System
+		s.system = &sys
+	}
 	if opts.Runs != nil {
 		if opts.Runs.Store == nil || opts.Runs.Execute == nil {
 			return nil, errors.New("web: runs backend needs a store and an executor")
@@ -200,6 +214,19 @@ func (s *Server) Serve(ctx context.Context, ln net.Listener) error {
 		defer func() {
 			cancel()
 			s.runs.drain(shutdownTimeout)
+		}()
+	}
+	if s.system != nil {
+		warmCtx, stopWarm := context.WithCancel(ctx)
+		var wg sync.WaitGroup
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			s.warmSystem(warmCtx)
+		}()
+		defer func() {
+			stopWarm()
+			wg.Wait()
 		}()
 	}
 	srv := &http.Server{

@@ -81,6 +81,12 @@ templ shellBody(l Layout, sd ShellData) {
 					@Button(ButtonProps{Label: "Apply", Type: "submit", Variant: "secondary", Size: "sm"})
 				</form>
 				<span class="who">
+					if sd.Health != "" {
+						<a class={ healthClass(sd.Health) } href="/system" data-health={ sd.Health }>
+							@Icon(healthIcon(sd.Health), "")
+							<span class="visually-hidden">{ healthText(sd.Health) }</span>
+						</a>
+					}
 					<span class="user">{ sd.User }</span>
 					<span class="role" data-role={ sd.Role }>{ sd.Role }</span>
 					<form method="post" action="/logout" class="inline">

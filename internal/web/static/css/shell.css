@@ -153,3 +153,22 @@
     .shell-menu::details-content { content-visibility: visible; block-size: auto; }
   }
 }
+
+/* Health dot (UI-12): an icon in the top bar linking to /system; its text is
+   visually hidden, so colour is not the only signal. */
+.health {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+}
+.health-ok { background: var(--color-ok-soft); color: var(--color-ok); }
+.health-down { background: var(--color-danger-soft); color: var(--color-danger); }
+.health-unknown { background: var(--color-surface-2); color: var(--color-fg-muted); }
+@media (width < 56rem) {
+  .health { min-width: 2.5rem; min-height: 2.5rem; }
+}
