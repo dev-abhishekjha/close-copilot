@@ -29,6 +29,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/company"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/retrieval"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/web"
 )
@@ -732,5 +733,54 @@ func TestServeAuditWired(t *testing.T) {
 		if !wired && w.Code != http.StatusNotImplemented {
 			t.Errorf("unwired /audit = %d, want 501", w.Code)
 		}
+	}
+}
+
+// fakeServeDocs is a web.DocumentsBackend that records the company it was asked for.
+type fakeServeDocs struct{ company string }
+
+func (f *fakeServeDocs) ListDocuments(_ context.Context, company string, _ []string) ([]retrieval.DocSummary, error) {
+	f.company = company
+	return []retrieval.DocSummary{{DocID: "POL-001", DocType: "policy", Title: "Accounting policy", Sections: 2}}, nil
+}
+
+func (f *fakeServeDocs) GetDocument(context.Context, string, string) (retrieval.Document, error) {
+	return retrieval.Document{}, retrieval.ErrDocNotFound
+}
+
+func TestServeDocumentsWired(t *testing.T) {
+	st := newServeStore()
+	exec := func(context.Context, uuid.UUID) error { return nil }
+	be := serveBackends{runs: &web.RunsBackend{Store: st, Execute: exec, Findings: st}}
+	login := func(h http.Handler) jar {
+		j := jar{}
+		w := j.do(t, h, http.MethodGet, "/login", nil)
+		m := serveCSRF.FindStringSubmatch(w.Body.String())
+		if m == nil {
+			t.Fatal("no csrf field")
+		}
+		if w := j.do(t, h, http.MethodPost, "/login", url.Values{"csrf_token": {m[1]}, "username": {"demo"}, "password": {servePassword}}); w.Code != http.StatusSeeOther {
+			t.Fatalf("login = %d", w.Code)
+		}
+		return j
+	}
+
+	h, err := newServeServer(serveConfig(), serveUsers(t), be, slog.New(slog.DiscardHandler))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w := login(h).do(t, h, http.MethodGet, "/documents", nil); w.Code != http.StatusNotImplemented {
+		t.Errorf("without a backend /documents = %d, want 501", w.Code)
+	}
+
+	fd := &fakeServeDocs{}
+	be.documents = fd
+	h, err = newServeServer(serveConfig(), serveUsers(t), be, slog.New(slog.DiscardHandler))
+	if err != nil {
+		t.Fatal(err)
+	}
+	w := login(h).do(t, h, http.MethodGet, "/documents", nil)
+	if w.Code != http.StatusOK || !strings.Contains(w.Body.String(), "Accounting policy") || fd.company != "acme" {
+		t.Errorf("/documents = %d, company %q: %.200s", w.Code, fd.company, w.Body)
 	}
 }

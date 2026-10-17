@@ -1,0 +1,57 @@
+package templates
+
+templ docTypeChip(label string) {
+	<span class="ui-chip ui-chip-neutral">{ label }</span>
+}
+
+templ docsState(state string) {
+	switch state {
+		case DocsNotConfigured:
+			@EmptyState(EmptyProps{Icon: "info", Title: "Documents are not set up on this server", Body: "Ask your administrator to enable them."})
+		case DocsNoCompany:
+			@EmptyState(EmptyProps{Icon: "info", Title: "No company selected", Body: "Choose a company in the top bar."})
+		case DocsNotFound:
+			@EmptyState(EmptyProps{Icon: "search", Title: "Document not found", Action: &ButtonProps{Label: "Back to documents", Href: "/documents", Variant: "secondary"}})
+		default:
+			@EmptyState(EmptyProps{Icon: "alert", Title: "Something went wrong", Body: "Try again in a moment."})
+	}
+}
+
+// Documents lists the corpus documents of the selected company.
+templ Documents(p DocumentsPage) {
+	@Base(Layout{Title: "Documents", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		@PageHeader(PageHeaderProps{
+			Title:    "Documents",
+			Subtitle: "Policy and contracts for the selected company. Shared policy applies to every company.",
+		})
+		if p.State != "" {
+			@docsState(p.State)
+		} else {
+			@Tabs(p.Tabs)
+			<div class="docs-table">
+				@DataTable(p.Table)
+			</div>
+		}
+	}
+}
+
+// Document shows one document's sections.
+templ Document(p DocumentPage) {
+	@Base(Layout{Title: "Documents", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		if p.State != "" {
+			@PageHeader(PageHeaderProps{Title: "Documents"})
+			@docsState(p.State)
+		} else {
+			@PageHeader(PageHeaderProps{Title: p.Title})
+			<p class="docs-back"><a href="/documents">Back to documents</a></p>
+			@Facts(p.Facts)
+			<div class="docs-sections">
+				for _, s := range p.Sections {
+					@Card(CardProps{Title: s.Heading}) {
+						<div class="doc-text">{ s.Text }</div>
+					}
+				}
+			</div>
+		}
+	}
+}
