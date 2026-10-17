@@ -916,3 +916,70 @@ func uiPreview() *store.JournalProposal {
 		PostingDate: "2026-09-30", Lines: []store.JournalLine{{Account: "A", DebitPaise: 100}, {Account: "B", CreditPaise: 100}},
 	}}
 }
+
+// TestFindingDecideWrapperUnchanged pins the status, messages, store writes
+// and audit rows of accept and dismiss, now that both go through decideOne.
+func TestFindingDecideWrapperUnchanged(t *testing.T) {
+	type tc struct {
+		name, status, act string
+		live, notFound    bool
+		setErr, liveErr   error
+		reason            string
+		wantCode          int
+		wantBody          string
+		wantStatus        string
+		wantAudit         int
+	}
+	boom := errors.New("boom")
+	cases := []tc{
+		{name: "accept open", status: "open", act: "accept", wantCode: 303, wantStatus: "accepted", wantAudit: 1},
+		{name: "accept needs_review", status: "needs_review", act: "accept", wantCode: 303, wantStatus: "accepted", wantAudit: 1},
+		{name: "dismiss open", status: "open", act: "dismiss", reason: "dup", wantCode: 303, wantStatus: "dismissed", wantAudit: 1},
+		{name: "dismiss no reason", status: "open", act: "dismiss", wantCode: 400, wantBody: "a reason is required", wantStatus: "open"},
+		{name: "accept decided", status: "accepted", act: "accept", wantCode: 409, wantBody: "this finding is already accepted", wantStatus: "accepted"},
+		{name: "dismiss dismissed", status: "dismissed", act: "dismiss", reason: "x", wantCode: 409, wantBody: "this finding is already dismissed", wantStatus: "dismissed"},
+		{name: "accept live", status: "open", act: "accept", live: true, wantCode: 409, wantBody: "has a live proposal", wantStatus: "open"},
+		{name: "dismiss live", status: "open", act: "dismiss", live: true, reason: "x", wantCode: 409, wantBody: "has a live proposal", wantStatus: "open"},
+		{name: "not found", status: "open", act: "accept", notFound: true, wantCode: 404},
+		{name: "live lookup error", status: "open", act: "accept", liveErr: boom, wantCode: 500, wantStatus: "open"},
+		{name: "store error", status: "open", act: "accept", setErr: boom, wantCode: 500, wantStatus: "open"},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			ff := newFakeFindings()
+			x := ff.put(fnd(1, "variance", c.status))
+			if c.live {
+				ff.setLive(x.ID, store.JournalProposal{Status: "proposed"})
+			}
+			ff.setErr, ff.liveErr = c.setErr, c.liveErr
+			ts := findingsServer(t, ff)
+			id := x.ID
+			if c.notFound {
+				id = fid(9)
+			}
+			w := ts.do(t, formPost(ts, RoleMaker, "/findings/"+id.String()+"/"+c.act, url.Values{"reason": {c.reason}}))
+			if w.Code != c.wantCode {
+				t.Fatalf("code = %d, want %d: %s", w.Code, c.wantCode, w.Body)
+			}
+			if c.wantBody != "" && !strings.Contains(w.Body.String(), c.wantBody) {
+				t.Errorf("body lacks %q", c.wantBody)
+			}
+			if c.wantCode == 303 && w.Header().Get("Location") != "/findings/"+x.ID.String() {
+				t.Errorf("Location = %q", w.Header().Get("Location"))
+			}
+			if !c.notFound && ff.status(x.ID) != c.wantStatus {
+				t.Errorf("status = %s, want %s", ff.status(x.ID), c.wantStatus)
+			}
+			if got := ff.auditCount(); got != c.wantAudit {
+				t.Errorf("audit rows = %d, want %d", got, c.wantAudit)
+			}
+			if c.wantAudit == 1 {
+				e := ff.audits[0]
+				want := map[string]string{"accept": "finding.accept", "dismiss": "finding.dismiss"}[c.act]
+				if e.Tool == nil || *e.Tool != want || !strings.Contains(string(e.Args), x.ID.String()) {
+					t.Errorf("audit entry = %+v %s", e.Tool, e.Args)
+				}
+			}
+		})
+	}
+}

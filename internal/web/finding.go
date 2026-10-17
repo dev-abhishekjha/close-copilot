@@ -330,49 +330,82 @@ func (s *Server) handleFindingDismiss(w http.ResponseWriter, r *http.Request) {
 	s.decideFinding(w, r, "dismissed", "finding.dismiss")
 }
 
-func (s *Server) decideFinding(w http.ResponseWriter, r *http.Request, to, tool string) {
-	p := principalFrom(r.Context())
-	if p == nil {
-		unauthorized(w, r)
-		return
+// decideKind says how decideOne ended.
+type decideKind int
+
+const (
+	decideDone      decideKind = iota // status changed (the audit row is best effort)
+	decideNotFound                    // no such finding, or its run is missing
+	decideDecided                     // not open or needs_review any more
+	decideLive                        // a live journal proposal holds the finding
+	decideBadReason                   // a dismissal without a valid reason
+	decideFailed                      // a store error (Err is set)
+)
+
+// decision is decideOne's result. Finding and Run are set once the finding
+// has loaded; RawReason echoes a dismissal reason that was refused.
+type decision struct {
+	Kind      decideKind
+	Finding   store.Finding
+	Run       store.CloseRun
+	Msg       string
+	RawReason string
+	Err       error
+}
+
+// decideOne is the one place a finding is accepted or dismissed: the single
+// accept and dismiss handlers and the bulk accept all call it, so the open or
+// needs-review rule, the live-proposal rule and the audit entry apply to
+// every finding the same way. It loads the finding afresh, so a stale list
+// can't decide a finding that has moved on.
+func (s *Server) decideOne(ctx context.Context, p *principal, id uuid.UUID, to, tool, rawReason string) decision {
+	fs := s.runs.b.Findings
+	f, err := fs.GetFinding(ctx, id)
+	if errors.Is(err, store.ErrNotFound) {
+		return decision{Kind: decideNotFound}
 	}
-	f, run, ok := s.loadFinding(w, r)
-	if !ok {
-		return
+	if err != nil {
+		return decision{Kind: decideFailed, Err: err}
 	}
+	run, err := fs.GetCloseRun(ctx, f.RunID)
+	if errors.Is(err, store.ErrNotFound) {
+		s.log.ErrorContext(ctx, "web: finding has no run", "finding", f.ID.String(), "run", f.RunID.String())
+		return decision{Kind: decideNotFound}
+	}
+	if err != nil {
+		return decision{Kind: decideFailed, Err: err}
+	}
+	d := decision{Finding: f, Run: run}
 	if f.Status != "open" && f.Status != "needs_review" {
-		s.renderFinding(w, r, http.StatusConflict, p, f, run, "this finding is already "+f.Status, "")
-		return
+		d.Kind, d.Msg = decideDecided, "this finding is already "+f.Status
+		return d
 	}
 	// A finding with a live journal proposal (any status but rejected) can't
 	// be accepted or dismissed: the proposal decides it. A failed lookup
 	// refuses too.
-	_, hasLive, err := s.runs.b.Findings.GetProposalByFinding(r.Context(), f.ID)
+	_, hasLive, err := fs.GetProposalByFinding(ctx, f.ID)
 	if err != nil {
-		s.findingErr(w, r, err)
-		return
+		d.Kind, d.Err = decideFailed, err
+		return d
 	}
 	if hasLive {
-		s.renderFinding(w, r, http.StatusConflict, p, f, run, liveProposalMsg, "")
-		return
+		d.Kind, d.Msg = decideLive, liveProposalMsg
+		return d
 	}
 	args := map[string]string{
 		"finding_id": f.ID.String(), "run_id": f.RunID.String(), "from": f.Status, "to": to,
 	}
 	if to == "dismissed" {
-		raw := r.PostFormValue("reason")
-		reason, err := validateReason(raw)
+		reason, err := validateReason(rawReason)
 		if err != nil {
-			s.renderFinding(w, r, http.StatusBadRequest, p, f, run, err.Error(), raw)
-			return
+			d.Kind, d.Msg, d.RawReason = decideBadReason, err.Error(), rawReason
+			return d
 		}
 		args["reason"] = reason
 	}
-	ctx := r.Context()
-	fs := s.runs.b.Findings
 	if err := fs.SetFindingStatus(ctx, f.ID, to); err != nil {
-		s.findingErr(w, r, err)
-		return
+		d.Kind, d.Err = decideFailed, err
+		return d
 	}
 	// The status change and the audit row are not atomic: the store has no
 	// transaction for both. A failed audit insert is logged, not retried.
@@ -380,5 +413,36 @@ func (s *Server) decideFinding(w http.ResponseWriter, r *http.Request, to, tool 
 	if _, err := fs.InsertAuditLog(ctx, store.AuditLogEntry{Actor: p.user.Name, Tool: &tool, Args: raw}); err != nil {
 		s.log.ErrorContext(ctx, "web: finding audit row not written", "finding", f.ID.String(), "tool", tool, "err", err)
 	}
-	http.Redirect(w, r, "/findings/"+f.ID.String(), http.StatusSeeOther)
+	d.Kind = decideDone
+	return d
+}
+
+func (s *Server) decideFinding(w http.ResponseWriter, r *http.Request, to, tool string) {
+	p := principalFrom(r.Context())
+	if p == nil {
+		unauthorized(w, r)
+		return
+	}
+	id, err := uuid.Parse(r.PathValue("id"))
+	if err != nil {
+		http.Error(w, notFoundMsg, http.StatusNotFound)
+		return
+	}
+	var raw string
+	if to == "dismissed" {
+		raw = r.PostFormValue("reason")
+	}
+	d := s.decideOne(r.Context(), p, id, to, tool, raw)
+	switch d.Kind {
+	case decideNotFound:
+		http.Error(w, notFoundMsg, http.StatusNotFound)
+	case decideFailed:
+		s.findingErr(w, r, d.Err)
+	case decideDecided, decideLive:
+		s.renderFinding(w, r, http.StatusConflict, p, d.Finding, d.Run, d.Msg, "")
+	case decideBadReason:
+		s.renderFinding(w, r, http.StatusBadRequest, p, d.Finding, d.Run, d.Msg, d.RawReason)
+	default:
+		http.Redirect(w, r, "/findings/"+d.Finding.ID.String(), http.StatusSeeOther)
+	}
 }
