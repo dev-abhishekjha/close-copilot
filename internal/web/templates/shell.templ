@@ -44,6 +44,7 @@ templ shellBody(l Layout, sd ShellData) {
 						}
 					</nav>
 				</details>
+				<button type="button" class="shell-shortcuts-btn" data-dialog-open="ui-shortcuts" aria-haspopup="dialog">Shortcuts</button>
 			</aside>
 			<header class="topbar shell-top">
 				if len(l.Crumbs) > 0 {
@@ -61,6 +62,11 @@ templ shellBody(l Layout, sd ShellData) {
 						</ol>
 					</nav>
 				}
+				<button type="button" class="shell-palette-btn" data-dialog-open="ui-palette" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K">
+					@Icon("search", "")
+					<span class="shell-palette-label">Search or jump to…</span>
+					<kbd>Ctrl K</kbd>
+				</button>
 				<form method="post" action="/context" class="shell-context" aria-label="Company and month">
 					<input type="hidden" name="csrf_token" value={ sd.CSRFToken }/>
 					<input type="hidden" name="next" value={ sd.Path }/>
@@ -98,6 +104,101 @@ templ shellBody(l Layout, sd ShellData) {
 			<main id="main" tabindex="-1">
 				{ children... }
 			</main>
+			@ToastRegion()
+			<div id="ui-announce" class="visually-hidden" role="status" aria-live="polite" aria-atomic="true"></div>
+			@paletteDialog(sd)
+			@shortcutsDialog(sd)
 		</div>
 	</body>
+}
+
+// paletteDialog is the command palette: the same links as the sidebar, as a
+// listbox of real anchors that ui.js filters and activates. It holds only the
+// links the server drew into the sidebar.
+templ paletteDialog(sd ShellData) {
+	<dialog id="ui-palette" class="ui-dialog ui-palette" aria-label="Command palette">
+		<div class="ui-palette-head">
+			<input type="search" id="ui-palette-input" class="ui-palette-input" role="combobox" aria-expanded="true" aria-controls="ui-palette-list" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Type a page name" aria-label="Search pages and commands" autofocus/>
+			<button type="button" class="ui-palette-close" data-dialog-close aria-label="Close">
+				@Icon("x", "")
+			</button>
+		</div>
+		<ul id="ui-palette-list" class="ui-palette-list" role="listbox" aria-label="Pages">
+			for _, g := range sd.Nav {
+				for _, it := range g.Items {
+					<li role="presentation">
+						<a
+							role="option"
+							class="ui-palette-item"
+							href={ templ.SafeURL(it.Href) }
+							id={ "ui-palette-opt-" + itoa(paletteIndex(sd, g.Title, it.Href)) }
+							data-palette-item
+							data-group={ g.Title }
+							if it.Key != "" {
+								data-shortcut={ it.Key }
+							}
+						>
+							@Icon(it.Icon, "")
+							<span class="ui-palette-label">{ it.Label }</span>
+							<span class="ui-palette-group">{ g.Title }</span>
+							if it.Key != "" {
+								<span class="ui-palette-keys">
+									for _, k := range keyParts(it.Key) {
+										<kbd>{ k }</kbd>
+									}
+								</span>
+							}
+						</a>
+					</li>
+				}
+			}
+		</ul>
+		<p id="ui-palette-empty" class="ui-palette-empty" hidden>No matching page.</p>
+	</dialog>
+}
+
+// shortcutsDialog lists the keyboard shortcuts, including the go-to key of
+// every link the role may follow.
+templ shortcutsDialog(sd ShellData) {
+	<dialog id="ui-shortcuts" class="ui-dialog ui-shortcuts" aria-labelledby="ui-shortcuts-title">
+		<div class="ui-shortcuts-body">
+			<h2 id="ui-shortcuts-title" class="ui-dialog-title">Keyboard shortcuts</h2>
+			<dl class="ui-shortcuts-list">
+				<div class="ui-shortcuts-row">
+					<dt><kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>K</kbd></dt>
+					<dd>Open the command palette</dd>
+				</div>
+				<div class="ui-shortcuts-row">
+					<dt><kbd>?</kbd></dt>
+					<dd>Show this help</dd>
+				</div>
+				<div class="ui-shortcuts-row">
+					<dt><kbd>g</kbd> then a key</dt>
+					<dd>Go to a page</dd>
+				</div>
+				for _, g := range sd.Nav {
+					for _, it := range g.Items {
+						if it.Key != "" {
+							<div class="ui-shortcuts-row">
+								<dt>
+									for i, k := range keyParts(it.Key) {
+										if i > 0 {
+											{ " " }
+										}
+										<kbd>{ k }</kbd>
+									}
+								</dt>
+								<dd>{ it.Label }</dd>
+							</div>
+						}
+					}
+				}
+				<div class="ui-shortcuts-row">
+					<dt><kbd>Esc</kbd></dt>
+					<dd>Close a dialog</dd>
+				</div>
+			</dl>
+			<button type="button" class="ui-shortcuts-close" data-dialog-close>Close</button>
+		</div>
+	</dialog>
 }

@@ -1004,10 +1004,16 @@ func TestRunsUIStepper(t *testing.T) {
 				if polls := strings.Contains(body, `hx-trigger="every 2s"`); polls != tt.poll {
 					t.Errorf("%s polls = %v, want %v", p, polls, tt.poll)
 				}
-				if status := strings.Contains(body, `role="status"`); status != tt.poll {
+				// The shell adds its own announcer and toast region around <main>;
+				// the page's own content is what must not carry them.
+				content := body
+				if strings.Contains(body, `<main id="main"`) {
+					content = mainContent(t, body)
+				}
+				if status := strings.Contains(content, `role="status"`); status != tt.poll {
 					t.Errorf("%s role=status = %v, want %v", p, status, tt.poll)
 				}
-				if strings.Contains(body, "aria-live") {
+				if strings.Contains(content, "aria-live") {
 					t.Errorf("%s has aria-live on the replaced fragment", p)
 				}
 				if tt.status == store.RunFailed {

@@ -831,7 +831,8 @@ func TestFindingUIActionsByRole(t *testing.T) {
 	for _, r := range []Role{RoleViewer, RoleChecker} {
 		b := page(t, ts, r, x.ID)
 		wantAll(t, b, "Status: open")
-		wantNone(t, b, "Propose entry", "Mark accepted", ">Dismiss<", "<dialog", `name="reason"`, `/accept"`, `/dismiss"`)
+		wantNone(t, b, "Propose entry", "Mark accepted", ">Dismiss<", `name="reason"`, `/accept"`, `/dismiss"`)
+		wantNone(t, mainContent(t, b), "<dialog")
 	}
 }
 

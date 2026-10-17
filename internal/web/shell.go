@@ -23,20 +23,22 @@ import (
 // route does not exist yet stays hidden until its ticket adds the route.
 type navEntry struct {
 	group, label, icon, path string
+	// key is the go-to shortcut: "g" and one letter, space separated.
+	key string
 }
 
 var navTable = []navEntry{
 	// Dashboard: allows(role, "GET", "/") matches the catch-all "GET /" row,
 	// not "GET /{$}". Both are anyRole today; UI-04 must keep them in step.
-	{"Work", "Dashboard", "home", "/"},
-	{"Work", "Close runs", "play", "/runs"},
-	{"Work", "Findings", "alert", "/findings"},
-	{"Work", "Ask", "message", "/ask"},
-	{"Review", "Approvals", "check-circle", "/approvals"},
-	{"Review", "Proposals", "file-text", "/proposals"},
-	{"Reference", "Documents", "book", "/documents"},
-	{"Reference", "Audit log", "shield", "/audit"},
-	{"Reference", "System", "server", "/system"},
+	{"Work", "Dashboard", "home", "/", "g d"},
+	{"Work", "Close runs", "play", "/runs", "g r"},
+	{"Work", "Findings", "alert", "/findings", "g f"},
+	{"Work", "Ask", "message", "/ask", "g a"},
+	{"Review", "Approvals", "check-circle", "/approvals", "g p"},
+	{"Review", "Proposals", "file-text", "/proposals", "g o"},
+	{"Reference", "Documents", "book", "/documents", "g c"},
+	{"Reference", "Audit log", "shield", "/audit", "g l"},
+	{"Reference", "System", "server", "/system", "g s"},
 }
 
 // Context cookie and company cache limits.
@@ -65,7 +67,7 @@ func (s *Server) navFor(role Role, path string) []templates.NavGroup {
 			groups = append(groups, templates.NavGroup{Title: e.group})
 		}
 		g := &groups[len(groups)-1]
-		g.Items = append(g.Items, templates.NavItem{Label: e.label, Href: e.path, Icon: e.icon, Current: e.path == current})
+		g.Items = append(g.Items, templates.NavItem{Label: e.label, Href: e.path, Icon: e.icon, Key: e.key, Current: e.path == current})
 	}
 	return groups
 }

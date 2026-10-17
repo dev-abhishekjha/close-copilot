@@ -818,5 +818,6 @@ func TestApprovalsUIRetryRow(t *testing.T) {
 func TestApprovalsUIEmpty(t *testing.T) {
 	body := approvalsServer(t, &fakeApprovals{}, nil).get(t, RoleChecker, "/approvals").Body.String()
 	wantAll(t, body, "Pending proposals", `id="approvals"`, `class="ui-empty"`, "No proposals are waiting for a checker.")
-	wantNone(t, body, "table approvals", "<dialog")
+	wantNone(t, body, "table approvals")
+	wantNone(t, mainContent(t, body), "<dialog")
 }
