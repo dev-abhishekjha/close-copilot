@@ -1,0 +1,13 @@
+{
+  "name": "close-copilot-e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Browser suite for the Close Copilot web UI (dev only, runs against the in-memory fixture).",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@playwright/test": "1.64.1"
+  }
+}

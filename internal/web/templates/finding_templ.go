@@ -932,7 +932,7 @@ func proposalView(v ProposalView) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><div class=\"ui-table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Proposed journal lines\"><table class=\"ui-table proposal-lines\"><thead><tr><th scope=\"col\">Account</th><th scope=\"col\" class=\"ui-align-right\">Debit</th><th scope=\"col\" class=\"ui-align-right\">Credit</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "</p><div class=\"ui-table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Proposed journal lines\"><table class=\"ui-table proposal-lines\" aria-label=\"Journal lines\"><thead><tr><th scope=\"col\">Account</th><th scope=\"col\" class=\"ui-align-right\">Debit</th><th scope=\"col\" class=\"ui-align-right\">Credit</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

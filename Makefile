@@ -23,7 +23,7 @@ GOOSE     := $(GO) run github.com/pressly/goose/v3/cmd/goose@v3.28.0
 
 .PHONY: help
 help: ## List targets
-	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
+	@grep -hE '^[a-zA-Z0-9_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-12s %s\n", $$1, $$2}'
 
 ## ---- Go ----------------------------------------------------------------
 
@@ -143,6 +143,28 @@ eval-replay: ## Replay SUITE's fixtures without a model (Tier 1) and score the r
 .PHONY: run-agent
 run-agent: ## Run the agent service (CC-703, CC-1001)
 	$(GO) run ./cmd/agent
+
+## ---- Browser suite (UI-14; the only target that needs Node) -----------------
+
+# Playwright against an in-memory fixture server (e2e/fixture): no Docker, no
+# Postgres, no ERPNext, no model. Node lives only under e2e/. Neither target is
+# part of check or gates. E2E_ARGS narrows the run (a spec file or -g pattern).
+E2E_LOG  := tmp/reports/e2e.log
+E2E_ARGS ?=
+
+.PHONY: e2e
+e2e: ## Browser suite (Playwright, Node needed) against the in-memory fixture; log in tmp/reports/e2e.log
+	@mkdir -p tmp/reports
+	@npm ci --prefix e2e --no-audit --no-fund > $(E2E_LOG) 2>&1 || { tail -n 20 $(E2E_LOG); exit 1; }
+	@cd e2e && { node -e "process.exit(require('fs').existsSync(require('@playwright/test').chromium.executablePath()) ? 0 : 1)" \
+		|| npx playwright install chromium; } >> ../$(E2E_LOG) 2>&1 || { tail -n 20 ../$(E2E_LOG); exit 1; }
+	@cd e2e && npx playwright test --reporter=list $(E2E_ARGS) >> ../$(E2E_LOG) 2>&1; rc=$$?; \
+	if [ $$rc -ne 0 ]; then grep -nE '✘|Error:|Test timeout|[0-9]+ (failed|flaky)' ../$(E2E_LOG) | head -n 40; fi; \
+	tail -n 3 ../$(E2E_LOG); exit $$rc
+
+.PHONY: e2e-shots
+e2e-shots: ## Rewrite e2e/screenshots/*.png (synthetic data) with the screenshots spec only
+	@$(MAKE) --no-print-directory e2e E2E_ARGS=screenshots.spec.ts
 
 .PHONY: clean
 clean: ## Remove build output

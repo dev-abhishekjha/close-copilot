@@ -255,3 +255,15 @@ kbd {
   .shell-palette-label, .shell-palette-btn kbd { display: none; }
   .shell-palette-btn { min-width: 2.5rem; justify-content: center; }
 }
+
+/* Touch targets (UI-14): under the sidebar breakpoint every control is at
+   least 40px high. Links inside running text are exempt (WCAG 2.5.8). */
+@media (width < 56rem) {
+  .ui-btn, .ui-tab, select.ui-input, input.ui-input, .shell-palette-btn, .shell-shortcuts-btn,
+  .shell-field select, .shell-field input, .who button {
+    min-height: 2.5rem;
+    box-sizing: border-box;
+  }
+  .ui-btn, .ui-tab { min-width: 2.5rem; }
+  main summary { min-height: 2.5rem; box-sizing: border-box; padding-block: var(--space-2); }
+}

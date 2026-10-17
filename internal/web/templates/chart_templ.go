@@ -638,7 +638,7 @@ func chartFigure(l chartLayout) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, " <details class=\"chart-data\"><summary>Data</summary><table class=\"chart-table\"><thead><tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, " <details class=\"chart-data\"><summary>Data</summary><table class=\"chart-table\" aria-label=\"Chart data\"><thead><tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

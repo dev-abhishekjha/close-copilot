@@ -5,6 +5,9 @@ templ DataTable(p TableProps) {
 	<div class="ui-table-wrap" tabindex="0" role="region" aria-label={ tableLabel(p) }>
 		<table
 			class="ui-table"
+			if p.Caption == "" {
+				aria-label={ tableLabel(p) }
+			}
 			if p.Dense {
 				data-dense="true"
 			}

@@ -26,3 +26,8 @@ Claude outputs/
 
 # Per-ticket git worktrees for parallel builds (Go tooling skips dot-dirs).
 .worktrees/
+
+# Browser suite (UI-14): Node dev dependencies and run output live under e2e/.
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/

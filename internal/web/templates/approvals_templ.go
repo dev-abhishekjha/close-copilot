@@ -210,7 +210,7 @@ func Approvals(p ApprovalsPage) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"ui-table-wrap approvals-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Pending proposals\"><table class=\"ui-table approvals\"><thead><tr><th scope=\"col\">Proposal</th><th scope=\"col\">Company</th><th scope=\"col\">Posting date</th><th scope=\"col\" class=\"ui-align-right\">Amount</th><th scope=\"col\">Lines</th><th scope=\"col\">Maker</th><th scope=\"col\">Status</th><th scope=\"col\">Finding</th><th scope=\"col\">Created</th><th scope=\"col\">Decision</th></tr></thead> <tbody>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"ui-table-wrap approvals-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Pending proposals\"><table class=\"ui-table approvals\" aria-label=\"Proposals waiting for a checker\"><thead><tr><th scope=\"col\">Proposal</th><th scope=\"col\">Company</th><th scope=\"col\">Posting date</th><th scope=\"col\" class=\"ui-align-right\">Amount</th><th scope=\"col\">Lines</th><th scope=\"col\">Maker</th><th scope=\"col\">Status</th><th scope=\"col\">Finding</th><th scope=\"col\">Created</th><th scope=\"col\">Decision</th></tr></thead> <tbody>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -494,7 +494,7 @@ func entryLines(lines []ProposalLine, debit, credit, class string) templ.Compone
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\"><thead><tr><th scope=\"col\">Account</th><th scope=\"col\" class=\"ui-align-right\">Debit</th><th scope=\"col\" class=\"ui-align-right\">Credit</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 40, "\" aria-label=\"Journal lines\"><thead><tr><th scope=\"col\">Account</th><th scope=\"col\" class=\"ui-align-right\">Debit</th><th scope=\"col\" class=\"ui-align-right\">Credit</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

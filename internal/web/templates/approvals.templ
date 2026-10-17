@@ -35,7 +35,7 @@ templ Approvals(p ApprovalsPage) {
 				@EmptyState(EmptyProps{Icon: "check-circle", Title: "Nothing to approve", Body: "No proposals are waiting for a checker."})
 			} else {
 				<div class="ui-table-wrap approvals-wrap" tabindex="0" role="region" aria-label="Pending proposals">
-					<table class="ui-table approvals">
+					<table class="ui-table approvals" aria-label="Proposals waiting for a checker">
 						<thead>
 							<tr>
 								<th scope="col">Proposal</th>
@@ -100,7 +100,7 @@ templ Approvals(p ApprovalsPage) {
 // entryLines is a proposal's journal lines with a totals line. class is
 // the table's own hook ("lines" on the approvals list).
 templ entryLines(lines []ProposalLine, debit, credit, class string) {
-	<table class={ "ui-table approvals-entry " + class }>
+	<table class={ "ui-table approvals-entry " + class } aria-label="Journal lines">
 		<thead>
 			<tr>
 				<th scope="col">Account</th>
