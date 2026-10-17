@@ -1,0 +1,91 @@
+package templates
+
+// Proposal is one journal proposal: its facts, its entry, who proposed,
+// decided and posted it, and, for a checker, the same decision controls as
+// the approvals list. The server enforces every rule.
+templ Proposal(p ProposalPage) {
+	@Base(Layout{Title: "Proposal " + p.Row.ShortID, User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
+		<div id="proposal" class="proposal-page" data-proposal={ p.Row.ID }>
+			@PageHeader(PageHeaderProps{
+				Title:    "Proposal " + p.Row.ShortID,
+				Subtitle: p.Row.Company + " · " + p.Row.PostingDate,
+				Actions:  proposalHeaderActions(p),
+			})
+			@Card(CardProps{ID: "proposal-facts", Title: "Details"}) {
+				@Facts(proposalFacts(p))
+				if p.Row.StatusNote != "" {
+					<p class="note proposal-note">{ p.Row.StatusNote }</p>
+				}
+			}
+			if p.ShowControls {
+				@Card(CardProps{ID: "proposal-decision", Title: "Decision"}) {
+					<div class="decision proposal-decision">
+						@decisionButtons(p.Row)
+						if !p.Row.Own && !p.Row.CanApprove && !p.Row.CanReject {
+							<p class="note">No decision is open to you on this proposal.</p>
+						}
+					</div>
+					@decisionDialogs(p.Row, p.CSRFToken)
+				}
+			}
+			<div class="proposal-grid">
+				<div class="proposal-col">
+					@Card(CardProps{ID: "proposal-entry", Title: "Journal entry"}) {
+						if p.Row.Remark != "" {
+							<p class="remark proposal-remark">{ p.Row.Remark }</p>
+						}
+						<div class="ui-table-wrap" tabindex="0" role="region" aria-label="Journal lines">
+							@entryLines(p.Row.Lines, p.Entry.TotalDebit, p.Entry.TotalCredit, "lines proposal-lines")
+						</div>
+						@balanceNote(p.Entry.Balanced, p.Entry.Difference)
+					}
+				</div>
+				<div class="proposal-col">
+					@Card(CardProps{ID: "proposal-history", Title: "History"}) {
+						@Timeline(p.Timeline)
+					}
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ proposalHeaderActions(p ProposalPage) {
+	<div class="proposal-header-actions">
+		@StatusChip(p.Row.Status)
+		if p.BackHref != "" {
+			@Button(ButtonProps{Label: p.BackLabel, Variant: "ghost", Size: "sm", Href: p.BackHref})
+		}
+	</div>
+}
+
+templ findingLink(id string) {
+	<a href={ templ.SafeURL(findingURL(id)) }>View finding</a>
+}
+
+templ erpEntryLink(name, link string) {
+	if link != "" {
+		<a href={ templ.SafeURL(link) } rel="noopener noreferrer" target="_blank">{ name }</a>
+	} else {
+		{ name }
+	}
+}
+
+func proposalFacts(p ProposalPage) []Fact {
+	facts := []Fact{
+		{Label: "Company", Value: p.Row.Company},
+		{Label: "Posting date", Value: p.Row.PostingDate},
+		{Label: "Total", Value: p.Row.Total},
+	}
+	if p.Row.FindingID != "" {
+		facts = append(facts, Fact{Label: "Finding", Content: findingLink(p.Row.FindingID)})
+	}
+	facts = append(facts, Fact{Label: "Maker", Value: p.Row.Maker})
+	if p.Checker != "" {
+		facts = append(facts, Fact{Label: "Checker", Value: p.Checker})
+	}
+	if p.Row.Status == "posted" && p.Entry.ERPName != "" {
+		facts = append(facts, Fact{Label: "ERPNext journal entry", Content: erpEntryLink(p.Entry.ERPName, p.Entry.ERPLink)})
+	}
+	return facts
+}

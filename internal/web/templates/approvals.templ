@@ -4,109 +4,228 @@ package templates
 // buttons it shows are a convenience; the server enforces who may decide.
 templ Approvals(p ApprovalsPage) {
 	@Base(Layout{Title: "Approvals", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card" id="approvals">
-			<h1>Pending proposals</h1>
-			if p.Error != "" {
-				<p class="error" role="alert">{ p.Error }</p>
-			}
-			if p.Posted != nil {
-				<p class="posted" role="status">
-					Proposal { p.Posted.ProposalID } posted as journal entry
+		@PageHeader(PageHeaderProps{Title: "Pending proposals", Subtitle: pendingCount(len(p.Rows))})
+		if p.Error != "" {
+			<div class="error approvals-alert" role="alert">
+				@Icon("alert", "")
+				<span>{ p.Error }</span>
+			</div>
+		}
+		if p.Posted != nil {
+			<div class="posted approvals-posted" role="status">
+				@Icon("check-circle", "")
+				<p class="approvals-posted-text">
+					Proposal
+					if p.Posted.ID != "" {
+						<a href={ templ.SafeURL(proposalURL(p.Posted.ID)) }>{ p.Posted.ProposalID }</a>
+					} else {
+						{ p.Posted.ProposalID }
+					}
+					posted as journal entry
 					if p.Posted.ERPLink != "" {
 						<a href={ templ.SafeURL(p.Posted.ERPLink) } rel="noopener noreferrer" target="_blank">{ p.Posted.ERPName }</a>
 					} else {
 						{ p.Posted.ERPName }
 					}
 				</p>
-			}
+			</div>
+		}
+		@Card(CardProps{ID: "approvals"}) {
 			if len(p.Rows) == 0 {
-				<p>No proposals are waiting for a checker.</p>
+				@EmptyState(EmptyProps{Icon: "check-circle", Title: "Nothing to approve", Body: "No proposals are waiting for a checker."})
 			} else {
-				<table class="approvals">
-					<thead>
-						<tr>
-							<th>Proposal</th>
-							<th>Company</th>
-							<th>Posting date</th>
-							<th>Amount</th>
-							<th>Lines</th>
-							<th>Maker</th>
-							<th>Status</th>
-							<th>Finding</th>
-							<th>Created</th>
-							<th>Decision</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, r := range p.Rows {
-							<tr data-proposal={ r.ID }>
-								<td><code title={ r.ID }>{ r.ShortID }</code></td>
-								<td>{ r.Company }</td>
-								<td>{ r.PostingDate }</td>
-								<td class="amount">{ r.Total }</td>
-								<td>
-									<table class="lines">
-										<thead>
-											<tr>
-												<th>Account</th>
-												<th>Debit</th>
-												<th>Credit</th>
-											</tr>
-										</thead>
-										<tbody>
-											for _, l := range r.Lines {
-												<tr>
-													<td>{ l.Account }</td>
-													<td>{ l.Debit }</td>
-													<td>{ l.Credit }</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-									if r.Remark != "" {
-										<p class="remark">{ r.Remark }</p>
-									}
-								</td>
-								<td>{ r.Maker }</td>
-								<td>
-									{ r.Status }
-									if r.StatusNote != "" {
-										<p class="note">{ r.StatusNote }</p>
-									}
-								</td>
-								<td>
-									if r.FindingID != "" {
-										<a href={ templ.SafeURL(findingURL(r.FindingID)) }>finding</a>
-									}
-								</td>
-								<td>{ r.Created }</td>
-								<td class="decision">
-									if r.Own {
-										<p class="own">You proposed this; another checker must decide</p>
-									} else {
-										if r.CanApprove {
-											<form method="post" action={ templ.SafeURL(approveURL(r.ID)) }>
-												<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-												<button type="submit">Approve and post</button>
-											</form>
-										}
-										if r.CanReject {
-											<form method="post" action={ templ.SafeURL(rejectURL(r.ID)) }>
-												<input type="hidden" name="csrf_token" value={ p.CSRFToken }/>
-												<label>
-													Reason
-													<textarea name="reason" required maxlength="500" rows="2"></textarea>
-												</label>
-												<button type="submit">Reject</button>
-											</form>
-										}
-									}
-								</td>
+				<div class="ui-table-wrap approvals-wrap" tabindex="0" role="region" aria-label="Pending proposals">
+					<table class="ui-table approvals">
+						<thead>
+							<tr>
+								<th scope="col">Proposal</th>
+								<th scope="col">Company</th>
+								<th scope="col">Posting date</th>
+								<th scope="col" class="ui-align-right">Amount</th>
+								<th scope="col">Lines</th>
+								<th scope="col">Maker</th>
+								<th scope="col">Status</th>
+								<th scope="col">Finding</th>
+								<th scope="col">Created</th>
+								<th scope="col">Decision</th>
 							</tr>
-						}
-					</tbody>
-				</table>
+						</thead>
+						<tbody>
+							for _, r := range p.Rows {
+								<tr data-proposal={ r.ID }>
+									<td data-label="Proposal">
+										<a href={ templ.SafeURL(proposalURL(r.ID)) }><code title={ r.ID }>{ r.ShortID }</code></a>
+									</td>
+									<td data-label="Company">{ r.Company }</td>
+									<td class="approvals-nowrap" data-label="Posting date">{ r.PostingDate }</td>
+									<td class="amount ui-num ui-align-right" data-label="Amount">{ r.Total }</td>
+									<td class="approvals-lines" data-label="Lines">
+										@entryLines(r.Lines, r.Total, r.TotalCredit, "lines")
+										@balanceNote(r.Balanced, r.Difference)
+										if r.Remark != "" {
+											<p class="remark">{ r.Remark }</p>
+										}
+									</td>
+									<td data-label="Maker">{ r.Maker }</td>
+									<td data-label="Status">
+										<div class="approvals-status">
+											@StatusChip(r.Status)
+											if r.StatusNote != "" {
+												<p class="note">{ r.StatusNote }</p>
+											}
+										</div>
+									</td>
+									<td data-label="Finding">
+										if r.FindingID != "" {
+											<a href={ templ.SafeURL(findingURL(r.FindingID)) }>View finding</a>
+										}
+									</td>
+									<td class="approvals-created" data-label="Created">{ r.Created }</td>
+									<td class="decision" data-label="Decision">
+										@decisionButtons(r)
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+				for _, r := range p.Rows {
+					@decisionDialogs(r, p.CSRFToken)
+				}
 			}
-		</section>
+		}
 	}
+}
+
+// entryLines is a proposal's journal lines with a totals line. class is
+// the table's own hook ("lines" on the approvals list).
+templ entryLines(lines []ProposalLine, debit, credit, class string) {
+	<table class={ "ui-table approvals-entry " + class }>
+		<thead>
+			<tr>
+				<th scope="col">Account</th>
+				<th scope="col" class="ui-align-right">Debit</th>
+				<th scope="col" class="ui-align-right">Credit</th>
+			</tr>
+		</thead>
+		<tbody>
+			for _, l := range lines {
+				<tr>
+					<td>{ l.Account }</td>
+					<td class="ui-num ui-align-right">{ l.Debit }</td>
+					<td class="ui-num ui-align-right">{ l.Credit }</td>
+				</tr>
+			}
+			<tr class="totals">
+				<th scope="row">Total</th>
+				<th class="ui-num ui-align-right">{ debit }</th>
+				<th class="ui-num ui-align-right">{ credit }</th>
+			</tr>
+		</tbody>
+	</table>
+}
+
+templ balanceNote(balanced bool, difference string) {
+	if balanced {
+		<p class="balanced approvals-balance">Balanced</p>
+	} else {
+		<p class="error approvals-balance" role="alert">Unbalanced: difference { difference }</p>
+	}
+}
+
+// decisionButtons are the controls approvalRow allows for r. The user's own
+// proposal gets disabled buttons and the reason, never a dialog or a form.
+templ decisionButtons(r ApprovalRow) {
+	if r.Own {
+		<div class="approvals-buttons">
+			@Button(ButtonProps{Label: "Approve", Variant: "primary", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)})
+			if r.Status == "proposed" {
+				@Button(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)})
+			}
+		</div>
+		<p class="own" id={ ownID(r.ID) }>You proposed this; another checker must decide it.</p>
+	} else if r.CanApprove || r.CanReject {
+		<div class="approvals-buttons">
+			if r.CanApprove {
+				@OpenDialogButton(ButtonProps{Label: "Approve", Variant: "primary", Size: "sm", Icon: "check"}, approveDialogID(r.ID))
+			}
+			if r.CanReject {
+				@OpenDialogButton(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Icon: "x"}, rejectDialogID(r.ID))
+			}
+		</div>
+	}
+}
+
+// decisionDialogs are the confirmation dialogs behind decisionButtons; they
+// exist only for the controls approvalRow allows.
+templ decisionDialogs(r ApprovalRow, csrf string) {
+	if !r.Own {
+		if r.CanApprove {
+			@ConfirmModal(ConfirmProps{
+				ID:        approveDialogID(r.ID),
+				Title:     "Approve proposal " + r.ShortID + "?",
+				Body:      approveBody(r),
+				Method:    "post",
+				Action:    approveURL(r.ID),
+				CSRFToken: csrf,
+				Confirm:   ButtonProps{Label: "Approve and post", Variant: "primary"},
+			})
+		}
+		if r.CanReject {
+			@ConfirmModal(ConfirmProps{
+				ID:        rejectDialogID(r.ID),
+				Title:     "Reject proposal " + r.ShortID + "?",
+				Body:      "Nothing is posted to ERPNext. Say why this entry is wrong.",
+				Method:    "post",
+				Action:    rejectURL(r.ID),
+				CSRFToken: csrf,
+				Confirm:   ButtonProps{Label: "Reject", Variant: "danger"},
+				Extra:     rejectReasonField(r.ID),
+			})
+		}
+	}
+}
+
+// rejectReasonField has no Hint and no Error so the textarea renders
+// required maxlength="500" contiguously.
+templ rejectReasonField(id string) {
+	@TextareaField(FieldProps{
+		ID:       "reason-" + id,
+		Name:     "reason",
+		Label:    "Reason",
+		Required: true,
+		Attrs:    templ.Attributes{"maxlength": "500"},
+	})
+}
+
+func proposalURL(id string) string { return "/proposals/" + id }
+
+func approveDialogID(id string) string { return "approve-" + id }
+
+func rejectDialogID(id string) string { return "reject-" + id }
+
+func ownID(id string) string { return "own-" + id }
+
+func ownAttrs(id string) templ.Attributes {
+	return templ.Attributes{"aria-disabled": "true", "aria-describedby": ownID(id)}
+}
+
+func plural(n int, one, many string) string {
+	if n == 1 {
+		return "1 " + one
+	}
+	return itoa(n) + " " + many
+}
+
+func pendingCount(n int) string {
+	if n == 0 {
+		return ""
+	}
+	return plural(n, "proposal", "proposals") + " waiting for a checker"
+}
+
+// approveBody restates what approving does.
+func approveBody(r ApprovalRow) string {
+	return "Post this journal entry to ERPNext for " + r.Company + " on " + r.PostingDate +
+		"? Total " + r.Total + ", " + plural(len(r.Lines), "line", "lines") + "."
 }

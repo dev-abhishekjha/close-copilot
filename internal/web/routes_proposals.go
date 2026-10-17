@@ -1,4 +1,11 @@
 package web
 
-// proposalsRoutes is filled by UI-09; it adds that page's routes here, not in routes.go.
-func (s *Server) proposalsRoutes() []route { return nil }
+import "net/http"
+
+// proposalsRoutes is filled by UI-09: the proposal page, for any signed-in
+// role. It answers 501 until Options.Approvals is set.
+func (s *Server) proposalsRoutes() []route {
+	return []route{
+		{http.MethodGet, "/proposals/{id}", anyRole, s.approvalsRoute(s.handleProposalPage)},
+	}
+}
