@@ -30,7 +30,7 @@ func TestRouteHooksEmpty(t *testing.T) {
 	hooks := map[string]func() []route{
 		"dashboard": s.dashboardRoutes,
 		"documents": s.documentsRoutes,
-		"system":    s.systemRoutes, "audit": s.auditRoutes,
+		"audit":     s.auditRoutes,
 	}
 	for name, h := range hooks {
 		if got := h(); len(got) != 0 {

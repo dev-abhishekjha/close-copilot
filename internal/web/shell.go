@@ -100,7 +100,7 @@ func (s *Server) shellData(r *http.Request, p *principal) templates.ShellData {
 		User: p.user.Name, Role: string(p.user.Role), CSRFToken: p.csrf,
 		Nav:       s.navFor(p.user.Role, r.URL.Path),
 		Companies: companies, Company: company, Month: month,
-		Path: path,
+		Path: path, Health: s.systemHealth(),
 	}
 }
 

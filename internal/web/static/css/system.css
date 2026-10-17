@@ -1,1 +1,7 @@
 /* System (UI-12). */
+.system-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.system-text { margin: 0 0 var(--space-3); overflow-wrap: anywhere; }
+.system-footer { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin: var(--space-5) 0 0; color: var(--color-fg-muted); font-size: var(--text-sm); }
+@media (min-width: 40rem) {
+  .system-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

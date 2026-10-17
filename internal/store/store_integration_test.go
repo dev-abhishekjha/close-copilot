@@ -678,3 +678,40 @@ func TestReplaceBankLines(t *testing.T) {
 		t.Errorf("after empty replace: %d, want 1 (Sep)", n)
 	}
 }
+
+func TestLLMSpendToday(t *testing.T) {
+	ctx := context.Background()
+	st, _ := setupTestStore(t)
+	run := newRun(t, st)
+	step, _, err := st.Begin(ctx, run, store.StepKindExplain, "spend")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A day no other test writes to, so a shared database can't skew it.
+	day := time.Date(2032, 3, 10, 0, 0, 0, 0, time.UTC)
+	spend := func(now time.Time) string {
+		t.Helper()
+		got, err := st.LLMSpendToday(ctx, now)
+		if err != nil {
+			t.Fatalf("LLMSpendToday(%s): %v", now, err)
+		}
+		return got
+	}
+	if got := spend(day.Add(12 * time.Hour)); got != "0" {
+		t.Errorf("empty day = %q, want 0", got)
+	}
+	recordCall(t, st, run, step.ID, 10, 10, 0, "0.75", day.Add(9*time.Hour))
+	recordCall(t, st, run, step.ID, 10, 10, 0, "0.5", day.Add(23*time.Hour))
+	recordCall(t, st, run, step.ID, 10, 10, 0, "5", day.Add(-time.Minute)) // the day before
+	recordCall(t, st, run, step.ID, 10, 10, 0, "7", day.Add(24*time.Hour)) // the next day
+	if got := spend(day.Add(12 * time.Hour)); got != "1.250000" {
+		t.Errorf("the UTC day = %q, want 1.250000", got)
+	}
+	ist := time.FixedZone("IST", 5*3600+1800)
+	if got := spend(day.Add(12 * time.Hour).In(ist)); got != "1.250000" {
+		t.Errorf("the UTC day seen from IST = %q, want 1.250000", got)
+	}
+	if got := spend(day.Add(36 * time.Hour)); got != "7.000000" {
+		t.Errorf("next day = %q, want 7.000000", got)
+	}
+}

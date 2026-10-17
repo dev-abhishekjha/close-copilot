@@ -127,9 +127,9 @@ func TestShellNavByRole(t *testing.T) {
 		role Role
 		want []string
 	}{
-		{RoleViewer, []string{"/", "/runs", "/findings", "/ask"}},
-		{RoleMaker, []string{"/", "/runs", "/findings", "/ask"}},
-		{RoleChecker, []string{"/", "/runs", "/findings", "/ask", "/approvals", "/audit"}},
+		{RoleViewer, []string{"/", "/runs", "/findings", "/ask", "/system"}},
+		{RoleMaker, []string{"/", "/runs", "/findings", "/ask", "/system"}},
+		{RoleChecker, []string{"/", "/runs", "/findings", "/ask", "/approvals", "/audit", "/system"}},
 	}
 	for _, tt := range tests {
 		t.Run(string(tt.role), func(t *testing.T) {
@@ -165,7 +165,7 @@ func TestShellNavByRole(t *testing.T) {
 }
 
 func TestShellNavOmitsUnroutedPages(t *testing.T) {
-	unrouted := []string{"/proposals", "/documents", "/system"}
+	unrouted := []string{"/proposals", "/documents"}
 	ts := newTestServer(t)
 	ck, _ := ts.session(RoleChecker)
 	nav := mainNav(t, okBody(t, ts, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}}))
@@ -178,13 +178,12 @@ func TestShellNavOmitsUnroutedPages(t *testing.T) {
 	// roles it allows only; the group appears with it.
 	ts.routes = append(slices.Clone(ts.routes),
 		route{http.MethodGet, "/findings", anyRole, http.NotFoundHandler()},
-		route{http.MethodGet, "/system", checkerOnly, http.NotFoundHandler()},
 	)
 	for _, tt := range []struct {
 		role       Role
 		want, deny []string
 	}{
-		{RoleViewer, []string{"/findings"}, []string{"/system", "/proposals", "/documents"}},
+		{RoleViewer, []string{"/findings", "/system"}, []string{"/proposals", "/documents"}},
 		{RoleChecker, []string{"/findings", "/system"}, []string{"/proposals", "/documents"}},
 	} {
 		ck, _ := ts.session(tt.role)
