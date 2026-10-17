@@ -120,3 +120,11 @@ func TestChartNoInlineStyle(t *testing.T) {
 		}
 	}
 }
+
+// TestChartDataTableNamed: the table behind "Data" is named (UI-14).
+func TestChartDataTableNamed(t *testing.T) {
+	out := bar(t, ChartProps{Title: "Tokens", Desc: "d", Categories: []string{"a"}, Series: []Series{{Name: "In", Values: []float64{1}}}})
+	if !strings.Contains(out, `<table class="chart-table" aria-label="Chart data">`) {
+		t.Error("the chart data table is anonymous")
+	}
+}

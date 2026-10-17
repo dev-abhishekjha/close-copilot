@@ -340,3 +340,16 @@ func TestUIChipPartial(t *testing.T) {
 	h := render(t, StatusChip("partial"))
 	wantAll(t, "partial", h, "ui-chip-warn", ">Partial<", "<svg")
 }
+
+// TestUITableNames: a table with a caption is named by it; one without gets an
+// aria-label, so no table is anonymous (UI-14).
+func TestUITableNames(t *testing.T) {
+	withCaption := render(t, DataTable(TableProps{Caption: "Runs", Columns: []Column{{Label: "A"}}}))
+	if strings.Contains(withCaption, `<table class="ui-table" aria-label=`) {
+		t.Error("a captioned table repeats its name in aria-label")
+	}
+	noCaption := render(t, DataTable(TableProps{Columns: []Column{{Label: "A"}}}))
+	if !strings.Contains(noCaption, `<table class="ui-table" aria-label="Table"`) {
+		t.Errorf("an uncaptioned table is anonymous: %s", noCaption)
+	}
+}

@@ -1122,3 +1122,72 @@ func TestShellRunsDefaultsFromContext(t *testing.T) {
 		t.Errorf("query month not escaped: %s", startForm(body))
 	}
 }
+
+// TestShellA11y keeps the shell's accessibility fixes (UI-14) from regressing
+// without a browser: one banner, one labelled nav, the current page marked,
+// and no heading before the page's own h1.
+func TestShellA11y(t *testing.T) {
+	ts := newTestServer(t)
+	ck, _ := ts.session(RoleChecker)
+	body := okBody(t, ts, req{method: http.MethodGet, path: "/", cookies: []*http.Cookie{ck}})
+
+	if n := strings.Count(body, "<header class=\"topbar shell-top\""); n != 1 {
+		t.Errorf("%d top-bar banners, want 1", n)
+	}
+	if n := strings.Count(body, "<nav "); n < 1 {
+		t.Error("no nav")
+	}
+	for _, nav := range regexp.MustCompile(`<nav [^>]*>`).FindAllString(body, -1) {
+		if !strings.Contains(nav, "aria-label=") {
+			t.Errorf("unlabelled nav landmark: %s", nav)
+		}
+	}
+	if strings.Contains(body, `<h2 class="shell-group-title"`) || !strings.Contains(body, `<p class="shell-group-title">`) {
+		t.Error("nav group titles must not be headings: they would precede the page's h1")
+	}
+	h1, h2 := strings.Index(body, "<h1"), strings.Index(body, "<h2")
+	if h1 < 0 || (h2 >= 0 && h2 < h1) {
+		t.Errorf("heading order: h1 at %d, first h2 at %d", h1, h2)
+	}
+	if n := strings.Count(body, `aria-current="page"`); n != 1 {
+		t.Errorf("%d nav items marked current, want 1", n)
+	}
+}
+
+// TestStylesheetsA11y checks the stylesheet rules the browser suite relies on:
+// reduced motion everywhere (one global rule) and 40px touch targets under the
+// sidebar breakpoint.
+func TestStylesheetsA11y(t *testing.T) {
+	read := func(name string) string {
+		b, err := staticFiles.ReadFile("static/css/" + name)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return string(b)
+	}
+	base := read("base.css")
+	if !strings.Contains(base, "@media (prefers-reduced-motion: reduce)") ||
+		!strings.Contains(base, "animation-duration: 0.01ms !important") ||
+		!strings.Contains(base, "transition-duration: 0.01ms !important") {
+		t.Error("base.css lacks the global reduced-motion rule")
+	}
+	// Any stylesheet that animates is covered by that rule or has its own.
+	for _, name := range []string{"components.css", "shell.css", "runs.css", "finding.css", "ask.css", "dashboard.css",
+		"findings-list.css", "proposals.css", "audit.css", "documents.css", "system.css"} {
+		css := read(name)
+		if (strings.Contains(css, "animation:") || strings.Contains(css, "@keyframes")) && !strings.Contains(css, "prefers-reduced-motion") {
+			t.Errorf("%s animates without a prefers-reduced-motion rule of its own", name)
+		}
+	}
+	shell := read("shell.css")
+	i := strings.Index(shell, "Touch targets (UI-14)")
+	if i < 0 {
+		t.Fatal("shell.css lacks the touch-target block")
+	}
+	block := shell[i:]
+	for _, want := range []string{"@media (width < 56rem)", ".ui-btn", ".ui-tab", "select.ui-input", "min-height: 2.5rem"} {
+		if !strings.Contains(block, want) {
+			t.Errorf("touch-target block lacks %q", want)
+		}
+	}
+}

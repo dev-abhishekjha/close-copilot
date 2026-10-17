@@ -6,6 +6,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"regexp"
 	"strings"
 	"sync"
 	"testing"
@@ -820,4 +821,21 @@ func TestApprovalsUIEmpty(t *testing.T) {
 	wantAll(t, body, "Pending proposals", `id="approvals"`, `class="ui-empty"`, "No proposals are waiting for a checker.")
 	wantNone(t, body, "table approvals")
 	wantNone(t, mainContent(t, body), "<dialog")
+}
+
+// TestApprovalsUITablesNamed: every table on the approvals page has an
+// accessible name (UI-14), the list and each proposal's journal lines.
+func TestApprovalsUITablesNamed(t *testing.T) {
+	fa := &fakeApprovals{pending: []store.JournalProposal{uiProposal(1, "proposed", "asha", nil)}}
+	ts := approvalsServer(t, fa, nil)
+	body := ts.get(t, RoleChecker, "/approvals").Body.String()
+	tables := regexp.MustCompile(`<table [^>]*>`).FindAllString(body, -1)
+	if len(tables) < 2 {
+		t.Fatalf("%d tables, want the list and the journal lines", len(tables))
+	}
+	for _, tb := range tables {
+		if !strings.Contains(tb, "aria-label=") {
+			t.Errorf("unnamed table: %s", tb)
+		}
+	}
 }

@@ -23,7 +23,7 @@ templ shellBody(l Layout, sd ShellData) {
 					<nav class="shell-nav" aria-label="Main">
 						for _, g := range sd.Nav {
 							<div class="shell-group">
-								<h2 class="shell-group-title">{ g.Title }</h2>
+								<p class="shell-group-title">{ g.Title }</p>
 								<ul class="shell-links">
 									for _, it := range g.Items {
 										<li>

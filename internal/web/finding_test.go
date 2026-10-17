@@ -984,3 +984,17 @@ func TestFindingDecideWrapperUnchanged(t *testing.T) {
 		})
 	}
 }
+
+// TestFindingUIProposalTableNamed: the proposed journal lines table is named
+// (UI-14).
+func TestFindingUIProposalTableNamed(t *testing.T) {
+	ff := newFakeFindings()
+	a := fnd(1, "unrecorded_bank_charge", "open")
+	a.Verified, a.Proposal = true, uiPreview()
+	a = ff.put(a)
+	ts := approvalsServer(t, &fakeApprovals{}, ff)
+	body := page(t, ts, RoleMaker, a.ID)
+	if !strings.Contains(body, `<table class="ui-table proposal-lines" aria-label="Journal lines">`) {
+		t.Error("the proposed journal lines table has no accessible name")
+	}
+}
