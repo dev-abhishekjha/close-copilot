@@ -147,6 +147,35 @@ type AuditPage struct {
 	To        string
 	Rows      []AuditRow
 	OlderURL  string // empty when there are no older rows
+	Chips     []FilterChip
+	ClearURL  string // "/audit"; shown only when Chips is not empty
+	ExportURL string // CSV of the current filter
+}
+
+// FilterChip is one active audit filter; RemoveURL drops only that filter.
+type FilterChip struct {
+	Label     string
+	Value     string
+	RemoveURL string
+}
+
+const datePattern = `\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])`
+
+func auditColumns() []Column {
+	return []Column{{Label: "Time (UTC)"}, {Label: "Actor"}, {Label: "Server"}, {Label: "Tool"},
+		{Label: "Arguments"}, {Label: "Rows"}, {Label: "Latency (ms)"}, {Label: "Error"}}
+}
+
+func auditRows(rs []AuditRow) []Row {
+	out := make([]Row, 0, len(rs))
+	for _, r := range rs {
+		out = append(out, Row{Attrs: templ.Attributes{"data-audit-row": "1"}, Cells: []Cell{
+			{Text: r.Time, Class: "time"}, {Text: r.Actor, Class: "actor"}, {Text: r.Server, Class: "server"},
+			{Text: r.Tool, Class: "tool"}, {Content: auditArgs(r), Class: "args"},
+			{Text: r.ResultCount, Class: "count"}, {Text: r.Latency, Class: "latency"}, {Text: r.Error, Class: "error"},
+		}})
+	}
+	return out
 }
 
 // StepRow is the usage of one step family on the metrics page.
@@ -177,6 +206,32 @@ type MetricsPage struct {
 	Steps        []StepRow
 	VerifiedRate string
 	TraceID      string
+	TokenChart   ChartProps
+	CostChart    ChartProps
+	Trend        *TrendView // nil omits the card
+}
+
+// TrendView is the recent-runs card: cost and verified rate per run.
+type TrendView struct {
+	Cost     ChartProps
+	Verified ChartProps
+}
+
+func stepColumns() []Column {
+	return []Column{{Label: "Step"}, {Label: "Input"}, {Label: "Output"}, {Label: "Cache read"},
+		{Label: "Cost"}, {Label: "Calls"}, {Label: "Latency (ms)"}}
+}
+
+func stepRows(ss []StepRow) []Row {
+	out := make([]Row, 0, len(ss))
+	for _, s := range ss {
+		out = append(out, Row{Attrs: templ.Attributes{"data-step": s.Kind}, Cells: []Cell{
+			{Text: s.Kind}, {Text: i64(s.Input), Class: "input"}, {Text: i64(s.Output), Class: "output"},
+			{Text: i64(s.Cache), Class: "cache"}, {Text: s.Cost, Class: "cost"}, {Text: i64(s.Calls), Class: "calls"},
+			{Text: i64(s.Latency), Class: "latency"},
+		}})
+	}
+	return out
 }
 
 func metricsURL(id string) string { return "/runs/" + id + "/metrics" }

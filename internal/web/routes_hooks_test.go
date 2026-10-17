@@ -1,8 +1,10 @@
 package web
 
 import (
+	"net/http"
 	"os"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 )
@@ -30,12 +32,23 @@ func TestRouteHooksEmpty(t *testing.T) {
 	hooks := map[string]func() []route{
 		"dashboard": s.dashboardRoutes,
 		"documents": s.documentsRoutes,
-		"audit":     s.auditRoutes,
 	}
 	for name, h := range hooks {
 		if got := h(); len(got) != 0 {
 			t.Errorf("%s hook returned %d routes, want none", name, len(got))
 		}
+	}
+}
+
+func TestRouteHooksAudit(t *testing.T) {
+	s := &Server{}
+	got := s.auditRoutes()
+	if len(got) != 1 {
+		t.Fatalf("audit hook returned %d routes, want 1", len(got))
+	}
+	rt := got[0]
+	if rt.method != http.MethodGet || rt.path != "/audit/export.csv" || !slices.Equal(rt.roles, checkerOnly) || rt.handler == nil {
+		t.Errorf("audit route = %+v", rt)
 	}
 }
 

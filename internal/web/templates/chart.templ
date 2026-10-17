@@ -1,0 +1,77 @@
+package templates
+
+// BarChart is a server-rendered SVG bar chart: one group per category, one
+// bar per series. Colour comes from CSS classes; there is no script and no
+// style attribute.
+templ BarChart(p ChartProps) {
+	@chartFigure(layoutChart(p, false))
+}
+
+// LineChart is a server-rendered SVG line chart with one polyline per series.
+templ LineChart(p ChartProps) {
+	@chartFigure(layoutChart(p, true))
+}
+
+templ chartFigure(l chartLayout) {
+	<figure class="chart">
+		<figcaption class="chart-title">{ l.Title }</figcaption>
+		if l.Empty {
+			@EmptyState(EmptyProps{Icon: "bar-chart", Title: "No usage recorded"})
+		} else {
+			<svg class="chart-svg" role="img" aria-labelledby={ l.TitleID + " " + l.DescID } viewBox={ l.ViewBox } preserveAspectRatio="xMidYMid meet">
+				<title id={ l.TitleID }>{ l.Title }</title>
+				<desc id={ l.DescID }>{ l.Desc }</desc>
+				for _, t := range l.Ticks {
+					<line class="chart-grid" x1={ t.X1 } x2={ t.X2 } y1={ t.Y } y2={ t.Y }></line>
+					<text class="chart-tick" x={ t.LX } y={ t.LY } text-anchor="end">{ t.Label }</text>
+				}
+				for _, r := range l.Rects {
+					<rect class={ r.Class } x={ r.X } y={ r.Y } width={ r.W } height={ r.H }>
+						<title>{ r.Tip }</title>
+					</rect>
+				}
+				for _, ln := range l.Lines {
+					<polyline class={ ln.Class } points={ ln.Points }></polyline>
+				}
+				for _, d := range l.Dots {
+					<circle class={ d.Class } cx={ d.CX } cy={ d.CY } r="3">
+						<title>{ d.Tip }</title>
+					</circle>
+				}
+				<line class="chart-axis" x1={ l.AxisX1 } x2={ l.AxisX2 } y1={ l.Axis } y2={ l.Axis }></line>
+				for _, x := range l.XLabels {
+					<text class="chart-xlabel" x={ x.X } y={ x.Y } text-anchor="middle">{ x.Text }</text>
+				}
+			</svg>
+			if len(l.Legend) > 0 {
+				<ul class="chart-legend">
+					for _, k := range l.Legend {
+						<li><span class={ k.Class } aria-hidden="true"></span> { k.Name }</li>
+					}
+				</ul>
+			}
+			<details class="chart-data">
+				<summary>Data</summary>
+				<table class="chart-table">
+					<thead>
+						<tr>
+							for _, h := range l.Head {
+								<th scope="col">{ h }</th>
+							}
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range l.Rows {
+							<tr>
+								<th scope="row">{ r.Label }</th>
+								for _, c := range r.Cells {
+									<td>{ c }</td>
+								}
+							</tr>
+						}
+					</tbody>
+				</table>
+			</details>
+		}
+	</figure>
+}
