@@ -58,6 +58,9 @@ type Options struct {
 	// Audit backs the audit log page and the run metrics page (CC-1005).
 	// Nil means not configured: they answer 501 after the role check.
 	Audit AuditStore
+	// Documents backs the documents browser (UI-11). Nil means not
+	// configured: the routes answer 501 after the role check.
+	Documents DocumentsBackend
 	// System backs the System page and the top bar's health dot (UI-12).
 	// Nil means not configured: GET /system answers 501 after the role
 	// check and the shell shows no dot.
@@ -98,6 +101,7 @@ type Server struct {
 	ask           AskBackend       // nil when Options.Ask is nil
 	approvals     ApprovalsBackend // nil when Options.Approvals is nil
 	audit         AuditStore       // nil when Options.Audit is nil
+	documents     DocumentsBackend // nil when Options.Documents is nil
 	erpBase       string
 	devComponents bool
 	limits        *apiLimits
@@ -132,6 +136,7 @@ func NewServer(opts Options, users Users, log *slog.Logger) (*Server, error) {
 		ask:           opts.Ask,
 		approvals:     opts.Approvals,
 		audit:         opts.Audit,
+		documents:     opts.Documents,
 		limits:        newAPILimits(opts),
 		logins:        newLoginLimiter(opts),
 	}

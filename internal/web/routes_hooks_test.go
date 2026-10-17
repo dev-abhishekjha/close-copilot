@@ -31,11 +31,23 @@ func TestRouteHooksEmpty(t *testing.T) {
 	s := &Server{}
 	hooks := map[string]func() []route{
 		"dashboard": s.dashboardRoutes,
-		"documents": s.documentsRoutes,
 	}
 	for name, h := range hooks {
 		if got := h(); len(got) != 0 {
 			t.Errorf("%s hook returned %d routes, want none", name, len(got))
+		}
+	}
+}
+
+func TestRouteHooksDocuments(t *testing.T) {
+	s := &Server{}
+	got := s.documentsRoutes()
+	if len(got) != 2 {
+		t.Fatalf("documents hook returned %d routes, want 2", len(got))
+	}
+	for i, path := range []string{"/documents", "/documents/{id}"} {
+		if rt := got[i]; rt.method != http.MethodGet || rt.path != path || !slices.Equal(rt.roles, anyRole) || rt.handler == nil {
+			t.Errorf("documents route %d = %+v", i, rt)
 		}
 	}
 }

@@ -14,6 +14,7 @@ import (
 	"github.com/abhishekjha/close-copilot/internal/approvals"
 	"github.com/abhishekjha/close-copilot/internal/config"
 	"github.com/abhishekjha/close-copilot/internal/llm"
+	"github.com/abhishekjha/close-copilot/internal/retrieval"
 	"github.com/abhishekjha/close-copilot/internal/store"
 	"github.com/abhishekjha/close-copilot/internal/telemetry"
 	"github.com/abhishekjha/close-copilot/internal/telemetry/llmtrace"
@@ -46,6 +47,7 @@ type serveBackends struct {
 	ask       web.AskBackend
 	approvals web.ApprovalsBackend
 	audit     web.AuditStore
+	documents web.DocumentsBackend
 	system    *web.SystemOptions
 }
 
@@ -59,6 +61,7 @@ func newServeServer(cfg config.Config, users web.Users, be serveBackends, log *s
 	opts.Ask = be.ask
 	opts.Approvals = be.approvals
 	opts.Audit = be.audit
+	opts.Documents = be.documents
 	opts.System = be.system
 	return web.NewServer(opts, users, log)
 }
@@ -229,6 +232,7 @@ func serve(ctx context.Context, cfg config.Config, log *slog.Logger, cmd command
 		runs:      &web.RunsBackend{Store: d.st, Execute: executeRun(wf), Findings: d.st},
 		approvals: newApprovals(cfg, d.st, log),
 		audit:     d.st,
+		documents: retrieval.NewLister(d.st.Pool()),
 	}
 	if !cmd.noExplain {
 		asker, err := newAsker(cfg, log, cmd, d, model, key, names)

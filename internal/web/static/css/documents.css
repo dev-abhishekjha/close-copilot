@@ -1,1 +1,5 @@
 /* Documents (UI-11). */
+.docs-table { margin-top: var(--space-4); }
+.docs-back { margin: 0 0 var(--space-4); font-size: var(--text-sm); }
+.docs-sections { display: grid; gap: var(--space-4); margin-top: var(--space-5); }
+.doc-text { white-space: pre-wrap; overflow-wrap: anywhere; }
