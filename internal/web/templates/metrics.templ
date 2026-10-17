@@ -4,64 +4,59 @@ package templates
 // rate and the trace ID.
 templ Metrics(p MetricsPage) {
 	@Base(Layout{Title: "Run metrics", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card" id="metrics">
-			<h1>Run metrics: { p.Company } { p.Month }</h1>
-			<p><a href="/runs">All runs</a> · <a href={ templ.SafeURL(runURL(p.RunID)) }>Run</a> · <a href={ templ.SafeURL(findingsURL(p.RunID)) }>Findings</a></p>
-			<dl class="facts">
-				<dt>Status</dt>
-				<dd class="status">{ p.Status }</dd>
-				<dt>Duration</dt>
-				<dd class="duration">{ p.Duration }</dd>
-				<dt>Tokens</dt>
-				<dd class="tokens">
-					<span class="input">{ i64(p.Input) }</span> in,
-					<span class="output">{ i64(p.Output) }</span> out,
-					<span class="cache">{ i64(p.Cache) }</span> cache read
-				</dd>
-				<dt>Cost</dt>
-				<dd class="cost">{ p.Cost }</dd>
-				<dt>Verified rate</dt>
-				<dd class="verified-rate">{ p.VerifiedRate }</dd>
-				<dt>Trace</dt>
-				<dd class="trace">
-					if p.TraceID == "" {
-						none
-					} else {
-						<code>{ p.TraceID }</code>
-					}
-				</dd>
-			</dl>
-			<h2>Usage by step</h2>
-			if len(p.Steps) == 0 {
-				<p>No model calls recorded.</p>
-			} else {
-				<table class="steps">
-					<thead>
-						<tr>
-							<th>Step</th>
-							<th>Input</th>
-							<th>Output</th>
-							<th>Cache read</th>
-							<th>Cost</th>
-							<th>Calls</th>
-							<th>Latency (ms)</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, s := range p.Steps {
-							<tr data-step={ s.Kind }>
-								<td>{ s.Kind }</td>
-								<td class="input">{ i64(s.Input) }</td>
-								<td class="output">{ i64(s.Output) }</td>
-								<td class="cache">{ i64(s.Cache) }</td>
-								<td class="cost">{ s.Cost }</td>
-								<td class="calls">{ i64(s.Calls) }</td>
-								<td class="latency">{ i64(s.Latency) }</td>
-							</tr>
-						}
-					</tbody>
-				</table>
+		<div id="metrics" class="metrics-page">
+			@PageHeader(PageHeaderProps{Title: "Run metrics: " + p.Company + " " + p.Month, Actions: metricsLinks(p.RunID)})
+			<div class="metrics-tiles">
+				<div class="ui-stat">
+					<span class="ui-stat-label">Status</span>
+					<span class="ui-stat-value metrics-status">
+						@StatusChip(p.Status)
+					</span>
+				</div>
+				@StatTile(StatProps{Label: "Duration", Value: p.Duration})
+				@StatTile(StatProps{Label: "Cost", Value: p.Cost})
+				@StatTile(StatProps{Label: "Verified rate", Value: p.VerifiedRate})
+				@StatTile(StatProps{Label: "Tokens in", Value: i64(p.Input)})
+				@StatTile(StatProps{Label: "Tokens out", Value: i64(p.Output)})
+				@StatTile(StatProps{Label: "Cache read", Value: i64(p.Cache)})
+			</div>
+			<p class="metrics-trace">
+				Trace:
+				if p.TraceID == "" {
+					none
+				} else {
+					<code>{ p.TraceID }</code>
+				}
+			</p>
+			@Card(CardProps{Title: "Usage by step"}) {
+				@DataTable(TableProps{Caption: "Usage by step", Columns: stepColumns(), Rows: stepRows(p.Steps), EmptyTitle: "No model calls recorded.", Dense: true})
 			}
-		</section>
+			if len(p.Steps) > 0 {
+				<div class="metrics-charts">
+					@Card(CardProps{Title: "Tokens by step"}) {
+						@BarChart(p.TokenChart)
+					}
+					@Card(CardProps{Title: "Cost by step"}) {
+						@BarChart(p.CostChart)
+					}
+				</div>
+			}
+			if p.Trend != nil {
+				@Card(CardProps{ID: "recent-runs", Title: "Recent runs", Subtitle: "Last finished runs of any company, newest on the right."}) {
+					<div class="metrics-charts">
+						@LineChart(p.Trend.Cost)
+						@LineChart(p.Trend.Verified)
+					</div>
+				}
+			}
+		</div>
 	}
+}
+
+templ metricsLinks(runID string) {
+	<nav class="metrics-links" aria-label="Related">
+		<a href="/runs">All runs</a>
+		<a href={ templ.SafeURL(runURL(runID)) }>Run</a>
+		<a href={ templ.SafeURL(findingsURL(runID)) }>Findings</a>
+	</nav>
 }

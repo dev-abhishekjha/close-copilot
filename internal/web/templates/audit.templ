@@ -4,89 +4,55 @@ package templates
 // are untrusted JSON and render as text only.
 templ Audit(p AuditPage) {
 	@Base(Layout{Title: "Audit log", User: p.User, Role: p.Role, CSRFToken: p.CSRFToken}) {
-		<section class="card" id="audit">
-			<h1>Audit log</h1>
-			<form method="get" action="/audit" class="filters">
-				<label>
-					Actor
-					<select name="actor">
-						<option value="">any</option>
-						for _, a := range p.Actors {
-							<option value={ a } selected?={ a == p.SelActor }>{ a }</option>
+		<div id="audit" class="audit-page">
+			@PageHeader(PageHeaderProps{Title: "Audit log", Subtitle: "Every tool call and decision, newest first.", Actions: auditActions(p.ExportURL)})
+			@Card(CardProps{Title: "Filters"}) {
+				<form method="get" action="/audit" class="audit-filters">
+					@SelectField(FieldProps{ID: "audit-actor", Name: "actor", Label: "Actor", Value: p.SelActor, Options: filterOptions(p.Actors)})
+					@SelectField(FieldProps{ID: "audit-server", Name: "server", Label: "Server", Value: p.SelServer, Options: filterOptions(p.Servers)})
+					@SelectField(FieldProps{ID: "audit-tool", Name: "tool", Label: "Tool", Value: p.SelTool, Options: filterOptions(p.Tools)})
+					@Field(FieldProps{ID: "audit-from", Name: "from", Label: "From", Value: p.From, Placeholder: "YYYY-MM-DD", Attrs: map[string]any{"pattern": datePattern}})
+					@Field(FieldProps{ID: "audit-to", Name: "to", Label: "To", Value: p.To, Placeholder: "YYYY-MM-DD", Attrs: map[string]any{"pattern": datePattern}})
+					@Button(ButtonProps{Label: "Filter", Type: "submit", Icon: "filter"})
+				</form>
+				if len(p.Chips) > 0 {
+					<ul class="audit-chips" aria-label="Active filters">
+						for _, c := range p.Chips {
+							<li>
+								<a class="audit-chip" href={ templ.SafeURL(c.RemoveURL) }>
+									<span>{ c.Label }: { c.Value }</span>
+									<span aria-hidden="true">×</span>
+									<span class="visually-hidden">remove filter</span>
+								</a>
+							</li>
 						}
-					</select>
-				</label>
-				<label>
-					Server
-					<select name="server">
-						<option value="">any</option>
-						for _, a := range p.Servers {
-							<option value={ a } selected?={ a == p.SelServer }>{ a }</option>
-						}
-					</select>
-				</label>
-				<label>
-					Tool
-					<select name="tool">
-						<option value="">any</option>
-						for _, a := range p.Tools {
-							<option value={ a } selected?={ a == p.SelTool }>{ a }</option>
-						}
-					</select>
-				</label>
-				<label>
-					From
-					<input type="text" name="from" value={ p.From } placeholder="YYYY-MM-DD"/>
-				</label>
-				<label>
-					To
-					<input type="text" name="to" value={ p.To } placeholder="YYYY-MM-DD"/>
-				</label>
-				<button type="submit">Filter</button>
-			</form>
-			if len(p.Rows) == 0 {
-				<p>No audit entries match.</p>
-			} else {
-				<table class="audit">
-					<thead>
-						<tr>
-							<th>Time (UTC)</th>
-							<th>Actor</th>
-							<th>Server</th>
-							<th>Tool</th>
-							<th>Arguments</th>
-							<th>Rows</th>
-							<th>Latency (ms)</th>
-							<th>Error</th>
-						</tr>
-					</thead>
-					<tbody>
-						for _, r := range p.Rows {
-							<tr class="audit-row">
-								<td class="time">{ r.Time }</td>
-								<td class="actor">{ r.Actor }</td>
-								<td class="server">{ r.Server }</td>
-								<td class="tool">{ r.Tool }</td>
-								<td class="args">
-									<code>{ r.ArgsShort }</code>
-									if r.Truncated {
-										<details>
-											<summary>full</summary>
-											<code>{ r.ArgsFull }</code>
-										</details>
-									}
-								</td>
-								<td class="count">{ r.ResultCount }</td>
-								<td class="latency">{ r.Latency }</td>
-								<td class="error">{ r.Error }</td>
-							</tr>
-						}
-					</tbody>
-				</table>
+						<li><a class="audit-clear" href={ templ.SafeURL(p.ClearURL) }>Clear all</a></li>
+					</ul>
+				}
 			}
+			<div class="audit-table">
+				@DataTable(TableProps{
+					Caption: "Audit log", Columns: auditColumns(), Rows: auditRows(p.Rows), Dense: true,
+					EmptyTitle: "No audit entries match.", EmptyBody: "Try a wider date range or clear the filters.",
+				})
+			</div>
 			if p.OlderURL != "" {
 				<p><a class="older" href={ templ.SafeURL(p.OlderURL) }>Older</a></p>
 			}
-		</section>
+		</div>
+	}
+}
+
+templ auditActions(exportURL string) {
+	@Button(ButtonProps{Label: "Export CSV", Variant: "secondary", Icon: "download", Href: exportURL})
+}
+
+templ auditArgs(r AuditRow) {
+	<code>{ r.ArgsShort }</code>
+	if r.Truncated {
+		<details>
+			<summary>full</summary>
+			<code>{ r.ArgsFull }</code>
+		</details>
 	}
 }

@@ -1,1 +1,52 @@
-/* Audit (UI-10). */
+/* Audit and run metrics (UI-10). Tokens only; colours come from tokens.css. */
+.audit-page > * + *, .metrics-page > * + * { margin-top: var(--space-4); }
+.audit-filters { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: flex-end; }
+.audit-filters .ui-field { flex: 0 1 14rem; min-width: 0; margin-bottom: 0; }
+.audit-chips { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-2); margin: var(--space-4) 0 0; padding: 0; align-items: center; }
+.audit-chip {
+  display: inline-flex; gap: var(--space-2); align-items: center; padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-strong); border-radius: var(--radius-pill);
+  background: var(--color-accent-soft); color: var(--color-fg); text-decoration: none; font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+.audit-chip:hover { border-color: var(--color-accent); }
+.audit-clear { font-size: var(--text-sm); }
+.audit-table td.args code { overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--text-xs); }
+.audit-table td.error { color: var(--color-danger); }
+.metrics-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--space-3); }
+.metrics-status { font-size: var(--text-md); }
+.metrics-trace { color: var(--color-fg-muted); overflow-wrap: anywhere; margin: 0; }
+.metrics-links { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.metrics-charts { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.chart { margin: 0; min-width: 0; }
+.chart-title { font-weight: 600; margin-bottom: var(--space-2); }
+.chart-svg { display: block; width: 100%; height: auto; max-width: 40rem; }
+.chart-grid { stroke: var(--color-border); stroke-width: 1; }
+.chart-axis { stroke: var(--color-border-strong); stroke-width: 1; }
+.chart-tick, .chart-xlabel { fill: var(--color-fg-muted); font-size: 10px; font-family: var(--font-sans); }
+.chart-bar.chart-s0, .chart-dot.chart-s0 { fill: var(--color-accent); }
+.chart-bar.chart-s1, .chart-dot.chart-s1 { fill: var(--color-ok); }
+.chart-bar.chart-s2, .chart-dot.chart-s2 { fill: var(--color-warn); }
+.chart-bar.chart-s3, .chart-dot.chart-s3 { fill: var(--color-fg-muted); }
+.chart-line { fill: none; stroke-width: 2; }
+.chart-line.chart-s0 { stroke: var(--color-accent); }
+.chart-line.chart-s1 { stroke: var(--color-ok); }
+.chart-line.chart-s2 { stroke: var(--color-warn); }
+.chart-line.chart-s3 { stroke: var(--color-fg-muted); }
+.chart-legend { list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-4); margin: var(--space-2) 0 0; padding: 0; font-size: var(--text-sm); }
+.chart-key { display: inline-block; width: 0.75rem; height: 0.75rem; border-radius: var(--radius-sm); vertical-align: middle; }
+.chart-k0 { background: var(--color-accent); }
+.chart-k1 { background: var(--color-ok); }
+.chart-k2 { background: var(--color-warn); }
+.chart-k3 { background: var(--color-fg-muted); }
+.chart-data { margin-top: var(--space-2); font-size: var(--text-sm); }
+.chart-data summary { cursor: pointer; color: var(--color-fg-muted); }
+.chart-table { border-collapse: collapse; margin-top: var(--space-2); }
+.chart-table th, .chart-table td { padding: var(--space-1) var(--space-3); border-bottom: 1px solid var(--color-border); text-align: left; }
+@media (min-width: 60rem) {
+  .metrics-charts { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 30rem) {
+  .audit-filters .ui-field { flex-basis: 100%; }
+  .audit-filters .ui-btn { width: 100%; }
+}

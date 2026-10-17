@@ -1,4 +1,8 @@
 package web
 
-// auditRoutes is filled by UI-10; it adds that page's routes here, not in routes.go.
-func (s *Server) auditRoutes() []route { return nil }
+import "net/http"
+
+// auditRoutes adds the audit CSV export; the audit page itself stays in routes.go.
+func (s *Server) auditRoutes() []route {
+	return []route{{http.MethodGet, "/audit/export.csv", checkerOnly, s.auditRoute(s.handleAuditExport)}}
+}
