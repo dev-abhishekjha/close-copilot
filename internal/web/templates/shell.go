@@ -2,6 +2,7 @@ package templates
 
 import (
 	"context"
+	"strings"
 	"sync"
 )
 
@@ -12,8 +13,12 @@ import (
 // NavItem is one sidebar link.
 type NavItem struct {
 	Label, Href, Icon string
+	Key               string // go-to shortcut, e.g. "g r"; empty for none
 	Current           bool
 }
+
+// keyParts splits a key sequence into the keys to show.
+func keyParts(key string) []string { return strings.Fields(key) }
 
 // NavGroup is a titled group of sidebar links. The server leaves out groups
 // with no visible item.
@@ -64,4 +69,19 @@ func ShellFrom(ctx context.Context) (ShellData, bool) {
 	}
 	src.once.Do(func() { src.data = src.build() })
 	return src.data, true
+}
+
+// paletteIndex is the position of the item with href in sd.Nav, counting
+// across groups, so every palette option gets a unique id.
+func paletteIndex(sd ShellData, group, href string) int {
+	n := 0
+	for _, g := range sd.Nav {
+		for _, it := range g.Items {
+			if g.Title == group && it.Href == href {
+				return n
+			}
+			n++
+		}
+	}
+	return n
 }

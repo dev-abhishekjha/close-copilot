@@ -168,7 +168,8 @@ func TestProposalPageControls(t *testing.T) {
 				t.Errorf("status note shown = %v, want %v", got, tc.want.note)
 			}
 			if !tc.want.approve && !tc.want.reject && !tc.want.own {
-				wantNone(t, body, "<dialog", "data-dialog-open", `action="/proposals/`)
+				wantNone(t, body, `action="/proposals/`)
+				wantNone(t, mainContent(t, body), "<dialog", "data-dialog-open")
 			}
 		})
 	}
