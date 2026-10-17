@@ -618,3 +618,7 @@ These are requirements on tickets that already exist. When you spec one of them,
   - **UI and listing:** `/approvals` shows "approved, posting failed; retry by X" while a post is still in flight; `Pending` shows at most 200 rows per status; the misleading `not_pending` message in the unreachable "row became postable" fallback is gone with the pre-read.
   - **Test notes:** the integration test builds its own `itBackend`, not `cmd/agent`'s `approvalsAdapter` (mapping covered by `TestAdaptApprovalErr`); `TestProposalsIntegration/"a committed dismissal is seen under the lock"` would also pass with a plain SELECT (the "status read blocks a dismissal until commit" subtest is the lock proof); `cmd/agent/serve_test.go` fake maps any `GetFinding` error to "not found"; the integration test cleans up through the seeder key (cancel, then delete) because the posting key can't.
   - **Spec note:** the owner approved the revised branch spec (fcbf0cd); `main` briefly held an older text with `approved_by` (0f4233d), superseded.
+- **UI-09 (merged 2026-10-17 as d53c868; regulated; owner review list; G5 and Opus diff review passed):** proposals and approvals UI. Follow-ups, none blocking:
+  - `GET /proposals/{id}` has no company scope, so any signed-in user who knows an id can read it (checker name, rejection reason). Fix together with `Get`, `Pending` and the finding page when per-user scoping lands.
+  - Approve and reject now need JavaScript (`<dialog>`s); routes and JSON API are unchanged.
+  - Unbalanced-row notices all use `role="alert"`; prefer `role="status"`.
