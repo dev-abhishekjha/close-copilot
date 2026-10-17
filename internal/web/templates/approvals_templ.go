@@ -658,9 +658,11 @@ func decisionButtons(r ApprovalRow) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = Button(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)}).Render(ctx, templ_7745c5c3_Buffer)
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
+			if r.Status == "proposed" {
+				templ_7745c5c3_Err = Button(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)}).Render(ctx, templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
 			}
 			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 52, "</div><p class=\"own\" id=\"")
 			if templ_7745c5c3_Err != nil {
@@ -669,7 +671,7 @@ func decisionButtons(r ApprovalRow) templ.Component {
 			var templ_7745c5c3_Var34 string
 			templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.ResolveAttributeValue(ownID(r.ID))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/approvals.templ`, Line: 144, Col: 33}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/web/templates/approvals.templ`, Line: 146, Col: 33}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var34)
 			if templ_7745c5c3_Err != nil {

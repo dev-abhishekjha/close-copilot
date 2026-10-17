@@ -160,7 +160,7 @@ func TestProposalPageControls(t *testing.T) {
 				}
 			}
 			if tc.want.own {
-				wantOwnState(t, body, pid(1))
+				wantOwnState(t, body, pid(1), 2)
 			} else {
 				wantNone(t, body, `own-`+pid(1).String(), "You proposed this")
 			}

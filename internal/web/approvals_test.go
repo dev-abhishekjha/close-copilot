@@ -587,15 +587,16 @@ func buttonsWith(body, attr string) []string {
 	}
 }
 
-// wantOwnState checks the disabled own-proposal state for id: two disabled
-// buttons tied to the reason, the reason, and no control.
-func wantOwnState(t *testing.T, body string, id uuid.UUID) {
+// wantOwnState checks the disabled own-proposal state for id: the given number
+// of disabled buttons (Approve and Reject for a proposed row, Approve only for
+// an approved one) tied to the reason, the reason, and no control.
+func wantOwnState(t *testing.T, body string, id uuid.UUID, buttons int) {
 	t.Helper()
 	own := `own-` + id.String()
 	wantAll(t, body, `id="`+own+`"`, "You proposed this; another checker must decide it.")
 	tags := buttonsWith(body, `aria-describedby="`+own+`"`)
-	if len(tags) != 2 {
-		t.Fatalf("own buttons for %s = %d, want 2", id, len(tags))
+	if len(tags) != buttons {
+		t.Fatalf("own buttons for %s = %d, want %d", id, len(tags), buttons)
 	}
 	for _, tag := range tags {
 		if !strings.Contains(tag, " disabled") || !strings.Contains(tag, `aria-disabled="true"`) || strings.Contains(tag, "data-dialog-open") {
@@ -629,7 +630,7 @@ func TestApprovalsUIButtonsByOwnership(t *testing.T) {
 				}
 			}
 			if tc.own {
-				wantOwnState(t, body, tc.id)
+				wantOwnState(t, body, tc.id, 2)
 			} else {
 				wantNone(t, body, `id="own-`+tc.id.String()+`"`)
 			}
@@ -681,7 +682,7 @@ func TestApprovalsUIServerStillRefuses(t *testing.T) {
 
 	// The page shows only disabled buttons, but a forced post reaches the
 	// backend, which refuses it with the existing 403 and message.
-	wantOwnState(t, ts.get(t, RoleChecker, "/approvals").Body.String(), pid(2))
+	wantOwnState(t, ts.get(t, RoleChecker, "/approvals").Body.String(), pid(2), 2)
 	w := ts.do(t, formPost(ts, RoleChecker, path, nil))
 	if w.Code != http.StatusForbidden || !strings.Contains(w.Body.String(), selfApprovalMsg) || !strings.Contains(w.Body.String(), `role="alert"`) {
 		t.Errorf("forced own approve = %d %s", w.Code, w.Body)
@@ -811,7 +812,7 @@ func TestApprovalsUIRetryRow(t *testing.T) {
 	wantAll(t, body, note, "approved, posting failed; retry by ravi")
 	wantNone(t, body, append(controlHooks(pid(3), "approve"), controlHooks(pid(3), "reject")...)...)
 	wantNone(t, body, `id="own-`+pid(3).String()+`"`)
-	wantOwnState(t, body, pid(4))
+	wantOwnState(t, body, pid(4), 1)
 }
 
 func TestApprovalsUIEmpty(t *testing.T) {

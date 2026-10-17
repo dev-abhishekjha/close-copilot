@@ -139,7 +139,9 @@ templ decisionButtons(r ApprovalRow) {
 	if r.Own {
 		<div class="approvals-buttons">
 			@Button(ButtonProps{Label: "Approve", Variant: "primary", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)})
-			@Button(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)})
+			if r.Status == "proposed" {
+				@Button(ButtonProps{Label: "Reject", Variant: "danger", Size: "sm", Disabled: true, Attrs: ownAttrs(r.ID)})
+			}
 		</div>
 		<p class="own" id={ ownID(r.ID) }>You proposed this; another checker must decide it.</p>
 	} else if r.CanApprove || r.CanReject {
